@@ -229,8 +229,8 @@ class ProductManager(tk.Tk):
                         continue
                         
                     print(f"Successfully fetched feed {feed_name}, parsing XML...")
-                    # Pass root_element_tag to parse_xml_feed
-                    df = parse_xml_feed(root, feed_info['root_element'], feed_info['mapping'])
+                    # Pass root_element_tag and feed_name to parse_xml_feed for specialized processing
+                    df = parse_xml_feed(root, feed_info['root_element'], feed_info['mapping'], feed_name)
                     
                     if df is None or df.empty:
                         print(f"Warning: Empty DataFrame from feed {feed_name}")
@@ -267,8 +267,6 @@ class ProductManager(tk.Tk):
         """Show success message and then the save dialog from the main thread."""
         try:
             print("Merge was successful, preparing to show save dialog")
-            # Show a message box first to confirm processing is complete
-            messagebox.showinfo("Spracovanie dokončené", "Dáta boli úspešne spracované a pripravené na export.")
             
             # Open save dialog directly
             self._open_save_dialog(final_df)
@@ -283,6 +281,7 @@ class ProductManager(tk.Tk):
         try:
             print("Opening save dialog...")
             save_path = filedialog.asksaveasfilename(
+                initialfile="Merged.csv",
                 defaultextension=".csv",
                 filetypes=[("CSV files", "*.csv")],
                 title="Uložiť výsledný CSV súbor"
@@ -294,7 +293,7 @@ class ProductManager(tk.Tk):
                 print("Saving file...")
                 final_df.to_csv(save_path, index=False, encoding='utf-8-sig')  # Use utf-8-sig for BOM
                 print("File saved successfully")
-                messagebox.showinfo("Úspech", f"Súbor bol úspešne uložený do: {save_path}")
+                messagebox.showinfo("Great success!", f"Súbor bol úspešne uložený do: {save_path}")
         except Exception as e:
             print(f"Error in _open_save_dialog: {e}")
             print(traceback.format_exc())

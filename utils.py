@@ -3,7 +3,11 @@ import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
 import json
+import html
+import re
+from bs4 import BeautifulSoup
 from tkinter import filedialog, messagebox
+import unicodedata
 
 def load_config(config_path: str = 'config.json') -> dict:
     """Loads configuration from a JSON file."""
@@ -91,10 +95,183 @@ def fetch_xml_feed(url: str) -> ET.Element:
         messagebox.showwarning("Chyba pri sťahovaní feedu", f"Nepodarilo sa stiahnuť XML feed z {url}. Pokračujem bez neho.\nChyba: {e}")
         return None
 
-def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict) -> pd.DataFrame:
+def process_gastromarket_text(description, category):
+    """
+    Process text content from gastromarket feed:
+    1. Split description on delimiters (▪, -) and format as multiline
+    2. Replace | with / in category path
+    
+    Returns a tuple of (processed_description, processed_category)
+    """
+    processed_description = ""
+    processed_category = ""
+    
+    # Process description
+    if description and isinstance(description, str):
+        print(f"Processing gastromarket description: {len(description)} characters")
+        print(f"Preview: {description[:100]}...")
+        
+        # Normalize unicode characters (like special bullet points)
+        description = unicodedata.normalize('NFKC', description)
+        
+        # Strip all non-printable and control characters first
+        description = ''.join(char for char in description if ord(char) >= 32 or char in '\n\r\t')
+        
+        # Split on common delimiters
+        # First replace the bullet points with a standard marker
+        description = re.sub(r'[▪•●\-■□✓✔]', '###BULLET###', description)
+        # Replace dash at beginning of line or after space
+        description = re.sub(r'(^|\s)-\s', '\1###BULLET###', description)
+        
+        # Split by the marker and clean up
+        if '###BULLET###' in description:
+            parts = description.split('###BULLET###')
+            # Clean parts - remove leading/trailing whitespace and any non-standard characters
+            cleaned_parts = []
+            for part in parts:
+                if part.strip():
+                    # Remove any special characters at the beginning of each line
+                    clean_part = re.sub(r'^[^\w\s]*', '', part.strip())
+                    # Remove control chars and odd unicode characters
+                    clean_part = re.sub(r'[\x00-\x1F\x7F-\x9F\u2028\u2029\ufeff]', '', clean_part)
+                    # Also replace multiple spaces with single space
+                    clean_part = re.sub(r'\s+', ' ', clean_part).strip()
+                    if clean_part:
+                        cleaned_parts.append(clean_part)
+                        
+            processed_description = '\n'.join(cleaned_parts)
+            print(f"Split description into {len(cleaned_parts)} lines")
+        else:
+            # If no bullets found, still clean the text
+            processed_description = re.sub(r'\s+', ' ', description).strip()
+    else:
+        processed_description = ""
+    
+    # Process category
+    if category and isinstance(category, str):
+        # Replace pipe delimiter with slash
+        processed_category = category.replace(" | ", "/")
+        print(f"Processed category: '{category}' -> '{processed_category}'")
+    else:
+        processed_category = ""
+    
+    return (processed_description, processed_category)
+
+def process_forgastro_html(html_content):
+    """
+    Process HTML content from forgastro feed:
+    1. Decode HTML entities
+    2. Extract content from {tab title="popis"} and {tab title="parametre"}
+    3. Parse with BeautifulSoup and extract text
+    
+    Returns a tuple of (long_desc, params_text)
+    """
+    if not html_content or not isinstance(html_content, str):
+        print("HTML content is empty or not a string")
+        return ("", "")
+    
+    print(f"Processing HTML content: {len(html_content)} characters")
+    print(f"Preview of HTML content: {html_content[:150]}...")
+    
+    # Step 1: Decode HTML entities
+    try:
+        decoded_html = html.unescape(html_content)
+        print("Successfully decoded HTML entities")
+        
+        # Step 2: Extract content from specific tabs
+        # Format 1: {tab title="popis"} ... {tab title} or {/tabs}
+        popis_pattern1 = re.compile(r'\{tab title="popis"\}(.*?)(?:\{tab title|\{/tabs\}|$)', re.DOTALL)
+        parametre_pattern1 = re.compile(r'\{tab title="parametre"\}(.*?)(?:\{tab title|\{/tabs\}|$)', re.DOTALL)
+        
+        popis_match = popis_pattern1.search(decoded_html)
+        parametre_match = parametre_pattern1.search(decoded_html)
+        
+        print(f"Found popis tab: {popis_match is not None}")
+        print(f"Found parametre tab: {parametre_match is not None}")
+        
+        popis_content = popis_match.group(1) if popis_match else ""
+        parametre_content = parametre_match.group(1) if parametre_match else ""
+        
+        # If no matches are found, try to check if there are other patterns
+        if not popis_match and not parametre_match:
+            print(f"No standard tabs found, checking for alternative patterns")
+            # Look for any HTML tables or structured content
+            soup_check = BeautifulSoup(decoded_html, 'html.parser')
+            tables = soup_check.find_all('table')
+            print(f"Found {len(tables)} HTML tables")
+        
+        # Step 3: Parse with BeautifulSoup
+        if popis_content:
+            soup_popis = BeautifulSoup(popis_content, 'html.parser')
+            popis_text = soup_popis.get_text(separator=' ', strip=True)
+            print(f"Extracted popis text: {len(popis_text)} characters")
+            print(f"Sample of popis text: {popis_text[:100]}...")
+        else:
+            popis_text = ""
+            print("No popis content found")
+            
+        if parametre_content:
+            soup_params = BeautifulSoup(parametre_content, 'html.parser')
+            
+            # Look for tables in the parameters section
+            tables = soup_params.find_all('table')
+            if tables:
+                print(f"Found {len(tables)} tables in parameters section")
+                # Process the first table (assuming it's the parameters table)
+                param_table = tables[0]
+                rows = param_table.find_all('tr')
+                
+                # Build formatted parameter text
+                param_lines = []
+                
+                # Skip header row (first row) which contains 'Parameter' and 'Hodnota'
+                for row_idx, row in enumerate(rows):
+                    if row_idx == 0:  # Skip header row
+                        print("Skipping header row in parameters table")
+                        continue
+                        
+                    # Extract columns
+                    cols = row.find_all(['td', 'th'])
+                    if len(cols) >= 2:
+                        param_name = cols[0].get_text(strip=True)
+                        param_value = cols[1].get_text(strip=True)
+                        if param_value == "":
+                            continue
+                        
+                        param_line = f"{param_name} {param_value}"
+                        param_lines.append(param_line)
+                        print(f"Added parameter: {param_line}")
+                
+                # Join parameters with line breaks
+                params_text = "\n".join(param_lines)
+            else:
+                # Fallback to regular text extraction if no table is found
+                params_text = soup_params.get_text(separator=' ', strip=True)
+                
+            print(f"Extracted parametre text: {len(params_text)} characters")
+            print(f"Sample of parametre text: {params_text[:100]}...")
+        else:
+            params_text = ""
+            print("No parametre content found")
+        
+        return (popis_text, params_text)
+    except Exception as e:
+        print(f"Error processing HTML content: {e}")
+        print(f"Exception type: {type(e).__name__}")
+        import traceback
+        print(traceback.format_exc())
+        return ("", "")
+
+def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_name: str = None) -> pd.DataFrame:
     """
     Parses XML root element and transforms it into a Pandas DataFrame
     according to the provided mapping and root element tag of the product.
+    
+    Args:
+        root: XML root element
+        root_element_tag: Tag name of products in the feed
+        mapping: Dictionary mapping XML keys to CSV column names
+        feed_name: Name of the feed for specialized processing
     """
     if root is None:
         return pd.DataFrame()
@@ -103,6 +280,11 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict) -> pd
     # Find all elements that represent a single product
     for item in root.findall(f".//{root_element_tag}"):
         row = {}
+        
+        # Special processing for forgastro product descriptions
+        product_desc_html = None
+        product_s_desc = None
+        
         for xml_key, csv_column in mapping.items():
             # If the key is compound (e.g., "images/item/url"), use findall and join values
             if '/' in xml_key:
@@ -114,7 +296,52 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict) -> pd
                     row[csv_column] = None
             else:
                 element = item.find(xml_key)
-                row[csv_column] = element.text.strip() if element is not None and element.text is not None else None
+                element_text = element.text.strip() if element is not None and element.text is not None else None
+                
+                # Store HTML content for specialized processing later
+                if xml_key == "product_desc" and feed_name == "forgastro":
+                    product_desc_html = element_text
+                    # Don't add to row yet, we'll process it specially
+                elif xml_key == "product_s_desc" and feed_name == "forgastro":
+                    product_s_desc = element_text
+                    row[csv_column] = element_text
+                else:
+                    row[csv_column] = element_text
+                    
+        # Apply feed-specific processing based on feed name
+        if feed_name == "forgastro" and product_desc_html:
+            # Forgastro-specific HTML processing
+            long_desc, params_text = process_forgastro_html(product_desc_html)
+            
+            # Map content to appropriate columns
+            if "Dlhý popis" in mapping.values():
+                row["Dlhý popis"] = long_desc
+                
+            # Append parameter text to short description if it exists
+            if "Krátky popis" in mapping.values() and params_text:
+                current_short = row.get("Krátky popis", "")
+                if current_short and current_short.strip():
+                    # Add a blank line between description and parameters for better formatting
+                    row["Krátky popis"] = f"{current_short.strip()}\n{params_text}"
+                else:
+                    row["Krátky popis"] = params_text
+                    
+        elif feed_name == "gastromarket":
+            # Gastromarket-specific text processing
+            description = row.get("Krátky popis", "")
+            category = row.get("Hlavna kategória", "")
+            
+            processed_desc, processed_cat = process_gastromarket_text(description, category)
+            
+            # Update fields with processed values
+            if processed_desc:
+                row["Krátky popis"] = processed_desc
+                
+            if processed_cat:
+                row["Hlavna kategória"] = processed_cat
+            
+        # Set 'Viditeľný' field to '1' for all feed products
+        row["Viditeľný"] = "1"        
         data.append(row)
     
     df = pd.DataFrame(data)
@@ -125,7 +352,7 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict) -> pd
         df[col] = None
         
     # Return DataFrame with only columns defined in mapping
-    return df[list(mapping.values())]
+    return df[list(mapping.values()) + ["Viditeľný"]]
 
 def merge_dataframes(main_df: pd.DataFrame, feed_dfs: list, final_cols: list) -> pd.DataFrame:
     """
