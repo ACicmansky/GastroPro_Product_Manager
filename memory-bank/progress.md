@@ -1,17 +1,20 @@
 # GastroPro Product Manager - Progress
 
 ## Completed Features
-- ✅ Basic application framework with PyQt5
+- ✅ Basic application framework with Tkinter
 - ✅ Configuration management (load/save config)
 - ✅ Local CSV file import functionality
 - ✅ Basic UI components and layout
 - ✅ Output CSV saving functionality
-- ✅ Placeholder for XML feed parsing
+- ✅ XML feed fetching and parsing
+- ✅ Feed-specific data processing (forgastro, gastromarket)
+- ✅ Data merging with multiple feeds (outer join)
+- ✅ Specialized HTML content extraction for product descriptions
+- ✅ Handling special characters and formatting in feeds
+- ✅ Setting "Viditeľný" field to "1" for all imported feed products
 
 ## In Progress
 - 🔄 Category-based product filtering
-- 🔄 XML feed data processing
-- 🔄 Data merging logic
 - 🔄 Error handling improvements
 
 ## Pending

@@ -1,35 +1,41 @@
 # GastroPro Product Manager - Active Context
 
 ## Current Focus
-- Completing core application functionality for CSV and XML data merging
-- Implementing category-based filtering for product selection
-- Creating a user-friendly interface for the entire workflow
-- Ensuring proper data processing and transformation
+- Optimizing product data processing from multiple feed sources
+- Fine-tuning specialized data extraction and formatting
+- Ensuring proper data merging and export functionality
+- Implementing remaining features for complete workflow
 
 ## Recent Changes
-- Initial project setup with basic UI components
-- Configuration management implementation
-- CSV loading and saving functionality
-- Placeholder for XML feed processing
+- Successfully implemented XML feed fetching and parsing for multiple vendors
+- Added specialized processing for forgastro feed HTML content extraction
+- Implemented gastromarket feed text processing for bullet points and categories
+- Modified merge operation to use outer join to include all products
+- Added automatic "Viditeľný" field setting to "1" for all feed products
+- Enhanced HTML parsing with BeautifulSoup to extract tab content
+- Improved special character handling and text formatting
+- Fixed issues with parameter table extraction and formatting
 
 ## Next Steps
 1. Implement category selection functionality from local CSV
-2. Complete XML feed parsing and data extraction
-3. Create data merging logic between CSV and XML sources
-4. Enhance error handling and user feedback
-5. Implement data preview functionality
+2. Add support for additional feed sources if needed
+3. Improve error handling and user feedback
+4. Implement data preview functionality
+5. Optimize performance for large datasets
 
 ## Active Decisions
 - Using semicolon (;) as the default CSV delimiter based on common European CSV format
 - Maintaining UTF-8 as the default encoding for all file operations
-- Implementing configuration persistence to remember user preferences
+- Using feed name to trigger specialized content processing routines
+- Using outer join to ensure all products are included in the final output
+- Setting "Viditeľný" field to "1" for all imported products
 - Using Pandas DataFrames as the core data structure for manipulation
 
 ## Current Challenges
-- Need to determine exact mapping between CSV fields and XML feed data
-- Handling potential encoding issues in imported files
+- Handling complex HTML in product descriptions from various feeds
+- Managing special characters and formatting across different feeds
 - Optimizing performance for large datasets
-- Creating intuitive category selection interface
+- Ensuring consistent behavior across multiple feed formats
 
 ## User Experience Considerations
 - Providing clear feedback during data processing operations
