@@ -144,7 +144,7 @@ class ProductManager(QMainWindow):
         self.select_all_button = QPushButton("Prepnúť všetky")
         self.select_all_button.clicked.connect(self.select_all_categories)
         self.select_all_button.setToolTip("Prepnúť všetky kategórie")
-        self.select_all_button.setMaximumWidth(100)
+        self.select_all_button.setMaximumWidth(130)
         
         # Button for filtered categories
         self.toggle_filtered_button = QPushButton("Prepnúť filtrované")
