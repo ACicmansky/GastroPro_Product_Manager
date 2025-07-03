@@ -1,7 +1,7 @@
 # app.py
 import sys
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout,
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QFileDialog, QMessageBox, QListWidget,
     QCheckBox, QListWidgetItem, QDesktopWidget, QFrame, QLineEdit, QProgressBar
 )
@@ -134,12 +134,33 @@ class ProductManager(QMainWindow):
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText("Hľadať kategórie...")
         self.search_bar.textChanged.connect(self.filter_categories)
-        self.select_all_checkbox = QCheckBox("Vybrať všetky kategórie")
-        self.select_all_checkbox.stateChanged.connect(self.toggle_all_categories)
+        
+        # Create horizontal layout for buttons
+        buttons_layout = QHBoxLayout()
+        buttons_layout.setContentsMargins(0, 0, 0, 0)
+        buttons_layout.setAlignment(Qt.AlignLeft)
+        
+        # Replace checkbox with button for selecting all categories
+        self.select_all_button = QPushButton("Prepnúť všetky")
+        self.select_all_button.clicked.connect(self.select_all_categories)
+        self.select_all_button.setToolTip("Prepnúť všetky kategórie")
+        self.select_all_button.setMaximumWidth(100)
+        
+        # Button for filtered categories
+        self.toggle_filtered_button = QPushButton("Prepnúť filtrované")
+        self.toggle_filtered_button.clicked.connect(self.toggle_filtered_categories)
+        self.toggle_filtered_button.setToolTip("Označiť/odznačiť všetky filtrované kategórie")
+        self.toggle_filtered_button.setMaximumWidth(130)
+        
+        # Add buttons to horizontal layout
+        buttons_layout.addWidget(self.select_all_button)
+        buttons_layout.addWidget(self.toggle_filtered_button)
+        buttons_layout.addStretch(1)
+        
         self.category_list = QListWidget()
         filter_layout.addWidget(filter_label)
         filter_layout.addWidget(self.search_bar)
-        filter_layout.addWidget(self.select_all_checkbox)
+        filter_layout.addLayout(buttons_layout)
         filter_layout.addWidget(self.category_list)
         self.layout.addWidget(self.filter_group)
         self.filter_group.setVisible(False)
@@ -168,9 +189,35 @@ class ProductManager(QMainWindow):
         self.load_stylesheet()
 
     def filter_categories(self, text):
+        from rapidfuzz import fuzz
+        
+        # If search text is empty, show all items
+        if not text:
+            for i in range(self.category_list.count()):
+                item = self.category_list.item(i)
+                item.setHidden(False)
+            return
+            
+        # Set the similarity threshold (0-100)
+        # Lower values will match more items but with less precision
+        threshold = 70
+        
         for i in range(self.category_list.count()):
             item = self.category_list.item(i)
-            item.setHidden(text.lower() not in item.text().lower())
+            item_text = item.text()
+            
+            # Calculate similarity scores using different methods
+            # 1. Check if search is a substring (original method)
+            substring_match = text.lower() in item_text.lower()
+            
+            # 2. Check for partial ratio (fuzzy substring matching)
+            partial_score = fuzz.partial_ratio(text.lower(), item_text.lower())
+            
+            # 3. Check for token sort ratio (for word order independence)
+            token_score = fuzz.token_sort_ratio(text.lower(), item_text.lower())
+            
+            # Hide item if it doesn't meet any of the match criteria
+            item.setHidden(not (substring_match or partial_score >= threshold or token_score >= threshold))
 
     def _reset_ui(self):
         self.main_df = None
@@ -215,12 +262,45 @@ class ProductManager(QMainWindow):
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
             item.setCheckState(Qt.Checked)
             self.category_list.addItem(item)
-        self.select_all_checkbox.setChecked(True)
-
-    def toggle_all_categories(self, state):
+        # Select all categories by default
         for i in range(self.category_list.count()):
             item = self.category_list.item(i)
-            item.setCheckState(Qt.Checked if state == Qt.Checked else Qt.Unchecked)
+            item.setCheckState(Qt.Checked)
+
+    def select_all_categories(self):
+        # Toggle between selecting all and deselecting all
+        all_checked = True
+        
+        # Check if all items are already checked
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            if item.checkState() != Qt.Checked:
+                all_checked = False
+                break
+        
+        # Set all items to the opposite state
+        new_state = Qt.Unchecked if all_checked else Qt.Checked
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            item.setCheckState(new_state)
+            
+    def toggle_filtered_categories(self):
+        # Determine the state to apply based on the first visible item
+        new_state = Qt.Unchecked
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            if not item.isHidden():
+                # If first visible item is unchecked, we'll check all visible items
+                # Otherwise, we'll uncheck all visible items
+                if item.checkState() == Qt.Unchecked:
+                    new_state = Qt.Checked
+                break
+                
+        # Apply the determined state to all visible items
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            if not item.isHidden():
+                item.setCheckState(new_state)
 
     def generate_and_export_csv(self):
         if self.main_df is None:
