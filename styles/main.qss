@@ -1,0 +1,123 @@
+/* styles/main.qss */
+
+/* General Window Styling */
+QMainWindow {
+    background-color: #f0f0f0; /* Light gray background */
+}
+
+QWidget#central_widget {
+    background-color: rgba(255, 255, 255, 0.8);
+    border-radius: 10px;
+}
+
+/* --- Glassmorphism Effect --- */
+.glass {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Dark Mode --- */
+QMainWindow.dark {
+    background-color: #121212;
+}
+
+QWidget#central_widget.dark {
+    background-color: rgba(28, 28, 28, 0.8);
+}
+
+.glass.dark {
+    background: rgba(10, 10, 10, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+QLabel.dark {
+    color: #e0e0e0;
+}
+
+PUSHButton.dark {
+    background-color: #222;
+    color: #e0e0e0;
+}
+
+PUSHButton.dark:hover {
+    background-color: #333;
+}
+
+PUSHButton.dark:pressed {
+    background-color: #444;
+}
+
+QCheckBox.dark {
+    color: #e0e0e0;
+}
+
+QListWidget.dark {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border: 1px solid #333;
+}
+
+QProgressBar.dark {
+    border: 1px solid #333;
+}
+
+QProgressBar::chunk.dark {
+    background-color: #0099ff;
+}
+
+/* --- Labels --- */
+QLabel {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+/* --- Buttons --- */
+PUSHButton {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+    color: #fff;
+    background-color: #007bff; /* Primary blue */
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    min-width: 100px;
+    transition: background-color 0.3s ease;
+}
+
+PUSHButton:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+PUSHButton:pressed {
+    background-color: #004085; /* Even darker blue when pressed */
+}
+
+/* --- Checkbox --- */
+QCheckBox {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+}
+
+/* --- List Widget --- */
+QListWidget {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* --- Progress Bar --- */
+QProgressBar {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    text-align: center;
+}
+
+QProgressBar::chunk {
+    background-color: #007bff;
+    width: 10px; 
+    margin: 0.5px;
+}

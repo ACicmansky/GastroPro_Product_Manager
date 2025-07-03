@@ -1,16 +1,34 @@
 # app.py
 import sys
-import pandas as pd
-import threading
-import traceback
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QApplication, QMainWindow, QWidget, QVBoxLayout,
     QPushButton, QLabel, QFileDialog, QMessageBox, QListWidget,
-    QCheckBox, QListWidgetItem, QDesktopWidget, QProgressDialog
+    QCheckBox, QListWidgetItem, QDesktopWidget, QFrame, QLineEdit, QProgressBar
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 
 from utils import load_config, fetch_xml_feed, parse_xml_feed, merge_dataframes, load_csv_data
+
+class DropArea(QFrame):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setFrameShape(QFrame.StyledPanel)
+        self.label = QLabel("Presuňte CSV súbor sem alebo kliknite na tlačidlo nižšie")
+        self.label.setAlignment(Qt.AlignCenter)
+        layout = QVBoxLayout()
+        layout.addWidget(self.label)
+        self.setLayout(layout)
+        self.setAcceptDrops(True)
+
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        for url in event.mimeData().urls():
+            file_path = url.toLocalFile()
+            if file_path.endswith('.csv'):
+                self.parent().load_csv_file(file_path)
 
 class Worker(QObject):
     finished = pyqtSignal()
@@ -67,6 +85,7 @@ class ProductManager(QMainWindow):
         self.main_df = None
         self.categories = []
         self.config = load_config()
+        self.dark_mode = False
 
         if not self.config:
             QMessageBox.critical(self, "Chyba konfigurácie", "Nepodarilo sa načítať konfiguračný súbor. Aplikácia sa ukončí.")
@@ -74,6 +93,14 @@ class ProductManager(QMainWindow):
         
         self.init_ui()
         self.center_window()
+        self.load_stylesheet()
+
+    def load_stylesheet(self):
+        try:
+            with open('styles/main.qss', 'r') as f:
+                self.setStyleSheet(f.read())
+        except FileNotFoundError:
+            print("Stylesheet not found.")
 
     def center_window(self):
         qr = self.frameGeometry()
@@ -83,31 +110,44 @@ class ProductManager(QMainWindow):
 
     def init_ui(self):
         self.central_widget = QWidget()
+        self.central_widget.setObjectName("central_widget")
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
 
+        # --- Dark Mode Toggle ---
+        self.dark_mode_button = QPushButton("Dark Mode")
+        self.dark_mode_button.clicked.connect(self.toggle_dark_mode)
+        self.layout.addWidget(self.dark_mode_button)
+
         # --- CSV Upload ---
-        upload_group = QWidget()
-        upload_layout = QHBoxLayout(upload_group)
-        self.upload_label = QLabel("Nebol nahraný žiadny súbor.")
+        self.drop_area = DropArea(self)
+        self.layout.addWidget(self.drop_area)
         upload_button = QPushButton("Vybrať CSV")
-        upload_button.clicked.connect(self.load_csv_file)
-        upload_layout.addWidget(self.upload_label)
-        upload_layout.addWidget(upload_button)
-        self.layout.addWidget(upload_group)
+        upload_button.clicked.connect(self.select_csv_file)
+        self.layout.addWidget(upload_button)
 
         # --- Category Filter ---
         self.filter_group = QWidget()
+        self.filter_group.setObjectName("glass")
         filter_layout = QVBoxLayout(self.filter_group)
         filter_label = QLabel("Vyberte kategórie na export:")
+        self.search_bar = QLineEdit()
+        self.search_bar.setPlaceholderText("Hľadať kategórie...")
+        self.search_bar.textChanged.connect(self.filter_categories)
         self.select_all_checkbox = QCheckBox("Vybrať všetky kategórie")
         self.select_all_checkbox.stateChanged.connect(self.toggle_all_categories)
         self.category_list = QListWidget()
         filter_layout.addWidget(filter_label)
+        filter_layout.addWidget(self.search_bar)
         filter_layout.addWidget(self.select_all_checkbox)
         filter_layout.addWidget(self.category_list)
         self.layout.addWidget(self.filter_group)
         self.filter_group.setVisible(False)
+
+        # --- Progress Bar ---
+        self.progress_bar = QProgressBar()
+        self.layout.addWidget(self.progress_bar)
+        self.progress_bar.setVisible(False)
 
         # --- Export Button ---
         self.generate_button = QPushButton("Generovať a Exportovať CSV")
@@ -115,17 +155,36 @@ class ProductManager(QMainWindow):
         self.layout.addWidget(self.generate_button)
         self.generate_button.setVisible(False)
 
+    def toggle_dark_mode(self):
+        self.dark_mode = not self.dark_mode
+        if self.dark_mode:
+            self.central_widget.setObjectName("central_widget dark")
+            self.filter_group.setObjectName("glass dark")
+            self.dark_mode_button.setText("Light Mode")
+        else:
+            self.central_widget.setObjectName("central_widget")
+            self.filter_group.setObjectName("glass")
+            self.dark_mode_button.setText("Dark Mode")
+        self.load_stylesheet()
+
+    def filter_categories(self, text):
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            item.setHidden(text.lower() not in item.text().lower())
+
     def _reset_ui(self):
         self.main_df = None
-        self.upload_label.setText("Zatiaľ nebol nahratý žiadny súbor.")
+        self.drop_area.label.setText("Presuňte CSV súbor sem alebo kliknite na tlačidlo nižšie")
         self.filter_group.setVisible(False)
         self.generate_button.setVisible(False)
+        self.progress_bar.setVisible(False)
 
-    def load_csv_file(self):
+    def select_csv_file(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte CSV súbor", "", "CSV files (*.csv)")
-        if not file_path:
-            return
+        if file_path:
+            self.load_csv_file(file_path)
 
+    def load_csv_file(self, file_path):
         try:
             self.main_df = load_csv_data(file_path)
             
@@ -133,7 +192,7 @@ class ProductManager(QMainWindow):
                 self._reset_ui()
                 return
 
-            self.upload_label.setText(f"Nahraný súbor: {file_path.split('/')[-1]}")
+            self.drop_area.label.setText(f"Nahraný súbor: {file_path.split('/')[-1]}")
             
             if 'Hlavna kategória' in self.main_df.columns:
                 self.categories = sorted(self.main_df['Hlavna kategória'].dropna().unique().tolist())
@@ -147,6 +206,7 @@ class ProductManager(QMainWindow):
         except Exception as e:
             QMessageBox.critical(self, "Chyba načítania", f"Nepodarilo sa načítať CSV súbor.\nChyba: {e}")
             self._reset_ui()
+
 
     def populate_category_list(self):
         self.category_list.clear()
@@ -177,10 +237,8 @@ class ProductManager(QMainWindow):
             QMessageBox.warning(self, "Bez výberu", "Vyberte aspoň jednu kategóriu na export.")
             return
 
-        self.progress_dialog = QProgressDialog("Spracovávam dáta...", "Zrušiť", 0, 0, self)
-        self.progress_dialog.setWindowModality(Qt.WindowModal)
-        self.progress_dialog.setAutoClose(True)
-        self.progress_dialog.show()
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setRange(0, 0) # Indeterminate progress
 
         self.thread = QThread()
         self.worker = Worker(self.main_df, selected_categories, self.config)
@@ -197,11 +255,11 @@ class ProductManager(QMainWindow):
         self.thread.start()
         self.generate_button.setEnabled(False)
         self.thread.finished.connect(lambda: self.generate_button.setEnabled(True))
-        self.thread.finished.connect(lambda: self.progress_dialog.close())
+        self.thread.finished.connect(lambda: self.progress_bar.setVisible(False))
 
 
     def update_progress(self, message):
-        self.progress_dialog.setLabelText(message)
+        self.progress_bar.setFormat(message)
 
     def show_error_message(self, error_info):
         title, message = error_info
