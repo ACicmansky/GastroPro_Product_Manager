@@ -101,6 +101,35 @@ def process_forgastro(root, output_file):
     df.to_csv(output_file, index=False, encoding='utf-8')
     print(f"Saved {len(df)} Forgastro products to {output_file}")
 
+def process_csv_file(input_file, output_file):
+    """Process main CSV file and extract name and category columns"""
+    try:
+        print(f"Processing CSV file: {input_file}")
+        df = pd.read_csv(input_file, encoding='cp1250', sep=';')
+        
+        # Check if required columns exist
+        if "Názov tovaru" not in df.columns or "Hlavna kategória" not in df.columns:
+            print(f"Error: Required columns not found in {input_file}")
+            print(f"Available columns: {df.columns.tolist()}")
+            return False
+        
+        # Extract required columns
+        filtered_df = df[["Názov tovaru", "Hlavna kategória"]].copy()
+        
+        # Rename columns to match our standard format
+        filtered_df.rename(columns={"Názov tovaru": "name", "Hlavna kategória": "category"}, inplace=True)
+        
+        # Save to CSV
+        filtered_df.to_csv(output_file, index=False, encoding='utf-8')
+        print(f"Saved {len(filtered_df)} rows to {output_file}")
+        return True
+        
+    except Exception as e:
+        print(f"Error processing CSV file {input_file}: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
 def main():
     """Main function to process both feeds and generate clean CSV files"""
     # Load configuration
@@ -140,8 +169,23 @@ def main():
     # Process Forgastro data and save to CSV
     process_forgastro(forgastro_root, forgastro_output)
     
+    # Check if main CSV file exists and process it
+    main_csv_file = "scripts/export-products.csv"
+    filtered_output = "scripts/gastropro.csv"
+    csv_processed = False
+    
+    if os.path.exists(main_csv_file):
+        print(f"\nFound main CSV file: {main_csv_file}")
+        csv_processed = process_csv_file(main_csv_file, filtered_output)
+    
     print("\nCleaning process completed successfully!")
     print(f"Output files: {gastromarket_output}, {forgastro_output}")
+    
+    if csv_processed:
+        print(f", {filtered_output}")
+    else:
+        print(f"\nNote: {main_csv_file} was not found or could not be processed.")
+    
 
 if __name__ == "__main__":
     main()
