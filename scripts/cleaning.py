@@ -1,0 +1,147 @@
+# cleaning.py
+# Script to read both feeds and clean them of extra data
+# Only keeps specified fields for each feed
+
+import os
+import sys
+import requests
+import xml.etree.ElementTree as ET
+import pandas as pd
+
+# Add parent directory to path so we can import utils
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import load_config
+
+# Direct implementation of fetch_xml_feed to ensure proper error handling
+def fetch_feed(url):
+    """Fetch XML feed from URL and return the root element"""
+    print(f"Fetching XML feed from {url}...")
+    try:
+        response = requests.get(url, timeout=60)
+        print(f"Response status: {response.status_code}")
+        
+        if response.status_code != 200:
+            print(f"Error: Received status code {response.status_code}")
+            return None
+            
+        # Try to parse the XML
+        try:
+            root = ET.fromstring(response.content)
+            return root
+        except ET.ParseError as e:
+            print(f"XML parsing error: {e}")
+            print(f"First 500 chars of content: {response.content[:500]}")
+            return None
+            
+    except requests.RequestException as e:
+        print(f"Request error: {e}")
+        return None
+
+
+
+def process_gastromarket(root, output_file):
+    """Process GastroMarket feed and extract MENO and KATEGORIA_KOMPLET tags"""
+    if root is None:
+        return
+    
+    # Find all PRODUKT elements
+    products = root.findall('.//PRODUKT')
+    print(f"Found {len(products)} products in GastroMarket feed")
+    
+    # Create a list to hold the cleaned data
+    cleaned_data = []
+    
+    # Extract required fields
+    for product in products:
+        name_element = product.find('MENO')
+        category_element = product.find('KATEGORIA_KOMPLET')
+        
+        name = name_element.text.strip() if name_element is not None and name_element.text else ""
+        category = category_element.text.strip() if category_element is not None and category_element.text else ""
+        
+        if name or category:  # Only add if at least one field has data
+            cleaned_data.append({
+                'name': name,
+                'category': category
+            })
+    
+    # Convert to DataFrame and save as CSV
+    df = pd.DataFrame(cleaned_data)
+    df.to_csv(output_file, index=False, encoding='utf-8')
+    print(f"Saved {len(df)} GastroMarket products to {output_file}")
+
+def process_forgastro(root, output_file):
+    """Process Forgastro feed and extract product_name and category tags"""
+    if root is None:
+        return
+    
+    # Find all product elements
+    products = root.findall('.//product')
+    print(f"Found {len(products)} products in Forgastro feed")
+    
+    # Create a list to hold the cleaned data
+    cleaned_data = []
+    
+    # Extract required fields
+    for product in products:
+        name_element = product.find('product_name')
+        category_element = product.find('category')
+        
+        name = name_element.text.strip() if name_element is not None and name_element.text else ""
+        category = category_element.text.strip() if category_element is not None and category_element.text else ""
+        
+        if name or category:  # Only add if at least one field has data
+            cleaned_data.append({
+                'name': name,
+                'category': category
+            })
+    
+    # Convert to DataFrame and save as CSV
+    df = pd.DataFrame(cleaned_data)
+    df.to_csv(output_file, index=False, encoding='utf-8')
+    print(f"Saved {len(df)} Forgastro products to {output_file}")
+
+def main():
+    """Main function to process both feeds and generate clean CSV files"""
+    # Load configuration
+    try:
+        config = load_config()
+        print("Config loaded successfully")
+    except Exception as e:
+        print(f"Error loading config: {e}")
+        import traceback
+        traceback.print_exc()
+        return
+    
+    # Check if feeds are configured
+    if 'xml_feeds' not in config or 'gastromarket' not in config['xml_feeds'] or 'forgastro' not in config['xml_feeds']:
+        print("Required feed configurations not found")
+        return
+    
+    # Process GastroMarket feed
+    gastromarket_config = config['xml_feeds']['gastromarket']
+    gastromarket_url = gastromarket_config['url']
+    gastromarket_output = "scripts/gastromarket.csv"
+    
+    # Fetch XML directly from URL
+    gastromarket_root = fetch_feed(gastromarket_url)
+    
+    # Process GastroMarket data and save to CSV
+    process_gastromarket(gastromarket_root, gastromarket_output)
+    
+    # Process Forgastro feed
+    forgastro_config = config['xml_feeds']['forgastro']
+    forgastro_url = forgastro_config['url']
+    forgastro_output = "scripts/forgastro.csv"
+    
+    # Fetch XML directly from URL
+    forgastro_root = fetch_feed(forgastro_url)
+    
+    # Process Forgastro data and save to CSV
+    process_forgastro(forgastro_root, forgastro_output)
+    
+    print("\nCleaning process completed successfully!")
+    print(f"Output files: {gastromarket_output}, {forgastro_output}")
+
+if __name__ == "__main__":
+    main()

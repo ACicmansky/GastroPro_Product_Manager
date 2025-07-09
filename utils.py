@@ -3,10 +3,11 @@ import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
 import json
-import html
 import re
+import html
 from bs4 import BeautifulSoup
 import unicodedata
+import os
 
 def load_config(config_path: str = 'config.json') -> dict:
     """Loads configuration from a JSON file."""
@@ -17,6 +18,22 @@ def load_config(config_path: str = 'config.json') -> dict:
         raise FileNotFoundError(f"Konfiguračný súbor '{config_path}' nebol nájdený.")
     except json.JSONDecodeError as e:
         raise ValueError(f"Chyba pri parsovaní súboru '{config_path}'. Skontrolujte syntax JSON.") from e
+
+
+def load_category_mappings(mappings_path: str = 'categories.json') -> dict:
+    """Loads category mappings from a JSON file."""
+    try:
+        if os.path.exists(mappings_path):
+            with open(mappings_path, 'r', encoding='utf-8') as f:
+                mappings = json.load(f)
+                print(f"Loaded {sum(len(feed_mappings) for feed_mappings in mappings.values())} category mappings from {mappings_path}")
+                return mappings
+        else:
+            print(f"Category mappings file '{mappings_path}' not found, using default category processing")
+            return {}
+    except Exception as e:
+        print(f"Error loading category mappings: {e}")
+        return {}
 
 
 def load_csv_data(file_path: str) -> pd.DataFrame:
@@ -64,11 +81,12 @@ def fetch_xml_feed(url: str) -> ET.Element:
         print(f"Request error for {url}: {e}")
         raise e
 
-def process_gastromarket_text(description, category):
+def process_gastromarket_text(description, category, category_mappings=None):
     """
     Process text content from gastromarket feed:
     1. Split description on delimiters (▪, -) and format as multiline
-    2. Replace | with / in category path
+    2. Apply category mapping from categories.json if available
+    3. Otherwise replace | with / in category path as fallback
     
     Returns a tuple of (processed_description, processed_category)
     """
@@ -116,15 +134,53 @@ def process_gastromarket_text(description, category):
     else:
         processed_description = ""
     
-    # Process category
+    # Process category with mapping if available
     if category and isinstance(category, str):
-        # Replace pipe delimiter with slash
-        processed_category = category.replace(" | ", "/")
-        print(f"Processed category: '{category}' -> '{processed_category}'")
+        # First try to find a mapping in the category mappings file
+        if category_mappings and 'gastromarket' in category_mappings:
+            found_mapping = False
+            for mapping in category_mappings['gastromarket']:
+                if mapping['oldCategory'] == category:
+                    processed_category = mapping['newCategory']
+                    found_mapping = True
+                    print(f"Mapped category using categories.json: '{category}' -> '{processed_category}'")
+                    break
+            
+            if not found_mapping:
+                # Fallback to default processing if no mapping found
+                processed_category = category.replace(" | ", "/")
+                print(f"No mapping found in categories.json, using default: '{category}' -> '{processed_category}'")
+        else:
+            # Fallback to original processing if no mappings available
+            processed_category = category.replace(" | ", "/")
+            print(f"No category mappings available, using default: '{category}' -> '{processed_category}'")
     else:
         processed_category = ""
     
     return (processed_description, processed_category)
+
+def process_forgastro_category(category, category_mappings=None):
+    """
+    Process category from forgastro feed using category mappings.
+    Returns the mapped category if found, or the original otherwise.
+    """
+    if not category or not isinstance(category, str):
+        return ""
+        
+    # Check if we have mappings for forgastro feed
+    if category_mappings and 'forgastro' in category_mappings:
+        for mapping in category_mappings['forgastro']:
+            if mapping['oldCategory'] == category:
+                mapped_category = mapping['newCategory']
+                print(f"Mapped forgastro category: '{category}' -> '{mapped_category}'")
+                return mapped_category
+                
+        print(f"No mapping found for forgastro category: '{category}'")
+    else:
+        print(f"No forgastro category mappings available, using original: '{category}'")
+        
+    return category
+
 
 def process_forgastro_html(html_content):
     """
@@ -244,6 +300,9 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
     """
     if root is None:
         return pd.DataFrame()
+        
+    # Load category mappings
+    category_mappings = load_category_mappings()
 
     data = []
     # Find all elements that represent a single product
@@ -278,29 +337,35 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
                     row[csv_column] = element_text
                     
         # Apply feed-specific processing based on feed name
-        if feed_name == "forgastro" and product_desc_html:
-            # Forgastro-specific HTML processing
-            long_desc, params_text = process_forgastro_html(product_desc_html)
-            
-            # Map content to appropriate columns
-            if "Dlhý popis" in mapping.values():
-                row["Dlhý popis"] = long_desc
+        if feed_name == "forgastro":
+            # Process category mapping for forgastro
+            if "Hlavna kategória" in row and row["Hlavna kategória"]:
+                row["Hlavna kategória"] = process_forgastro_category(row["Hlavna kategória"], category_mappings)
                 
-            # Append parameter text to short description if it exists
-            if "Krátky popis" in mapping.values() and params_text:
-                current_short = row.get("Krátky popis", "")
-                if current_short and current_short.strip():
-                    # Add a blank line between description and parameters for better formatting
-                    row["Krátky popis"] = f"{current_short.strip()}\n{params_text}"
-                else:
-                    row["Krátky popis"] = params_text
+            # Process HTML content if available
+            if product_desc_html:
+                # Forgastro-specific HTML processing
+                long_desc, params_text = process_forgastro_html(product_desc_html)
+                
+                # Map content to appropriate columns
+                if "Dlhý popis" in mapping.values():
+                    row["Dlhý popis"] = long_desc
+                    
+                # Append parameter text to short description if it exists
+                if "Krátky popis" in mapping.values() and params_text:
+                    current_short = row.get("Krátky popis", "")
+                    if current_short and current_short.strip():
+                        # Add a blank line between description and parameters for better formatting
+                        row["Krátky popis"] = f"{current_short.strip()}\n{params_text}"
+                    else:
+                        row["Krátky popis"] = params_text
                     
         elif feed_name == "gastromarket":
             # Gastromarket-specific text processing
             description = row.get("Krátky popis", "")
             category = row.get("Hlavna kategória", "")
             
-            processed_desc, processed_cat = process_gastromarket_text(description, category)
+            processed_desc, processed_cat = process_gastromarket_text(description, category, category_mappings)
             
             # Update fields with processed values
             if processed_desc:

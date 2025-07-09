@@ -54,11 +54,6 @@ class Worker(QObject):
             self.progress.emit("Filtering main CSV...")
             filtered_df = self.main_df[self.main_df['Hlavna kategória'].isin(self.selected_categories)].copy()
 
-            if filtered_df.empty:
-                self.error.emit(("Prázdny výsledok", "Žiadne produkty nespĺňajú vybrané kritériá."))
-                self.finished.emit()
-                return
-
             self.progress.emit(f"Starting to fetch {len(self.config['xml_feeds'])} XML feeds...")
             feed_dataframes = []
             for feed_name, feed_info in self.config['xml_feeds'].items():
@@ -295,10 +290,6 @@ class ProductManager(QMainWindow):
             if item.checkState() == Qt.Checked:
                 selected_categories.append(item.text())
 
-        if not selected_categories:
-            QMessageBox.warning(self, "Bez výberu", "Vyberte aspoň jednu kategóriu na export.")
-            return
-
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0) # Indeterminate progress
 
@@ -328,7 +319,7 @@ class ProductManager(QMainWindow):
         QMessageBox.critical(self, title, message)
 
     def save_final_csv(self, final_df):
-        save_path, _ = QFileDialog.getSaveFileName(self, "Uložiť výsledný CSV súbor", "Merged.csv", "CSV files (*.csv)")
+        save_path, _ = QFileDialog.getSaveFileName(self, "Uložiť výsledný CSV súbor", QStandardPaths.writableLocation(QStandardPaths.DownloadLocation) + "/Merged.csv", "CSV files (*.csv)")
         if save_path:
             try:
                 # First try cp1250 with character replacement

@@ -1,0 +1,2542 @@
+{
+    "gastromarket": [
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice oceľové",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Oceľové panvice"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice oceľové smaltované",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Smaltované panvice"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Hrnce a rajnice | Cedníky na varenie cestovín",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Cedníky a vložky na cestoviny"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 700 | Plynové šporáky BERTO´s",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sporáky"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 900 | Sporáky BERTO´s 900",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sporáky"
+        },
+        {
+            "oldCategory": "Varná technológia | STALGAST 700 | Plynové šporáky",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sporáky"
+        },
+        {
+            "oldCategory": "Bar a káva | Chladiace stoly na nápoje",
+            "newCategory": "Gastro nábytok/Chladiace stoly/Stoly na nápoje"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 700 | Elektrické šporáky BERTO´s",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sporáky"
+        },
+        {
+            "oldCategory": "Bar a káva | Mlynčeky a nádoby na ľad",
+            "newCategory": "Bar a káva/Príslušenstvo/Nádoby a kliešte na ľad"
+        },
+        {
+            "oldCategory": "Stolový inventár | Mlynčeky na soľ a korenie",
+            "newCategory": "Stolovanie a servírovanie/Dochucovanie/Mlynčeky na soľ a korenie"
+        },
+        {
+            "oldCategory": "Umývacie zariadenia | Umývacie batérie a sprchy | Senzorové batérie",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Senzorové batérie"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Konvektomaty ICON",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Konvektomaty"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Konvektomaty COMPACT",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Konvektomaty"
+        },
+        {
+            "oldCategory": "Umývací program | Zmäkčovače vody",
+            "newCategory": "Hygiena a údržba/Úprava vody/Zmäkčovače vody"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 600 EKO | Bain-Marie a varič cestovín",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Vodné kúpele (Bain-Marie)"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Bain-Marie - vodné kúpele",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Vodné kúpele (Bain-Marie)"
+        },
+        {
+            "oldCategory": "Bar a káva | Barové príslušenstvo",
+            "newCategory": "Bar a káva/Barové pomôcky a príslušenstvo"
+        },
+        {
+            "oldCategory": "Chladiaci program | Presklené chladničky",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladničky s presklenými dverami"
+        },
+        {
+            "oldCategory": "Umývací program | Umývacie batérie a sprchy | Stolové batérie",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Stolové batérie"
+        },
+        {
+            "oldCategory": "Umývacie zariadenia | Umývacie batérie a sprchy | Stolové batérie",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Stolové batérie"
+        },
+        {
+            "oldCategory": "Chladiaci program | Biele chladničky a mrazničky EKO",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladničky s plnými dverami"
+        },
+        {
+            "oldCategory": "Vitríny | Stolové chladené vitríny - oblé",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Zmrzlina a pečenie | Šľahačka",
+            "newCategory": "Cukrárenské a pekárske potreby/Príprava šľahačky"
+        },
+        {
+            "oldCategory": "Bar a káva | Výroba sódy",
+            "newCategory": "Bar a káva/Výrobníky sódy"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad na servírovanie | Bridlicové podložky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Servírovacie dosky a podložky"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Nože na kebab",
+            "newCategory": "Pizza a kebab/Príslušenstvo/Nože a príslušenstvo na kebab"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Odkvapkávače a cedníky",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Cedníky a sitá"
+        },
+        {
+            "oldCategory": "Príprava potravín | Formovače na hamburger",
+            "newCategory": "Gastro zariadenia/Spracovanie mäsa/Formovače na hamburgery"
+        },
+        {
+            "oldCategory": "Catering | Chafingy | Chafingy PROFI - Roll-Top",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Chafingy"
+        },
+        {
+            "oldCategory": "Catering | Chafingy | Chafingy EKO",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Chafingy"
+        },
+        {
+            "oldCategory": "Catering | Chafingy | Electrické chafingy",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Elektrické chafingy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Pizza a sushi vitríny",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Pizza a sushi vitríny"
+        },
+        {
+            "oldCategory": "Vitríny | Stolové chladené vitríny - hranaté",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Modulárny výdaj | Chladené výdajné vitríny",
+            "newCategory": "Vitríny a výdaj/Výdajné linky/Chladené moduly"
+        },
+        {
+            "oldCategory": "Catering | Prepravné vozíky | Chladené prepravné vozíky",
+            "newCategory": "Catering a transport/Prepravné vozíky/Chladené vozíky"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Bufetové stoly | Chladené bufetové stoly",
+            "newCategory": "Catering a výdaj/Bufetové stoly/Chladené bufetové stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Modulárny výdaj | Chladené výdajné stoly",
+            "newCategory": "Vitríny a výdaj/Výdajné linky/Chladené moduly"
+        },
+        {
+            "oldCategory": "Bar a káva | Chladenie fliaš",
+            "newCategory": "Bar a káva/Chladenie nápojov a vína"
+        },
+        {
+            "oldCategory": "Vitríny | Predajné vitríny EVO",
+            "newCategory": "Vitríny a výdaj/Obslužné vitríny"
+        },
+        {
+            "oldCategory": "Vitríny | Predajné vitríny EVOK",
+            "newCategory": "Vitríny a výdaj/Obslužné vitríny"
+        },
+        {
+            "oldCategory": "Vitríny | Vysoké chladené vitríny - okrúhle",
+            "newCategory": "Vitríny a výdaj/Samostatne stojace vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Stolový inventár | Rolltop vitrínky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Stolové vitrínky a poklopy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Split chladiace a mraziace agregáty | Split chladiace agregáty",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace agregáty"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 2140 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 1140 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 1340 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 1540 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 1740 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 1940 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 2340 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 2540 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 2740 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 2940 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 3140 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy so šírkou 3340 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy | Chladiace boxy son šírkou 3540 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace stoly EKO",
+            "newCategory": "Gastro nábytok/Chladiace stoly"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace stoly PROFI",
+            "newCategory": "Gastro nábytok/Chladiace stoly"
+        },
+        {
+            "oldCategory": "Chladiaci program | Nerezové chladničky a mrazničky PROFI",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Nerezové chladničky a mrazničky"
+        },
+        {
+            "oldCategory": "Chladiaci program | Nerezové chladničky a mrazničky EKO",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Nerezové chladničky a mrazničky"
+        },
+        {
+            "oldCategory": "Bar a káva | Doplnky pre kaviareň",
+            "newCategory": "Bar a káva/Kaviarenské príslušenstvo"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Kuchynské váhy - ciachované",
+            "newCategory": "Kuchynský inventár/Váhy a meranie/Ciachované váhy"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Sous-vide program",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sous-vide"
+        },
+        {
+            "oldCategory": "Príprava potravín | Krájače zeleniny | Krájače zeleniny - Robomix Fimar Hällde",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Krájače zeleniny"
+        },
+        {
+            "oldCategory": "Stolový inventár | Stolové doplnky",
+            "newCategory": "Stolovanie a servírovanie/Stolové doplnky"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad | Porcelán KASUB",
+            "newCategory": "Stolovanie a servírovanie/Porcelán a keramika"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nože Victorinox PREMIUM",
+            "newCategory": "Kuchynský inventár/Nože a náradie/Profesionálne nože"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Konvektomaty SYNAPSY | Konvektomaty",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Konvektomaty"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace saladety PROFI",
+            "newCategory": "Vitríny a výdaj/Saladety a pizza stoly/Chladiace saladety"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Nádoby na cesto",
+            "newCategory": "Pizza a kebab/Príslušenstvo/Nádoby na cesto"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Deliace lišty PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Príslušenstvo ku gastronádobám"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Ocieľky a brúsky",
+            "newCategory": "Kuchynský inventár/Nože a náradie/Ocieľky a brúsky"
+        },
+        {
+            "oldCategory": "Zmrzlina a pečenie | Práca s cestom",
+            "newCategory": "Cukrárenské a pekárske potreby/Pomôcky na cesto"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Teplomery",
+            "newCategory": "Kuchynský inventár/Váhy a meranie/Teplomery a sondy"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Dosky na krájanie | Čierne dosky na krájanie",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Dosky na krájanie"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Dosky na krájanie | Dosky na krájanie 45x30 cm HACCP",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Dosky na krájanie"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Dosky na krájanie | Dosky na krájanie 60x40 cm HACCP",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Dosky na krájanie"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Dosky na krájanie | Dosky na krájanie GN1/1 HACCP",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Dosky na krájanie"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Dosky na krájanie | Dosky na krájanie GN1/2 HACCP",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Dosky na krájanie"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Podnosy a taniere na pizzu",
+            "newCategory": "Pizza a kebab/Príslušenstvo/Taniere a podnosy na pizzu"
+        },
+        {
+            "oldCategory": "",
+            "newCategory": "Stolovanie a servírovanie/Dochucovanie/Mlynčeky na soľ a korenie"
+        },
+        {
+            "oldCategory": "Umývací program | Zátky s prepadom",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Príslušenstvo a sifóny"
+        },
+        {
+            "oldCategory": "Bar a káva | Drviče a výrobníky ľadu | Drviče ľadu",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Drviče ľadu"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Salamandre a toastre",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Salamandre a grily"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Šumovačky | Drôtené šumovačky",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Naberačky a šumovačky"
+        },
+        {
+            "oldCategory": "Stolový inventár | Príbory | Príborníky",
+            "newCategory": "Stolovanie a servírovanie/Príbory/Príborníky a stojany"
+        },
+        {
+            "oldCategory": "Zmrzlina a pečenie | Zmrzlinárske príslušenstvo",
+            "newCategory": "Cukrárenské a pekárske potreby/Zmrzlinárske potreby"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Plechy a sitá",
+            "newCategory": "Pizza a kebab/Príslušenstvo/Plechy a sitá na pizzu"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Krájače a mandolíny",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Krájače a strúhadlá"
+        },
+        {
+            "oldCategory": "Stolový inventár | Podnosy a tácky | Podnosy melamínové",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Podnosy a tácky"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 700 | Neutrálne pracovné plochy BERTO´s",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly a plochy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace saladety EKO",
+            "newCategory": "Vitríny a výdaj/Saladety a pizza stoly/Chladiace saladety"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Výlevky",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Výlevky"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Pizza-stoly",
+            "newCategory": "Vitríny a výdaj/Saladety a pizza stoly/Pizza stoly"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Pizzapece XL | MINI pizzapece",
+            "newCategory": "Pizza a kebab/Pece na pizzu"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Dávkovače na omáčky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Dávkovače"
+        },
+        {
+            "oldCategory": "Stolový inventár | Stojany a dávkovače",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Stojany a dávkovače"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad | Porcelán KASUB",
+            "newCategory": "Stolovanie a servírovanie/Porcelán a keramika/Kanvice a šálky"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 700 | Bain-Marie - vodná kúpeľ BERTO´s",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Vodné kúpele (Bain-Marie)"
+        },
+        {
+            "oldCategory": "Catering | Elektrické kotlíky na polievky",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Kotlíky na polievku"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 900 | Grilovacie platne BERTO´s 900",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 700 | Grily BERTO´s",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Catering | Chafingy | Elektrické špirály k chafingom",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Príslušenstvo k chafingom"
+        },
+        {
+            "oldCategory": "Varná technológia | STALGAST 700 | Grily 700",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Stroje na kebab PROFI | Elektrický stroj na kebab",
+            "newCategory": "Pizza a kebab/Stroje na kebab"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 700 | Fritézy BERTO´s",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 900 | Elektrické a plynové fritézy BERTO´s 900",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 600 EKO | Fritézy a udržiavače",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 900 | Elektrické fritézy 900",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "Varná technológia | STALGAST 700 | Fritézy 700",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "Varná technológia | STALGAST 700 | Panvice 700",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sklápacie panvice"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 900 | Smažiace panvice BERTO´s 900",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sklápacie panvice"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 700 | Smažiace panvice BERTO´s",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sklápacie panvice"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 900 | Výklopné panvice EKO",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sklápacie panvice"
+        },
+        {
+            "oldCategory": "Varná technológia | Varné stoličky",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Varné stoličky"
+        },
+        {
+            "oldCategory": "Varná technológia | STALGAST 700 | Bain-Marie 700",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Vodné kúpele (Bain-Marie)"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 600 EKO | Elektrické grily",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 900 | Elektrické grily 900",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Grily na kurence",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily na kurčatá"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Konvektomaty STALGAST",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Konvektomaty"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 900 | Varné kotle BERTO´s 900",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Varné kotly"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 700 | Varné kotle BERTO´s",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Varné kotly"
+        },
+        {
+            "oldCategory": "Varná technológia | STALGAST 700 | Elektrické šporáky",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sporáky"
+        },
+        {
+            "oldCategory": "Varná technológia | Varná rada 700 EKO",
+            "newCategory": "Gastro zariadenia/Tepelná úprava"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 600 EKO | Sporáky",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sporáky"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Stroje na kebab Gastromarket | Elektrický stroj na kebab",
+            "newCategory": "Pizza a kebab/Stroje na kebab"
+        },
+        {
+            "oldCategory": "Varná technológia | BERTO´s 700 | Variče cestovín BERTO´s",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Variče cestovín"
+        },
+        {
+            "oldCategory": "Varná technológia | STALGAST 700 | Variče cestovín 700",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Variče cestovín"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 900 | Varné kotle EKO",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Varné kotly"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Nádoby na skladovanie",
+            "newCategory": "Kuchynský inventár/Skladovanie potravín/Nádoby na potraviny"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nože z kovanej ocele Stalgast",
+            "newCategory": "Kuchynský inventár/Nože a náradie/Profesionálne nože"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Formy na teriny",
+            "newCategory": "Cukrárenské a pekárske potreby/Formy na pečenie/Formy na teriny a paštéty"
+        },
+        {
+            "oldCategory": "Príprava potravín | Zatavovacie stroje na obaly",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Zatavovacie stroje"
+        },
+        {
+            "oldCategory": "Príprava potravín | Univezálne roboty | Univerzálne roboty ROBOMIX",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Univerzálne roboty"
+        },
+        {
+            "oldCategory": "Bar a káva | Mixéry a frapovače",
+            "newCategory": "Bar a káva/Mixéry, shakery a frapovače"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Stolové fritézy EKO",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/1 nádoby EKO",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/1 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby s úchytmi | GN1/1 nádoby s úchytmi",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby s úchytmi"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | GN1/1 nádoby s úchytmi",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby s úchytmi"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/12 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/2 nádoby EKO",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/2 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | GN1/2 nádoby s úchytmi",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby s úchytmi"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/3 nádoby EKO",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/3 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | GN1/3 nádoby s úchytmi",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby s úchytmi"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/4 nádoby EKO",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/4 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/6 nádoby EKO",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/6 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | GN1/6 nádoby s úchytmi",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby s úchytmi"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/9 nádoby EKO",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/9 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN2/1 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN2/3 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN2/4 nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | Pokrievky pre GN nádoby EKO",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | Pokrievky pre GN nádoby PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | Pokrievky s tesnenim PROFI",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | Pokrievky s výrezom na úchyty",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby s úchytmi | GN1/3 nádoby s úchytmi",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby s úchytmi"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby s úchytmi | GN1/6 nádoby s úchytmi",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Nerezové gastronádoby s úchytmi"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 600 EKO | Neutrálne pracovné plochy",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly a plochy"
+        },
+        {
+            "oldCategory": "Varná technológia | GASTROMARKET 600 EKO | Podstavce pod varnú radu 600",
+            "newCategory": "Gastro nábytok/Podstavce pod zariadenia"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Gastropekáče",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Grily na uhlie",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily na drevené uhlie"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Elektrické grilovacie platne",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice liatinové",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Liatinové panvice"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Plynové grilovacie platne GASTROMARKET",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Catering | Cateringový nábytok | Cateringové stoly",
+            "newCategory": "Catering a transport/Cateringový nábytok/Stoly a lavice"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nože HACCP | Modré nože HACCP",
+            "newCategory": "Kuchynský inventár/Nože a náradie/HACCP nože"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nože HACCP | Červené nože HACCP",
+            "newCategory": "Kuchynský inventár/Nože a náradie/HACCP nože"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nože HACCP | Biele nože HACCP",
+            "newCategory": "Kuchynský inventár/Nože a náradie/HACCP nože"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nože HACCP | Hnedé nože HACCP",
+            "newCategory": "Kuchynský inventár/Nože a náradie/HACCP nože"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nože HACCP | Zelené nože HACCP",
+            "newCategory": "Kuchynský inventár/Nože a náradie/HACCP nože"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nože HACCP | Žlté nože HACCP",
+            "newCategory": "Kuchynský inventár/Nože a náradie/HACCP nože"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Hot-dog",
+            "newCategory": "Gastro zariadenia/Fast food zariadenia/Hot-dog zariadenia"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Lisy",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Lisy a haluškovače"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby hliníkové s teflónovým porvchom",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Hliníkové a teflónové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice hliníkové na indukciu",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Panvice na indukciu"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Držiaky na nože",
+            "newCategory": "Kuchynský inventár/Nože a náradie/Držiaky a púzdra na nože"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Špeciálne rošty a plechy",
+            "newCategory": "Cukrárenské a pekárske potreby/Pekárske plechy a rošty"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Dosky na krájanie | Drevené dosky a mäsokláty",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Dosky na krájanie"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Holdomaty",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Udržiavacie skrine (Holdomaty)"
+        },
+        {
+            "oldCategory": "Príprava potravín | Krájače zeleniny | Kotúče ku krájačom zeleniny | Ku krájačom ROBOMIX a FIMAR",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Príslušenstvo a disky"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Hrnce a rajnice | Nerezové hrnce PROFI s pokrievkou | Hrnce stredné PROFI s pokrievkou",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Hrnce"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Hrnce a rajnice | Nerezové hrnce PROFI s pokrievkou | Hrnce nízke PROFI s pokrievkou",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Hrnce"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Hrnce a rajnice | Nerezové hrnce PROFI s pokrievkou | Hrnce vysoké PROFI s pokrievkou",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Hrnce"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Hrnce a rajnice | Hrnce s pokrievkou EKO",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Hrnce"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad | Opálové sklo TOLEDO",
+            "newCategory": "Stolovanie a servírovanie/Sklo/Opálové sklo"
+        },
+        {
+            "oldCategory": "Stolový inventár | Rôzne",
+            "newCategory": "Stolovanie a servírovanie/Stolové doplnky"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Indukčné platne EKO",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Indukčné variče"
+        },
+        {
+            "oldCategory": "Varná technológia | STALGAST 700 | Indukčné sporáky 700",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Indukčné sporáky"
+        },
+        {
+            "oldCategory": "Zmrzlina a pečenie | Zdobenie | Vrecká na vytláčanie",
+            "newCategory": "Cukrárenské a pekárske potreby/Zdobenie/Cukrárske vrecká"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Korenie a olej",
+            "newCategory": "Stolovanie a servírovanie/Dochucovanie"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Príslušenstvo",
+            "newCategory": "Pizza a kebab/Príslušenstvo"
+        },
+        {
+            "oldCategory": "Stolový inventár | Džbániky a kanvice | Kanvice bez poklopu",
+            "newCategory": "Stolovanie a servírovanie/Nápoje/Kanvice a džbány"
+        },
+        {
+            "oldCategory": "Stolový inventár | Džbániky a kanvice | Kanvice s poklopom",
+            "newCategory": "Stolovanie a servírovanie/Nápoje/Kanvice a džbány"
+        },
+        {
+            "oldCategory": "Catering | Cateringový nábytok | Cateringové stoly",
+            "newCategory": "Catering a transport/Cateringový nábytok/Stoly a lavice"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Príslušenstvo ku grilu",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Príslušenstvo ku grilom"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Kefy na pizza pece",
+            "newCategory": "Pizza a kebab/Príslušenstvo/Kefy na pece"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Kliešte",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Kliešte a pinzety"
+        },
+        {
+            "oldCategory": "Chladiaci program | Dozrievanie mäsa",
+            "newCategory": "Gastro zariadenia/Spracovanie mäsa/Skrine na zrenie mäsa"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Konvektomaty SYNAPSY | Doplnky SYNAPSY",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Príslušenstvo ku konvektomatom"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Odpadové koše a popolníky | Plastové odpadové koše",
+            "newCategory": "Hygiena a údržba/Odpadové hospodárstvo/Odpadkové koše"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Kontaktné grily",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Kontaktné grily"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Teplovzdušné rúry s parnou funkciou",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Konvektomaty"
+        },
+        {
+            "oldCategory": "Stolový inventár | Koreničky",
+            "newCategory": "Stolovanie a servírovanie/Dochucovanie/Koreničky a soľničky"
+        },
+        {
+            "oldCategory": "Zmrzlina a pečenie | Zdobenie | Koncovky na vytláčanie",
+            "newCategory": "Cukrárenské a pekárske potreby/Zdobenie/Zdobiacie špičky"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad na servírovanie | Košíky a kornúty",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Košíky a kornúty"
+        },
+        {
+            "oldCategory": "Stolový inventár | Košíky na pečivo | Klasické košíky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Košíky na pečivo"
+        },
+        {
+            "oldCategory": "Príprava potravín | Krájače zeleniny | Krájače zeleniny - Robomix Fimar Hällde",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Krájače zeleniny"
+        },
+        {
+            "oldCategory": "Stolový inventár | Informačné tabule",
+            "newCategory": "Stolovanie a servírovanie/Informačné tabule a stojany"
+        },
+        {
+            "oldCategory": "Umývací program | Umývadla na ruky",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Umývadlá"
+        },
+        {
+            "oldCategory": "Zmrzlina a pečenie | Servírovanie",
+            "newCategory": "Cukrárenské a pekárske potreby/Servírovanie a prezentácia"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Lopatky a krájače",
+            "newCategory": "Pizza a kebab/Príslušenstvo/Lopaty a krájače na pizzu"
+        },
+        {
+            "oldCategory": "Príprava potravín | Kutre",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Kutre a blixéry"
+        },
+        {
+            "oldCategory": "Stolový inventár | Príbory | Pribor PROFI",
+            "newCategory": "Stolovanie a servírovanie/Príbory/Sady príborov"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Misy | Misy kónické",
+            "newCategory": "Kuchynský inventár/Misy a misky"
+        },
+        {
+            "oldCategory": "Umývací program | Umývacie koše",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Koše do umývačky"
+        },
+        {
+            "oldCategory": "Umývací program | Umývačky riadu",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Umývačky riadu"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Lopaty na pizzu",
+            "newCategory": "Pizza a kebab/Príslušenstvo/Lopaty a krájače na pizzu"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Kuchynské náradie monoblock",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie"
+        },
+        {
+            "oldCategory": "Catering | Príbor na servírovanie | Príbor na servírovanie EKO",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Servírovací príbor"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nástroje na šľahanie | Lopatky/Lyžice z PE",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Varechy a stierky"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Šľahanie | Lopatky/Lyžice z PE",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Varechy a stierky"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Špachtle | Špachtle s drevenou rúčkou",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Varechy a stierky"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice na Paelu",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Panvice na paellu"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Lapače hmyzu",
+            "newCategory": "Hygiena a údržba/Lapače hmyzu"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Lieviky a dávkovače",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Lieviky a odmerky"
+        },
+        {
+            "oldCategory": "Stolový inventár | Podnosy a tácky | Podnosy laminované",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Podnosy a tácky"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Otvárače na konzervy",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Otvárače"
+        },
+        {
+            "oldCategory": "Stolový inventár | Podnosy a tácky | Okrúhle a oválne tácky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Podnosy a tácky"
+        },
+        {
+            "oldCategory": "Príprava potravín | Mlynčeky na mäso a príslušenstvo | Mlynčeky na mäso",
+            "newCategory": "Gastro zariadenia/Spracovanie mäsa/Mlynčeky na mäso"
+        },
+        {
+            "oldCategory": "Bar a káva | Mlynčeky na kávu",
+            "newCategory": "Bar a káva/Mlynčeky na kávu"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Príslušenstvo pre odsávače pár",
+            "newCategory": "Gastro nábytok/Odsávače pár/Príslušenstvo k odsávačom"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 1200 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 1400 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 1600 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 1800 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2000 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2200 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2400 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2600 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2800 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 3000 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 3200 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 3400 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 3600 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Mraziace truhlicové boxy",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Truhlicové mrazničky"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace stoly EKO",
+            "newCategory": "Gastro nábytok/Chladiace stoly"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Multifunkčná rúra GN1/1",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Multifunkčné rúry"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Rôzne",
+            "newCategory": "Kuchynský inventár/Ostatné náradie"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Kuchynské náradie monoblock",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Naberačky | Naberačky monoblock PROFI",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Naberačky a šumovačky"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Naberačky | Naberačky monoblock EKO",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Naberačky a šumovačky"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad na servírovanie | Klasické servírovanie",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár"
+        },
+        {
+            "oldCategory": "Stainless steel furniture | Modular system – serving counter | Showcases with stainless steel shelf",
+            "newCategory": "Vitríny a výdaj/Výdajné linky/Nadstavby a police"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Modulárny výdaj | Nadstavby s nerezovou policou",
+            "newCategory": "Vitríny a výdaj/Výdajné linky/Nadstavby a police"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Modulárny výdaj | Nadstavby so sklenenou policou",
+            "newCategory": "Vitríny a výdaj/Výdajné linky/Nadstavby a police"
+        },
+        {
+            "oldCategory": "Príprava potravín | Výrobníky cestovín",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Stroje na cestoviny"
+        },
+        {
+            "oldCategory": "Príprava potravín | Mlynčeky na mäso a príslušenstvo | Prílušenstvo k mlynčekom na mäso",
+            "newCategory": "Gastro zariadenia/Spracovanie mäsa/Príslušenstvo k mlynčekom"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Nádoby na skladovanie",
+            "newCategory": "Kuchynský inventár/Skladovanie potravín/Nádoby na potraviny"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Nástenné police a skrinky EKO",
+            "newCategory": "Gastro nábytok/Nerezové police a skrinky"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Priestorové odsávače pár | Hĺbka 1200 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Priestorové odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Krabicové odsávače pár | Hĺbka 1000 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Nástenné odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Krabicové odsávače pár | Hĺbka 700 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Nástenné odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Krabicové odsávače pár | Hĺbka 800 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Nástenné odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Krabicové odsávače pár | Hĺbka 900 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Nástenné odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Zošikmené odsávače pár | Hĺbka 1000 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Nástenné odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Zošikmené odsávače pár | Hĺbka 700 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Nástenné odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Zošikmené odsávače pár | Hĺbka 800 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Nástenné odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Zošikmené odsávače pár | Hĺbka 900 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Nástenné odsávače pár"
+        },
+        {
+            "oldCategory": "Stolový inventár | Príbory | Detský príbor",
+            "newCategory": "Stolovanie a servírovanie/Príbory/Detské príbory"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nože Victorinox EKO",
+            "newCategory": "Kuchynský inventár/Nože a náradie/Univerzálne nože"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad na servírovanie | Liatinové panvice s drevenou podložkou",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Liatinový riad na servírovanie"
+        },
+        {
+            "oldCategory": "Stolový inventár | Podnosy a tácky | Podnosy pogumované - polypropylén",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Protišmykové podnosy a tácky"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Modulárny výdaj | Dráhy a obklady",
+            "newCategory": "Vitríny a výdaj/Výdajné linky/Dráhy na tácky a obklady"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Regále do chladiacich boxov | Policový systém s hĺbkou 300 mm",
+            "newCategory": "Gastro nábytok/Regály/Regály do chladiacich boxov"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Regále do chladiacich boxov | Policový systém s hĺbkou 400 mm",
+            "newCategory": "Gastro nábytok/Regály/Regály do chladiacich boxov"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Regále do chladiacich boxov | Policový systém s hĺbkou 500 mm",
+            "newCategory": "Gastro nábytok/Regály/Regály do chladiacich boxov"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Regále do chladiacich boxov | Policový systém s hĺbkou 600 mm",
+            "newCategory": "Gastro nábytok/Regály/Regály do chladiacich boxov"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/1 nádoby polykarbonátové - transparentné",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/1 nádoby polypropylén - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polypropylénové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | GN1/1 nádoby polykarbonátové - čierne",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - biele | GN1/1 nádoby PC biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - čierne | GN1/1 nádoby PC čierne",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/2 nádoby polykarbonátové - transparentné",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/2 nádoby polypropylén - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polypropylénové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - čierne | GN1/2 nádoby PC čierne",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - biele | GN1/2 nádoby PC biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - biele | GN1/3 nádoby polykarbonátové - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/3 nádoby polykarbonátové - transparentné",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/3 nádoby polypropylén - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polypropylénové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | GN1/3 nádoby polykarbonátové - čierne",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polypropylén - biele | GN1/3 nádoby polypropylén - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polypropylénové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - biele | GN1/4 nádoby polykarbonátové - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/4 nádoby polykarbonátové - transparentné",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/4 nádoby polypropylén - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polypropylénové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | GN1/4 nádoby polykarbonátové - čierne",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - biele | GN1/6 nádoby PC biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/6 nádoby polykarbonátové - transparentné",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/6 nádoby polypropylén - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polypropylénové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | GN1/6 nádoby polykarbonátové - čierne",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - biele | GN1/6 nádoby polykarbonátové - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/9 nádoby polykarbonátové - transparentné",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Polykarbonátové gastronádoby"
+        },
+        {
+            "oldCategory": "Catering | Chafingy | Palivo k chafingom",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Príslušenstvo k chafingom"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice hliníkové s teflonom",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Hliníkové a teflónové panvice"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice nerezové s teflonom",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Nerezové panvice"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice nerezové",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Nerezové panvice"
+        },
+        {
+            "oldCategory": "Zmrzlina a pečenie | Pečenie",
+            "newCategory": "Cukrárenské a pekárske potreby/Pekárske pomôcky"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Perforované gastronádoby STALGAST® PROFI | GN1/1 nádoby perforované",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Perforované gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Perforované gastronádoby STALGAST® PROFI | GN1/2 nádoby perforované",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Perforované gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Perforované gastronádoby STALGAST® PROFI | GN2/3 nádoby perforované",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Perforované gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice liatinové",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Liatinové panvice"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Pizzapece XL | Elektrické pizzapece XL",
+            "newCategory": "Pizza a kebab/Pece na pizzu/Elektrické pece"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Pizzapece Cuppone | Elektrické pizzapece CUPPONE",
+            "newCategory": "Pizza a kebab/Pece na pizzu/Elektrické pece"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Pizzapece Gastromarket EKO",
+            "newCategory": "Pizza a kebab/Pece na pizzu/Elektrické pece"
+        },
+        {
+            "oldCategory": "Chladiaci program | Príslušenstvo k chladiacej technike",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Príslušenstvo"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Teplovzdušné rúry NERONE",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Teplovzdušné rúry"
+        },
+        {
+            "oldCategory": "Príprava potravín | Plnenie klobás",
+            "newCategory": "Gastro zariadenia/Spracovanie mäsa/Plničky klobás"
+        },
+        {
+            "oldCategory": "Bar a káva | Kávovary",
+            "newCategory": "Bar a káva/Kávovary a mlynčeky/Kávovary"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Stroje na kebab PROFI | Plynový stroj na kebab",
+            "newCategory": "Pizza a kebab/Stroje na kebab"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Pizzapece Cuppone | Plynové pizzapece CUPPONE",
+            "newCategory": "Pizza a kebab/Pece na pizzu/Plynové pece"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Pizzapece XL | Plynové pizzapece XL",
+            "newCategory": "Pizza a kebab/Pece na pizzu/Plynové pece"
+        },
+        {
+            "oldCategory": "Varná technológia | WOKY | WOK PROFI",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/WOK variče"
+        },
+        {
+            "oldCategory": "Varná technológia | WOKY | WOK EKO",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/WOK variče"
+        },
+        {
+            "oldCategory": "Zmrzlina a pečenie | Flambovanie",
+            "newCategory": "Cukrárenské a pekárske potreby/Flambovacie pištole"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Stroje na kebab Gastromarket | Plynový stroj na kebab",
+            "newCategory": "Pizza a kebab/Stroje na kebab"
+        },
+        {
+            "oldCategory": "Catering | Ohrievače | Ohrievače plynové",
+            "newCategory": "Catering a transport/Ohrievače/Plynové ohrievače"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly EKO bez lemu a políc",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly EKO bez lemu a so spodnou policou",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly EKO bez políc",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly krytované EKO s krídlovými dvierkami",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Uzavreté stoly a skrinky"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly EKO so spodnou policou",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly krytované EKO s posuvnými dvierkami",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Uzavreté stoly a skrinky"
+        },
+        {
+            "oldCategory": "Vitríny | Predajné vitríny EVO",
+            "newCategory": "Vitríny a výdaj/Obslužné vitríny"
+        },
+        {
+            "oldCategory": "Vitríny | Predajné vitríny EVOK",
+            "newCategory": "Vitríny a výdaj/Obslužné vitríny"
+        },
+        {
+            "oldCategory": "Umývací program | Umývačky riadu priebežné",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Priebežné umývačky"
+        },
+        {
+            "oldCategory": "Umývacie zariadenia | Umývačky riadu priebežné",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Priebežné umývačky"
+        },
+        {
+            "oldCategory": "Umývací program | Umývačky na čierny riad",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Umývačky na čierny riad"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Priestorové odsávače pár | Hĺbka 2200 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Priestorové odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Priestorové odsávače pár | Hĺbka 1500 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Priestorové odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Priestorové odsávače pár | Hĺbka 1600 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Priestorové odsávače pár"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Priestorové odsávače pár | Hĺbka 1800 mm",
+            "newCategory": "Gastro nábytok/Odsávače pár/Priestorové odsávače pár"
+        },
+        {
+            "oldCategory": "Konvektomaty a pece | Grily na uhlie",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily na drevené uhlie"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Indukčné platne PROFI",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Indukčné variče"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Prostriedky Stalgast",
+            "newCategory": "Hygiena a údržba/Čistiace prostriedky"
+        },
+        {
+            "oldCategory": "Stolový inventár | Príbory | Príborníky",
+            "newCategory": "Stolovanie a servírovanie/Príbory/Príborníky a stojany"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Hrnce a rajnice | Rajnice bez pokrievky",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Rajnice"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Montovateľné regály EKO",
+            "newCategory": "Gastro nábytok/Regály/Nerezové regály"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Transportné regále",
+            "newCategory": "Gastro nábytok/Vozíky/Regálové vozíky"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Skladové regále",
+            "newCategory": "Gastro nábytok/Regály/Skladové regály"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Ohrevné režóny",
+            "newCategory": "Gastro nábytok/Ohrevné skrine a stoly (Režóny)"
+        },
+        {
+            "oldCategory": "Príprava potravín | Univezálne roboty | Príslušenstvo k robotom",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Príslušenstvo k robotom"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Rošty a pekáče",
+            "newCategory": "Kuchynský inventár/Pekáče a rošty"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Kuchynské váhy - neciahované",
+            "newCategory": "Kuchynský inventár/Váhy a meranie/Kuchynské váhy"
+        },
+        {
+            "oldCategory": "Bar a káva | Nalievatka a odmerky",
+            "newCategory": "Bar a káva/Barové pomôcky a príslušenstvo/Odmerky a nálevky"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Meranie",
+            "newCategory": "Kuchynský inventár/Váhy a meranie/Odmerky"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Odpadové koše a popolníky | Nerezové odpadové koše",
+            "newCategory": "Hygiena a údržba/Odpadové hospodárstvo/Odpadkové koše"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Sušička na šaláty",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Odstredivky na šalát"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Prostriedky Stalgast",
+            "newCategory": "Hygiena a údržba/Čistiace prostriedky"
+        },
+        {
+            "oldCategory": "Bar a káva | Odšťavovače",
+            "newCategory": "Bar a káva/Mixéry, shakery a odšťavovače/Odšťavovače"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Špachtle | Špachtle s plastovou rúčkou",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Varechy a stierky"
+        },
+        {
+            "oldCategory": "Catering | Ohrevné lampy",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Ohrevné lampy a mosty"
+        },
+        {
+            "oldCategory": "Catering | Ohrievače | Ohrievače elektrické",
+            "newCategory": "Catering a transport/Ohrievače/Elektrické ohrievače"
+        },
+        {
+            "oldCategory": "Vitríny | Stolové ohrevné vitríny",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Vyhrievané vitríny"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Bain-Marie - vodné kúpele",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Vodné kúpele (Bain-Marie)"
+        },
+        {
+            "oldCategory": "Vitríny | Stolové ohrevné vitríny - mini",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Vyhrievané vitríny"
+        },
+        {
+            "oldCategory": "Catering | Prepravné vozíky | Ohrevné prepravné vozíky",
+            "newCategory": "Catering a transport/Prepravné vozíky/Ohrevné vozíky"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Bufetové stoly | Ohrevné bufetové stoly",
+            "newCategory": "Catering a výdaj/Bufetové stoly/Ohrevné bufetové stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Modulárny výdaj | Ohrevné výdajné stoly",
+            "newCategory": "Vitríny a výdaj/Výdajné linky/Ohrevné moduly"
+        },
+        {
+            "oldCategory": "Vitríny | Stolové chladené vitríny - hranaté",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Príprava potravín | Krájače zeleniny | Kotúče ku krájačom zeleniny | Ku krájačom Hällde",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Príslušenstvo a disky"
+        },
+        {
+            "oldCategory": "Catering | Bariérový systém",
+            "newCategory": "Catering a transport/Vybavenie pre akcie/Bariérové stĺpiky"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Strúhadlá",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Krájače a strúhadlá"
+        },
+        {
+            "oldCategory": "Príprava potravín | Strúhač na syr",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Strúhače syra"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Modulárny výdaj | Výdajné kasa stoly",
+            "newCategory": "Vitríny a výdaj/Výdajné linky/Pokladničné pulty"
+        },
+        {
+            "oldCategory": "Umývací program | Leštička a sušička príborov",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Leštičky príborov a skla"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Sitá",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Cedníky a sitá"
+        },
+        {
+            "oldCategory": "Príprava potravín | Škrabky na zemiaky",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Škrabky zemiakov"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Odsávače pár | Príslušenstvo pre odsávače pár",
+            "newCategory": "Gastro nábytok/Odsávače pár/Príslušenstvo k odsávačom"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Prostriedky Stalgast",
+            "newCategory": "Hygiena a údržba/Čistiace prostriedky"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Riad | Opálové sklo EBRO",
+            "newCategory": "Stolovanie a servírovanie/Sklo/Opálové sklo"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Puzdrá a tašky na nože",
+            "newCategory": "Kuchynský inventár/Nože a náradie/Držiaky a púzdra na nože"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Variče na ryžu",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Ryžovary"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Vedrá",
+            "newCategory": "Kuchynský inventár/Ostatné nádoby/Vedrá"
+        },
+        {
+            "oldCategory": "Stolový inventár | Príbory | Príbor PREMIUM",
+            "newCategory": "Stolovanie a servírovanie/Príbory/Sady príborov"
+        },
+        {
+            "oldCategory": "Stolový inventár | Príbory | Príbor EKO",
+            "newCategory": "Stolovanie a servírovanie/Príbory/Sady príborov"
+        },
+        {
+            "oldCategory": "Vitríny | Vysoké chladené vitríny - hranaté",
+            "newCategory": "Vitríny a výdaj/Samostatne stojace vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | Odkvapkávacie vložky do nádob",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Príslušenstvo ku gastronádobám"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - transparentné | GN odkvapkávacie vložky PC transparentné",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Príslušenstvo ku gastronádobám"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Transportné vozíky",
+            "newCategory": "Gastro nábytok/Vozíky/Servírovacie a transportné vozíky"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Modulárny výdaj | Stojany a vozíky na príbor a podnosy",
+            "newCategory": "Gastro nábytok/Vozíky/Vozíky na podnosy a príbory"
+        },
+        {
+            "oldCategory": "Príprava potravín | Tyčové mixéry | Tyčové ručné mixéry FIMAR",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Ponorné mixéry"
+        },
+        {
+            "oldCategory": "Stolový inventár | Podnosy a tácky | Podnosy EKO",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Podnosy a tácky"
+        },
+        {
+            "oldCategory": "Stolový inventár | Podnosy a tácky | Obdĺžníkové tácky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Podnosy a tácky"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Tĺčiky a perforátory",
+            "newCategory": "Kuchynský inventár/Nože a náradie/Tĺčiky na mäso"
+        },
+        {
+            "oldCategory": "Varná technológia | STALGAST 700 | Udržiavač hranoliek 700",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Ohrievače hranoliek"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Umývacie vane EKO | Umývacie vane EKO s dvojvaňou",
+            "newCategory": "Gastro nábytok/Nerezové stoly a drezy/Umývacie stoly s drezom"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Umývacie vane EKO | Umývacie vane EKO s jednou vaňou",
+            "newCategory": "Gastro nábytok/Nerezové stoly a drezy/Umývacie stoly s drezom"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Umývacie stoly EKO s drezom",
+            "newCategory": "Gastro nábytok/Nerezové stoly a drezy/Umývacie stoly s drezom"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Umývacie stoly EKO s dvojdrezom",
+            "newCategory": "Gastro nábytok/Nerezové stoly a drezy/Umývacie stoly s drezom"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Umývadlá na ruky",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Umývadlá"
+        },
+        {
+            "oldCategory": "Umývacie zariadenia | Umývačky pohárov",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Umývačky pohárov"
+        },
+        {
+            "oldCategory": "Umývacie zariadenia | Umývačky riadu",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Umývačky riadu"
+        },
+        {
+            "oldCategory": "Vitríny | Predajné vitríny M80",
+            "newCategory": "Vitríny a výdaj/Obslužné vitríny"
+        },
+        {
+            "oldCategory": "Vitríny | Predajné vitríny SALINA",
+            "newCategory": "Vitríny a výdaj/Obslužné vitríny"
+        },
+        {
+            "oldCategory": "B2B | Stalgast® | Príbory bufet | Džbány | Oceľ | Bez veka",
+            "newCategory": "Stolovanie a servírovanie/Nápoje/Kanvice a džbány"
+        },
+        {
+            "oldCategory": "Príprava potravín | Vákuovanie potravín | Vákuovacie sáčky klasické",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuovacie vrecká a fólie"
+        },
+        {
+            "oldCategory": "Príprava potravín | Vákuovanie potravín | Vákuovacie sáčky dvojvrstvové",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuovacie vrecká a fólie"
+        },
+        {
+            "oldCategory": "Príprava potravín | Vákuovanie potravín | Vákuovacie stroje",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuové baličky"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Válkače cesta",
+            "newCategory": "Pizza a kebab/Tvarovače a válkače cesta"
+        },
+        {
+            "oldCategory": "Catering | Variče na víno a perkolátory | Variče na víno",
+            "newCategory": "Bar a káva/Ohrievače nápojov/Variče na víno"
+        },
+        {
+            "oldCategory": "Bar a káva | Drviče a výrobníky ľadu | Výrobníky ľadových kalíškov",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky kociek a kalíškov"
+        },
+        {
+            "oldCategory": "Bar a káva | Drviče a výrobníky ľadu | Výrobníky ľadových kociek",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky kociek a kalíškov"
+        },
+        {
+            "oldCategory": "Bar a káva | Drviče a výrobníky ľadu | Výrobníky drveného ľadu",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky drte a šupín"
+        },
+        {
+            "oldCategory": "Umývací program | Stoly k umývačkám riadu | Vstupné a výstupné stoly ARISTARCO",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Vstupné a výstupné stoly"
+        },
+        {
+            "oldCategory": "Stolové zariadenia | Palacinkovače a waflovače",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Palacinkovače a vaflovače"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice wok",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/WOK panvice"
+        },
+        {
+            "oldCategory": "Chladiaci program | Šokery",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Šokové schladzovače a zmrazovače"
+        },
+        {
+            "oldCategory": "Zmrzlina a pečenie | Stierky a špachtle",
+            "newCategory": "Cukrárenské a pekárske potreby/Cukrárske náradie/Stierky a špachtle"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Šumovačky | Šumovačky monoblock PROFI",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Naberačky a šumovačky"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Šumovačky | Šumovačky monoblock EKO",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Naberačky a šumovačky"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad | Opálové sklo EBRO",
+            "newCategory": "Stolovanie a servírovanie/Sklo/Opálové sklo"
+        },
+        {
+            "oldCategory": "Umývací program | Umývačky pohárov",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Umývačky pohárov"
+        },
+        {
+            "oldCategory": "Príprava potravín | Nárezové stroje | Nárezové stroje FIMAR",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Nárezové stroje"
+        },
+        {
+            "oldCategory": "Príprava potravín | Nárezové stroje | Nárezové stroje ROBOMIX",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Nárezové stroje"
+        },
+        {
+            "oldCategory": "Príprava potravín | Nárezové stroje | Nárezové stroje s teflonom ROBOMIX",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Nárezové stroje"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Stolové police | Stolové dvojpolice",
+            "newCategory": "Gastro nábytok/Nerezové police a skrinky/Stolové police"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Stolové police | Stolové jednopolice",
+            "newCategory": "Gastro nábytok/Nerezové police a skrinky/Stolové police"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Stropové chladiace a mraziace agregáty | Stropové chladiace agregáty",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace agregáty"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Stropové chladiace a mraziace agregáty | Stropové mraziace agregáty",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace agregáty"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Škrabky",
+            "newCategory": "Kuchynský inventár/Nože a náradie/Škrabky"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Teplé mosty | Ohrevné dvojpolice",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Ohrevné lampy a mosty"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Teplé mosty | Ohrevné jednopolice",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Ohrevné lampy a mosty"
+        },
+        {
+            "oldCategory": "Catering | Termoboxy",
+            "newCategory": "Catering a transport/Termoboxy a termoporty"
+        },
+        {
+            "oldCategory": "Catering | Termoizolačné nádoby",
+            "newCategory": "Catering a transport/Termosky a termo nádoby"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Termotašky na pizzu",
+            "newCategory": "Pizza a kebab/Príslušenstvo/Termotašky"
+        },
+        {
+            "oldCategory": "Catering | Termoporty",
+            "newCategory": "Catering a transport/Termoboxy a termoporty"
+        },
+        {
+            "oldCategory": "Umývací program | Zátky s prepadom",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Príslušenstvo a sifóny"
+        },
+        {
+            "oldCategory": "Umývací program | Umývacie batérie a sprchy | Sprchy",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Sprchy a sprchové batérie"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Závesné chladiace a mraziace agregáty | Závesné chladiace agregáty",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace agregáty"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Závesné chladiace a mraziace agregáty | Závesné mraziace agregáty",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace agregáty"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Vstupné a výstupné stoly EKO k priebežnej umývačke",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Vstupné a výstupné stoly"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | Pokrievky s výrezom na úchyty",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | Pokrievky polykarbonátové so silikónovým tesnením",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - transparentné | GN pokrievky s tesnením PC transparentné",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - biele | GN pokrievky PC biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | Pokrievky polykarbonátové",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | Pokrievky polypropylénové - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | Pokrievky polykarbonátové - čierne",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - biele | Pokrievky polykarbonátové - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - transparentné | GN pokrievky PC transparentné",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polypropylén - biele | GN pokrievky polypropylén - biele",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Pokrievky na gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Vedrá",
+            "newCategory": "Kuchynský inventár/Ostatné nádoby/Vedrá"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad na servírovanie",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Miniatúry a misky na servírovanie"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad na servírovanie | Smaltované panvice",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Smaltovaný riad na servírovanie"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad na servírovanie",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Miniatúry a misky na servírovanie"
+        },
+        {
+            "oldCategory": "Stolový inventár | Riad na servírovanie | Miniatúry na servírovanie",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Miniatúry a misky na servírovanie"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Misy | Misy hlboké na šľahanie",
+            "newCategory": "Kuchynský inventár/Misy a misky"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Misy | Misy so zaobleným okrajom",
+            "newCategory": "Kuchynský inventár/Misy a misky"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Misy | Misy s okrajom",
+            "newCategory": "Kuchynský inventár/Misy a misky"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Misy | Misa sférická",
+            "newCategory": "Kuchynský inventár/Misy a misky"
+        },
+        {
+            "oldCategory": "Príprava potravín | Mlynčeky na mäso a príslušenstvo | Mlynčeky na mäso",
+            "newCategory": "Gastro zariadenia/Spracovanie mäsa/Mlynčeky na mäso"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 1200 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 1400 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 1600 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 1800 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2000 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2200 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2400 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2600 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 2800 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 3000 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 3200 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 3400 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Mraziace boxy | Mraziace boxy so šírkou 3600 mm",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Lopatky",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie/Lopatky"
+        },
+        {
+            "oldCategory": "Stolový inventár | Príbory | Príbor EKO",
+            "newCategory": "Stolovanie a servírovanie/Príbory/Sady príborov"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nože a nožnice | Nožnice",
+            "newCategory": "Kuchynský inventár/Nože a náradie/Nožnice"
+        },
+        {
+            "oldCategory": "Catering | Termosky",
+            "newCategory": "Catering a transport/Termosky a termo nádoby"
+        },
+        {
+            "oldCategory": "Príprava potravín | Zjemňovač mäsa",
+            "newCategory": "Gastro zariadenia/Spracovanie mäsa/Zjemňovače mäsa"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Nerezové stojany",
+            "newCategory": "Kuchynský inventár/Organizéry a stojany"
+        },
+        {
+            "oldCategory": "Stolový inventár | Košíky na pečivo | Nerezové košíky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Košíky na pečivo"
+        },
+        {
+            "oldCategory": "Stolový inventár | Stojany na menu",
+            "newCategory": "Stolovanie a servírovanie/Informačné tabule a stojany/Stojany na menu"
+        },
+        {
+            "oldCategory": "Catering | Stojany na taniere",
+            "newCategory": "Catering a transport/Vybavenie pre akcie/Stojany na taniere"
+        },
+        {
+            "oldCategory": "Stolový inventár | Podnosy a tácky | Špeciálne tácky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Podnosy a tácky"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Odpadové koše a popolníky | Popolníky",
+            "newCategory": "Hygiena a údržba/Odpadové hospodárstvo/Popolníky"
+        },
+        {
+            "oldCategory": "Vitríny a výdaj/Stolové vitríny/Chladiace vitríny",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Smaltované gastronádoby STALGAST® PROFI | GN1/1 nádoby smaltované",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Smaltované gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Smaltované gastronádoby STALGAST® PROFI | GN2/1 nádoby smaltované",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Smaltované gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Smaltované gastronádoby STALGAST® PROFI | GN2/3 nádoby smaltované",
+            "newCategory": "Kuchynský inventár/Gastronádoby/Smaltované gastronádoby"
+        },
+        {
+            "oldCategory": "Kuchynský riad | Panvice | Panvice na Paelu",
+            "newCategory": "Kuchynský inventár/Hrnce a panvice/Panvice na paellu"
+        },
+        {
+            "oldCategory": "Stolový inventár | Podnosy a tácky | Okrúhle a oválne tácky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Podnosy a tácky"
+        },
+        {
+            "oldCategory": "Kuchynské náradie | Kuchynské náradie monoblock",
+            "newCategory": "Kuchynský inventár/Kuchynské náradie"
+        },
+        {
+            "oldCategory": "Stolový inventár | Košíky na pečivo | Čierne košíky",
+            "newCategory": "Stolovanie a servírovanie/Servírovací inventár/Košíky na pečivo"
+        },
+        {
+            "oldCategory": "Catering | Cateringový nábytok | Poťahy na cateringové stoly",
+            "newCategory": "Catering a transport/Cateringový nábytok/Poťahy a textílie"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly EKO bez lemu a políc",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly EKO bez lemu a so spodnou policou",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly EKO bez políc",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly krytované EKO s krídlovými dvierkami",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Uzavreté stoly a skrinky"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly EKO so spodnou policou",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Pracovné stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Pracovné stoly krytované EKO s posuvnými dvierkami",
+            "newCategory": "Gastro nábytok/Nerezové stoly/Uzavreté stoly a skrinky"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Umývacie vane EKO | Umývacie vane EKO s dvojvaňou",
+            "newCategory": "Gastro nábytok/Nerezové stoly a drezy/Umývacie stoly s drezom"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Umývacie vane EKO | Umývacie vane EKO s jednou vaňou",
+            "newCategory": "Gastro nábytok/Nerezové stoly a drezy/Umývacie stoly s drezom"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Umývacie stoly EKO s drezom",
+            "newCategory": "Gastro nábytok/Nerezové stoly a drezy/Umývacie stoly s drezom"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Umývacie stoly EKO s dvojdrezom",
+            "newCategory": "Gastro nábytok/Nerezové stoly a drezy/Umývacie stoly s drezom"
+        },
+        {
+            "oldCategory": "Skladovanie a hygiena | Umývadlá na ruky",
+            "newCategory": "Hygiena a údržba/Sanita a batérie/Umývadlá"
+        },
+        {
+            "oldCategory": "Umývacie zariadenia | Umývačky pohárov",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Umývačky pohárov"
+        },
+        {
+            "oldCategory": "Umývacie zariadenia | Umývačky riadu",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Umývačky riadu"
+        },
+        {
+            "oldCategory": "B2B | Stalgast® | Príbory bufet | Džbány | Oceľ | Bez veka",
+            "newCategory": "Stolovanie a servírovanie/Nápoje/Kanvice a džbány"
+        },
+        {
+            "oldCategory": "Príprava potravín | Vákuovanie potravín | Vákuovacie sáčky klasické",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuovacie vrecká a fólie"
+        },
+        {
+            "oldCategory": "Príprava potravín | Vákuovanie potravín | Vákuovacie sáčky dvojvrstvové",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuovacie vrecká a fólie"
+        },
+        {
+            "oldCategory": "Príprava potravín | Vákuovanie potravín | Vákuovacie stroje",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuové baličky"
+        },
+        {
+            "oldCategory": "Pizza a kebab | Válkače cesta",
+            "newCategory": "Pizza a kebab/Tvarovače a válkače cesta"
+        },
+        {
+            "oldCategory": "Bar a káva | Drviče a výrobníky ľadu | Výrobníky ľadových kalíškov",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky kociek a kalíškov"
+        },
+        {
+            "oldCategory": "Bar a káva | Drviče a výrobníky ľadu | Výrobníky ľadových kociek",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky kociek a kalíškov"
+        },
+        {
+            "oldCategory": "Bar a káva | Drviče a výrobníky ľadu | Výrobníky drveného ľadu",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky drte a šupín"
+        },
+        {
+            "oldCategory": "Umývací program | Stoly k umývačkám riadu | Vstupné a výstupné stoly ARISTARCO",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Vstupné a výstupné stoly"
+        },
+        {
+            "oldCategory": "Nerezový nábytok | Vstupné a výstupné stoly EKO k priebežnej umývačke",
+            "newCategory": "Hygiena a údržba/Umývanie riadu/Vstupné a výstupné stoly"
+        },
+        {
+            "oldCategory": "Chladiaci program | Chladiace a mraziace boxy | Chladiace boxy",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Chladiace a mraziace boxy"
+        }
+    ],
+    "forgastro": [
+        {
+            "oldCategory": "Krájače zeleniny pre malé a stredné prevádzky",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Krájače zeleniny"
+        },
+        {
+            "oldCategory": "Krájače zeleniny pre stredné a veľké prevádzky",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Krájače zeleniny"
+        },
+        {
+            "oldCategory": "Kombinované roboty",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Univerzálne roboty"
+        },
+        {
+            "oldCategory": "Blixéry",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Kutre a blixéry"
+        },
+        {
+            "oldCategory": "Stolové modely",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Kutre a blixéry"
+        },
+        {
+            "oldCategory": "Veľkokapacitné kutre",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Kutre a blixéry"
+        },
+        {
+            "oldCategory": "Pasírovače",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Pasírovače a odšťavovače"
+        },
+        {
+            "oldCategory": "Odšťavovače",
+            "newCategory": "Bar a káva/Mixéry, shakery a odšťavovače/Odšťavovače"
+        },
+        {
+            "oldCategory": "Ohrievače čokolády",
+            "newCategory": "Cukrárenské a pekárske potreby/Zariadenia na čokoládu/Ohrievače čokolády"
+        },
+        {
+            "oldCategory": "Granitory",
+            "newCategory": "Cukrárenské a barové zariadenia/Výrobníky zmrzliny a drte"
+        },
+        {
+            "oldCategory": "Výrobníky zmrzlinového krému",
+            "newCategory": "Cukrárenské a barové zariadenia/Výrobníky zmrzliny a drte"
+        },
+        {
+            "oldCategory": "Disky pre modely CL 20, CL 30 Bistro, CL 40, R 301, R 401, R 402",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Príslušenstvo a disky"
+        },
+        {
+            "oldCategory": "Disky pre modely CL 50, CL 52, CL 55, CL 60, R 502, R 752",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Príslušenstvo a disky"
+        },
+        {
+            "oldCategory": "Ponorné mixéry",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Ponorné mixéry"
+        },
+        {
+            "oldCategory": "Kombinované ponorné mixéry",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Ponorné mixéry"
+        },
+        {
+            "oldCategory": "Špeciálne verzie",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Ponorné mixéry"
+        },
+        {
+            "oldCategory": "Varný kuter",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Varné kutre a procesory"
+        },
+        {
+            "oldCategory": "Mixér na koktaily-shaker",
+            "newCategory": "Bar a káva/Mixéry, shakery a odšťavovače"
+        },
+        {
+            "oldCategory": "Mlynček na mäso",
+            "newCategory": "Gastro zariadenia/Spracovanie mäsa/Mlynčeky na mäso"
+        },
+        {
+            "oldCategory": "Mlynčeky na kávu",
+            "newCategory": "Bar a káva/Mlynčeky na kávu"
+        },
+        {
+            "oldCategory": "Mlynček na mak",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Mlynčeky"
+        },
+        {
+            "oldCategory": "Mixéry",
+            "newCategory": "Bar a káva/Mixéry, shakery a odšťavovače"
+        },
+        {
+            "oldCategory": "Drviče ľadu",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Drviče ľadu"
+        },
+        {
+            "oldCategory": "Čeriče chladených nápojov",
+            "newCategory": "Bar a káva/Dávkovače a chladiče nápojov"
+        },
+        {
+            "oldCategory": "Strúhač syra",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Strúhače syra"
+        },
+        {
+            "oldCategory": "Výrobníky kališkového ľadu chladené vzduchom",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky kociek a kalíškov"
+        },
+        {
+            "oldCategory": "Výrobníky kališkového ľadu chladené vodou",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky kociek a kalíškov"
+        },
+        {
+            "oldCategory": "Výrobníky šupinkového ľadu chladené vzduchom",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky drte a šupín"
+        },
+        {
+            "oldCategory": "Výrobníky šupinkového ľadu chladené vodou",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky drte a šupín"
+        },
+        {
+            "oldCategory": "Výrobníky ľadovej drte",
+            "newCategory": "Bar a káva/Výrobníky ľadu/Výrobníky drte a šupín"
+        },
+        {
+            "oldCategory": "Vákuové baličky s externým saním",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuové baličky"
+        },
+        {
+            "oldCategory": "Vákuové baličky s externým saním a s automatickým otváraním",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuové baličky"
+        },
+        {
+            "oldCategory": "Komorové vákuové baličky s jedným programom",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuové baličky"
+        },
+        {
+            "oldCategory": "Komorové vákuové baličky s 9-timi programami",
+            "newCategory": "Gastro zariadenia/Skladovanie a balenie/Vákuové baličky"
+        },
+        {
+            "oldCategory": "Pultové chladiace vitríny so vstavaným kompresorom",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Pultové chladiace vitríny s externým kompresorom",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Pultové chladiace vitríny s dvojitým chladením",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Pultové vyhrievané vitríny",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Vyhrievané vitríny"
+        },
+        {
+            "oldCategory": "Pultové neutrálne vitríny",
+            "newCategory": "Vitríny a výdaj/Stolové vitríny/Neutrálne vitríny"
+        },
+        {
+            "oldCategory": "Fritézy s vodnou clonou",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "Gril na drevené uhlie",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily na drevené uhlie"
+        },
+        {
+            "oldCategory": "Shakery",
+            "newCategory": "Bar a káva/Mixéry, shakery a odšťavovače"
+        },
+        {
+            "oldCategory": "Barové mixéry",
+            "newCategory": "Bar a káva/Mixéry, shakery a odšťavovače"
+        },
+        {
+            "oldCategory": "Vysokovýkonné kombinované rúry XpressChef",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Konvektomaty"
+        },
+        {
+            "oldCategory": "Vysokovýkonné modely 2x GN 1/1",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Mikrovlnné rúry"
+        },
+        {
+            "oldCategory": "Vysokovýkonné kompaktné modely",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Mikrovlnné rúry"
+        },
+        {
+            "oldCategory": "Stredne výkonné modely",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Mikrovlnné rúry"
+        },
+        {
+            "oldCategory": "Tvarovače cesta",
+            "newCategory": "Pizza a kebab/Tvarovače a válkače cesta"
+        },
+        {
+            "oldCategory": "Elektrické pece na pizzu",
+            "newCategory": "Pizza a kebab/Pece na pizzu/Elektrické pece"
+        },
+        {
+            "oldCategory": "Elektrické priebežné pece na pizzu",
+            "newCategory": "Pizza a kebab/Pece na pizzu/Priebežné pece"
+        },
+        {
+            "oldCategory": "Plynové priebežné pece na pizzu",
+            "newCategory": "Pizza a kebab/Pece na pizzu/Priebežné pece"
+        },
+        {
+            "oldCategory": "Špirálové miesiče cesta",
+            "newCategory": "Pizza a kebab/Miesiče cesta"
+        },
+        {
+            "oldCategory": "Kávovary na filtrovanú kávu s ručným plnením",
+            "newCategory": "Bar a káva/Kávovary a mlynčeky/Kávovary na filtrovanú kávu"
+        },
+        {
+            "oldCategory": "Kávovary na filtrovanú kávu s pripojením na vodu",
+            "newCategory": "Bar a káva/Kávovary a mlynčeky/Kávovary na filtrovanú kávu"
+        },
+        {
+            "oldCategory": "Kávovary  B - series",
+            "newCategory": "Bar a káva/Kávovary a mlynčeky/Kávovary na filtrovanú kávu"
+        },
+        {
+            "oldCategory": "Kávovary B HW - series",
+            "newCategory": "Bar a káva/Kávovary a mlynčeky/Kávovary na filtrovanú kávu"
+        },
+        {
+            "oldCategory": "Automaty na prípravu instantných nápojov",
+            "newCategory": "Bar a káva/Automaty na nápoje"
+        },
+        {
+            "oldCategory": "Automatické espresso kávovary",
+            "newCategory": "Bar a káva/Kávovary a mlynčeky/Automatické kávovary"
+        },
+        {
+            "oldCategory": "Papierové košíkové filtre",
+            "newCategory": "Bar a káva/Kaviarenské príslušenstvo/Filtre do kávovarov"
+        },
+        {
+            "oldCategory": "Papierové kruhové filtre",
+            "newCategory": "Bar a káva/Kaviarenské príslušenstvo/Filtre do kávovarov"
+        },
+        {
+            "oldCategory": "Termosy",
+            "newCategory": "Catering a transport/Termosky a termo nádoby"
+        },
+        {
+            "oldCategory": "Ohrievače vody",
+            "newCategory": "Bar a káva/Ohrievače nápojov/Ohrievače vody"
+        },
+        {
+            "oldCategory": "Ohrievače tanierov",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Ohrievače tanierov"
+        },
+        {
+            "oldCategory": "Grily a hriankovače",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Hriankovače a toastery"
+        },
+        {
+            "oldCategory": "Varič vajíčok",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Vaječné variče"
+        },
+        {
+            "oldCategory": "Elektrické platne na palacinky",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Palacinkovače a vaflovače"
+        },
+        {
+            "oldCategory": "Plynové platne na palacinky",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Palacinkovače a vaflovače"
+        },
+        {
+            "oldCategory": "Vaflovače",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Palacinkovače a vaflovače"
+        },
+        {
+            "oldCategory": "Elektrické fritézy",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "Plynové varidlá",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Varné stoličky"
+        },
+        {
+            "oldCategory": "Elektrické varidlá",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Varné stoličky"
+        },
+        {
+            "oldCategory": "Elektrické grilovacie platne",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Plynové grilovacie platne",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Kontaktné grily",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Kontaktné grily"
+        },
+        {
+            "oldCategory": "Elektrické salamandre",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Salamandre"
+        },
+        {
+            "oldCategory": "Plynové salamandre",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Salamandre"
+        },
+        {
+            "oldCategory": "Konvektické rúry",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Konvektomaty"
+        },
+        {
+            "oldCategory": "Elektrické grily na gyros",
+            "newCategory": "Pizza a kebab/Stroje na kebab"
+        },
+        {
+            "oldCategory": "Plynové grily na gyros",
+            "newCategory": "Pizza a kebab/Stroje na kebab"
+        },
+        {
+            "oldCategory": "Lávové grily",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Lávové grily"
+        },
+        {
+            "oldCategory": "Elektrické grily na kurčatá",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily na kurčatá"
+        },
+        {
+            "oldCategory": "Plynové grily na kurčatá",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily na kurčatá"
+        },
+        {
+            "oldCategory": "Sterilizátory",
+            "newCategory": "Hygiena a údržba/Sterilizátory"
+        },
+        {
+            "oldCategory": "Stroje na hot-dog",
+            "newCategory": "Gastro zariadenia/Fast food zariadenia/Hot-dog zariadenia"
+        },
+        {
+            "oldCategory": "Ohrievače toppingov",
+            "newCategory": "Cukrárenské a pekárske potreby/Dávkovače a ohrievače"
+        },
+        {
+            "oldCategory": "Pece na pizzu",
+            "newCategory": "Pizza a kebab/Pece na pizzu"
+        },
+        {
+            "oldCategory": "Mobilné šalátové bary",
+            "newCategory": "Catering a výdaj/Bufetové stoly/Chladené bufetové stoly"
+        },
+        {
+            "oldCategory": "Sklo-keramické grily",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily a grilovacie platne"
+        },
+        {
+            "oldCategory": "Vyhrievané skrinky na taniere",
+            "newCategory": "Catering a výdaj/Ohrev a servírovanie/Ohrievače tanierov"
+        },
+        {
+            "oldCategory": "Chladiace vitríny",
+            "newCategory": "Vitríny a výdaj/Samostatne stojace vitríny/Chladiace vitríny"
+        },
+        {
+            "oldCategory": "Sady diskov ku krájačom a robotom",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Príslušenstvo a disky"
+        },
+        {
+            "oldCategory": "Indukčné platne",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Indukčné variče"
+        },
+        {
+            "oldCategory": "Zmäkčovač vody",
+            "newCategory": "Hygiena a údržba/Úprava vody/Zmäkčovače vody"
+        },
+        {
+            "oldCategory": "Plynové fritézy",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "Príslušenstvo k ponorným mixérom",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Príslušenstvo k mixérom"
+        },
+        {
+            "oldCategory": "SOUS VIDE variče",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Sous-vide"
+        },
+        {
+            "oldCategory": "Šokové zmrazovače",
+            "newCategory": "Gastro zariadenia/Chladenie a mrazenie/Šokové schladzovače a zmrazovače"
+        },
+        {
+            "oldCategory": "Záhradné grily",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily na drevené uhlie"
+        },
+        {
+            "oldCategory": "Ponorný mixér",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Ponorné mixéry"
+        },
+        {
+            "oldCategory": "Espresso kávovar",
+            "newCategory": "Bar a káva/Kávovary a mlynčeky/Pákové kávovary"
+        },
+        {
+            "oldCategory": "Grily na drevené uhlie",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Grily na drevené uhlie"
+        },
+        {
+            "oldCategory": "Fritézy",
+            "newCategory": "Gastro zariadenia/Tepelná úprava/Fritézy"
+        },
+        {
+            "oldCategory": "",
+            "newCategory": "Gastro zariadenia/Dynamická príprava/Krájače zeleniny"
+        },
+        {
+            "oldCategory": "Ohrievač šálok",
+            "newCategory": "Bar a káva/Kaviarenské príslušenstvo/Ohrievače šálok"
+        },
+        {
+            "oldCategory": "Lisy na cesto",
+            "newCategory": "Pizza a kebab/Tvarovače a válkače cesta"
+        },
+        {
+            "oldCategory": "Miesiče cesta na 230 V",
+            "newCategory": "Pizza a kebab/Miesiče cesta"
+        },
+        {
+            "oldCategory": "Miesiče cesta na 400 V",
+            "newCategory": "Pizza a kebab/Miesiče cesta"
+        },
+        {
+            "oldCategory": "Miesiče cesta s reguláciou otáčok",
+            "newCategory": "Pizza a kebab/Miesiče cesta"
+        },
+        {
+            "oldCategory": "Miesiče cesta H²O s pevnou hlavou a nádobou",
+            "newCategory": "Pizza a kebab/Miesiče cesta"
+        },
+        {
+            "oldCategory": "Miesiče cesta H²O s výklopnou hlavou a odpojiteľnou nádobou",
+            "newCategory": "Pizza a kebab/Miesiče cesta"
+        }
+    ]
+}
