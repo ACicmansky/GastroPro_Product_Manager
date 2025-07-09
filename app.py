@@ -331,8 +331,23 @@ class ProductManager(QMainWindow):
         save_path, _ = QFileDialog.getSaveFileName(self, "Uložiť výsledný CSV súbor", "Merged.csv", "CSV files (*.csv)")
         if save_path:
             try:
-                final_df.to_csv(save_path, index=False, encoding='cp1250', sep=';')
-                QMessageBox.information(self, "Great success!", f"Súbor bol úspešne uložený do: {save_path}")
+                # First try cp1250 with character replacement
+                try:
+                    # Handle characters that can't be encoded in cp1250
+                    # Convert problematic characters first
+                    for col in final_df.columns:
+                        if final_df[col].dtype == 'object':
+                            final_df[col] = final_df[col].astype(str).apply(
+                                lambda x: ''.join(c if c.encode('cp1250', errors='replace') != b'?' else ' ' for c in x)
+                            )
+                    
+                    final_df.to_csv(save_path, index=False, encoding='cp1250', sep=';')
+                    QMessageBox.information(self, "Great success!", f"Súbor bol úspešne uložený do: {save_path}")
+                except UnicodeEncodeError:
+                    # Fall back to UTF-8 with BOM for Excel compatibility
+                    final_df.to_csv(save_path, index=False, encoding='utf-8-sig', sep=';')
+                    QMessageBox.information(self, "Great success!", 
+                        f"Súbor bol uložený do: {save_path}\n\nPoznámka: Použité kódovanie UTF-8 namiesto cp1250 kvôli nekompatibilným znakom.")
             except Exception as e:
                 self.show_error_message(("Chyba pri ukladaní", f"Pri ukladaní súboru došlo k chybe:\n{e}"))
 
