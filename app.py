@@ -3,9 +3,9 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QFileDialog, QMessageBox, QListWidget,
-    QCheckBox, QListWidgetItem, QDesktopWidget, QFrame, QLineEdit, QProgressBar
+    QListWidgetItem, QDesktopWidget, QFrame, QLineEdit, QProgressBar
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStandardPaths
 
 from utils import load_config, fetch_xml_feed, parse_xml_feed, merge_dataframes, load_csv_data
 
@@ -13,12 +13,13 @@ class DropArea(QFrame):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setFrameShape(QFrame.StyledPanel)
-        self.label = QLabel("Presuňte CSV súbor sem alebo kliknite na tlačidlo nižšie")
+        self.label = QLabel("Presuňte CSV súbor sem alebo kliknite sem pre výber súboru")
         self.label.setAlignment(Qt.AlignCenter)
         layout = QVBoxLayout()
         layout.addWidget(self.label)
         self.setLayout(layout)
         self.setAcceptDrops(True)
+        self.setCursor(Qt.PointingHandCursor)  # Change cursor to indicate clickable area
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -29,6 +30,12 @@ class DropArea(QFrame):
             file_path = url.toLocalFile()
             if file_path.endswith('.csv'):
                 self.parent().load_csv_file(file_path)
+    
+    def mousePressEvent(self, event):
+        # Handle mouse click event
+        if event.button() == Qt.LeftButton:
+            self.parent().parent().select_csv_file()
+        super().mousePressEvent(event)
 
 class Worker(QObject):
     finished = pyqtSignal()
@@ -85,7 +92,6 @@ class ProductManager(QMainWindow):
         self.main_df = None
         self.categories = []
         self.config = load_config()
-        self.dark_mode = False
 
         if not self.config:
             QMessageBox.critical(self, "Chyba konfigurácie", "Nepodarilo sa načítať konfiguračný súbor. Aplikácia sa ukončí.")
@@ -114,17 +120,9 @@ class ProductManager(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
 
-        # --- Dark Mode Toggle ---
-        self.dark_mode_button = QPushButton("Dark Mode")
-        self.dark_mode_button.clicked.connect(self.toggle_dark_mode)
-        self.layout.addWidget(self.dark_mode_button)
-
         # --- CSV Upload ---
         self.drop_area = DropArea(self)
         self.layout.addWidget(self.drop_area)
-        upload_button = QPushButton("Vybrať CSV")
-        upload_button.clicked.connect(self.select_csv_file)
-        self.layout.addWidget(upload_button)
 
         # --- Category Filter ---
         self.filter_group = QWidget()
@@ -176,18 +174,6 @@ class ProductManager(QMainWindow):
         self.layout.addWidget(self.generate_button)
         self.generate_button.setVisible(False)
 
-    def toggle_dark_mode(self):
-        self.dark_mode = not self.dark_mode
-        if self.dark_mode:
-            self.central_widget.setObjectName("central_widget dark")
-            self.filter_group.setObjectName("glass dark")
-            self.dark_mode_button.setText("Light Mode")
-        else:
-            self.central_widget.setObjectName("central_widget")
-            self.filter_group.setObjectName("glass")
-            self.dark_mode_button.setText("Dark Mode")
-        self.load_stylesheet()
-
     def filter_categories(self, text):
         from rapidfuzz import fuzz
         
@@ -221,13 +207,13 @@ class ProductManager(QMainWindow):
 
     def _reset_ui(self):
         self.main_df = None
-        self.drop_area.label.setText("Presuňte CSV súbor sem alebo kliknite na tlačidlo nižšie")
+        self.drop_area.label.setText("Presuňte CSV súbor sem alebo kliknite sem pre výber súboru")
         self.filter_group.setVisible(False)
         self.generate_button.setVisible(False)
         self.progress_bar.setVisible(False)
 
     def select_csv_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte CSV súbor", "", "CSV files (*.csv)")
+        file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte CSV súbor", QStandardPaths.writableLocation(QStandardPaths.DownloadLocation), "CSV files (*.csv)")
         if file_path:
             self.load_csv_file(file_path)
 
@@ -260,12 +246,8 @@ class ProductManager(QMainWindow):
         for category in self.categories:
             item = QListWidgetItem(category)
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
-            item.setCheckState(Qt.Checked)
+            item.setCheckState(Qt.Unchecked)
             self.category_list.addItem(item)
-        # Select all categories by default
-        for i in range(self.category_list.count()):
-            item = self.category_list.item(i)
-            item.setCheckState(Qt.Checked)
 
     def select_all_categories(self):
         # Toggle between selecting all and deselecting all
@@ -349,7 +331,7 @@ class ProductManager(QMainWindow):
         save_path, _ = QFileDialog.getSaveFileName(self, "Uložiť výsledný CSV súbor", "Merged.csv", "CSV files (*.csv)")
         if save_path:
             try:
-                final_df.to_csv(save_path, index=False, encoding='utf-8-sig')
+                final_df.to_csv(save_path, index=False, encoding='cp1250', sep=';')
                 QMessageBox.information(self, "Great success!", f"Súbor bol úspešne uložený do: {save_path}")
             except Exception as e:
                 self.show_error_message(("Chyba pri ukladaní", f"Pri ukladaní súboru došlo k chybe:\n{e}"))
