@@ -28,9 +28,15 @@ GastroPro Product Manager follows a simple modular architecture with separation 
    - Default configuration fallback
 
 3. **Data Processing Pipeline**:
-   - Input stage: CSV loading
-   - Processing stage: Category filtering, XML feed integration
+   - Input stage: CSV loading and preparation
+   - Processing stage: Category filtering, mapping, and XML feed integration
    - Output stage: CSV generation and export
+
+4. **Category Mapping System**:
+   - Universal JSON array format for mapping definitions
+   - Centralized mapping functions for consistent application
+   - User-controlled application at export time
+   - Detailed logging of mapping operations
 
 ## Component Relationships
 - **MainWindow Class**: Core controller that manages the application flow

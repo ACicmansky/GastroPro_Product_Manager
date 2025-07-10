@@ -1,12 +1,18 @@
 # GastroPro Product Manager - Active Context
 
 ## Current Focus
+- Standardizing category mapping across all data sources
 - Optimizing product data processing from multiple feed sources
 - Fine-tuning specialized data extraction and formatting
 - Ensuring proper data merging and export functionality
-- Implementing remaining features for complete workflow
+- Implementing user-controlled features for flexible workflow
 
 ## Recent Changes
+- Enhanced category mapping system with unified approach for XML feeds and CSV input
+- Implemented optional user-controlled category mapping at export time
+- Added UI checkbox to control CSV category mapping behavior
+- Restructured category mapping to use a simpler universal JSON array format
+- Created centralized mapping functions to ensure consistent category standardization
 - Successfully implemented XML feed fetching and parsing for multiple vendors
 - Added specialized processing for forgastro feed HTML content extraction
 - Implemented gastromarket feed text processing for bullet points and categories
@@ -14,7 +20,6 @@
 - Added automatic "Viditeľný" field setting to "1" for all feed products
 - Enhanced HTML parsing with BeautifulSoup to extract tab content
 - Improved special character handling and text formatting
-- Fixed issues with parameter table extraction and formatting
 
 ## Next Steps
 1. Implement category selection functionality from local CSV
