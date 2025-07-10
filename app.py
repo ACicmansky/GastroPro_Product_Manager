@@ -3,11 +3,12 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
     QPushButton, QLabel, QFileDialog, QMessageBox, QListWidget,
-    QListWidgetItem, QDesktopWidget, QFrame, QLineEdit, QProgressBar
+    QListWidgetItem, QDesktopWidget, QFrame, QLineEdit, QProgressBar,
+    QCheckBox
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStandardPaths
 
-from utils import load_config, fetch_xml_feed, parse_xml_feed, merge_dataframes, load_csv_data
+from utils import load_config, fetch_xml_feed, parse_xml_feed, merge_dataframes, load_csv_data, load_category_mappings, map_dataframe_categories
 
 class DropArea(QFrame):
     def __init__(self, parent=None):
@@ -43,14 +44,23 @@ class Worker(QObject):
     progress = pyqtSignal(str)
     result = pyqtSignal(object)
 
-    def __init__(self, main_df, selected_categories, config):
+    def __init__(self, main_df, selected_categories, config, map_categories=False):
         super().__init__()
         self.main_df = main_df
         self.selected_categories = selected_categories
         self.config = config
+        self.map_categories = map_categories
 
     def run(self):
         try:
+            # Apply category mapping to the input CSV file if enabled
+            if self.map_categories and 'Hlavna kategória' in self.main_df.columns:
+                self.progress.emit("Applying category mappings to CSV...")
+                category_mappings = load_category_mappings()
+                if category_mappings:
+                    self.main_df = map_dataframe_categories(self.main_df, category_mappings)
+                    self.progress.emit("Category mapping completed")
+            
             self.progress.emit("Filtering main CSV...")
             filtered_df = self.main_df[self.main_df['Hlavna kategória'].isin(self.selected_categories)].copy()
 
@@ -145,9 +155,15 @@ class ProductManager(QMainWindow):
         self.toggle_filtered_button.setToolTip("Označiť/odznačiť všetky filtrované kategórie")
         self.toggle_filtered_button.setMaximumWidth(130)
         
-        # Add buttons to horizontal layout
+        # Checkbox for CSV category mapping
+        self.map_categories_checkbox = QCheckBox("Migrovat CSV kategorie")
+        self.map_categories_checkbox.setChecked(True)  # Enabled by default
+        self.map_categories_checkbox.setToolTip("Použiť mapovanie kategórií na vstupný CSV súbor")
+        
+        # Add buttons and checkbox to horizontal layout
         buttons_layout.addWidget(self.select_all_button)
         buttons_layout.addWidget(self.toggle_filtered_button)
+        buttons_layout.addWidget(self.map_categories_checkbox)
         buttons_layout.addStretch(1)
         
         self.category_list = QListWidget()
@@ -214,6 +230,7 @@ class ProductManager(QMainWindow):
 
     def load_csv_file(self, file_path):
         try:
+            # Load the CSV data
             self.main_df = load_csv_data(file_path)
             
             if self.main_df is None or self.main_df.empty:
@@ -293,8 +310,11 @@ class ProductManager(QMainWindow):
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0) # Indeterminate progress
 
+        # Get checkbox state for category mapping
+        map_categories = self.map_categories_checkbox.isChecked()
+
         self.thread = QThread()
-        self.worker = Worker(self.main_df, selected_categories, self.config)
+        self.worker = Worker(self.main_df, selected_categories, self.config, map_categories)
         self.worker.moveToThread(self.thread)
 
         self.thread.started.connect(self.worker.run)
@@ -341,14 +361,6 @@ class ProductManager(QMainWindow):
                         f"Súbor bol uložený do: {save_path}\n\nPoznámka: Použité kódovanie UTF-8 namiesto cp1250 kvôli nekompatibilným znakom.")
             except Exception as e:
                 self.show_error_message(("Chyba pri ukladaní", f"Pri ukladaní súboru došlo k chybe:\n{e}"))
-
-    def closeEvent(self, event):
-        reply = QMessageBox.question(self, 'Ukončiť', "Naozaj chcete aplikáciu ukončiť?",
-                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            event.accept()
-        else:
-            event.ignore()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

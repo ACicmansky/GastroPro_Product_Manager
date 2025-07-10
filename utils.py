@@ -20,20 +20,24 @@ def load_config(config_path: str = 'config.json') -> dict:
         raise ValueError(f"Chyba pri parsovaní súboru '{config_path}'. Skontrolujte syntax JSON.") from e
 
 
-def load_category_mappings(mappings_path: str = 'categories.json') -> dict:
-    """Loads category mappings from a JSON file."""
+def load_category_mappings(mappings_path: str = 'categories.json') -> list:
+    """Loads category mappings from a JSON file.
+    
+    Returns:
+        list: List containing category mappings, or an empty list if file not found.
+    """
     try:
         if os.path.exists(mappings_path):
             with open(mappings_path, 'r', encoding='utf-8') as f:
                 mappings = json.load(f)
-                print(f"Loaded {sum(len(feed_mappings) for feed_mappings in mappings.values())} category mappings from {mappings_path}")
+                print(f"Loaded {len(mappings)} category mappings from {mappings_path}")
                 return mappings
         else:
             print(f"Category mappings file '{mappings_path}' not found, using default category processing")
-            return {}
+            return []
     except Exception as e:
         print(f"Error loading category mappings: {e}")
-        return {}
+        return []
 
 
 def load_csv_data(file_path: str) -> pd.DataFrame:
@@ -137,47 +141,97 @@ def process_gastromarket_text(description, category, category_mappings=None):
     # Process category with mapping if available
     if category and isinstance(category, str):
         # First try to find a mapping in the category mappings file
-        if category_mappings and 'gastromarket' in category_mappings:
-            found_mapping = False
-            for mapping in category_mappings['gastromarket']:
-                if mapping['oldCategory'] == category:
-                    processed_category = mapping['newCategory']
-                    found_mapping = True
-                    print(f"Mapped category using categories.json: '{category}' -> '{processed_category}'")
-                    break
-            
-            if not found_mapping:
-                # Fallback to default processing if no mapping found
-                processed_category = category.replace(" | ", "/")
-                print(f"No mapping found in categories.json, using default: '{category}' -> '{processed_category}'")
-        else:
-            # Fallback to original processing if no mappings available
+        if category_mappings:
+            mapped_category = map_category(category, category_mappings)
+            if mapped_category != category:
+                return processed_description, mapped_category
+        
+        # If no mapping found or no mappings provided, use default processing
+        if " | " in category:
             processed_category = category.replace(" | ", "/")
-            print(f"No category mappings available, using default: '{category}' -> '{processed_category}'")
+            print(f"No mapping found for Gastromarket category '{category}', using default replacement: '{processed_category}'")
+        else:
+            processed_category = category
     else:
         processed_category = ""
     
-    return (processed_description, processed_category)
+    return processed_description, processed_category
+
+
+def map_category(category, category_mappings):
+    """Map a category using the provided mappings.
+    
+    Args:
+        category (str): The original category text
+        category_mappings (list): List of category mappings
+        
+    Returns:
+        str: Mapped category or original if no mapping found
+    """
+    if not category or not isinstance(category, str) or not category_mappings:
+        return category
+    
+    # Try to find a mapping for this category
+    for mapping in category_mappings:
+        if mapping.get("oldCategory") == category:
+            print(f"Mapped category '{category}' to '{mapping['newCategory']}'")
+            return mapping["newCategory"]
+    
+    print(f"No mapping found for category '{category}', using original")
+    return category
+
+
+def map_dataframe_categories(df, category_mappings):
+    """Map categories in a DataFrame based on the provided mappings.
+    
+    Args:
+        df (pd.DataFrame): DataFrame containing a 'Hlavna kategória' column
+        category_mappings (list): List of category mappings
+        
+    Returns:
+        pd.DataFrame: DataFrame with mapped categories
+    """
+    if df is None or not isinstance(df, pd.DataFrame) or 'Hlavna kategória' not in df.columns or not category_mappings:
+        return df
+    
+    # Create a copy of the DataFrame to avoid modifying the original
+    mapped_df = df.copy()
+    
+    # Count how many categories were mapped
+    mapped_count = 0
+    total_count = 0
+    
+    # Map each category in the DataFrame
+    for idx, row in mapped_df.iterrows():
+        if pd.notna(row['Hlavna kategória']):
+            total_count += 1
+            original = row['Hlavna kategória']
+            mapped = map_category(original, category_mappings)
+            if mapped != original:
+                mapped_count += 1
+                mapped_df.at[idx, 'Hlavna kategória'] = mapped
+    
+    print(f"Mapped {mapped_count} out of {total_count} categories in input CSV file")
+    return mapped_df
+
 
 def process_forgastro_category(category, category_mappings=None):
-    """
-    Process category from forgastro feed using category mappings.
-    Returns the mapped category if found, or the original otherwise.
+    """Process ForGastro category text.
+    
+    Args:
+        category (str): The category text
+        category_mappings (list, optional): List of category mappings
+        
+    Returns:
+        str: Processed category
     """
     if not category or not isinstance(category, str):
-        return ""
-        
-    # Check if we have mappings for forgastro feed
-    if category_mappings and 'forgastro' in category_mappings:
-        for mapping in category_mappings['forgastro']:
-            if mapping['oldCategory'] == category:
-                mapped_category = mapping['newCategory']
-                print(f"Mapped forgastro category: '{category}' -> '{mapped_category}'")
-                return mapped_category
-                
-        print(f"No mapping found for forgastro category: '{category}'")
-    else:
-        print(f"No forgastro category mappings available, using original: '{category}'")
+        return category
+    
+    # Try to find a mapping for this category using the common mapping function
+    if category_mappings:
+        return map_category(category, category_mappings)
+    
         
     return category
 
@@ -301,7 +355,10 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
     if root is None:
         return pd.DataFrame()
         
-    # Load category mappings
+    # List to store each item's data
+    items = []
+    
+    # Load category mappings - now it's a simple array of mappings, not grouped by feed
     category_mappings = load_category_mappings()
 
     data = []
@@ -359,18 +416,15 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
                         row["Krátky popis"] = f"{current_short.strip()}\n{params_text}"
                     else:
                         row["Krátky popis"] = params_text
-                    
         elif feed_name == "gastromarket":
-            # Gastromarket-specific text processing
+            # Process Gastromarket description and category using universal category mappings
             description = row.get("Krátky popis", "")
             category = row.get("Hlavna kategória", "")
-            
             processed_desc, processed_cat = process_gastromarket_text(description, category, category_mappings)
             
             # Update fields with processed values
             if processed_desc:
                 row["Krátky popis"] = processed_desc
-                
             if processed_cat:
                 row["Hlavna kategória"] = processed_cat
             
