@@ -1,13 +1,16 @@
 # scraping.py
 import requests
-from bs4 import BeautifulSoup
 import pandas as pd
-import re
+from bs4 import BeautifulSoup
+import logging
+from urllib.parse import urljoin
+import time
 import json
 import os
-import logging
-import time
-from urllib.parse import urljoin
+import re
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from threading import Lock
+from tqdm import tqdm
 
 # Configure logging
 logging.basicConfig(
@@ -93,55 +96,13 @@ class TopchladenieScraper:
         return df
     
     def get_category_links(self):
-        """Get all category links from the website
+        """Get all category links
         
         Returns:
             list: List of category URLs
         """
-        # logger.info("Fetching category links from homepage")
-        
-        # # Try different entry points to find categories
-        # entry_points = ["/e-shop", "/", "/category/list"]
         category_links = []
-        
-        # for entry in entry_points:
-        #     url = urljoin(self.base_url, entry)
-        #     try:
-        #         logger.info(f"Trying to find categories at: {url}")
-        #         response = self.session.get(url)
-        #         soup = BeautifulSoup(response.content, 'html.parser')
-                
-        #         # Try multiple selector strategies
-        #         selector_strategies = [
-        #             # Original selectors
-        #             '.main-menu li a',
-        #             '.main-menu .submenu a',
-        #             # Additional common navigation selectors
-        #             'nav a',
-        #             '.navigation a',
-        #             '.categories a',
-        #             '#navigation a',
-        #             '.menu-category a',
-        #             '.menu a[href*="/e-shop/"]',
-        #             'a[href*="/e-shop/"]',
-        #         ]
-                
-        #         for selector in selector_strategies:
-        #             elements = soup.select(selector)
-        #             logger.info(f"Selector '{selector}' found {len(elements)} elements")
-                    
-        #             for element in elements:
-        #                 href = element.get('href')
-        #                 if href and href.startswith('/e-shop/') and 'akcie-a-zlavy' not in href:
-        #                     full_url = urljoin(self.base_url, href)
-        #                     category_links.append(full_url)
-        #     except Exception as e:
-        #         logger.error(f"Error fetching categories from {url}: {str(e)}")
-        
-        # If we still have no categories, add known category URLs directly
-        if not category_links:
-            logger.warning("No categories found using selectors. Adding manual category URLs")
-            direct_categories = [
+        direct_categories = [
                 '/e-shop/samostatne-chladnicky/bez-mraznicky-vnutri',
                 '/e-shop/samostatne-chladnicky/s-mraznickou-vo-vnutri',
                 '/e-shop/chladnicky-s-mraznickou/s-mraznickou-hore',
@@ -161,22 +122,10 @@ class TopchladenieScraper:
                 '/e-shop/komercne-zariadenia/napojovy-priemysel',
                 '/e-shop/prislusenstvo'
             ]
-            for cat in direct_categories:
-                full_url = urljoin(self.base_url, cat)
-                category_links.append(full_url)
-        
-        # Remove duplicates
-        unique_links = list(set(category_links))
-        logger.info(f"Found {len(unique_links)} unique category links")
-
-
-
-
-
-
-
-
-        return unique_links
+        for cat in direct_categories:
+            full_url = urljoin(self.base_url, cat)
+            category_links.append(full_url)
+        return category_links
     
     def get_product_urls(self, category_url):
         """Get all product URLs from a category page, handling pagination
@@ -728,6 +677,142 @@ class TopchladenieScraper:
             return category_name
 
 
+class FastTopchladenieScraper(TopchladenieScraper):
+    """Enhanced scraper with threading support for faster processing"""
+    
+    def __init__(self, base_url="https://www.topchladenie.sk", categories_file="categories.json", max_workers=8):
+        """Initialize the fast scraper with threading capabilities
+        
+        Args:
+            base_url: Base URL for the website
+            categories_file: Categories mapping file
+            max_workers: Number of concurrent threads (default: 8)
+        """
+        super().__init__(base_url, categories_file)
+        self.max_workers = max_workers
+        self.progress_lock = Lock()
+        self.results = []
+        
+    def scrape_products_threaded(self, product_urls, show_progress=True):
+        """Scrape multiple products using threading
+        
+        Args:
+            product_urls: List of product URLs to scrape
+            show_progress: Whether to show progress bar
+            
+        Returns:
+            pandas.DataFrame: DataFrame with scraped products
+        """
+        logger.info(f"Starting threaded scraping of {len(product_urls)} products with {self.max_workers} workers")
+        
+        # Initialize results list
+        self.results = []
+        
+        # Create progress bar if requested
+        if show_progress:
+            pbar = tqdm(total=len(product_urls), desc="Scraping products", unit="product")
+        
+        # Use ThreadPoolExecutor for concurrent processing
+        with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
+            # Submit all tasks
+            future_to_url = {executor.submit(self._scrape_single_product_safe, url): url for url in product_urls}
+            
+            # Process completed tasks
+            for future in as_completed(future_to_url):
+                url = future_to_url[future]
+                try:
+                    product_data = future.result()
+                    if product_data:
+                        with self.progress_lock:
+                            self.results.append(product_data)
+                    
+                    if show_progress:
+                        pbar.update(1)
+                        pbar.set_postfix({
+                            'Success': len(self.results),
+                            'Total': len(product_urls)
+                        })
+                        
+                except Exception as e:
+                    logger.error(f"Failed to scrape {url}: {str(e)}")
+                    if show_progress:
+                        pbar.update(1)
+        
+        if show_progress:
+            pbar.close()
+        
+        # Convert results to DataFrame
+        if self.results:
+            df = pd.DataFrame(self.results)
+            df['Viditeľný'] = "1"
+            logger.info(f"Successfully scraped {len(self.results)} products")
+            return df
+        else:
+            logger.warning("No products were successfully scraped")
+            return pd.DataFrame()
+    
+    def _scrape_single_product_safe(self, url):
+        """Safely scrape a single product with error handling and rate limiting
+        
+        Args:
+            url: Product URL to scrape
+            
+        Returns:
+            dict: Product data or None if failed
+        """
+        try:
+            # Add small random delay to avoid overwhelming the server
+            time.sleep(0.1 + (hash(url) % 5) * 0.1)  # 0.1-0.6 second delay
+            
+            # Use the existing extract_product_details method
+            product_data = self.extract_product_details(url)
+            return product_data
+            
+        except Exception as e:
+            logger.error(f"Error scraping product {url}: {str(e)}")
+            return None
+    
+    def scrape_categories_threaded(self, category_urls=None, show_progress=True):
+        """Scrape all products from categories using threading
+        
+        Args:
+            category_urls: List of category URLs (if None, uses get_category_links())
+            show_progress: Whether to show progress bar
+            
+        Returns:
+            pandas.DataFrame: DataFrame with all scraped products
+        """
+        if category_urls is None:
+            category_urls = self.get_category_links()
+        
+        logger.info(f"Collecting product URLs from {len(category_urls)} categories")
+        
+        # Collect all product URLs first
+        all_product_urls = []
+        for category_url in category_urls:
+            try:
+                product_urls = self.get_product_urls(category_url)
+                all_product_urls.extend(product_urls)
+                logger.info(f"Found {len(product_urls)} products in category: {category_url}")
+            except Exception as e:
+                logger.error(f"Error getting products from category {category_url}: {str(e)}")
+        
+        # Remove duplicates
+        unique_product_urls = list(set(all_product_urls))
+        logger.info(f"Total unique products to scrape: {len(unique_product_urls)}")
+        
+        # Scrape all products using threading
+        return self.scrape_products_threaded(unique_product_urls, show_progress)
+    
+    def scrape_all_products(self):
+        """Override parent method to use threading
+        
+        Returns:
+            pandas.DataFrame: DataFrame containing all scraped products
+        """
+        return self.scrape_categories_threaded()
+
+
 def save_to_csv(df, output_file='topchladenie_products.csv'):
     """Save the DataFrame to a CSV file
     
@@ -808,25 +893,47 @@ def merge_with_existing_data(original_df, scraped_df):
     return merged_df
 
 
-# This allows the file to be run as a standalone script
 if __name__ == "__main__":
     print("Starting topchladenie.sk scraper...")
+    
+    # Ask user about scraper type
+    print("\nChoose scraper type:")
+    print("1. Fast scraper with threading (recommended)")
+    print("2. Original single-threaded scraper")
+    
+    scraper_choice = input("Enter choice (1 or 2, default=1): ").strip() or "1"
+    
+    if scraper_choice == "1":
+        # Get number of threads
+        max_workers = input("Enter number of threads (default=8, max=16): ").strip()
+        try:
+            max_workers = min(int(max_workers), 16) if max_workers else 8
+        except ValueError:
+            max_workers = 8
+        
+        scraper = FastTopchladenieScraper(max_workers=max_workers)
+        print(f"Using fast scraper with {max_workers} threads")
+    else:
+        scraper = TopchladenieScraper()
+        print("Using original single-threaded scraper")
+    
     print("Initializing scraper...")
-    scraper = TopchladenieScraper()
-    print("Beginning to scrape products...")
+    print("Beginning to scrape products...\n")
     
     try:
-        # Single product test
-        print("\nTesting with a single product page...")
+        # Test with a single product first
+        print("Testing with a single product page...")
         test_url = "https://www.topchladenie.sk/e-shop/liebherr-cbnsdc-765i-prime"
         print(f"Retrieving data from: {test_url}")
+        
         product_data = scraper.extract_product_details(test_url)
-        print("\n============= PRODUCT TEST RESULTS =============\n")
         
-        print("BASIC PRODUCT DETAILS")
-        print("-" * 50)
+        # Display formatted product information
+        print("\n" + "=" * 50)
+        print("PRODUCT INFORMATION")
+        print("=" * 50)
         
-        # Display basic product information
+        # Display basic info
         basic_fields = ['Kat. číslo', 'Názov tovaru', 'Bežná cena', 'Výrobca', 'Hlavna kategória']
         max_key_length = max(len(key) for key in basic_fields)
         
@@ -838,7 +945,6 @@ if __name__ == "__main__":
         print("\nSHORT DESCRIPTION / PARAMETERS")
         print("-" * 50)
         if product_data.get('Krátky popis'):
-            # Format parameters for better readability if they're on separate lines
             params = product_data['Krátky popis'].split('\n')
             for param in params:
                 print(f"• {param.strip()}")
@@ -849,10 +955,6 @@ if __name__ == "__main__":
         print("\nLONG DESCRIPTION")
         print("-" * 50)
         if product_data.get('Dlhý popis'):
-            # Show first 200 chars with proper formatting
-            preview = product_data['Dlhý popis'][:200]
-            if len(product_data['Dlhý popis']) > 200:
-                preview += "..."
             print(product_data['Dlhý popis'])
             print(f"\n[Total length: {len(product_data['Dlhý popis'])} characters]")
         else:
@@ -862,30 +964,47 @@ if __name__ == "__main__":
         print("\nPRODUCT IMAGES")
         print("-" * 50)
         if product_data.get('Obrázky'):
-            image_list = product_data['Obrázky'].split(';') if product_data['Obrázky'] else []
-            print(f"Found {len(image_list)} product image(s)")
-            if image_list:
-                print(f"Sample image URL: {image_list[0]}")
+            image_urls = product_data['Obrázky'].split(';')
+            for i, url in enumerate(image_urls, 1):
+                print(f"{i}. {url}")
+            print(f"\n[Total images: {len(image_urls)}]")
         else:
             print("[No images found]")
         
         print("\n" + "=" * 45)
         
-        # Create a DataFrame with this single test product to ensure we have data
+        # Create a DataFrame with this single test product
         columns = ['Kat. číslo', 'Názov tovaru', 'Bežná cena', 'Výrobca', 
                   'Krátky popis', 'Dlhý popis', 'Obrázky', 'Hlavna kategória', 'Viditeľný']
         test_df = pd.DataFrame([product_data], columns=columns)
         
-        # Save test product to CSV to ensure we have output
+        # Save test product to CSV
         save_to_csv(test_df)
         print("Data saved to topchladenie_products.csv")
         
-        print("\nWould you like to continue with full scraping? (This could take a while)")
+        # Ask about full scraping
+        print("\nWould you like to continue with full scraping?")
+        if isinstance(scraper, FastTopchladenieScraper):
+            print(f"(Using {scraper.max_workers} threads - this will be much faster!)")
+        else:
+            print("(Using single-threaded scraper - this could take a while)")
+            
         response = input("Enter 'y' for full scrape, 'c' to provide custom category URLs, or any other key to exit: ")
         
         if response.lower() == 'y':
             print("Starting full scrape of all products...")
+            start_time = time.time()
             products_df = scraper.scrape_all_products()
+            end_time = time.time()
+            
+            if not products_df.empty:
+                print(f"\nCompleted in {end_time - start_time:.2f} seconds")
+                print(f"Scraped {len(products_df)} products")
+                save_to_csv(products_df)
+                print("Full data saved to topchladenie_products.csv")
+            else:
+                print("No products found during full scraping.")
+                
         elif response.lower() == 'c':
             print("\nEnter category URLs (one per line, empty line to finish):")
             custom_categories = []
@@ -893,59 +1012,57 @@ if __name__ == "__main__":
                 url = input().strip()
                 if not url:
                     break
-                # Add base URL if just a path was provided
-                if not url.startswith('http'):
-                    url = urljoin(scraper.base_url, url)
+                if url.startswith('/'):
+                    url = scraper.base_url + url
                 custom_categories.append(url)
             
             if custom_categories:
-                print(f"Starting scrape with {len(custom_categories)} custom categories...")
-                # Replace the normal category scraping with custom categories
-                product_urls = []
-                for category_url in custom_categories:
-                    category_product_urls = scraper.get_product_urls(category_url)
-                    product_urls.extend(category_product_urls)
+                print(f"\nScraping {len(custom_categories)} custom categories...")
+                start_time = time.time()
                 
-                product_urls = list(set(product_urls))  # Remove duplicates
-                print(f"Found {len(product_urls)} unique product URLs from custom categories")
-                
-                # Create empty DataFrame with correct columns
-                df = pd.DataFrame(columns=['Kat. číslo', 'Názov tovaru', 'Bežná cena', 'Výrobca', 
-                                        'Krátky popis', 'Dlhý popis', 'Obrázky', 'Hlavna kategória', 'Viditeľný'])
-                
-                # Extract product details
-                for i, url in enumerate(product_urls):
-                    print(f"Processing product {i+1}/{len(product_urls)}: {url}")
-                    try:
-                        product_data = scraper.extract_product_details(url)
-                        df = pd.concat([df, pd.DataFrame([product_data])], ignore_index=True)
-                    except Exception as e:
-                        print(f"Error processing {url}: {str(e)}")
+                if isinstance(scraper, FastTopchladenieScraper):
+                    products_df = scraper.scrape_categories_threaded(custom_categories)
+                else:
+                    # Collect product URLs
+                    product_urls = []
+                    for category_url in custom_categories:
+                        category_product_urls = scraper.get_product_urls(category_url)
+                        product_urls.extend(category_product_urls)
                     
-                    # Add a small delay between product requests
-                    if i < len(product_urls) - 1:
+                    product_urls = list(set(product_urls))
+                    print(f"Found {len(product_urls)} unique product URLs")
+                    
+                    # Create DataFrame and scrape sequentially
+                    df = pd.DataFrame(columns=columns)
+                    for i, url in enumerate(product_urls):
+                        print(f"Processing product {i+1}/{len(product_urls)}: {url}")
+                        try:
+                            product_data = scraper.extract_product_details(url)
+                            df = pd.concat([df, pd.DataFrame([product_data])], ignore_index=True)
+                        except Exception as e:
+                            print(f"Error processing {url}: {str(e)}")
                         time.sleep(1)
+                    
+                    df['Viditeľný'] = "1"
+                    products_df = df
                 
-                df['Viditeľný'] = "1"
-                products_df = df
+                end_time = time.time()
+                
+                if not products_df.empty:
+                    print(f"\nCompleted in {end_time - start_time:.2f} seconds")
+                    print(f"Scraped {len(products_df)} products from custom categories")
+                    save_to_csv(products_df)
+                    print("Data saved to topchladenie_products.csv")
+                else:
+                    print("No products found in custom categories.")
             else:
-                print("No custom categories provided. Starting normal scrape...")
-                products_df = scraper.scrape_all_products()
-            
-        if not products_df.empty:
-            # Display statistics
-            print(f"\nScraped {len(products_df)} products from topchladenie.sk")
-            print(f"Columns: {products_df.columns.tolist()}")
-            print(f"Sample data:\n{products_df.head()}")
-            
-            # Save to CSV
-            save_to_csv(products_df)
-            print("Full data saved to topchladenie_products.csv")
-        else:
-            print("No products found during full scraping. Using test product only.")
+                print("No custom categories provided.")
+        
+        print("\nScraping completed!")
             
     except Exception as e:
         import traceback
         print(f"Scraping failed with error: {str(e)}")
         print("Traceback:")
         traceback.print_exc()
+
