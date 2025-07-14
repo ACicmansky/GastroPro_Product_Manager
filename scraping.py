@@ -17,8 +17,28 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
-
 logger = logging.getLogger('TopchladenieScraper')
+
+class ScrapingConfig:
+    """Configuration class for scraping parameters"""
+    
+    # Request settings
+    REQUEST_DELAY_MIN = 0.5
+    REQUEST_TIMEOUT = 30
+    
+    # Threading settings
+    DEFAULT_THREADS = 8
+    MAX_THREADS = 16
+    
+    # CSV settings
+    CSV_ENCODING = 'utf-8-sig'
+    
+    # User agent
+    USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+    
+    @classmethod
+    def get_headers(cls):
+        return {'User-Agent': cls.USER_AGENT}
 
 
 class TopchladenieScraper:
@@ -28,10 +48,10 @@ class TopchladenieScraper:
         """Initialize the scraper with base URL and categories mapping file"""
         self.base_url = base_url
         self.categories_file = categories_file
+        self.config = ScrapingConfig()
         self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        })
+        self.session.headers.update(self.config.get_headers())
+        self.session.timeout = self.config.REQUEST_TIMEOUT
         
     def scrape_all_products(self):
         """Main function to scrape all products from the website
@@ -69,28 +89,32 @@ class TopchladenieScraper:
         
         logger.info(f"Found {len(product_urls)} unique products")
         
-        # Create empty DataFrame with expected columns
-        df = pd.DataFrame(columns=[
-            'Kat. číslo', 'Názov tovaru', 'Bežná cena', 'Výrobca',
-            'Krátky popis', 'Dlhý popis', 'Obrázky', 'Hlavna kategória', 'Viditeľný'
-        ])
+        # Collect all product data first (much faster than repeated DataFrame concat)
+        products_data = []
         
         # For each product, extract details
         for i, url in enumerate(product_urls):
             try:
                 logger.info(f"Scraping product {i+1}/{len(product_urls)}: {url}")
                 product_data = self.extract_product_details(url)
-                
-                # Append to DataFrame
-                df = pd.concat([df, pd.DataFrame([product_data])], ignore_index=True)
+                if product_data:  # Only add if data was extracted successfully
+                    product_data['Viditeľný'] = "1"  # Set visibility flag
+                    products_data.append(product_data)
                 
                 # Respect the website by adding a small delay between requests
-                time.sleep(1)
+                time.sleep(self.config.REQUEST_DELAY_MIN)
             except Exception as e:
                 logger.error(f"Error extracting data from {url}: {str(e)}")
         
-        # Set "Viditeľný" field to "1" for all scraped products
-        df['Viditeľný'] = "1"
+        # Create DataFrame once from all collected data (much faster)
+        if products_data:
+            df = pd.DataFrame(products_data)
+        else:
+            # Create empty DataFrame with expected columns if no data
+            df = pd.DataFrame(columns=[
+                'Kat. číslo', 'Názov tovaru', 'Bežná cena', 'Výrobca',
+                'Krátky popis', 'Dlhý popis', 'Obrázky', 'Hlavna kategória', 'Viditeľný'
+            ])
         
         logger.info(f"Successfully scraped {len(df)} products")
         return df
@@ -855,7 +879,7 @@ def get_scraped_products(include_scraping=True):
         
     try:
         logger.info("Starting to scrape products from topchladenie.sk")
-        scraper = TopchladenieScraper()
+        scraper = FastTopchladenieScraper()
         products_df = scraper.scrape_all_products()
         logger.info(f"Successfully scraped {len(products_df)} products")
         return products_df
