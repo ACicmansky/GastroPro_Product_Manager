@@ -3078,5 +3078,77 @@
   {
     "oldCategory": "Stolové zariadenia/Fritézy/Plynove fritézy",
     "newCategory": "Tepelná úprava/Fritézy"
+  },
+  {
+    "oldCategory": "/e-shop/samostatne-chladnicky/bez-mraznicky-vnutri",
+    "newCategory": "Chladenie a Mrazenie/Chladničky a mrazničky"
+  },
+  {
+    "oldCategory": "/e-shop/samostatne-chladnicky/s-mraznickou-vo-vnutri",
+    "newCategory": "Chladenie a Mrazenie/Chladničky a mrazničky"
+  },
+  {
+    "oldCategory": "/e-shop/chladnicky-s-mraznickou/s-mraznickou-hore",
+    "newCategory": "Chladenie a Mrazenie/Chladničky a mrazničky"
+  },
+  {
+    "oldCategory": "/e-shop/chladnicky-s-mraznickou/s-mraznickou-dole",
+    "newCategory": "Chladenie a Mrazenie/Chladničky a mrazničky"
+  },
+  {
+    "oldCategory": "/e-shop/americke-chladnicky",
+    "newCategory": "Chladenie a Mrazenie/Americké chladničky"
+  },
+  {
+    "oldCategory": "/e-shop/mraznicky/pultove",
+    "newCategory": "Chladenie a Mrazenie/Mraziace boxy a truhlice"
+  },
+  {
+    "oldCategory": "/e-shop/mraznicky/suplikove",
+    "newCategory": "Chladenie a Mrazenie/Chladničky a mrazničky"
+  },
+  {
+    "oldCategory": "/e-shop/vstavane-spotrebice/chladnicky-na-vino",
+    "newCategory": "Chladenie a Mrazenie/Vinotéky"
+  },
+  {
+    "oldCategory": "/e-shop/vstavane-spotrebice/mraznicky",
+    "newCategory": "Chladenie a Mrazenie/Chladničky a mrazničky"
+  },
+  {
+    "oldCategory": "/e-shop/vstavane-spotrebice/chladnicky",
+    "newCategory": "Chladenie a Mrazenie/Chladničky a mrazničky"
+  },
+  {
+    "oldCategory": "/e-shop/vstavane-spotrebice/kombinovane-chladnicky",
+    "newCategory": "Chladenie a Mrazenie/Chladničky a mrazničky"
+  },
+  {
+    "oldCategory": "/e-shop/domace-vinoteky/temperovane",
+    "newCategory": "Chladenie a Mrazenie/Vinotéky"
+  },
+  {
+    "oldCategory": "/e-shop/domace-vinoteky/klimatizovane",
+    "newCategory": "Chladenie a Mrazenie/Vinotéky"
+  },
+  {
+    "oldCategory": "/e-shop/humidory",
+    "newCategory": "Chladenie a Mrazenie/Humidory"
+  },
+  {
+    "oldCategory": "/e-shop/komercne-zariadenia/gastro-zariadenie",
+    "newCategory": "Chladenie a Mrazenie/Profesionálne chladenie a mrazenie"
+  },
+  {
+    "oldCategory": "/e-shop/komercne-zariadenia/pekaren",
+    "newCategory": "Chladenie a Mrazenie/Pekárenské chladenie a mrazenie"
+  },
+  {
+    "oldCategory": "/e-shop/komercne-zariadenia/napojovy-priemysel",
+    "newCategory": "Bar a Káva/Chladiče a chladenie fliaš"
+  },
+  {
+    "oldCategory": "/e-shop/prislusenstvo",
+    "newCategory": "Chladenie a Mrazenie/Príslušenstvo k chladeniu"
   }
 ]

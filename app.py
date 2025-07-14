@@ -8,6 +8,9 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStandardPaths
 
+# Import for the topchladenie.sk scraper
+from scraping import get_scraped_products, merge_with_existing_data
+
 from utils import load_config, fetch_xml_feed, parse_xml_feed, merge_dataframes, load_csv_data, load_category_mappings, map_dataframe_categories
 
 class DropArea(QFrame):
@@ -44,12 +47,13 @@ class Worker(QObject):
     progress = pyqtSignal(str)
     result = pyqtSignal(object)
 
-    def __init__(self, main_df, selected_categories, config, map_categories=False):
+    def __init__(self, main_df, selected_categories, config, map_categories=False, scrape_topchladenie=False):
         super().__init__()
         self.main_df = main_df
         self.selected_categories = selected_categories
         self.config = config
         self.map_categories = map_categories
+        self.scrape_topchladenie = scrape_topchladenie
 
     def run(self):
         try:
@@ -60,6 +64,19 @@ class Worker(QObject):
                 if category_mappings:
                     self.main_df = map_dataframe_categories(self.main_df, category_mappings)
                     self.progress.emit("Category mapping completed")
+                    
+            # Get scraped products from topchladenie.sk if enabled
+            if self.scrape_topchladenie:
+                self.progress.emit("Sťahovanie údajov z Topchladenie.sk...")
+                scraped_df = get_scraped_products(include_scraping=True)
+                
+                if scraped_df is not None and not scraped_df.empty:
+                    self.progress.emit(f"Získané údaje o {len(scraped_df)} produktoch z Topchladenie.sk")
+                    # Merge scraped data with existing data
+                    self.main_df = merge_with_existing_data(self.main_df, scraped_df)
+                    self.progress.emit("Údaje z Topchladenie.sk úspešne začlenené")
+                else:
+                    self.progress.emit("Neboli nájdené žiadne údaje z Topchladenie.sk")
             
             self.progress.emit("Filtering main CSV...")
             filtered_df = self.main_df[self.main_df['Hlavna kategória'].isin(self.selected_categories)].copy()
@@ -160,10 +177,16 @@ class ProductManager(QMainWindow):
         self.map_categories_checkbox.setChecked(True)  # Enabled by default
         self.map_categories_checkbox.setToolTip("Použiť mapovanie kategórií na vstupný CSV súbor")
         
-        # Add buttons and checkbox to horizontal layout
+        # Checkbox for topchladenie.sk scraper
+        self.scrape_topchladenie_checkbox = QCheckBox("Sťahovať z Topchladenie.sk")
+        self.scrape_topchladenie_checkbox.setChecked(False)  # Disabled by default
+        self.scrape_topchladenie_checkbox.setToolTip("Sťahovať aktuálne údaje o produktoch z topchladenie.sk a pridať ich do exportu")
+        
+        # Add buttons and checkboxes to horizontal layout
         buttons_layout.addWidget(self.select_all_button)
         buttons_layout.addWidget(self.toggle_filtered_button)
         buttons_layout.addWidget(self.map_categories_checkbox)
+        buttons_layout.addWidget(self.scrape_topchladenie_checkbox)
         buttons_layout.addStretch(1)
         
         self.category_list = QListWidget()
@@ -310,11 +333,12 @@ class ProductManager(QMainWindow):
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0) # Indeterminate progress
 
-        # Get checkbox state for category mapping
+        # Get checkbox states
         map_categories = self.map_categories_checkbox.isChecked()
+        scrape_topchladenie = self.scrape_topchladenie_checkbox.isChecked()
 
         self.thread = QThread()
-        self.worker = Worker(self.main_df, selected_categories, self.config, map_categories)
+        self.worker = Worker(self.main_df, selected_categories, self.config, map_categories, scrape_topchladenie)
         self.worker.moveToThread(self.thread)
 
         self.thread.started.connect(self.worker.run)
