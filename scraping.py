@@ -560,7 +560,9 @@ class TopchladenieScraper:
                             logger.warning(f"No content found for section: {heading_text}")
                 
                 # Join all parts with double newlines between sections
-                product_data['Dlhý popis'] = '\n\n'.join(long_desc_parts) if long_desc_parts else ""
+                product_data['Dlhý popis'] = '\n\n'.join(long_desc_parts) if long_desc_parts else ""                
+                soup = BeautifulSoup(product_data['Dlhý popis'], "html.parser")
+                product_data['Dlhý popis'] = soup.get_text()
                 
                 if long_desc_parts:
                     logger.info(f"Successfully extracted long description with {len(long_desc_parts)} sections")
@@ -947,7 +949,7 @@ if __name__ == "__main__":
     try:
         # Test with a single product first
         print("Testing with a single product page...")
-        test_url = "https://www.topchladenie.sk/e-shop/liebherr-cbnsdc-765i-prime"
+        test_url = "https://www.topchladenie.sk/e-shop/liebherr-wpbli-5231-grandcru-selection"
         print(f"Retrieving data from: {test_url}")
         
         product_data = scraper.extract_product_details(test_url)
