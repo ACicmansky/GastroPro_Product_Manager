@@ -37,20 +37,26 @@ class ScrapingConfig:
     USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 
     ULRS_TO_SKIP_DURING_GET_PRODUCT_URLS = [
+        'https://www.topchladenie.sk/e-shop/samostatne-chladnicky',
         'https://www.topchladenie.sk/e-shop/samostatne-chladnicky/bez-mraznicky-vnutri',
         'https://www.topchladenie.sk/e-shop/samostatne-chladnicky/s-mraznickou-vo-vnutri',
+        'https://www.topchladenie.sk/e-shop/chladnicky-s-mraznickou',
         'https://www.topchladenie.sk/e-shop/chladnicky-s-mraznickou/s-mraznickou-hore',
         'https://www.topchladenie.sk/e-shop/chladnicky-s-mraznickou/s-mraznickou-dole',
         'https://www.topchladenie.sk/e-shop/americke-chladnicky',
+        'https://www.topchladenie.sk/e-shop/mraznicky',
         'https://www.topchladenie.sk/e-shop/mraznicky/pultove',
         'https://www.topchladenie.sk/e-shop/mraznicky/suplikove',
+        'https://www.topchladenie.sk/e-shop/vstavane-spotrebice',
         'https://www.topchladenie.sk/e-shop/vstavane-spotrebice/chladnicky-na-vino',
         'https://www.topchladenie.sk/e-shop/vstavane-spotrebice/mraznicky',
         'https://www.topchladenie.sk/e-shop/vstavane-spotrebice/chladnicky',
         'https://www.topchladenie.sk/e-shop/vstavane-spotrebice/kombinovane-chladnicky',
+        'https://www.topchladenie.sk/e-shop/domace-vinoteky',
         'https://www.topchladenie.sk/e-shop/domace-vinoteky/temperovane',
         'https://www.topchladenie.sk/e-shop/domace-vinoteky/klimatizovane',
         'https://www.topchladenie.sk/e-shop/humidory',
+        'https://www.topchladenie.sk/e-shop/komercne-zariadenia',
         'https://www.topchladenie.sk/e-shop/komercne-zariadenia/gastro-zariadenie',
         'https://www.topchladenie.sk/e-shop/komercne-zariadenia/pekaren',
         'https://www.topchladenie.sk/e-shop/komercne-zariadenia/napojovy-priemysel',
@@ -602,6 +608,7 @@ class TopchladenieScraper:
         # 7. "Obrázky" - Image URLs
         try:
             image_urls = []
+            soup = BeautifulSoup(response.content, 'html.parser')
             
             # Based on debug output, we know product gallery has id='productGallery'
             gallery = soup.find('div', id='productGallery')
