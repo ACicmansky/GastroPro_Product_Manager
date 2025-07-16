@@ -35,6 +35,29 @@ class ScrapingConfig:
     
     # User agent
     USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+
+    ULRS_TO_SKIP_DURING_GET_PRODUCT_URLS = [
+        'https://www.topchladenie.sk/e-shop/samostatne-chladnicky/bez-mraznicky-vnutri',
+        'https://www.topchladenie.sk/e-shop/samostatne-chladnicky/s-mraznickou-vo-vnutri',
+        'https://www.topchladenie.sk/e-shop/chladnicky-s-mraznickou/s-mraznickou-hore',
+        'https://www.topchladenie.sk/e-shop/chladnicky-s-mraznickou/s-mraznickou-dole',
+        'https://www.topchladenie.sk/e-shop/americke-chladnicky',
+        'https://www.topchladenie.sk/e-shop/mraznicky/pultove',
+        'https://www.topchladenie.sk/e-shop/mraznicky/suplikove',
+        'https://www.topchladenie.sk/e-shop/vstavane-spotrebice/chladnicky-na-vino',
+        'https://www.topchladenie.sk/e-shop/vstavane-spotrebice/mraznicky',
+        'https://www.topchladenie.sk/e-shop/vstavane-spotrebice/chladnicky',
+        'https://www.topchladenie.sk/e-shop/vstavane-spotrebice/kombinovane-chladnicky',
+        'https://www.topchladenie.sk/e-shop/domace-vinoteky/temperovane',
+        'https://www.topchladenie.sk/e-shop/domace-vinoteky/klimatizovane',
+        'https://www.topchladenie.sk/e-shop/humidory',
+        'https://www.topchladenie.sk/e-shop/komercne-zariadenia/gastro-zariadenie',
+        'https://www.topchladenie.sk/e-shop/komercne-zariadenia/pekaren',
+        'https://www.topchladenie.sk/e-shop/komercne-zariadenia/napojovy-priemysel',
+        'https://www.topchladenie.sk/e-shop/prislusenstvo',
+        'https://www.topchladenie.sk/e-shop/mystyle',
+        'https://www.topchladenie.sk/e-shop/akcie-a-zavy',
+    ]
     
     @classmethod
     def get_headers(cls):
@@ -245,6 +268,7 @@ class TopchladenieScraper:
                 break
         
         unique_urls = list(set(product_urls))  # Ensure no duplicates
+        unique_urls = [url for url in unique_urls if url not in self.config.ULRS_TO_SKIP_DURING_GET_PRODUCT_URLS]
         logger.info(f"Found {len(unique_urls)} unique product URLs in category {category_url}")
         return unique_urls
     
@@ -636,7 +660,7 @@ class TopchladenieScraper:
                     seen.add(url)
                     unique_urls.append(url)
             
-            product_data['Obrázky'] = ';'.join(unique_urls) if unique_urls else ""
+            product_data['Obrázky'] = ','.join(unique_urls) if unique_urls else ""
             
             # Debug logging for image extraction
             logger.info(f"Extracted {len(unique_urls)} image URLs for product {url}")
@@ -825,6 +849,7 @@ class FastTopchladenieScraper(TopchladenieScraper):
         
         # Remove duplicates
         unique_product_urls = list(set(all_product_urls))
+        unique_product_urls = [url for url in unique_product_urls if url not in self.config.ULRS_TO_SKIP_DURING_GET_PRODUCT_URLS]
         logger.info(f"Total unique products to scrape: {len(unique_product_urls)}")
         
         # Scrape all products using threading

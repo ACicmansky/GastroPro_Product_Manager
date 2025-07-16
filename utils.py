@@ -459,7 +459,8 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: list, final_cols: list) ->
             merged_df[col] = ""  # Add missing columns with empty string
     
     # Define the join column
-    join_column = "Kat. číslo"  # Catalog number as primary key for joining
+    #join_column = "Kat. číslo"  # Catalog number as primary key for joining
+    join_column = "Názov tovaru"  # Product name as primary key for joining
             
     # Process feeds in order of priority (lower index = higher priority)
     for i, df_from_feed in enumerate(feed_dfs):
