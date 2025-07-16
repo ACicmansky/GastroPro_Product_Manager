@@ -16,6 +16,13 @@
 - ✅ Optional user-controlled CSV category mapping at export time
 - ✅ Category filtering with text search and toggle selection
 - ✅ Progress indicators for long-running operations
+- ✅ Topchladenie.sk web scraping with multi-threading
+- ✅ Alternative CSV loading for Topchladenie.sk products
+- ✅ Dedicated drag & drop area for Topchladenie CSV files
+- ✅ Mutual exclusivity between scraping and CSV loading
+- ✅ Enhanced data validation with empty catalog number filtering
+- ✅ Detailed statistics reporting in export summary dialog
+- ✅ Fixed semicolon separator handling for Topchladenie CSV files
 
 ## In Progress
 - 🔄 Error handling improvements
@@ -30,8 +37,7 @@
 - ⏳ Performance optimizations
 
 ## Known Issues
-- Basic implementation only copies local CSV data to output without actual processing
-- XML feed parsing is incomplete (placeholder only)
-- No validation for CSV structure or required fields
-- No filtering by product categories yet
-- Configuration only stores file paths, not processing preferences
+- Some minor memory optimization needed for very large datasets
+- Limited validation for optional CSV fields and their formats
+- Configuration could store more processing preferences
+- No confirmation when replacing existing data in export file
