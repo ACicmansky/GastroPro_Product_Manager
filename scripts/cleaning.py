@@ -53,15 +53,12 @@ def process_gastromarket(root, output_file):
     
     # Extract required fields
     for product in products:
-        name_element = product.find('MENO')
         category_element = product.find('KATEGORIA_KOMPLET')
         
-        name = name_element.text.strip() if name_element is not None and name_element.text else ""
         category = category_element.text.strip() if category_element is not None and category_element.text else ""
         
-        if name or category:  # Only add if at least one field has data
+        if category and not any(item.get('category') == category for item in cleaned_data):
             cleaned_data.append({
-                'name': name,
                 'category': category
             })
     
@@ -84,15 +81,12 @@ def process_forgastro(root, output_file):
     
     # Extract required fields
     for product in products:
-        name_element = product.find('product_name')
         category_element = product.find('category')
         
-        name = name_element.text.strip() if name_element is not None and name_element.text else ""
         category = category_element.text.strip() if category_element is not None and category_element.text else ""
         
-        if name or category:  # Only add if at least one field has data
+        if category and not any(item.get('category') == category for item in cleaned_data):
             cleaned_data.append({
-                'name': name,
                 'category': category
             })
     
@@ -114,10 +108,10 @@ def process_csv_file(input_file, output_file):
             return False
         
         # Extract required columns
-        filtered_df = df[["Názov tovaru", "Hlavna kategória"]].copy()
+        filtered_df = df[["Hlavna kategória"]].drop_duplicates().copy()
         
         # Rename columns to match our standard format
-        filtered_df.rename(columns={"Názov tovaru": "name", "Hlavna kategória": "category"}, inplace=True)
+        filtered_df.rename(columns={"Hlavna kategória": "category"}, inplace=True)
         
         # Save to CSV
         filtered_df.to_csv(output_file, index=False, encoding='utf-8')
@@ -170,7 +164,7 @@ def main():
     process_forgastro(forgastro_root, forgastro_output)
     
     # Check if main CSV file exists and process it
-    main_csv_file = "scripts/export-products.csv"
+    main_csv_file = "scripts/nerezovy nabytok.csv"
     filtered_output = "scripts/gastropro.csv"
     csv_processed = False
     
