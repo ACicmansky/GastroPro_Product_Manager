@@ -182,6 +182,12 @@ class Worker(QObject):
                 removed_count = before_count - len(filtered_df)
                 if removed_count > 0:
                     self.progress.emit(f"Removed {removed_count} products with empty catalog numbers from main CSV")
+
+            # Process each DataFrame in the list to check and update 'Kat. číslo rodiča' from 0 to ""
+            if 'Kat. číslo rodiča' in filtered_df.columns:
+                # Check for both numeric 0 and string "0"
+                filtered_df.loc[filtered_df['Kat. číslo rodiča'].isin([0, "0"]), 'Kat. číslo rodiča'] = ""
+                self.progress.emit("Replaced '0' values in 'Kat. číslo rodiča' with empty strings")
             
             # Clean feed dataframes
             cleaned_feed_dataframes = []
@@ -211,7 +217,7 @@ class Worker(QObject):
             # Add cleaned XML feed data
             if cleaned_feed_dataframes:
                 all_dataframes.extend(cleaned_feed_dataframes)
-                self.progress.emit(f"Added {len(cleaned_feed_dataframes)} cleaned XML feed datasets")
+                self.progress.emit(f"Added {len(cleaned_feed_dataframes)} cleaned XML feed datasets")        
             
             # Add cleaned scraped data last (freshest data has priority)
             if scraped_df is not None and not scraped_df.empty:
