@@ -164,8 +164,8 @@ def main():
     process_forgastro(forgastro_root, forgastro_output)
     
     # Check if main CSV file exists and process it
-    main_csv_file = "scripts/nerezovy nabytok.csv"
-    filtered_output = "scripts/gastropro.csv"
+    main_csv_file = "scripts/additional categories export.csv"
+    filtered_output = "scripts/gastropro additional.csv"
     csv_processed = False
     
     if os.path.exists(main_csv_file):
