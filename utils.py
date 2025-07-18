@@ -171,13 +171,52 @@ def map_category(category, category_mappings):
     if not category or not isinstance(category, str) or not category_mappings:
         return category
     
-    # Try to find a mapping for this category
+    # Normalize category by replacing common escape sequences
+    normalized_category = category
+    
+    # Handle Unicode escape sequences like \xa0 (non-breaking space)
+    normalized_category = normalized_category.replace('\xa0', ' ')
+    
+    # Handle HTML entities if present
+    try:
+        import html
+        normalized_category = html.unescape(normalized_category)
+    except (ImportError, AttributeError):
+        # Fallback for basic HTML entities if html module is unavailable
+        normalized_category = normalized_category.replace('&nbsp;', ' ')
+    
+    # Try to find a mapping for this category (both original and normalized)
     for mapping in category_mappings:
+        # Check original category first
         if mapping.get("oldCategory") == category:
             print(f"Mapped category '{category}' to '{mapping['newCategory']}'")
             return mapping["newCategory"]
+        
+        # Try with normalized category if different from original
+        if normalized_category != category and mapping.get("oldCategory") == normalized_category:
+            print(f"Mapped normalized category '{normalized_category}' (from '{category}') to '{mapping['newCategory']}'")
+            return mapping["newCategory"]
     
-    print(f"No mapping found for category '{category}', using original")
+    # If original mapping fails, normalize the mappings too and try again
+    for mapping in category_mappings:
+        old_cat = mapping.get("oldCategory", "")
+        if not old_cat:
+            continue
+            
+        # Normalize the mapping's oldCategory
+        norm_old_cat = old_cat.replace('\xa0', ' ')
+        try:
+            import html
+            norm_old_cat = html.unescape(norm_old_cat)
+        except (ImportError, AttributeError):
+            norm_old_cat = norm_old_cat.replace('&nbsp;', ' ')
+            
+        # Compare with both original and normalized category
+        if norm_old_cat == category or norm_old_cat == normalized_category:
+            print(f"Mapped category '{category}' to '{mapping['newCategory']}' using normalized mapping")
+            return mapping["newCategory"]
+    
+    print(f"No mapping found for category '{category}' (normalized: '{normalized_category}'), using original")
     return category
 
 
