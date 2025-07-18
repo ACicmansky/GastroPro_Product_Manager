@@ -227,6 +227,13 @@ class Worker(QObject):
             # Merge everything
             final_df = merge_dataframes(filtered_df, cleaned_feed_dataframes + ([scraped_df] if scraped_df is not None and not scraped_df.empty else []), self.config['final_csv_columns'])
             
+            # strip all strings in final_df
+            final_df = final_df.apply(lambda x: x.str.strip() if x.dtype == 'object' else x)
+
+            # replace all \n with <br /> in Krátky popis and Dlhý popis
+            final_df['Krátky popis'] = final_df['Krátky popis'].str.replace('\n', '<br />')
+            final_df['Dlhý popis'] = final_df['Dlhý popis'].str.replace('\n', '<br />')
+
             # Prepare statistics
             statistics = {
                 'original_csv': len(filtered_df),
