@@ -580,11 +580,11 @@
      "newCategory":"Pizza a cestoviny/Miesiče cesta"
   },
   {
-     "oldCategory":"Miesiče cesta H²O s pevnou hlavou a nádobou",
+     "oldCategory":"Miesiče cesta H O s pevnou hlavou a nádobou",
      "newCategory":"Pizza a cestoviny/Miesiče cesta"
   },
   {
-     "oldCategory":"Miesiče cesta H²O s výklopnou hlavou a odpojiteľnou nádobou",
+     "oldCategory":"Miesiče cesta H O s výklopnou hlavou a odpojiteľnou nádobou",
      "newCategory":"Pizza a cestoviny/Miesiče cesta"
   },
   {
@@ -2544,6 +2544,10 @@
      "newCategory":"Chladenie a mrazenie/Mrazničky/Truhlicové mrazničky"
   },
   {
+   "oldCategory":"/e-shop/gastro-zariadenie/pultove-mraznicky",
+   "newCategory":"Chladenie a mrazenie/Mrazničky/Truhlicové mrazničky"
+  },
+  {
      "oldCategory":"/e-shop/mraznicky/suplikove",
      "newCategory":"Chladenie a mrazenie/Mrazničky/Skriňové mrazničky"
   },
@@ -2580,12 +2584,36 @@
      "newCategory":"Chladenie a mrazenie/Profesionálne chladenie a mrazenie"
   },
   {
+   "oldCategory":"/e-shop/gastro-zariadenie/kuchynske-chladnicky",
+   "newCategory":"Chladenie a mrazenie/Profesionálne chladenie a mrazenie"
+  },
+  {
+   "oldCategory":"/e-shop/gastro-zariadenie/kuchynske-mraznicky",
+   "newCategory":"Chladenie a mrazenie/Profesionálne chladenie a mrazenie"
+  },
+  {
+   "oldCategory":"/e-shop/gastro-zariadenie/prezentacne-chladnicky",
+   "newCategory":"Chladenie a mrazenie/Profesionálne chladenie a mrazenie"
+  },
+  {
+   "oldCategory":"/e-shop/gastro-zariadenie/prezentacne-mraznicky",
+   "newCategory":"Chladenie a mrazenie/Profesionálne chladenie a mrazenie"
+  },
+  {
      "oldCategory":"/e-shop/komercne-zariadenia/pekaren",
      "newCategory":"Chladenie a mrazenie/Pekárenské chladenie a mrazenie"
   },
   {
-     "oldCategory":"/e-shop/komercne-zariadenia/napojovy-priemysel",
-     "newCategory":"Bar a kaviareň/Chladenie pre bary"
+   "oldCategory":"/e-shop/komercne-zariadenia/pekaren/chladnicky-pre-pekarne",
+   "newCategory":"Chladenie a mrazenie/Pekárenské chladenie a mrazenie"
+  },
+  {
+   "oldCategory":"/e-shop/komercne-zariadenia/pekaren/zmrazovacie-zariadenia-pekarne",
+   "newCategory":"Chladenie a mrazenie/Pekárenské chladenie a mrazenie"
+  },
+  {
+   "oldCategory":"/e-shop/komercne-zariadenia/napojovy-priemysel",
+   "newCategory":"Bar a kaviareň/Chladenie pre bary"
   },
   {
      "oldCategory":"/e-shop/prislusenstvo",

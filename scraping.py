@@ -682,7 +682,10 @@ class TopchladenieScraper:
             if category_links:
                 last_category_link = category_links[-1]
                 category_url = last_category_link.get('href')
-                
+                if category_url == '/e-shop/mystyle':
+                    product_data = None
+                    return product_data
+
                 # Use full category path for mapping
                 if category_url:
                     mapped_category = self.map_category(category_url)
@@ -692,7 +695,7 @@ class TopchladenieScraper:
             else:
                 product_data['Hlavna kategória'] = ""
         else:
-            product_data['Hlavna kategória'] = ""
+            product_data = None
         
         return product_data
     
@@ -723,15 +726,11 @@ class TopchladenieScraper:
                         if mapping['oldCategory'] == category_path:
                             return mapping['newCategory']
             
-            # If no mapping found or file doesn't exist, extract category name from URL
-            category_name = category_url.split('/')[-1].replace('-', ' ').title()
-            return category_name
+            return category_url
         
         except Exception as e:
             logger.error(f"Error mapping category: {str(e)}")
-            # Extract category name from URL as fallback
-            category_name = category_url.split('/')[-1].replace('-', ' ').title()
-            return category_name
+            return category_url
 
 
 class FastTopchladenieScraper(TopchladenieScraper):
@@ -1096,7 +1095,8 @@ if __name__ == "__main__":
                         print(f"Processing product {i+1}/{len(product_urls)}: {url}")
                         try:
                             product_data = scraper.extract_product_details(url)
-                            df = pd.concat([df, pd.DataFrame([product_data])], ignore_index=True)
+                            if product_data is not None:
+                                df = pd.concat([df, pd.DataFrame([product_data])], ignore_index=True)
                         except Exception as e:
                             print(f"Error processing {url}: {str(e)}")
                         time.sleep(1)
