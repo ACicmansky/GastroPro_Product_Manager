@@ -13,6 +13,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStandardPaths
 from scraping import get_scraped_products
 
 from utils import load_config, fetch_xml_feed, parse_xml_feed, merge_dataframes, load_csv_data, load_category_mappings, map_dataframe_categories
+from product_variant_matcher import ProductVariantMatcher
 
 class DropArea(QFrame):
     def __init__(self, parent=None):
@@ -234,6 +235,12 @@ class Worker(QObject):
             final_df['Krátky popis'] = final_df['Krátky popis'].str.replace('\n', '<br />')
             final_df['Dlhý popis'] = final_df['Dlhý popis'].str.replace('\n', '<br />')
 
+            # Identify product variants and assign parent catalog numbers
+            if self.variant_checkbox.isChecked():
+                self.progress.emit("Analyzing products for variant detection...")
+                variant_matcher = ProductVariantMatcher(progress_callback=self.progress.emit)
+                final_df = variant_matcher.identify_variants(final_df)
+
             # Prepare statistics
             statistics = {
                 'original_csv': len(filtered_df),
@@ -338,20 +345,26 @@ class ProductManager(QMainWindow):
         # Row 1: CSV and Category options
         row1_layout = QHBoxLayout()
         self.map_categories_checkbox = QCheckBox("Migrovať pôvodné CSV kategórie")
-        self.map_categories_checkbox.setChecked(True)
+        self.map_categories_checkbox.setChecked(False)
         self.map_categories_checkbox.setToolTip("Použiť mapovanie kategórií na vstupný CSV súbor")
+
+        self.variant_checkbox = QCheckBox("Analyzovať produkty na varianty")
+        self.variant_checkbox.setChecked(True)
+        self.variant_checkbox.setToolTip("Analyzovať produkty na varianty")
+
         row1_layout.addWidget(self.map_categories_checkbox)
+        row1_layout.addWidget(self.variant_checkbox)
         row1_layout.addStretch(1)
         options_layout.addLayout(row1_layout)
         
         # Row 2: XML Feeds options
         row2_layout = QHBoxLayout()
         self.gastromarket_checkbox = QCheckBox("Načítať z GastroMarket XML")
-        self.gastromarket_checkbox.setChecked(True)
+        self.gastromarket_checkbox.setChecked(False)
         self.gastromarket_checkbox.setToolTip("Načítať produkty z GastroMarket XML feedu")
         
         self.forgastro_checkbox = QCheckBox("Načítať z ForGastro XML")
-        self.forgastro_checkbox.setChecked(True)
+        self.forgastro_checkbox.setChecked(False)
         self.forgastro_checkbox.setToolTip("Načítať produkty z ForGastro XML feedu")
         
         row2_layout.addWidget(self.gastromarket_checkbox)
@@ -365,7 +378,7 @@ class ProductManager(QMainWindow):
         # Scraping checkbox
         scrape_layout = QHBoxLayout()
         self.scrape_topchladenie_checkbox = QCheckBox("Stiahnuť z Topchladenie.sk")
-        self.scrape_topchladenie_checkbox.setChecked(True)
+        self.scrape_topchladenie_checkbox.setChecked(False)
         self.scrape_topchladenie_checkbox.setToolTip("Stiahnuť aktuálne údaje o produktoch z topchladenie.sk")
         self.scrape_topchladenie_checkbox.stateChanged.connect(self.on_scrape_topchladenie_changed)
         
