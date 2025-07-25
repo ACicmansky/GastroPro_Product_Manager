@@ -85,12 +85,13 @@ class Worker(QObject):
     progress = pyqtSignal(str)
     result = pyqtSignal(object, dict)  # Pass dataframe and statistics dictionary
 
-    def __init__(self, main_df, selected_categories, config, map_categories=False, scrape_topchladenie=False, topchladenie_csv_df=None, enable_gastromarket=True, enable_forgastro=True):
+    def __init__(self, main_df, selected_categories, config, map_categories=False, variant_checkbox=False, scrape_topchladenie=False, topchladenie_csv_df=None, enable_gastromarket=True, enable_forgastro=True):
         super().__init__()
         self.main_df = main_df.copy()
         self.selected_categories = selected_categories
         self.config = config
         self.map_categories = map_categories
+        self.variant_checkbox = variant_checkbox
         self.scrape_topchladenie = scrape_topchladenie
         self.topchladenie_csv_df = topchladenie_csv_df
         self.enable_gastromarket = enable_gastromarket
@@ -236,10 +237,15 @@ class Worker(QObject):
             final_df['Dlhý popis'] = final_df['Dlhý popis'].str.replace('\n', '<br />')
 
             # Identify product variants and assign parent catalog numbers
-            if self.variant_checkbox.isChecked():
+            if self.variant_checkbox:
                 self.progress.emit("Analyzing products for variant detection...")
                 variant_matcher = ProductVariantMatcher(progress_callback=self.progress.emit)
-                final_df = variant_matcher.identify_variants(final_df)
+                
+                # Extract product differences (dimensions, power, volume, etc.)
+                self.progress.emit("Extracting product dimensions and differences...")
+                final_df, group_data = variant_matcher.identify_variants(final_df, generate_report=True)
+                
+                variant_matcher.extract_product_differences(final_df, group_data)
 
             # Prepare statistics
             statistics = {
@@ -556,6 +562,7 @@ class ProductManager(QMainWindow):
 
         # Get all checkbox states
         map_categories = self.map_categories_checkbox.isChecked()
+        variant_checkbox = self.variant_checkbox.isChecked()
         scrape_topchladenie = self.scrape_topchladenie_checkbox.isChecked()
         topchladenie_csv_df = self.topchladenie_csv_drop_area.topchladenie_df
         enable_gastromarket = self.gastromarket_checkbox.isChecked()
@@ -565,6 +572,7 @@ class ProductManager(QMainWindow):
         self.worker = Worker(
             self.main_df, selected_categories, self.config, 
             map_categories=map_categories,
+            variant_checkbox=variant_checkbox,
             scrape_topchladenie=scrape_topchladenie,
             topchladenie_csv_df=topchladenie_csv_df,
             enable_gastromarket=enable_gastromarket,
