@@ -1,4 +1,5 @@
 # utils.py
+from decimal import Decimal
 import requests
 import xml.etree.ElementTree as ET
 import pandas as pd
@@ -393,9 +394,6 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
     """
     if root is None:
         return pd.DataFrame()
-        
-    # List to store each item's data
-    items = []
     
     # Load category mappings - now it's a simple array of mappings, not grouped by feed
     category_mappings = load_category_mappings()
@@ -407,7 +405,6 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
         
         # Special processing for forgastro product descriptions
         product_desc_html = None
-        product_s_desc = None
         
         for xml_key, csv_column in mapping.items():
             # If the key is compound (e.g., "images/item/url"), use findall and join values
@@ -427,11 +424,10 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
                     product_desc_html = element_text
                     # Don't add to row yet, we'll process it specially
                 elif xml_key == "product_s_desc" and feed_name == "forgastro":
-                    product_s_desc = element_text
                     row[csv_column] = element_text
                 else:
                     row[csv_column] = element_text
-                    
+
         # Apply feed-specific processing based on feed name
         if feed_name == "forgastro":
             # Process category mapping for forgastro
@@ -466,7 +462,10 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
                 row["Krátky popis"] = processed_desc
             if processed_cat:
                 row["Hlavna kategória"] = processed_cat
-            
+
+        # add VAT 23% to price for all feeds
+        row["Bežná cena"] = str(Decimal(row["Bežná cena"]) + Decimal(row["Bežná cena"]) * (23/Decimal('100')))
+        
         # Set 'Viditeľný' field to '1' for all feed products
         row["Viditeľný"] = "1"        
         data.append(row)
@@ -534,12 +533,14 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: list, final_cols: list) ->
                 # Find columns from the feed (those with the suffix)
                 feed_suffix_columns = [col for col in temp_df.columns if col.endswith(feed_suffix)]
                 
-                # For each feed column, fill NaN values in the corresponding original column
+                # For each feed column, replace values in the original column with values from feed
                 for feed_col in feed_suffix_columns:
                     original_col = feed_col.replace(feed_suffix, '')
                     if original_col in temp_df.columns:
-                        # Fill NaN values in original column with values from feed column
-                        temp_df[original_col] = temp_df[original_col].fillna(temp_df[feed_col])
+                        # Replace values in original column with values from feed column
+                        # Only replace non-empty values from feed
+                        mask = ~temp_df[feed_col].isna() & (temp_df[feed_col] != "")
+                        temp_df.loc[mask, original_col] = temp_df.loc[mask, feed_col]
                     
                     # Remove the feed suffixed column after using its values
                     temp_df = temp_df.drop(columns=[feed_col])
