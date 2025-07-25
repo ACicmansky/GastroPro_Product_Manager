@@ -23,21 +23,26 @@
 - ✅ Enhanced data validation with empty catalog number filtering
 - ✅ Detailed statistics reporting in export summary dialog
 - ✅ Fixed semicolon separator handling for Topchladenie CSV files
+- ✅ Product variant detection based on name similarity
+- ✅ Configuration-based difference extraction for product variants
+- ✅ Human-readable variant difference reports
+- ✅ Category-specific difference extraction rules
 
 ## In Progress
 - 🔄 Error handling improvements
 - 🔄 Performance optimizations for larger datasets
+- 🔄 Testing and validation of variant detection across different product categories
 
 ## Pending
 - ⏳ Data preview functionality
-- ⏳ Category selection interface
-- ⏳ XML-to-CSV field mapping
-- ⏳ Progress indicators for long operations
-- ⏳ Data validation and error checking
-- ⏳ Performance optimizations
+- ⏳ Enhanced variant difference visualization
+- ⏳ User interface for managing variant extraction rules
+- ⏳ Performance optimizations for large variant groups
+- ⏳ Automated testing for variant detection accuracy
 
 ## Known Issues
 - Some minor memory optimization needed for very large datasets
 - Limited validation for optional CSV fields and their formats
 - Configuration could store more processing preferences
 - No confirmation when replacing existing data in export file
+- Variant detection may require fine-tuning for certain product categories

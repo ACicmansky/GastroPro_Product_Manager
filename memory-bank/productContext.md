@@ -6,6 +6,8 @@ E-commerce businesses frequently need to manage product data from multiple sourc
 ## Solution
 GastroPro Product Manager provides an automated solution for merging and synchronizing product data from local CSV files with online XML product feeds, creating a unified output that maintains the structure of the original CSV while incorporating valuable data from external sources.
 
+The system also includes advanced product variant detection and difference extraction, allowing users to automatically identify related product variants and extract their differences (dimensions, power, volume, etc.) based on configurable rules.
+
 ## User Experience Goals
 - **Simplicity**: Users should be able to complete the entire workflow in a few clicks
 - **Visibility**: Clear feedback about the data processing status and results
@@ -18,7 +20,10 @@ GastroPro Product Manager provides an automated solution for merging and synchro
 2. User selects product categories to include in the final output
 3. System automatically loads and processes configured XML feeds
 4. System merges the selected local data with the online feed data
-5. User reviews and saves the final CSV output
+5. System identifies product variants and extracts differences based on configuration
+6. User reviews the detected variants and extracted differences
+7. System generates detailed reports of variant groups and differences
+8. User saves the final CSV output with variant relationships and differences
 
 ## Target Users
 - E-commerce store administrators

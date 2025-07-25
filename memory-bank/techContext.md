@@ -8,6 +8,8 @@
 - **BeautifulSoup4**: HTML parsing for web scraping
 - **ElementTree**: XML parsing library (built into Python standard library)
 - **Concurrent.futures**: Multi-threading for parallel scraping operations
+- **difflib**: For string similarity comparison in variant detection
+- **regex**: Advanced pattern matching for product difference extraction
 
 ## Development Setup
 - **Environment**: Windows operating system
@@ -19,6 +21,8 @@
 - **Memory Usage**: Efficient memory management for large datasets
 - **Error Handling**: Robust error handling for network failures and malformed data
 - **Encoding**: Support for UTF-8 and other encodings common in CSV files
+- **Variant Detection**: Configurable similarity threshold (default: 0.98) for product grouping
+- **Extraction Rules**: Category-specific configuration for difference extraction
 
 ## Dependencies
 - Python 3.x
@@ -26,13 +30,15 @@
 - pandas
 - requests
 - beautifulsoup4
-- tqdm (optional, for progress reporting)
+- tqdm (for progress reporting)
+- regex (for advanced pattern matching)
 
 ## Data Structures
 1. **Configuration (JSON)**:
    - App settings
    - Data source configurations
    - Output settings
+   - Variant extraction rules (variant_extractions.json)
 
 2. **Local CSV Structure**:
    - Product ID

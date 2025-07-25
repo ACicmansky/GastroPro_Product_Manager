@@ -1,19 +1,20 @@
 # GastroPro Product Manager - System Patterns
 
 ## Architecture Overview
-GastroPro Product Manager follows a simple modular architecture with separation of concerns:
+GastroPro Product Manager follows a modular architecture with clear separation of concerns:
 
 ```
-┌───────────────┐     ┌───────────────┐     ┌───────────────┐
-│  User         │     │  Data         │     │  Output       │
-│  Interface    │◄────┤  Processing   │◄────┤  Generation   │
-└───────────────┘     └───────────────┘     └───────────────┘
-        │                     │                     │
-        ▼                     ▼                     ▼
-┌───────────────┐     ┌───────────────┐     ┌───────────────┐
-│  Input        │     │  Data         │     │  Config       │
-│  Handling     │     │  Storage      │     │  Management   │
-└───────────────┘     └───────────────┘     └───────────────┘
+┌───────────────┐     ┌─────────────────┐     ┌──────────────────┐     ┌───────────────┐
+│  User         │     │  Data           │     │  Product         │     │  Output       │
+│  Interface    │◄────┤  Processing     │◄────┤  Variant         │◄────┤  Generation   │
+└───────────────┘     └─────────────────┘     └──────────────────┘     └───────────────┘
+        │                     │                        │                       │
+        ▼                     ▼                        ▼                       ▼
+┌───────────────┐     ┌─────────────────┐     ┌──────────────────┐     ┌───────────────┐
+│  Input        │     │  Data           │     │  Variant         │     │  Config       │
+│  Handling     │     │  Storage        │     │  Configuration   │     │  Management   │
+└───────────────┘     └─────────────────┘     └──────────────────┘     └───────────────┘
+```
 ```
 
 ## Design Patterns
@@ -21,6 +22,10 @@ GastroPro Product Manager follows a simple modular architecture with separation 
    - **Model**: Data structures for product information
    - **View**: PyQt5-based GUI components
    - **Controller**: Application logic in the MainWindow class
+
+2. **Strategy Pattern**:
+   - Used in variant detection with different similarity comparison strategies
+   - Configurable extraction rules for different product categories
 
 2. **Configuration Management Pattern**:
    - External JSON configuration file
@@ -30,7 +35,14 @@ GastroPro Product Manager follows a simple modular architecture with separation 
 3. **Data Processing Pipeline**:
    - Input stage: CSV loading and preparation
    - Processing stage: Category filtering, mapping, and XML feed integration
-   - Output stage: CSV generation and export
+   - Variant Detection: Product grouping and difference extraction
+   - Output stage: CSV generation and report export
+
+4. **Variant Detection System**:
+   - Product similarity analysis using name patterns
+   - Configurable extraction of differences (dimensions, power, etc.)
+   - Category-specific extraction rules
+   - Human-readable reporting of variant groups
 
 4. **Category Mapping System**:
    - Universal JSON array format for mapping definitions
@@ -40,9 +52,10 @@ GastroPro Product Manager follows a simple modular architecture with separation 
 
 ## Component Relationships
 - **MainWindow Class**: Core controller that manages the application flow
+- **ProductVariantMatcher**: Handles variant detection and difference extraction
 - **Utils Module**: Handles file operations, configuration, and external data fetching
 - **Data Models**: Pandas DataFrames for data manipulation
-- **Config File**: External configuration for app settings and data sources
+- **Config Files**: External configurations for app settings, data sources, and variant extraction rules
 
 ## Technical Decisions
 1. **PyQt5 for GUI**: Provides robust desktop application interface
