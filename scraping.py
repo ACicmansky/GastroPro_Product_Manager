@@ -288,46 +288,31 @@ class TopchladenieScraper:
             dict: Product data
         """
         product_data = {}
-        try:
-            response = self.session.get(url)
-            soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Extract product name - first look for h1 tags
-            product_name = None
-            for selector in ['h1', 'h1[itemprop="name"]', '.product-title', '.product-name']:
-                product_name_elem = soup.select_one(selector)
-                if product_name_elem and product_name_elem.text.strip():
-                    product_name = product_name_elem.text.strip()
-                    break
-                    
-            # If no product name found, try to extract from page title
-            if not product_name:
-                title_elem = soup.select_one('title')
-                if title_elem and title_elem.text.strip():
-                    product_name = title_elem.text.split('|')[0].strip()
-            
-            # 1. "Kat. číslo" - Extract from product name (second and third word)
-            if product_name:
-                name_parts = product_name.split()
-                if len(name_parts) >= 3:
-                    product_data['Kat. číslo'] = f"{name_parts[1]} {name_parts[2]}"
-                else:
-                    product_data['Kat. číslo'] = ""
-            else:
-                product_data['Kat. číslo'] = ""
-            
-            # 2. "Názov tovaru" - Full product name
-            if product_name:
-                product_data['Názov tovaru'] = product_name
-            else:
-                product_data['Názov tovaru'] = ""
-        except Exception as e:
-            logger.error(f"Error extracting product details from {url}: {str(e)}")
-            # Initialize empty fields if an error occurs
-            product_data['Kat. číslo'] = ""
-            product_data['Názov tovaru'] = ""
         
-        # 3. "Bežná cena" - Price
+        response = self.session.get(url)
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Extract product name - first look for h1 tags
+        product_name = None
+        for selector in ['h1', 'h1[itemprop="name"]', '.product-title', '.product-name']:
+            product_name_elem = soup.select_one(selector)
+            if product_name_elem and product_name_elem.text.strip():
+                product_name = product_name_elem.text.strip()
+                break
+                
+        # If no product name found, try to extract from page title
+        if not product_name:
+            title_elem = soup.select_one('title')
+            if title_elem and title_elem.text.strip():
+                product_name = title_elem.text.split('|')[0].strip()
+        
+        # 1. "Kat. číslo" and "Názov tovaru" - Full product name
+        if product_name:
+            product_data['Kat. číslo'], product_data['Názov tovaru'] = product_name
+        else:
+            return None
+        
+        # 2. "Bežná cena" - Price
         price_value = 0
         
         # Based on our debugging, we know the actual price is in a p tag with class big red
@@ -395,10 +380,10 @@ class TopchladenieScraper:
             
         product_data['Bežná cena'] = price_value
         
-        # 4. "Výrobca" - Set to "Liebherr"
+        # 3. "Výrobca" - Set to "Liebherr"
         product_data['Výrobca'] = "Liebherr"
         
-        # 5. "Krátky popis" - Short description or parameters
+        # 4. "Krátky popis" - Short description or parameters
         try:
             short_desc_items = []
             
@@ -503,7 +488,7 @@ class TopchladenieScraper:
             logger.error(f"Error extracting short description for {url}: {str(e)}")
             product_data['Krátky popis'] = ""
         
-        # 6. "Dlhý popis" - Equipment section
+        # 5. "Dlhý popis" - Equipment section
         try:
             # Find section with class containing 'article_module'
             long_desc_parts = []
@@ -605,7 +590,7 @@ class TopchladenieScraper:
             logger.error(f"Error extracting long description: {str(e)}")
             product_data['Dlhý popis'] = ""
         
-        # 7. "Obrázky" - Image URLs
+        # 6. "Obrázky" - Image URLs
         try:
             image_urls = []
             soup = BeautifulSoup(response.content, 'html.parser')
@@ -675,7 +660,7 @@ class TopchladenieScraper:
             logger.error(f"Error extracting product images from {url}: {str(e)}")
             product_data['Obrázky'] = ""
         
-        # 8. "Hlavna kategória" - Last category link
+        # 7. "Hlavna kategória" - Last category link
         category_div = soup.find('div', class_='category')
         if category_div:
             category_links = category_div.find_all('a')
