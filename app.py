@@ -85,7 +85,7 @@ class Worker(QObject):
     progress = pyqtSignal(str)
     result = pyqtSignal(object, dict)  # Pass dataframe and statistics dictionary
 
-    def __init__(self, main_df, selected_categories, config, map_categories=False, variant_checkbox=False, scrape_topchladenie=False, topchladenie_csv_df=None, enable_gastromarket=True, enable_forgastro=True):
+    def __init__(self, main_df, selected_categories, config, map_categories=False, variant_checkbox=False, scrape_topchladenie=False, topchladenie_csv_df=None, enable_gastromarket=True, enable_forgastro=True, ai_enhancement_checkbox=False):
         super().__init__()
         self.main_df = main_df.copy()
         self.selected_categories = selected_categories
@@ -96,6 +96,7 @@ class Worker(QObject):
         self.topchladenie_csv_df = topchladenie_csv_df
         self.enable_gastromarket = enable_gastromarket
         self.enable_forgastro = enable_forgastro
+        self.ai_enhancement_checkbox = ai_enhancement_checkbox
 
     def run(self):
         try:
@@ -247,6 +248,22 @@ class Worker(QObject):
                 
                 variant_matcher.extract_product_differences(final_df, group_data)
 
+            # AI Enhancement for descriptions
+            if self.ai_enhancement_checkbox and self.config.get('ai_enhancement', {}).get('enabled', False):
+                try:
+                    from ai_enhancement import AIEnhancementProcessor
+                    self.progress.emit("Enhancing product descriptions with AI...")
+                    ai_processor = AIEnhancementProcessor(self.config.get('ai_enhancement', {}))
+                    
+                    def ai_progress_callback(processed, total):
+                        self.progress.emit(f"AI enhancement: {processed}/{total} products processed")
+                    
+                    final_df = ai_processor.process_dataframe(final_df, progress_callback=ai_progress_callback)
+                except ImportError as e:
+                    self.progress.emit(f"AI enhancement: Required packages not installed - {e}")
+                except Exception as e:
+                    self.progress.emit(f"AI enhancement: Error - {str(e)}")
+
             # Prepare statistics
             statistics = {
                 'original_csv': len(filtered_df),
@@ -355,11 +372,16 @@ class ProductManager(QMainWindow):
         self.map_categories_checkbox.setToolTip("Použiť mapovanie kategórií na vstupný CSV súbor")
 
         self.variant_checkbox = QCheckBox("Analyzovať produkty na varianty")
-        self.variant_checkbox.setChecked(True)
+        self.variant_checkbox.setChecked(False)
         self.variant_checkbox.setToolTip("Analyzovať produkty na varianty")
+
+        self.ai_enhancement_checkbox = QCheckBox("Použiť AI vylepšenie")
+        self.ai_enhancement_checkbox.setChecked(True)
+        self.ai_enhancement_checkbox.setToolTip("Použiť AI vylepšenie")
 
         row1_layout.addWidget(self.map_categories_checkbox)
         row1_layout.addWidget(self.variant_checkbox)
+        row1_layout.addWidget(self.ai_enhancement_checkbox)
         row1_layout.addStretch(1)
         options_layout.addLayout(row1_layout)
         
@@ -567,6 +589,7 @@ class ProductManager(QMainWindow):
         topchladenie_csv_df = self.topchladenie_csv_drop_area.topchladenie_df
         enable_gastromarket = self.gastromarket_checkbox.isChecked()
         enable_forgastro = self.forgastro_checkbox.isChecked()
+        ai_enhancement_checkbox = self.ai_enhancement_checkbox.isChecked()
 
         self.thread = QThread()
         self.worker = Worker(
@@ -576,7 +599,8 @@ class ProductManager(QMainWindow):
             scrape_topchladenie=scrape_topchladenie,
             topchladenie_csv_df=topchladenie_csv_df,
             enable_gastromarket=enable_gastromarket,
-            enable_forgastro=enable_forgastro
+            enable_forgastro=enable_forgastro,
+            ai_enhancement_checkbox=ai_enhancement_checkbox
         )
         self.worker.moveToThread(self.thread)
 

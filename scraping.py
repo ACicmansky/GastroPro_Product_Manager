@@ -308,7 +308,7 @@ class TopchladenieScraper:
         
         # 1. "Kat. číslo" and "Názov tovaru" - Full product name
         if product_name:
-            product_data['Kat. číslo'], product_data['Názov tovaru'] = product_name
+            product_data['Kat. číslo'] = product_data['Názov tovaru'] = product_name
         else:
             return None
         
