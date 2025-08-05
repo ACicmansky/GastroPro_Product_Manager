@@ -27,11 +27,19 @@
 - ✅ Configuration-based difference extraction for product variants
 - ✅ Human-readable variant difference reports
 - ✅ Category-specific difference extraction rules
+- ✅ AI-powered product description enhancement
+- ✅ Parallel batch processing with ThreadPoolExecutor
+- ✅ API quota management (15 calls/minute, 250k tokens/minute)
+- ✅ Token tracking and rate limiting
+- ✅ Automatic retry with exponential backoff
+- ✅ Incremental progress saving with encoding fallback (cp1250/UTF-8)
+- ✅ Processing status tracking (Spracovane AI, AI_Processed_Date)
 
 ## In Progress
 - 🔄 Error handling improvements
 - 🔄 Performance optimizations for larger datasets
 - 🔄 Testing and validation of variant detection across different product categories
+- 🔄 Monitoring and fine-tuning of AI enhancement quality
 
 ## Pending
 - ⏳ Data preview functionality

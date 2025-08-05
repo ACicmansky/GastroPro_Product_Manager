@@ -7,22 +7,31 @@
 - **Requests**: HTTP client for XML feed fetching and web scraping
 - **BeautifulSoup4**: HTML parsing for web scraping
 - **ElementTree**: XML parsing library (built into Python standard library)
-- **Concurrent.futures**: Multi-threading for parallel scraping operations
+- **Concurrent.futures**: Multi-threading for parallel operations
 - **difflib**: For string similarity comparison in variant detection
 - **regex**: Advanced pattern matching for product difference extraction
+- **google-generativeai**: For AI-powered product description enhancement
+- **python-dotenv**: For managing environment variables (API keys)
+- **threading**: For thread-safe quota management
 
 ## Development Setup
 - **Environment**: Windows operating system
 - **IDE**: Compatible with standard Python IDEs
 - **Version Control**: Git repository
+- **Environment Variables**:
+  - `GOOGLE_API_KEY`: Required for Gemini API access
 
 ## Technical Constraints
 - **Performance**: Must handle CSV files with potentially thousands of products
 - **Memory Usage**: Efficient memory management for large datasets
 - **Error Handling**: Robust error handling for network failures and malformed data
-- **Encoding**: Support for UTF-8 and other encodings common in CSV files
+- **Encoding**: Support for UTF-8, cp1250 with fallback to UTF-8
 - **Variant Detection**: Configurable similarity threshold (default: 0.98) for product grouping
 - **Extraction Rules**: Category-specific configuration for difference extraction
+- **API Quotas**:
+  - Max 15 API calls per minute
+  - Max 250,000 tokens per minute
+  - Automatic retry with exponential backoff
 
 ## Dependencies
 - Python 3.x
@@ -32,6 +41,8 @@
 - beautifulsoup4
 - tqdm (for progress reporting)
 - regex (for advanced pattern matching)
+- google-generativeai>=0.5.0
+- python-dotenv>=1.0.0
 
 ## Data Structures
 1. **Configuration (JSON)**:
@@ -46,6 +57,8 @@
    - Price
    - Description
    - "Hlavna kategória" (Main category) - used for filtering
+   - "Spracovane AI" - Tracks if product was processed by AI (TRUE/FALSE)
+   - "AI_Processed_Date" - Timestamp of last AI processing
    - Other product attributes
 
 3. **XML Feed Structure** (Typical):

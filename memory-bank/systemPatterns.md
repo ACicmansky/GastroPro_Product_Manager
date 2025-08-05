@@ -5,16 +5,32 @@ GastroPro Product Manager follows a modular architecture with clear separation o
 
 ```
 ┌───────────────┐     ┌─────────────────┐     ┌──────────────────┐     ┌───────────────┐
-│  User         │     │  Data           │     │  Product         │     │  Output       │
-│  Interface    │◄────┤  Processing     │◄────┤  Variant         │◄────┤  Generation   │
+│  User         │     │  Data           │     │  AI              │     │  Output       │
+│  Interface    │◄────┤  Processing     │◄────┤  Enhancement     │◄────┤  Generation   │
 └───────────────┘     └─────────────────┘     └──────────────────┘     └───────────────┘
         │                     │                        │                       │
         ▼                     ▼                        ▼                       ▼
 ┌───────────────┐     ┌─────────────────┐     ┌──────────────────┐     ┌───────────────┐
-│  Input        │     │  Data           │     │  Variant         │     │  Config       │
-│  Handling     │     │  Storage        │     │  Configuration   │     │  Management   │
+│  Input        │     │  Data           │     │  Product         │     │  Config       │
+│  Handling     │     │  Storage        │     │  Variant         │     │  Management   │
 └───────────────┘     └─────────────────┘     └──────────────────┘     └───────────────┘
 ```
+
+### AI Enhancement Layer
+```
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                AI Enhancement                                 │
+│  ┌─────────────┐     ┌────────────────┐     ┌─────────────────────────┐     │
+│  │  Batch      │     │  Parallel      │     │  Quota & Rate          │     │
+│  │  Processor  │◄───►│  Executor      │◄───►│  Limiter               │     │
+│  └─────────────┘     └────────────────┘     └─────────────────────────┘     │
+│         │                      │                       │                     │
+│         ▼                      ▼                       ▼                     │
+│  ┌─────────────┐     ┌────────────────┐     ┌─────────────────────────┐     │
+│  │  Progress   │     │  Error         │     │  Token & Call           │     │
+│  │  Tracking   │     │  Handling      │     │  Management             │     │
+│  └─────────────┘     └────────────────┘     └─────────────────────────┘     │
+└───────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Design Patterns
@@ -23,9 +39,22 @@ GastroPro Product Manager follows a modular architecture with clear separation o
    - **View**: PyQt5-based GUI components
    - **Controller**: Application logic in the MainWindow class
 
-2. **Strategy Pattern**:
+2. **Parallel Processing Pattern**:
+   - ThreadPoolExecutor for concurrent batch processing
+   - Configurable thread pool size (max_parallel_calls)
+   - Thread-safe quota and token management
+   - Progress tracking across multiple threads
+
+3. **Rate Limiter Pattern**:
+   - Enforces API call limits (15/minute)
+   - Token bucket algorithm for token management
+   - Automatic wait and retry on quota limits
+   - Thread-safe counters with locks
+
+4. **Strategy Pattern**:
    - Used in variant detection with different similarity comparison strategies
    - Configurable extraction rules for different product categories
+   - Flexible prompt engineering for different product types
 
 2. **Configuration Management Pattern**:
    - External JSON configuration file
@@ -43,6 +72,15 @@ GastroPro Product Manager follows a modular architecture with clear separation o
    - Configurable extraction of differences (dimensions, power, etc.)
    - Category-specific extraction rules
    - Human-readable reporting of variant groups
+
+5. **AI Enhancement System**:
+   - Parallel batch processing with configurable batch sizes
+   - Token-based quota management (250k tokens/minute)
+   - Automatic retry with exponential backoff
+   - Progress tracking and incremental saving
+   - Thread-safe API call management
+   - Encoding fallback (cp1250 → UTF-8)
+   - Status tracking with timestamps
 
 4. **Category Mapping System**:
    - Universal JSON array format for mapping definitions
