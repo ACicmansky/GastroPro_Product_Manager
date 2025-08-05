@@ -46,13 +46,26 @@ def load_csv_data(file_path: str) -> pd.DataFrame:
     encodings = ['cp1250', 'latin1', 'utf-8-sig']
     for encoding in encodings:
         try:
-            return pd.read_csv(
+            df = pd.read_csv(
                 file_path,
                 sep=';',
                 decimal=',',
                 encoding=encoding,
                 on_bad_lines='skip'
             )
+            
+            # Ensure numeric columns are properly typed and preserve original values
+            numeric_columns = ['Viditeľný', 'Bežná cena', 'Váha']
+            for col in numeric_columns:
+                if col in df.columns:
+                    # Convert to string first to handle comma decimals, then to numeric
+                    df[col] = df[col].astype(str).str.replace(',', '.')
+                    # Convert to numeric, keeping NaN for invalid values
+                    df[col] = pd.to_numeric(df[col], errors='coerce')
+                    # Replace NaN with empty string for consistency
+                    df[col] = df[col].fillna('')
+            
+            return df
         except UnicodeDecodeError:
             continue
     raise Exception(f"Nepodarilo sa načítať CSV súbor s kódovaním {encodings}.")    
@@ -491,93 +504,67 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: list, final_cols: list) ->
     # Start with a copy of the main dataframe, ensuring all final columns exist
     merged_df = main_df.copy()
     
-    # First make sure the main dataframe has all necessary columns for the final output
+    # Ensure all final columns exist in the dataframe
     for col in final_cols:
         if col not in merged_df.columns:
-            merged_df[col] = ""  # Add missing columns with empty string
+            merged_df[col] = ""
     
     # Define the join column
-    join_column = "Kat. číslo"  # Catalog number as primary key for joining
-    #join_column = "Názov tovaru"  # Product name as primary key for joining
-            
-    # Process feeds in order of priority (lower index = higher priority)
+    join_column = "Kat. číslo"
+    
+    # Process feeds in order of priority
     for i, df_from_feed in enumerate(feed_dfs):
-        # Skip empty dataframes
-        if df_from_feed.empty:
+        if df_from_feed.empty or len(df_from_feed) == 0:
             print(f"Feed {i+1} is empty, skipping.")
-            continue
-        
-        # No join needed if feed has no data
-        if len(df_from_feed) == 0:
-            print(f"Feed {i+1} has no rows, skipping.")
             continue
             
         try:
-            # Check if we can join by catalog number
+            # Ensure both dataframes have the join column as string
             if join_column in df_from_feed.columns and join_column in merged_df.columns:
-                # Standard join on catalog number
                 feed_suffix = f'_feed{i+1}'
                 
-                # First clean up any NaN values in the join column
-                merged_df[join_column] = merged_df[join_column].fillna("")
-                df_from_feed[join_column] = df_from_feed[join_column].fillna("")
+                # Convert join columns to string for proper matching
+                merged_df[join_column] = merged_df[join_column].astype(str).fillna("")
+                df_from_feed[join_column] = df_from_feed[join_column].astype(str).fillna("")
                 
-                # Debug the join values to see what might match
-                print(f"Join column '{join_column}' sample values in main DF: {merged_df[join_column].unique()[:5]}")
-                print(f"Join column '{join_column}' sample values in feed: {df_from_feed[join_column].unique()[:5]}")
-                
-                # Use outer join to include ALL products from both sources
-                # 'outer' will include rows that appear in EITHER DataFrame
+                # Perform outer join
                 temp_df = pd.merge(merged_df, df_from_feed, on=join_column, how="outer", suffixes=('', feed_suffix))
                 
-                # Find columns from the feed (those with the suffix)
+                # Process feed columns, only filling empty values
                 feed_suffix_columns = [col for col in temp_df.columns if col.endswith(feed_suffix)]
                 
-                # For each feed column, replace values in the original column with values from feed
                 for feed_col in feed_suffix_columns:
                     original_col = feed_col.replace(feed_suffix, '')
                     if original_col in temp_df.columns:
-                        # Replace values in original column with values from feed column
-                        # Only replace non-empty values from feed
-                        mask = ~temp_df[feed_col].isna() & (temp_df[feed_col] != "")
+                        # Only replace values when original is empty or NaN
+                        mask = (temp_df[original_col].isna() | (temp_df[original_col] == "")) & ~temp_df[feed_col].isna()
                         temp_df.loc[mask, original_col] = temp_df.loc[mask, feed_col]
                     
-                    # Remove the feed suffixed column after using its values
+                    # Remove the suffixed column
                     temp_df = temp_df.drop(columns=[feed_col])
-                    
-                # Update the merged dataframe
+                
                 merged_df = temp_df
             else:
-                # Alternative approach for feeds missing the join column
-                print(f"Feed {i+1} or main dataframe doesn't have '{join_column}' column for joining. Handling columns individually.")
+                print(f"Feed {i+1} missing join column '{join_column}'")
                 
-                # Add all columns from feed to the main dataframe
-                for col in df_from_feed.columns:
-                    if col in final_cols and col not in merged_df.columns:
-                        # This is a new column we want in the output
-                        merged_df[col] = ""
-                    elif col in final_cols:
-                        # This is a column we already have, but maybe with empty values
-                        # Copy non-empty values from feed to fill empty spots in main df
-                        for idx in merged_df.index:
-                            if pd.isna(merged_df.at[idx, col]) or merged_df.at[idx, col] == "":
-                                # Try to find a non-empty value in the feed
-                                if len(df_from_feed) > 0:  # Only attempt if feed has data
-                                    # Take the first non-empty value we find (or empty if none found)
-                                    feed_val = df_from_feed[col].dropna().iloc[0] if not df_from_feed[col].dropna().empty else ""
-                                    merged_df.at[idx, col] = feed_val
-        
         except Exception as e:
             print(f"Error processing feed {i+1}: {str(e)}")
-            # Continue with next feed despite the error
             continue
 
-    # Make sure all required columns exist in the final output
-    for col in final_cols:
-        if col not in merged_df.columns:
-            merged_df[col] = ""  # Add any missing columns with empty string
+    # Ensure all final columns are present and handle NaN values appropriately
+    result_df = merged_df[final_cols].copy()
     
-    # Handle any remaining NaN values by converting to empty string
-    result_df = merged_df[final_cols].fillna("")
+    # Handle specific numeric columns to ensure they don't become NaN
+    numeric_cols = ['Viditeľný', 'Bežná cena', 'Váha']
+    for col in numeric_cols:
+        if col in result_df.columns:
+            # Convert to string and handle empty values
+            result_df[col] = result_df[col].astype(str)
+            # Replace 'nan' strings with empty strings
+            result_df[col] = result_df[col].replace('nan', '')
+            result_df[col] = result_df[col].replace('NaN', '')
+    
+    # Fill any remaining NaN values with empty strings
+    result_df = result_df.fillna("")
     
     return result_df
