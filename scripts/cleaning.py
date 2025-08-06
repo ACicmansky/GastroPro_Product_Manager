@@ -99,7 +99,7 @@ def process_csv_file(input_file, output_file):
     """Process main CSV file and extract name and category columns"""
     try:
         print(f"Processing CSV file: {input_file}")
-        df = pd.read_csv(input_file, encoding='cp1250', sep=';')
+        df = pd.read_csv(input_file, encoding='cp1250', sep=';', dtype=str, keep_default_na=False)
         
         # Check if required columns exist
         if "Názov tovaru" not in df.columns or "Hlavna kategória" not in df.columns:

@@ -230,12 +230,33 @@ class Worker(QObject):
             # Merge everything
             final_df = merge_dataframes(filtered_df, cleaned_feed_dataframes + ([scraped_df] if scraped_df is not None and not scraped_df.empty else []), self.config['final_csv_columns'])
             
-            # strip all strings in final_df
-            final_df = final_df.apply(lambda x: x.str.strip() if x.dtype == 'object' else x)
+            # Ensure all values are clean strings and strip whitespace
+            # But only for object columns and only at the end of processing
+            for col in final_df.columns:
+                if final_df[col].dtype == 'object':
+                    # Fill NaN values with empty string and convert to string
+                    final_df[col] = final_df[col].fillna("")
+                    final_df[col] = final_df[col].astype(str)
+                    # Handle the special case where pandas converts NaN to the string "nan"
+                    final_df[col] = final_df[col].replace("nan", "")
+                    # Strip whitespace
+                    final_df[col] = final_df[col].str.strip()
+            
+            # Replace all \n with <br /> in Krátky popis and Dlhý popis
+            # Ensure columns exist before processing
+            if 'Krátky popis' in final_df.columns:
+                final_df['Krátky popis'] = final_df['Krátky popis'].str.replace('\n', '<br />')
+            if 'Dlhý popis' in final_df.columns:
+                final_df['Dlhý popis'] = final_df['Dlhý popis'].str.replace('\n', '<br />')
 
-            # replace all \n with <br /> in Krátky popis and Dlhý popis
-            final_df['Krátky popis'] = final_df['Krátky popis'].str.replace('\n', '<br />')
-            final_df['Dlhý popis'] = final_df['Dlhý popis'].str.replace('\n', '<br />')
+            # Find all products with empty 'Hlavna kategória' (NaN or empty string) and set their values
+            mask_f841622 = (final_df['Kat. číslo'] == "F841622") & (final_df['Hlavna kategória'].isna() | (final_df['Hlavna kategória'] == ""))
+            mask_l131712 = (final_df['Kat. číslo'] == "L131712") & (final_df['Hlavna kategória'].isna() | (final_df['Hlavna kategória'] == ""))
+            mask_roc_cl201 = (final_df['Kat. číslo'] == "ROC_CL201") & (final_df['Hlavna kategória'].isna() | (final_df['Hlavna kategória'] == ""))
+            
+            final_df.loc[mask_f841622, 'Hlavna kategória'] = "Chladenie a mrazenie/Chladiace a mraziace stoly"
+            final_df.loc[mask_l131712, 'Hlavna kategória'] = "Stolový inventár/Dochucovacie súpravy a mlynčeky"
+            final_df.loc[mask_roc_cl201, 'Hlavna kategória'] = "Príprava surovín/Krájače zeleniny"
 
             # Identify product variants and assign parent catalog numbers
             if self.variant_checkbox:
@@ -528,7 +549,7 @@ class ProductManager(QMainWindow):
         """Load topchladenie CSV file and update UI"""
         try:
             # Load CSV with semicolon separator and proper encoding
-            df = pd.read_csv(file_path, sep=';', encoding='utf-8')
+            df = pd.read_csv(file_path, sep=';', encoding='utf-8', dtype=str, keep_default_na=False)
             if df.empty:
                 QMessageBox.warning(self, "Prázdny súbor", "Vybraný CSV súbor je prázdny.")
                 return
@@ -637,10 +658,12 @@ class ProductManager(QMainWindow):
                 # First try cp1250 with character replacement
                 try:
                     # Handle characters that can't be encoded in cp1250
-                    # Convert problematic characters first
+                    # Convert problematic characters first, but preserve data
                     for col in final_df.columns:
                         if final_df[col].dtype == 'object':
-                            final_df[col] = final_df[col].astype(str).apply(
+                            # Ensure all values are strings and handle encoding issues
+                            final_df[col] = final_df[col].astype(str)
+                            final_df[col] = final_df[col].apply(
                                 lambda x: ''.join(c if c.encode('cp1250', errors='replace') != b'?' else ' ' for c in x)
                             )
                     
@@ -651,6 +674,10 @@ class ProductManager(QMainWindow):
                     QMessageBox.information(self, "Great success!", stats_message)
                 except UnicodeEncodeError:
                     # Fall back to UTF-8 with BOM for Excel compatibility
+                    # Ensure all values are clean strings before saving
+                    for col in final_df.columns:
+                        if final_df[col].dtype == 'object':
+                            final_df[col] = final_df[col].astype(str)
                     final_df.to_csv(save_path, index=False, encoding='utf-8-sig', sep=';')
                     stats_message = self.create_statistics_message(save_path)
                     stats_message += "\n\nPoznámka: Použité kódovanie UTF-8 namiesto cp1250 kvôli nekompatibilným znakom."

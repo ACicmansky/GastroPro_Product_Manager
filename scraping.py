@@ -143,7 +143,7 @@ class TopchladenieScraper:
             df = pd.DataFrame(columns=[
                 'Kat. číslo', 'Názov tovaru', 'Bežná cena', 'Výrobca',
                 'Krátky popis', 'Dlhý popis', 'Obrázky', 'Hlavna kategória', 'Viditeľný'
-            ])
+            ], dtype=str, keep_default_na=False)
         
         logger.info(f"Successfully scraped {len(df)} products")
         return df

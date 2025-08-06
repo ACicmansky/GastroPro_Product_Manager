@@ -14,7 +14,7 @@ def extract_products(num_products=50):
     
     try:
         # Read the CSV file, limiting to num_products rows
-        df = pd.read_csv("scripts/ALLexport-products.csv", nrows=num_products, encoding='cp1250', sep=';')
+        df = pd.read_csv("scripts/ALLexport-products.csv", nrows=num_products, encoding='cp1250', sep=';', dtype=str, keep_default_na=False)
         
         # Select only the required columns
         columns_needed = ["Názov tovaru", "Hlavna kategória", "Krátky popis", "Dlhý popis"]

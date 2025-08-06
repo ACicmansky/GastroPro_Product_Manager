@@ -51,19 +51,10 @@ def load_csv_data(file_path: str) -> pd.DataFrame:
                 sep=';',
                 decimal=',',
                 encoding=encoding,
-                on_bad_lines='skip'
+                on_bad_lines='skip',
+                dtype=str,
+                keep_default_na=False
             )
-            
-            # Ensure numeric columns are properly typed and preserve original values
-            numeric_columns = ['Viditeľný', 'Bežná cena', 'Váha']
-            for col in numeric_columns:
-                if col in df.columns:
-                    # Convert to string first to handle comma decimals, then to numeric
-                    df[col] = df[col].astype(str).str.replace(',', '.')
-                    # Convert to numeric, keeping NaN for invalid values
-                    df[col] = pd.to_numeric(df[col], errors='coerce')
-                    # Replace NaN with empty string for consistency
-                    df[col] = df[col].fillna('')
             
             return df
         except UnicodeDecodeError:
@@ -159,13 +150,6 @@ def process_gastromarket_text(description, category, category_mappings=None):
             mapped_category = map_category(category, category_mappings)
             if mapped_category != category:
                 return processed_description, mapped_category
-        
-        # If no mapping found or no mappings provided, use default processing
-        if " | " in category:
-            processed_category = category.replace(" | ", "/")
-            print(f"No mapping found for Gastromarket category '{category}', using default replacement: '{processed_category}'")
-        else:
-            processed_category = category
     else:
         processed_category = ""
     
@@ -417,7 +401,7 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
         row = {}
         
         # Special processing for forgastro product descriptions
-        product_desc_html = None
+        product_desc_html = ""
         
         for xml_key, csv_column in mapping.items():
             # If the key is compound (e.g., "images/item/url"), use findall and join values
@@ -427,10 +411,10 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
                     # Join all found URL addresses into one string separated by commas
                     row[csv_column] = ", ".join([el.text.strip() for el in elements if el.text])
                 else:
-                    row[csv_column] = None
+                    row[csv_column] = ""
             else:
                 element = item.find(xml_key)
-                element_text = element.text.strip() if element is not None and element.text is not None else None
+                element_text = element.text.strip() if element is not None and element.text is not None else ""
                 
                 # Store HTML content for specialized processing later
                 if xml_key == "product_desc" and feed_name == "forgastro":
@@ -488,7 +472,7 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
     # Ensure that DataFrame has all columns defined in mapping
     missing_cols = set(mapping.values()) - set(df.columns)
     for col in missing_cols:
-        df[col] = None
+        df[col] = ""
         
     # Return DataFrame with only columns defined in mapping
     return df[list(mapping.values()) + ["Viditeľný"]]
@@ -519,13 +503,9 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: list, final_cols: list) ->
             continue
             
         try:
-            # Ensure both dataframes have the join column as string
+            # Ensure both dataframes have the join column
             if join_column in df_from_feed.columns and join_column in merged_df.columns:
                 feed_suffix = f'_feed{i+1}'
-                
-                # Convert join columns to string for proper matching
-                merged_df[join_column] = merged_df[join_column].astype(str).fillna("")
-                df_from_feed[join_column] = df_from_feed[join_column].astype(str).fillna("")
                 
                 # Perform outer join
                 temp_df = pd.merge(merged_df, df_from_feed, on=join_column, how="outer", suffixes=('', feed_suffix))
@@ -537,7 +517,7 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: list, final_cols: list) ->
                     original_col = feed_col.replace(feed_suffix, '')
                     if original_col in temp_df.columns:
                         # Only replace values when original is empty or NaN
-                        mask = (temp_df[original_col].isna() | (temp_df[original_col] == "")) & ~temp_df[feed_col].isna()
+                        mask = (temp_df[original_col].isna() | (temp_df[original_col] == "")) & temp_df[feed_col].notna()
                         temp_df.loc[mask, original_col] = temp_df.loc[mask, feed_col]
                     
                     # Remove the suffixed column
@@ -550,21 +530,19 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: list, final_cols: list) ->
         except Exception as e:
             print(f"Error processing feed {i+1}: {str(e)}")
             continue
-
-    # Ensure all final columns are present and handle NaN values appropriately
-    result_df = merged_df[final_cols].copy()
     
-    # Handle specific numeric columns to ensure they don't become NaN
-    numeric_cols = ['Viditeľný', 'Bežná cena', 'Váha']
-    for col in numeric_cols:
-        if col in result_df.columns:
-            # Convert to string and handle empty values
-            result_df[col] = result_df[col].astype(str)
-            # Replace 'nan' strings with empty strings
-            result_df[col] = result_df[col].replace('nan', '')
-            result_df[col] = result_df[col].replace('NaN', '')
+    # Before returning, ensure all columns that should exist are present
+    # and convert only final columns to strings, filling NaN with empty string
+    for col in final_cols:
+        if col in merged_df.columns:
+            # Convert to string and fill NaN with empty string
+            # This is the only place where we should convert to string to avoid data loss
+            merged_df[col] = merged_df[col].fillna("")
+            merged_df[col] = merged_df[col].astype(str)
+            # Handle the special case where pandas converts NaN to the string "nan"
+            merged_df[col] = merged_df[col].replace("nan", "")
+        else:
+            # Ensure the column exists even if it's empty
+            merged_df[col] = ""
     
-    # Fill any remaining NaN values with empty strings
-    result_df = result_df.fillna("")
-    
-    return result_df
+    return merged_df
