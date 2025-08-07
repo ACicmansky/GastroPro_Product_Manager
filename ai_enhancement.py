@@ -7,6 +7,7 @@ import logging
 from datetime import datetime
 from google import genai
 from google.genai import types
+from llm_output_parser import parse_json
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
@@ -36,7 +37,7 @@ class AIEnhancementProcessor:
         self.config = types.GenerateContentConfig(
             tools=[grounding_tool],
             system_instruction=self.create_system_prompt(),
-            temperature=self.temperature,
+            temperature=self.temperature
         )
         
         # Quota tracking
@@ -138,18 +139,18 @@ class AIEnhancementProcessor:
                 
                 # Parse response
                 if response and response.text:
-                    content = response.text.strip().replace('```json', '').replace('```', '').replace('\n', '')
+                    # content = response.text.strip().replace('```json', '').replace('```', '').replace('\n', '')
                     
                     # Try to parse JSON response
                     try:
-                        enhanced_products = json.loads(content)
+                        enhanced_products = parse_json(response.text)
                         return enhanced_products
                     except json.JSONDecodeError:
                         # If response is not valid JSON, try to extract JSON from text
-                        if '[' in content and ']' in content:
-                            json_start = content.find('[')
-                            json_end = content.rfind(']') + 1
-                            json_str = content[json_start:json_end]
+                        if '[' in response.text and ']' in response.text:
+                            json_start = response.text.find('[')
+                            json_end = response.text.rfind(']') + 1
+                            json_str = response.text[json_start:json_end]
                             enhanced_products = json.loads(json_str)
                             return enhanced_products
                         
@@ -170,23 +171,18 @@ class AIEnhancementProcessor:
         
         return None
 
-    def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, str]], 
-                        start_idx: int) -> pd.DataFrame:
+    def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, str]]) -> pd.DataFrame:
         """Update dataframe with enhanced descriptions."""
         df = df.copy()
         
-        for i, enhanced_product in enumerate(enhanced_products):
-            idx = start_idx + i
-            if idx < len(df):
-                # Update descriptions
-                if 'Krátky popis' in enhanced_product:
-                    df.at[idx, 'Krátky popis'] = enhanced_product['Krátky popis']
-                if 'Dlhý popis' in enhanced_product:
-                    df.at[idx, 'Dlhý popis'] = enhanced_product['Dlhý popis']
-                
-                # Mark as processed
-                df.at[idx, 'Spracovane AI'] = True
-                df.at[idx, 'AI_Processed_Date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        for enhanced_product in enhanced_products:
+            df.loc[df['Názov tovaru'] == enhanced_product['Názov tovaru'], [
+                'Krátky popis', 'Dlhý popis', 'SEO titulka', 'SEO popis', 'SEO kľúčové slová',
+                'Spracovane AI', 'AI_Processed_Date'
+            ]] = [
+                enhanced_product['Krátky popis'], enhanced_product['Dlhý popis'], enhanced_product['SEO titulka'],
+                enhanced_product['SEO popis'], enhanced_product['SEO kľúčové slová'], True, datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            ]
         
         return df
 
@@ -203,7 +199,7 @@ class AIEnhancementProcessor:
             df['AI_Processed_Date'] = ''
         
         # Filter products needing processing
-        needs_processing = df[df['Spracovane AI'] != 'TRUE']
+        needs_processing = df[df['Spracovane AI'].isin([False, 'FALSE', ""])]
         total_products = len(needs_processing)
         
         if total_products == 0:
@@ -239,8 +235,8 @@ class AIEnhancementProcessor:
                 try:
                     result = future.result()
                     if result:
-                        enhanced_products, start_idx = result
-                        df = self.update_dataframe(df, enhanced_products, start_idx)
+                        enhanced_products = result[0]
+                        df = self.update_dataframe(df, enhanced_products)
                         processed_count += len(enhanced_products)
                         
                         # Save incremental progress
@@ -354,9 +350,9 @@ class AIEnhancementProcessor:
         * Prirodzene začleň SEO frázy:
 
         * „profesionálne gastro vybavenie“
-        * „komerčná kuchyňa \[typ zariadenia]“
-        * „horeca \[kategória]“
-        * „\[značka] \[model] technické parametre“
+        * „komerčná kuchyňa \\ [typ zariadenia]“
+        * „horeca \\ [kategória]“
+        * „\\ [značka] \\ [model] technické parametre“
         * Uvádzaj technické údaje (výkon, kapacita, materiály, rozmery)
         * Ak je produkt nejasný, **použi webové vyhľadávanie** na zistenie funkcie a parametrov (simuluj odborné overenie informácií)
 
@@ -388,7 +384,7 @@ class AIEnhancementProcessor:
 
         ### 📤 **VÝSTUP**
 
-        **Presne to isté JSON pole**, ale s vylepšenými poľami:
+        **Presne to isté JSON pole** s všetkými produktmi ale s vylepšenými poľami:
 
         * `"Krátky popis"` (HTML),
         * `"Dlhý popis"` (HTML),

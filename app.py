@@ -1,5 +1,6 @@
 # app.py
 import sys
+import logging
 import pandas as pd
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
@@ -14,6 +15,8 @@ from scraping import get_scraped_products
 
 from utils import load_config, fetch_xml_feed, parse_xml_feed, merge_dataframes, load_csv_data, load_category_mappings, map_dataframe_categories
 from product_variant_matcher import ProductVariantMatcher
+
+logger = logging.getLogger(__name__)
 
 class DropArea(QFrame):
     def __init__(self, parent=None):
@@ -282,8 +285,10 @@ class Worker(QObject):
                     final_df = ai_processor.process_dataframe(final_df, progress_callback=ai_progress_callback)
                 except ImportError as e:
                     self.progress.emit(f"AI enhancement: Required packages not installed - {e}")
+                    logger.error(f"AI enhancement: Required packages not installed - {e}")
                 except Exception as e:
                     self.progress.emit(f"AI enhancement: Error - {str(e)}")
+                    logger.error(f"AI enhancement: Error - {str(e)}")
 
             # Prepare statistics
             statistics = {
