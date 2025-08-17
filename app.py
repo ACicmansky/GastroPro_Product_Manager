@@ -10,10 +10,8 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject, QStandardPaths
 
-# Import for the topchladenie.sk scraper
 from scraping import get_scraped_products
-
-from utils import load_config, fetch_xml_feed, parse_xml_feed, merge_dataframes, load_csv_data, load_category_mappings, map_dataframe_categories
+from utils import load_config, fetch_xml_feed, parse_xml_feed, merge_dataframes, load_csv_data, load_category_mappings, map_dataframe_categories, clean_html_text
 from product_variant_matcher import ProductVariantMatcher
 
 logger = logging.getLogger(__name__)
@@ -245,12 +243,14 @@ class Worker(QObject):
                     # Strip whitespace
                     final_df[col] = final_df[col].str.strip()
             
-            # Replace all \n with <br /> in Krátky popis and Dlhý popis
+            # Replace all \n with <br /> in Krátky popis and Dlhý popis and replace " with ''
             # Ensure columns exist before processing
-            if 'Krátky popis' in final_df.columns:
-                final_df['Krátky popis'] = final_df['Krátky popis'].str.replace('\n', '<br />')
-            if 'Dlhý popis' in final_df.columns:
-                final_df['Dlhý popis'] = final_df['Dlhý popis'].str.replace('\n', '<br />')
+            final_df['Krátky popis'] = final_df['Krátky popis'].apply(clean_html_text)
+            final_df['Dlhý popis'] = final_df['Dlhý popis'].apply(clean_html_text)
+            final_df['Názov tovaru'] = final_df['Názov tovaru'].apply(clean_html_text)
+
+            # Replace empty 'Názov tovaru' with Kat. číslo
+            final_df.loc[final_df['Názov tovaru'].isna() | (final_df['Názov tovaru'] == ""), 'Názov tovaru'] = final_df['Kat. číslo']
 
             # Find all products with empty 'Hlavna kategória' (NaN or empty string) and set their values
             mask_f841622 = (final_df['Kat. číslo'] == "F841622") & (final_df['Hlavna kategória'].isna() | (final_df['Hlavna kategória'] == ""))
@@ -282,7 +282,7 @@ class Worker(QObject):
                     def ai_progress_callback(processed, total):
                         self.progress.emit(f"AI enhancement: {processed}/{total} products processed")
                     
-                    final_df = ai_processor.process_dataframe(final_df, progress_callback=ai_progress_callback)
+                    final_df, ai_stats = ai_processor.process_dataframe(final_df, progress_callback=ai_progress_callback)
                 except ImportError as e:
                     self.progress.emit(f"AI enhancement: Required packages not installed - {e}")
                     logger.error(f"AI enhancement: Required packages not installed - {e}")
@@ -299,7 +299,16 @@ class Worker(QObject):
                 'total': len(final_df)
             }
             
-            self.progress.emit(f"Final dataset ready with {len(final_df)} total products")
+            # Add AI enhancement statistics if applicable
+            if 'ai_stats' in locals():
+                statistics.update(ai_stats)
+            
+            # Update progress message with AI statistics if applicable
+            if 'ai_stats' in locals() and ai_stats.get('ai_should_process', 0) > 0:
+                self.progress.emit(f"Final dataset ready with {len(final_df)} total products. "
+                                 f"AI processed {ai_stats['ai_processed']}/{ai_stats['ai_should_process']} products.")
+            else:
+                self.progress.emit(f"Final dataset ready with {len(final_df)} total products")
             self.result.emit(final_df, statistics)
         except Exception as e:
             self.error.emit(("Chyba generovania", f"Pri generovaní došlo k chybe:\n{e}"))
@@ -702,6 +711,11 @@ class ProductManager(QMainWindow):
         message += f"• GastroMarket XML: {stats['gastromarket']} produktov\n"
         message += f"• ForGastro XML: {stats['forgastro']} produktov\n"
         message += f"• Topchladenie.sk: {stats['topchladenie']} produktov\n"
+        
+        # Add AI enhancement statistics if applicable
+        if 'ai_should_process' in stats and stats['ai_should_process'] > 0:
+            message += f"• AI spracované: {stats['ai_processed']}/{stats['ai_should_process']} produktov\n"
+        
         message += f"\n🎯 Celkovo exportovaných: {stats['total']} produktov"
         
         return message

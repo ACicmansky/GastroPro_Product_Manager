@@ -546,3 +546,11 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: list, final_cols: list) ->
             merged_df[col] = ""
     
     return merged_df
+
+def clean_html_text(s):
+    # Replace special characters in text nodes, but leave tags and entities alone
+    def repl(match):
+        # Remove all except letters, numbers, and spaces from text portion
+        return re.sub(r'[^\w\u00C0-\u017F/\-\+\~\:\°\,\;\.\?\!\%\(\) ]+', '', match.group(0))
+    # Apply replacement only outside of HTML tags
+    return re.sub(r'>([^<]+)<', lambda m: '>' + repl(m) + '<', s).replace('"', "").replace('\\', "")

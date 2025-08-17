@@ -2,7 +2,7 @@ import json
 import time
 import os
 import pandas as pd
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 import logging
 from datetime import datetime
 from google import genai
@@ -11,6 +11,7 @@ from llm_output_parser import parse_json
 from dotenv import load_dotenv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
+from rapidfuzz import fuzz
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,7 @@ class AIEnhancementProcessor:
         self.retry_delay = config.get('retry_delay', 60)
         self.retry_attempts = config.get('retry_attempts', 3)
         self.max_parallel_calls = config.get('max_parallel_calls', 5)
+        self.similarity_threshold = config.get('similarity_threshold', 85)
 
         # Initialize the Gemini API
         self.client = genai.Client(api_key=self.api_key)
@@ -54,17 +56,16 @@ class AIEnhancementProcessor:
         """Prepare batch data for AI processing."""
         batch_df = df.iloc[start_idx:end_idx].copy()
         
-        # Filter and prepare data
+        # Prepare data (no need to filter again since we're working with already filtered data)
         products = []
         for _, row in batch_df.iterrows():
-            if pd.isna(row.get('Spracovane AI', False)) or not row.get('Spracovane AI', False):
-                product = {
-                    "Názov tovaru": str(row.get('Názov tovaru', '')),
-                    "Hlavna kategória": str(row.get('Hlavna kategória', '')),
-                    "Krátky popis": str(row.get('Krátky popis', '')),
-                    "Dlhý popis": str(row.get('Dlhý popis', ''))
-                }
-                products.append(product)
+            product = {
+                "Názov tovaru": str(row.get('Názov tovaru', '')),
+                "Hlavna kategória": str(row.get('Hlavna kategória', '')),
+                "Krátky popis": str(row.get('Krátky popis', '')),
+                "Dlhý popis": str(row.get('Dlhý popis', ''))
+            }
+            products.append(product)
         
         return products
 
@@ -171,26 +172,71 @@ class AIEnhancementProcessor:
         
         return None
 
-    def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, str]]) -> pd.DataFrame:
-        """Update dataframe with enhanced descriptions."""
+    def find_best_match(self, enhanced_product_name: str, df: pd.DataFrame) -> Optional[int]:
+        """Find the best matching product in the dataframe using fuzzy matching."""
+        best_match_idx = None
+        best_score = 0
+        
+        # Convert enhanced product name to lowercase for comparison
+        enhanced_name_lower = enhanced_product_name.lower()
+        
+        # Check each product in the dataframe
+        for idx, row in df.iterrows():
+            df_product_name = str(row['Názov tovaru'])
+            df_name_lower = df_product_name.lower()
+            
+            # Calculate similarity scores using different methods
+            # 1. Check if enhanced name is a substring of df name or vice versa
+            substring_match = enhanced_name_lower in df_name_lower or df_name_lower in enhanced_name_lower
+            
+            # 2. Check for partial ratio (fuzzy substring matching)
+            partial_score = fuzz.partial_ratio(enhanced_name_lower, df_name_lower)
+            
+            # 3. Check for token sort ratio (for word order independence)
+            token_score = fuzz.token_sort_ratio(enhanced_name_lower, df_name_lower)
+            
+            # Use the highest score among the three methods
+            max_score = max(partial_score, token_score)
+            
+            # If it's a substring match, give it a boost
+            if substring_match:
+                max_score = max(max_score, 90)  # Boost substring matches
+            
+            # Update best match if this score is higher
+            if max_score > best_score and max_score >= self.similarity_threshold:
+                best_score = max_score
+                best_match_idx = idx
+        
+        return best_match_idx
+    
+    def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, str]]) -> Tuple[pd.DataFrame, int]:
+        """Update dataframe with enhanced descriptions using fuzzy matching."""
         df = df.copy()
+        updated_count = 0
         
         for enhanced_product in enhanced_products:
-            df.loc[df['Názov tovaru'] == enhanced_product['Názov tovaru'], [
-                'Krátky popis', 'Dlhý popis', 'SEO titulka', 'SEO popis', 'SEO kľúčové slová',
-                'Spracovane AI', 'AI_Processed_Date'
-            ]] = [
-                enhanced_product['Krátky popis'], enhanced_product['Dlhý popis'], enhanced_product['SEO titulka'],
-                enhanced_product['SEO popis'], enhanced_product['SEO kľúčové slová'], True, datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            ]
+            # Find the best matching product using fuzzy matching
+            best_match_idx = self.find_best_match(enhanced_product['Názov tovaru'], df)
+            
+            if best_match_idx is not None:
+                # Update the matched product
+                df.loc[best_match_idx, [
+                    'Krátky popis', 'Dlhý popis', 'SEO titulka', 'SEO popis', 'SEO kľúčové slová',
+                    'Spracovane AI', 'AI_Processed_Date'
+                ]] = [
+                    enhanced_product['Krátky popis'], enhanced_product['Dlhý popis'], enhanced_product['SEO titulka'],
+                    enhanced_product['SEO popis'], enhanced_product['SEO kľúčové slová'], True, datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                ]
+                updated_count += 1
         
-        return df
+        return df, updated_count
 
-    def process_dataframe(self, df: pd.DataFrame, progress_callback=None) -> pd.DataFrame:
-        """Process entire dataframe with AI enhancement using parallel processing."""
+    def process_dataframe(self, df: pd.DataFrame, progress_callback=None) -> Tuple[pd.DataFrame, dict]:
+        """Process entire dataframe with AI enhancement using parallel processing.
+        Returns a tuple of (processed_dataframe, statistics_dict)"""
         if not self.api_key:
             logger.warning("No API key provided, skipping AI enhancement")
-            return df
+            return df, {"ai_should_process": 0, "ai_processed": 0}
         
         # Add AI processing columns if they don't exist
         if 'Spracovane AI' not in df.columns:
@@ -204,7 +250,7 @@ class AIEnhancementProcessor:
         
         if total_products == 0:
             logger.info("No products need AI enhancement")
-            return df
+            return df, {"ai_should_process": 0, "ai_processed": 0}
         
         logger.info(f"Processing {total_products} products with AI enhancement")
         
@@ -216,8 +262,8 @@ class AIEnhancementProcessor:
             batch_end = min(i + self.batch_size, total_products)
             # Get indices from original dataframe
             original_indices = needs_processing.index[i:batch_end]
-            # Prepare batch data
-            products = self.prepare_batch_data(df, original_indices[0], original_indices[-1] + 1)
+            # Prepare batch data using the correct slice of the filtered dataframe
+            products = self.prepare_batch_data(needs_processing, i, batch_end)
             if products:
                 batches.append((products, original_indices[0], len(batches) + 1))
         
@@ -236,8 +282,8 @@ class AIEnhancementProcessor:
                     result = future.result()
                     if result:
                         enhanced_products = result[0]
-                        df = self.update_dataframe(df, enhanced_products)
-                        processed_count += len(enhanced_products)
+                        df, updated_count = self.update_dataframe(df, enhanced_products)
+                        processed_count += updated_count
                         
                         # Save incremental progress
                         tmp_file = os.path.join(self.tmp_dir, 'processed_tmp.csv')
@@ -289,14 +335,18 @@ class AIEnhancementProcessor:
         except Exception as e:
             logger.error(f"Failed to save final progress: {e}")
             
-        logger.info(f"AI enhancement completed. Processed {processed_count} products")
-        return df
+        logger.info(f"AI enhancement completed. Processed {processed_count} products out of {total_products} eligible products")
+        statistics = {
+            "ai_should_process": total_products,
+            "ai_processed": processed_count
+        }
+        return df, statistics
 
     def _process_single_batch(self, products: List[Dict[str, str]], start_idx: int, batch_num: int):
         """Process a single batch of products."""
         enhanced_products = self.process_batch_with_retry(products)
         if enhanced_products:
-            return enhanced_products, start_idx
+            return enhanced_products, len(enhanced_products)
         return None
 
     def create_system_prompt(self) -> str:
