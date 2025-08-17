@@ -516,9 +516,28 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: list, final_cols: list) ->
                 for feed_col in feed_suffix_columns:
                     original_col = feed_col.replace(feed_suffix, '')
                     if original_col in temp_df.columns:
-                        # Only replace values when original is empty or NaN
-                        mask = (temp_df[original_col].isna() | (temp_df[original_col] == "")) & temp_df[feed_col].notna()
-                        temp_df.loc[mask, original_col] = temp_df.loc[mask, feed_col]
+                        # Special handling for description columns - only merge if product wasn't AI enhanced
+                        if original_col in ['Krátky popis', 'Dlhý popis']:
+                            # Check if 'Spracovane AI' column exists
+                            if 'Spracovane AI' in temp_df.columns:
+                                # Only replace values when:
+                                # 1. Original is empty or NaN
+                                # 2. Feed has a value
+                                # 3. Product was NOT previously AI enhanced (Spracovane AI is False, 'FALSE', or empty)
+                                mask = (
+                                    (temp_df[original_col].isna() | (temp_df[original_col] == "")) & 
+                                    temp_df[feed_col].notna() &
+                                    (temp_df['Spracovane AI'].isin([False, 'FALSE', ""]))
+                                )
+                            else:
+                                # If 'Spracovane AI' column doesn't exist, use original logic
+                                mask = (temp_df[original_col].isna() | (temp_df[original_col] == "")) & temp_df[feed_col].notna()
+                            
+                            temp_df.loc[mask, original_col] = temp_df.loc[mask, feed_col]
+                        else:
+                            # For all other columns, use original logic
+                            mask = (temp_df[original_col].isna() | (temp_df[original_col] == "")) & temp_df[feed_col].notna()
+                            temp_df.loc[mask, original_col] = temp_df.loc[mask, feed_col]
                     
                     # Remove the suffixed column
                     temp_df = temp_df.drop(columns=[feed_col])
