@@ -44,6 +44,7 @@ GastroPro Product Manager follows a modular architecture with clear separation o
    - Configurable thread pool size (max_parallel_calls)
    - Thread-safe quota and token management
    - Progress tracking across multiple threads
+   - Applied to both AI enhancement batches and multi-threaded web scraping
 
 3. **Rate Limiter Pattern**:
    - Enforces API call limits (15/minute)
@@ -64,6 +65,7 @@ GastroPro Product Manager follows a modular architecture with clear separation o
 3. **Data Processing Pipeline**:
    - Input stage: CSV loading and preparation
    - Processing stage: Category filtering, mapping, and XML feed integration
+   - Web scraping stage: Multi-threaded acquisition of additional products and attributes (optional)
    - Variant Detection: Product grouping and difference extraction
    - Output stage: CSV generation and report export
 
@@ -81,6 +83,8 @@ GastroPro Product Manager follows a modular architecture with clear separation o
    - Thread-safe API call management
    - Encoding fallback (cp1250 → UTF-8)
    - Status tracking with timestamps
+   - Grounded web search tool (Google Search) for contextual enrichment when inputs are sparse
+   - Structured prompt engineering for B2B tone, HTML formatting, and strict JSON-only outputs
 
 4. **Category Mapping System**:
    - Universal JSON array format for mapping definitions

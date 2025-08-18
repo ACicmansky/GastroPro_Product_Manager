@@ -6,6 +6,10 @@ E-commerce businesses frequently need to manage product data from multiple sourc
 ## Solution
 GastroPro Product Manager provides an automated solution for merging and synchronizing product data from local CSV files with online XML product feeds, creating a unified output that maintains the structure of the original CSV while incorporating valuable data from external sources.
 
+In addition to XML feeds and CSV, the system can augment the catalog via multi-threaded web scraping to download additional products and fill missing attributes. Scraping is integrated into the same processing pipeline and follows the Parallel Processing Pattern for performance.
+
+To further enhance data quality, the app uses a web-search-enabled LLM agent to improve or generate B2B-ready short and long descriptions and SEO metadata (SEO titulka, SEO popis, SEO kľúčové slová). The agent leverages a web search tool to gather missing context when product details are sparse, and relies on robust prompt engineering and parallel batch execution for efficiency and consistency.
+
 The system also includes advanced product variant detection and difference extraction, allowing users to automatically identify related product variants and extract their differences (dimensions, power, volume, etc.) based on configurable rules.
 
 ## User Experience Goals
@@ -19,14 +23,17 @@ The system also includes advanced product variant detection and difference extra
 1. User loads a primary CSV file containing product data
 2. User selects product categories to include in the final output
 3. System automatically loads and processes configured XML feeds
-4. System merges the selected local data with the online feed data
-5. System identifies product variants and extracts differences based on configuration
-6. User reviews the detected variants and extracted differences
-7. System generates detailed reports of variant groups and differences
-8. User saves the final CSV output with variant relationships and differences
+4. Optionally performs multi-threaded web scraping to augment the catalog and fill missing fields
+5. System merges the selected local data with the feed and scraped data
+6. System enhances data with AI: generates/improves B2B short and long descriptions and SEO meta (title, description, keywords) using a web-search-enabled LLM
+7. System identifies product variants and extracts differences based on configuration
+8. User reviews the detected variants and extracted differences
+9. System generates detailed reports of variant groups and differences
+10. User saves the final CSV output with variant relationships, differences, and enhanced content
 
 ## Target Users
 - E-commerce store administrators
 - Product catalog managers
 - Online marketplace sellers
 - Inventory management personnel
+

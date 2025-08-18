@@ -28,6 +28,8 @@
 - ✅ Human-readable variant difference reports
 - ✅ Category-specific difference extraction rules
 - ✅ AI-powered product description enhancement
+- ✅ SEO metadata generation (SEO titulka, SEO popis, SEO kľúčové slová)
+- ✅ Web search grounding to enrich missing context during AI processing
 - ✅ Parallel batch processing with ThreadPoolExecutor
 - ✅ API quota management (15 calls/minute, 250k tokens/minute)
 - ✅ Token tracking and rate limiting
@@ -54,3 +56,4 @@
 - Configuration could store more processing preferences
 - No confirmation when replacing existing data in export file
 - Variant detection may require fine-tuning for certain product categories
+

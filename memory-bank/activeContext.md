@@ -6,6 +6,7 @@
 - Fine-tuning specialized data extraction and formatting
 - Ensuring proper data merging and export functionality
 - Implementing user-controlled features for flexible workflow
+- Enhancing data quality with an LLM agent to generate B2B short/long descriptions and SEO metadata using web search; iterating on prompt engineering and parallel batch execution
 
 ## Recent Changes
 - Enhanced Topchladenie.sk data acquisition with dual approach:
@@ -26,6 +27,7 @@
 - Added automatic "Viditelný" field setting to "1" for all feed products
 - Enhanced HTML parsing with BeautifulSoup to extract tab content
 - Improved special character handling and text formatting
+- Introduced AI-based SEO metadata generation (SEO titulka, SEO popis, SEO kľúčové slová) with web search grounding to enrich missing context
 
 ## Next Steps
 1. Implement category selection functionality from local CSV
@@ -56,3 +58,4 @@
 - Providing clear feedback during data processing operations
 - Ensuring error messages are helpful and actionable
 - Maintaining consistent UI response during potentially lengthy operations
+

@@ -110,6 +110,14 @@
 7. **Data Cleaning**: Filter out products with empty catalog numbers
 8. **Integration**: Merge with other data sources according to priority rules
 
+## AI Enhancement Architecture
+
+- **Model & Tooling**: Gemini (google-generativeai) configured with a Google Search grounding tool to retrieve missing context when product inputs are sparse.
+- **Content Outputs**: Generates/improves B2B "Krátky popis" and "Dlhý popis" (HTML), plus SEO metadata: "SEO titulka", "SEO popis", "SEO kľúčové slová".
+- **Parallelism & Quotas**: Processes products in parallel batches via ThreadPoolExecutor while respecting API quotas (15 calls/min, 250k tokens/min) with token tracking and automatic backoff.
+- **Prompt Engineering**: Structured, domain-specific system prompt enforces professional B2B tone, HTML structure, and strict JSON-only responses for reliable parsing.
+- **Data Update Flow**: Fuzzy name matching updates the working DataFrame in-place; progress is saved incrementally with encoding fallback.
+
 ## File Operations
 - Reading/writing CSV files
 - Parsing XML from URLs
@@ -119,3 +127,4 @@
 - HTTP requests to XML feed URLs
 - Error handling for network failures
 - Timeout handling
+
