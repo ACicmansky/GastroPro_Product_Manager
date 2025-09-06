@@ -152,164 +152,461 @@ class ProductVariantMatcher:
     
     def identify_variants(self, df, generate_report=True):
         """
-        Identifies product variants and assigns parent catalog numbers based on product name similarity.
+        Backward-compatible wrapper that now splits detection into analysis and assignment.
+        It returns a DataFrame with assigned parents and the computed group_data.
+        """
+        # Analyze to produce group_data (no assignments here)
+        group_data = self.analyze_variants(df, generate_report=generate_report)
+        if not group_data:
+            return df, []
+        # Assign parents based on the analyzed groups
+        result_df = self.assign_variants_from_group_data(df, group_data, override=True)
+        return result_df, group_data
         
-        Args:
-            df: DataFrame containing product data with columns 'Názov tovaru', 'Kat. číslo', and optionally 'Kat. číslo rodiča'
-            generate_report: Whether to generate a report file of grouped products
-            extract_differences: Whether to extract product differences (dimensions, power, etc.)
-            
-        Returns:
-            DataFrame with updated 'Kat. číslo rodiča' values for identified variants and optional difference columns
+    def analyze_variants(self, df, generate_report=True):
+        """
+        Analyze product variants based on product name similarity and produce group_data only.
+        Does not modify the DataFrame. Optionally generates the group report.
         """
         # Ensure required columns exist
         if "Názov tovaru" not in df.columns or "Kat. číslo" not in df.columns:
-            self.log_progress("Warning: Required columns missing for variant detection")
-            return df
-        
-        # Create a copy to avoid modifying the original
-        result_df = df.copy()
-        
-        # Ensure 'Kat. číslo rodiča' column exists
-        if "Kat. číslo rodiča" not in result_df.columns:
-            result_df["Kat. číslo rodiča"] = ""
-        
-        # Step 1: Handle products that already have parent catalog numbers
-        has_parent = result_df["Kat. číslo rodiča"].notna() & (result_df["Kat. číslo rodiča"] != "")
-        
-        # Skip processing if all products already have parents or there are very few products
-        if has_parent.all() or len(result_df) < 2:
-            return result_df
-            
-        # Count products before processing
-        before_count = (~has_parent).sum()
-        self.log_progress(f"Analyzing {before_count} products for variant detection...")
-        
-        # Step 2: Find products that are already used as parent catalog numbers
-        # and exclude them from processing to avoid circular references
-        used_as_parent = result_df.loc[result_df["Kat. číslo rodiča"].notna() & 
-                                      (result_df["Kat. číslo rodiča"] != ""), 
-                                      "Kat. číslo rodiča"].unique()
-        
-        # Filter out products that are already used as parent catalog numbers
-        not_parent = ~result_df["Kat. číslo"].isin(used_as_parent)
-        self.log_progress(f"Excluding {(~not_parent).sum()} products already used as parent variants")
-        
-        # Skip Liebherr products if manufacturer column exists
-        is_not_liebherr = pd.Series(True, index=result_df.index)
-        if "Výrobca" in result_df.columns:
-            is_liebherr = result_df["Výrobca"].str.contains("Liebherr", case=False, na=False)
+            self.log_progress("Warning: Required columns missing for variant analysis")
+            return []
+
+        # Determine which products already have a parent
+        if "Kat. číslo rodiča" in df.columns:
+            has_parent = df["Kat. číslo rodiča"].notna() & (df["Kat. číslo rodiča"] != "")
+        else:
+            has_parent = pd.Series(False, index=df.index)
+
+        # Products used as parents (avoid circular references)
+        used_as_parent = []
+        if "Kat. číslo rodiča" in df.columns:
+            used_as_parent = df.loc[df["Kat. číslo rodiča"].notna() & (df["Kat. číslo rodiča"] != ""), "Kat. číslo rodiča"].unique()
+        not_parent = ~df["Kat. číslo"].isin(used_as_parent) if len(used_as_parent) > 0 else pd.Series(True, index=df.index)
+
+        # Skip Liebherr if manufacturer column exists
+        is_not_liebherr = pd.Series(True, index=df.index)
+        if "Výrobca" in df.columns:
+            is_liebherr = df["Výrobca"].str.contains("Liebherr", case=False, na=False)
             is_not_liebherr = ~is_liebherr
-            self.log_progress(f"Excluding {is_liebherr.sum()} Liebherr products from variant detection")
-        
-        # Step 3: Process products without parent catalog number and not used as parent
-        products_to_process = result_df[~has_parent & not_parent & is_not_liebherr].copy()
-        
-        # Step 4: Extract base names by removing dimensions and sizes
+
+        # Candidates to analyze
+        products_to_process = df[~has_parent & not_parent & is_not_liebherr].copy()
+        if products_to_process.empty or len(products_to_process) < 2:
+            self.log_progress("No suitable products for variant analysis")
+            return []
+
+        # Extract base names
         products_to_process["base_name"] = products_to_process["Názov tovaru"].apply(self.extract_base_name)
-        
-        # Filter out products with empty base names
         products_to_process = products_to_process[products_to_process["base_name"] != ""]
-        
-        # Step 4: Group by similar base names
+
+        # Group by similarity
         groups = defaultdict(list)
         processed_indices = set()
-        
-        # Compare each product with others
         product_data = list(products_to_process.iterrows())
         group_counter = 0
-        
+
         for i, (idx1, row1) in enumerate(product_data):
             if idx1 in processed_indices:
                 continue
-                
             base_name1 = row1["base_name"]
-            # Skip very short base names (likely to cause false positives)
             if len(base_name1) < 8:
                 continue
-                
             group_key = f"group_{group_counter}"
             group_counter += 1
-            
             groups[group_key].append(idx1)
             processed_indices.add(idx1)
-            
+
             for idx2, row2 in product_data[i+1:]:
                 if idx2 in processed_indices:
                     continue
-                    
                 base_name2 = row2["base_name"]
-                
-                # Skip very short base names
                 if len(base_name2) < 8:
                     continue
-                
-                # Skip if base names are different lengths by more than 50%
                 len_ratio = min(len(base_name1), len(base_name2)) / max(len(base_name1), len(base_name2))
-                if len_ratio < 0.5:  # Skip if too different in length
+                if len_ratio < 0.5:
                     continue
-                    
-                # Check if base names are similar (using sequence matcher)
                 similarity = SequenceMatcher(None, base_name1, base_name2).ratio()
-                if similarity > 0.98:  # Threshold can be adjusted
+                if similarity > 0.98:
                     groups[group_key].append(idx2)
                     processed_indices.add(idx2)
-        
-        # Step 5: Assign parent catalog numbers and collect group data for reporting
-        variants_count = 0
+
+        # Build group_data only
+        group_data = []
         groups_count = 0
-        group_data = [] # Collect data for reporting
-        
+        variants_count = 0
+
         for group_indices in groups.values():
-            # Skip groups with just one product
             if len(group_indices) <= 1:
                 continue
-                
             groups_count += 1
             variants_count += len(group_indices)
-            
-            # Get the products in this group
             group_products = products_to_process.loc[group_indices].copy()
-            
-            # Use natural sorting to find the "lowest" catalog number
             catalog_numbers = group_products["Kat. číslo"].tolist()
             parent_catalog = sorted(catalog_numbers, key=natural_sort_key)[0]
-            
-            # Assign this as parent for all products in group except the parent catalog
-            result_df.loc[group_indices[group_indices != parent_catalog], "Kat. číslo rodiča"] = parent_catalog
-            
-            # Add to group data for reporting
+
             group_info = {
                 "group_id": groups_count,
                 "parent_catalog": parent_catalog,
                 "products": []
             }
-            
-            # Add each product's details
-            for idx, row in group_products.iterrows():
+            for _, row in group_products.iterrows():
                 group_info["products"].append({
                     "catalog_number": row["Kat. číslo"],
                     "name": row["Názov tovaru"],
                     "base_name": row["base_name"],
                     "is_parent": row["Kat. číslo"] == parent_catalog
                 })
-                
             group_data.append(group_info)
-        
+
         if groups_count > 0:
-            self.log_progress(f"Detected {variants_count} variants in {groups_count} product groups")
-            self.log_progress(f"Assigned parent catalog numbers to {variants_count} products")
-            
-            # Generate report if requested
+            self.log_progress(f"Detected {variants_count} variants in {groups_count} groups (analysis only)")
             if generate_report and group_data:
                 report_file = self.generate_report(group_data)
                 self.log_progress(f"Generated variant groups report: {report_file}")
-
         else:
-            self.log_progress("No product variants detected")
-        
-        return result_df, group_data
-        
+            self.log_progress("No product variants detected during analysis")
+
+        return group_data
+
+    def assign_variants_from_group_data(self, df, group_data, override=True):
+        """
+        Assign 'Kat. číslo rodiča' according to provided group_data.
+        If override is False, keep existing non-empty parents.
+        """
+        result_df = df.copy()
+        if "Kat. číslo rodiča" not in result_df.columns:
+            result_df["Kat. číslo rodiča"] = ""
+
+        # Map catalog -> indices (handle potential duplicates)
+        catalog_to_indices = {}
+        for idx, cat in result_df["Kat. číslo"].items():
+            if pd.notna(cat) and cat != "":
+                catalog_to_indices.setdefault(cat, []).append(idx)
+
+        assigned = 0
+        for group in group_data:
+            parent = group.get("parent_catalog", "")
+            if not parent:
+                continue
+            for product in group.get("products", []):
+                cat = product.get("catalog_number", "")
+                if not cat or cat == parent:
+                    continue
+                for idx in catalog_to_indices.get(cat, []):
+                    if override or result_df.at[idx, "Kat. číslo rodiča"] in ("", None) or pd.isna(result_df.at[idx, "Kat. číslo rodiča"]):
+                        result_df.at[idx, "Kat. číslo rodiča"] = parent
+                        assigned += 1
+        self.log_progress(f"Assigned parent catalog numbers to {assigned} products from group_data")
+        return result_df
+
+    # ---------------------- Client report parsing & assignment ----------------------
+
+    def _normalize_catalog_token(self, token: str) -> str:
+        """Normalize a catalog token from report (strip leading slashes, file extensions, spaces)."""
+        if token is None:
+            return ""
+        t = str(token).strip()
+        # Remove leading slashes
+        while t.startswith('/'):
+            t = t[1:]
+        # Remove common file-like extension at end (e.g., .jpg)
+        t = re.sub(r"\.[A-Za-z]{2,4}$", "", t)
+        # Remove separators that we also remove from targets during matching
+        t = re.sub(r"[\s\-_/\\.]", "", t)
+        return t
+
+    def _normalize_for_match(self, s: str) -> str:
+        """Normalize target catalog strings for matching: uppercase and drop separators."""
+        if s is None:
+            return ""
+        x = str(s).upper()
+        x = re.sub(r"[\s\-_/\\.]", "", x)
+        return x
+
+    def _pattern_to_regex(self, token: str) -> re.Pattern:
+        """
+        Convert a normalized token into a regex.
+        Supports:
+        - 'x'/'X' as digit placeholders (xxxx -> \d{4})
+        - '*' as any sequence
+        - '?' as any single character
+        Other characters are treated literally (after normalization).
+        """
+        t = self._normalize_catalog_token(token)
+        if not t:
+            return re.compile(r".*", re.IGNORECASE)
+
+        regex_parts = []
+        i = 0
+        while i < len(t):
+            c = t[i]
+            if c in ('x', 'X'):
+                j = i
+                while j < len(t) and t[j] in ('x', 'X'):
+                    j += 1
+                count = j - i
+                regex_parts.append(fr"\d{{{count}}}")
+                i = j
+                continue
+            if c == '*':
+                regex_parts.append(".*")
+                i += 1
+                continue
+            if c == '?':
+                regex_parts.append('.')
+                i += 1
+                continue
+            # Literal char (already normalized, so just escape to be safe)
+            regex_parts.append(re.escape(c))
+            i += 1
+        pattern = '^' + ''.join(regex_parts) + '$'
+        return re.compile(pattern, re.IGNORECASE)
+
+    def parse_variant_groups_report(self, report_path):
+        """
+        Parse a client-provided product variants report into structured group_data.
+        Supports optional wildcard tokens in catalog fields.
+        """
+        if not os.path.exists(report_path):
+            self.log_progress(f"Report not found: {report_path}")
+            return []
+
+        def _read_text(p):
+            try:
+                with open(p, 'r', encoding='utf-8') as f:
+                    return f.read()
+            except UnicodeDecodeError:
+                with open(p, 'r', encoding='cp1250', errors='replace') as f:
+                    return f.read()
+
+        text = _read_text(report_path)
+        lines = text.splitlines()
+
+        header_re = re.compile(r'^Group\s*#\s*(\d+)\s*-\s*Parent catalog:\s*(.+)\s*$')
+        product_re = re.compile(r'^\s*\d+\.\s*(\[\s*PARENT\s*\])?\s*([^\s]+)\s*-\s*(.+?)\s*$')
+        base_re = re.compile(r'^\s*Base name:\s*(.+?)\s*$')
+
+        group_data = []
+        current_group = None
+
+        for line in lines:
+            line = line.rstrip('\r\n')
+            if not line:
+                continue
+            m_hdr = header_re.match(line)
+            if m_hdr:
+                if current_group:
+                    group_data.append(current_group)
+                gid = int(m_hdr.group(1))
+                parent_token = m_hdr.group(2).strip()
+                current_group = {"group_id": gid, "parent_catalog": parent_token, "products": []}
+                continue
+
+            if current_group is None:
+                continue
+
+            m_prod = product_re.match(line)
+            if m_prod:
+                is_parent = m_prod.group(1) is not None
+                catalog_token = m_prod.group(2).strip()
+                name = m_prod.group(3).strip()
+                base_name_guess = self.extract_base_name(name)
+                current_group["products"].append({
+                    "catalog_number": catalog_token,
+                    "name": name,
+                    "base_name": base_name_guess,
+                    "is_parent": is_parent,
+                })
+                continue
+
+            m_base = base_re.match(line)
+            if m_base and current_group["products"]:
+                current_group["products"][-1]["base_name"] = m_base.group(1).strip()
+                continue
+
+        if current_group:
+            group_data.append(current_group)
+
+        self.log_progress(f"Parsed {len(group_data)} groups from report")
+        return group_data
+
+    def _write_assignment_summary(self, summary: dict, filepath: str):
+        os.makedirs(self.report_dir, exist_ok=True)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write("VARIANT ASSIGNMENT SUMMARY\n")
+            f.write("=" * 80 + "\n\n")
+            f.write(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+            f.write(f"Groups processed: {summary.get('groups', 0)}\n")
+            f.write(f"Products considered: {summary.get('total_products', 0)}\n")
+            f.write(f"Assignments made: {summary.get('assigned_count', 0)}\n")
+            f.write(f"Conflicts overridden: {len(summary.get('overridden_conflicts', []))}\n")
+            f.write(f"Conflicts skipped: {len(summary.get('skipped_conflicts', []))}\n")
+            f.write(f"Unmatched parent tokens: {len(summary.get('unmatched_parents', []))}\n")
+            f.write(f"Unmatched product tokens: {len(summary.get('unmatched_products', []))}\n")
+            f.write(f"Ambiguous parent tokens: {len(summary.get('ambiguous_parents', []))}\n")
+            f.write(f"Ambiguous product tokens: {len(summary.get('ambiguous_products', []))}\n\n")
+
+            def _dump(title, items):
+                if not items:
+                    return
+                f.write(title + "\n")
+                f.write("-" * 80 + "\n")
+                for it in items:
+                    f.write(json.dumps(it, ensure_ascii=False) + "\n")
+                f.write("\n")
+
+            _dump("UNMATCHED PARENTS", summary.get('unmatched_parents', []))
+            _dump("UNMATCHED PRODUCTS", summary.get('unmatched_products', []))
+            _dump("AMBIGUOUS PARENTS", summary.get('ambiguous_parents', []))
+            _dump("AMBIGUOUS PRODUCTS", summary.get('ambiguous_products', []))
+            _dump("CONFLICTS OVERRIDDEN", summary.get('overridden_conflicts', []))
+            _dump("CONFLICTS SKIPPED", summary.get('skipped_conflicts', []))
+
+    def assign_variants_from_report(self, df, report_path, override=True, generate_differences=True):
+        """
+        Apply client-approved variant groups from a report file to assign 'Kat. číslo rodiča'.
+        - Supports wildcard catalog patterns (xxxx, xxx, *, ?)
+        - Resolves parent pattern to a concrete parent using natural sort if multiple match
+        - Optionally calls extract_product_differences() after assignment
+
+        Returns: (result_df, resolved_group_data, summary_report_path)
+        """
+        group_data_raw = self.parse_variant_groups_report(report_path)
+        if not group_data_raw:
+            return df, [], None
+
+        result_df = df.copy()
+        if "Kat. číslo rodiča" not in result_df.columns:
+            result_df["Kat. číslo rodiča"] = ""
+
+        # Build normalized catalog lookup
+        norm_to_originals = {}
+        catalog_to_indices = {}
+        for idx, cat in result_df["Kat. číslo"].items():
+            if pd.isna(cat) or cat == "":
+                continue
+            catalog_to_indices.setdefault(cat, []).append(idx)
+            norm = self._normalize_for_match(cat)
+            norm_to_originals.setdefault(norm, set()).add(cat)
+
+        def resolve_token(token):
+            token_norm = self._normalize_catalog_token(token)
+            # Direct match path (no wildcards/x)
+            if not any(ch in token_norm for ch in ['*', '?', 'x', 'X']):
+                # exact normalized match
+                candidates = norm_to_originals.get(self._normalize_for_match(token_norm), set())
+                return sorted(list(candidates), key=natural_sort_key)
+            # Regex path
+            rx = self._pattern_to_regex(token_norm)
+            matches = []
+            for norm, originals in norm_to_originals.items():
+                if rx.match(norm):
+                    matches.extend(list(originals))
+            return sorted(list(set(matches)), key=natural_sort_key)
+
+        resolved_group_data = []
+        summary = {
+            'groups': len(group_data_raw),
+            'total_products': sum(len(g.get('products', [])) for g in group_data_raw),
+            'assigned_count': 0,
+            'unmatched_parents': [],
+            'unmatched_products': [],
+            'ambiguous_parents': [],
+            'ambiguous_products': [],
+            'overridden_conflicts': [],
+            'skipped_conflicts': [],
+        }
+
+        for grp in group_data_raw:
+            gid = grp.get('group_id')
+            # Resolve all product tokens (expand patterns)
+            expanded_products = []
+            for p in grp.get('products', []):
+                token = p.get('catalog_number', '')
+                matches = resolve_token(token)
+                if not matches:
+                    summary['unmatched_products'].append({'group_id': gid, 'token': token})
+                    continue
+                if len(matches) > 1:
+                    summary['ambiguous_products'].append({'group_id': gid, 'token': token, 'match_count': len(matches)})
+                for cat in matches:
+                    # Pull real name from df
+                    # Choose first index for name lookup
+                    idx0 = catalog_to_indices.get(cat, [None])[0]
+                    name = result_df.at[idx0, 'Názov tovaru'] if idx0 is not None and 'Názov tovaru' in result_df.columns else p.get('name', '')
+                    expanded_products.append({
+                        'catalog_number': cat,
+                        'name': name,
+                        'base_name': self.extract_base_name(name),
+                        'is_parent': False,  # set later
+                    })
+
+            # Resolve parent
+            parent_token = grp.get('parent_catalog', '')
+            parent_matches = resolve_token(parent_token) if parent_token else []
+            chosen_parent = None
+            if not parent_matches:
+                if parent_token:
+                    summary['unmatched_parents'].append({'group_id': gid, 'token': parent_token})
+                # Fallback: choose smallest catalog among expanded products
+                if expanded_products:
+                    chosen_parent = sorted([p['catalog_number'] for p in expanded_products], key=natural_sort_key)[0]
+            else:
+                if len(parent_matches) > 1:
+                    chosen_parent = parent_matches[0]
+                    summary['ambiguous_parents'].append({'group_id': gid, 'token': parent_token, 'match_count': len(parent_matches), 'selected': chosen_parent})
+                else:
+                    chosen_parent = parent_matches[0]
+
+            if not expanded_products or not chosen_parent:
+                # Nothing to assign for this group
+                continue
+
+            # Mark parent flag
+            for p in expanded_products:
+                p['is_parent'] = (p['catalog_number'] == chosen_parent)
+
+            # Assign to DataFrame
+            for p in expanded_products:
+                cat = p['catalog_number']
+                if cat == chosen_parent:
+                    continue
+                for idx in catalog_to_indices.get(cat, []):
+                    cur = result_df.at[idx, 'Kat. číslo rodiča']
+                    if cur not in ("", None) and not pd.isna(cur):
+                        if cur != chosen_parent:
+                            if override:
+                                summary['overridden_conflicts'].append({'group_id': gid, 'catalog': cat, 'old_parent': cur, 'new_parent': chosen_parent})
+                                result_df.at[idx, 'Kat. číslo rodiča'] = chosen_parent
+                                summary['assigned_count'] += 1
+                            else:
+                                summary['skipped_conflicts'].append({'group_id': gid, 'catalog': cat, 'existing_parent': cur, 'desired_parent': chosen_parent})
+                        # else already set to desired parent; do nothing
+                    else:
+                        result_df.at[idx, 'Kat. číslo rodiča'] = chosen_parent
+                        summary['assigned_count'] += 1
+
+            resolved_group_data.append({
+                'group_id': gid,
+                'parent_catalog': chosen_parent,
+                'products': expanded_products,
+            })
+
+        # Write summary report
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        summary_path = os.path.join(self.report_dir, f"variant_assignment_summary_{timestamp}.txt")
+        self._write_assignment_summary(summary, summary_path)
+        self.log_progress(f"Variant assignment summary written: {summary_path}")
+        self.log_progress(f"Assignments made: {summary['assigned_count']}")
+
+        # Optionally extract differences using resolved groups
+        if generate_differences and resolved_group_data:
+            result_df = self.extract_product_differences(result_df, resolved_group_data)
+
+        return result_df, resolved_group_data, summary_path
+
     def generate_report(self, group_data):
         """
         Generate a human-readable report of the product variant groups.
