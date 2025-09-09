@@ -249,6 +249,33 @@ class MainWindow(QMainWindow):
         if save_path:
             try:
                 final_df.to_csv(save_path, index=False, sep=';', encoding='cp1250', errors='replace')
-                QMessageBox.information(self, "Export úspešný", f"Dáta boli úspešne exportované do {save_path}")
+                stats = self.last_statistics or {}
+                report_lines = [
+                    f"Dáta boli úspešne exportované do: {save_path}",
+                    "\n<b>Štatistiky spracovania:</b>",
+                    "<hr>",
+                    f"- Počet produktov z pôvodného CSV: {stats.get('original_csv', 0)}",
+                    f"- Počet produktov z GastroMarket XML: {stats.get('gastromarket', 0)}",
+                    f"- Počet produktov z ForGastro XML: {stats.get('forgastro', 0)}",
+                    f"- Počet produktov z Topchladenie.sk: {stats.get('topchladenie', 0)}",
+                    f"<b>- Celkový počet produktov: {stats.get('total', 0)}</b>",
+                    "<hr>"
+                ]
+
+                if 'ai_should_process' in stats:
+                    report_lines.extend([
+                        "<b>AI vylepšenie:</b>",
+                        f"- Produktov na spracovanie: {stats.get('ai_should_process', 0)}",
+                        f"- Úspešne spracovaných: {stats.get('ai_processed', 0)}"
+                    ])
+
+                report_message = "<br>".join(report_lines)
+                
+                msg_box = QMessageBox()
+                msg_box.setIcon(QMessageBox.Information)
+                msg_box.setText(report_message)
+                msg_box.setWindowTitle("Export úspešný")
+                msg_box.setTextFormat(Qt.RichText)
+                msg_box.exec_()
             except Exception as e:
                 QMessageBox.critical(self, "Chyba pri ukladaní", f"Nepodarilo sa uložiť súbor.\nChyba: {e}")
