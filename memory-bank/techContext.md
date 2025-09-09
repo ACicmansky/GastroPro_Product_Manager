@@ -110,6 +110,15 @@
 7. **Data Cleaning**: Filter out products with empty catalog numbers
 8. **Integration**: Merge with other data sources according to priority rules
 
+## File Structure
+The application is organized into a `src` package to ensure clear separation of concerns:
+
+- **main.py**: Application entry point.
+- **src/core/**: Contains the core business logic, including the main `DataPipeline`.
+- **src/gui/**: All PyQt5 user interface components, including the `MainWindow`, custom widgets, and the background `Worker` thread.
+- **src/services/**: Houses modules for interacting with external services, such as `scraper`, `ai_enhancer`, and `variant_matcher`.
+- **src/utils/**: A collection of helper modules for common tasks like loading data and configurations, processing feeds, and mapping categories.
+
 ## AI Enhancement Architecture
 
 - **Model & Tooling**: Gemini (google-generativeai) configured with a Google Search grounding tool to retrieve missing context when product inputs are sparse.

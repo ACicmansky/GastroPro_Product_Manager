@@ -1,35 +1,43 @@
 # GastroPro Product Manager - System Patterns
 
 ## Architecture Overview
-GastroPro Product Manager follows a modular architecture with clear separation of concerns:
+The application follows a modular, package-based architecture with a clear separation of concerns, organized within the `src` directory. This structure promotes maintainability, scalability, and testability.
 
 ```
-┌───────────────┐     ┌─────────────────┐     ┌──────────────────┐     ┌───────────────┐
-│  User         │     │  Data           │     │  AI              │     │  Output       │
-│  Interface    │◄────┤  Processing     │◄────┤  Enhancement     │◄────┤  Generation   │
-└───────────────┘     └─────────────────┘     └──────────────────┘     └───────────────┘
-        │                     │                        │                       │
-        ▼                     ▼                        ▼                       ▼
-┌───────────────┐     ┌─────────────────┐     ┌──────────────────┐     ┌───────────────┐
-│  Input        │     │  Data           │     │  Product         │     │  Config       │
-│  Handling     │     │  Storage        │     │  Variant         │     │  Management   │
-└───────────────┘     └─────────────────┘     └──────────────────┘     └───────────────┘
+src/
+├── core/         # Core business logic and data pipeline
+│   ├── data_pipeline.py
+│   └── models.py
+├── gui/          # All PyQt5 UI components and logic
+│   ├── main_window.py
+│   ├── widgets.py
+│   └── worker.py
+├── services/     # External service integrations
+│   ├── ai_enhancer.py
+│   ├── scraper.py
+│   └── variant_matcher.py
+└── utils/        # Shared utility functions
+    ├── config_loader.py
+    ├── data_loader.py
+    ├── category_mapper.py
+    ├── feed_processor.py
+    └── helpers.py
 ```
 
 ### AI Enhancement Layer
 ```
 ┌───────────────────────────────────────────────────────────────────────────────┐
 │                                AI Enhancement                                 │
-│  ┌─────────────┐     ┌────────────────┐     ┌─────────────────────────┐     │
-│  │  Batch      │     │  Parallel      │     │  Quota & Rate          │     │
-│  │  Processor  │◄───►│  Executor      │◄───►│  Limiter               │     │
-│  └─────────────┘     └────────────────┘     └─────────────────────────┘     │
-│         │                      │                       │                     │
-│         ▼                      ▼                       ▼                     │
-│  ┌─────────────┐     ┌────────────────┐     ┌─────────────────────────┐     │
-│  │  Progress   │     │  Error         │     │  Token & Call           │     │
-│  │  Tracking   │     │  Handling      │     │  Management             │     │
-│  └─────────────┘     └────────────────┘     └─────────────────────────┘     │
+│  ┌─────────────┐     ┌────────────────┐     ┌─────────────────────────┐       │
+│  │  Batch      │     │  Parallel      │     │  Quota & Rate           │       │
+│  │  Processor  │◄───►│  Executor      │◄───►│  Limiter                │       │
+│  └─────────────┘     └────────────────┘     └─────────────────────────┘       │
+│         │                      │                       │                      │
+│         ▼                      ▼                       ▼                      │
+│  ┌─────────────┐     ┌────────────────┐     ┌─────────────────────────┐       │
+│  │  Progress   │     │  Error         │     │  Token & Call           │       │
+│  │  Tracking   │     │  Handling      │     │  Management             │       │
+│  └─────────────┘     └────────────────┘     └─────────────────────────┘       │
 └───────────────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -93,11 +101,12 @@ GastroPro Product Manager follows a modular architecture with clear separation o
    - Detailed logging of mapping operations
 
 ## Component Relationships
-- **MainWindow Class**: Core controller that manages the application flow
-- **ProductVariantMatcher**: Handles variant detection and difference extraction
-- **Utils Module**: Handles file operations, configuration, and external data fetching
-- **Data Models**: Pandas DataFrames for data manipulation
-- **Config Files**: External configurations for app settings, data sources, and variant extraction rules
+- **main.py**: The main entry point of the application; initializes and runs the GUI.
+- **src/gui/main_window.py**: Contains the `MainWindow` class, which manages the entire UI, its state, and user interactions. It delegates data processing to the `worker`.
+- **src/gui/worker.py**: A thin `QThread` worker that runs the `DataPipeline` in the background to keep the UI responsive.
+- **src/core/data_pipeline.py**: The heart of the application's business logic. It orchestrates the entire data processing flow, from loading and filtering to merging, variant matching, and AI enhancement.
+- **src/services/**: A package containing modules that interact with external systems or perform complex, self-contained tasks (e.g., web scraping, AI enhancement, variant matching).
+- **src/utils/**: A package of small, focused modules providing reusable helper functions for tasks like loading data, processing feeds, and mapping categories.
 
 ## Technical Decisions
 1. **PyQt5 for GUI**: Provides robust desktop application interface

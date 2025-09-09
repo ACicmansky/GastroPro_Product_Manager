@@ -1,6 +1,7 @@
 # GastroPro Product Manager - Progress
 
 ## Completed Features
+- ✅ **Major Codebase Refactoring**: Restructured the application into a modular `src` package, separating concerns (GUI, core logic, services, utils) and improving maintainability.
 - ✅ Basic application framework with PyQt5
 - ✅ Configuration management (load/save config)
 - ✅ Local CSV file import functionality with drag & drop + clickable area

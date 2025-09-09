@@ -9,6 +9,7 @@
 - Enhancing data quality with an LLM agent to generate B2B short/long descriptions and SEO metadata using web search; iterating on prompt engineering and parallel batch execution
 
 ## Recent Changes
+- **Major Codebase Refactoring**: The entire application was refactored into a modular `src` package structure to improve maintainability and adhere to SOLID principles. This involved separating the GUI, core business logic, services, and utilities into distinct modules.
 - Enhanced Topchladenie.sk data acquisition with dual approach:
   - Live scraping with multi-threaded parallel processing
   - Alternative offline CSV loading with dedicated drop area
