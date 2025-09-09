@@ -5,8 +5,7 @@ Separated from main scraping.py for better modularity
 """
 
 import time
-import pandas as pd
-from scraping import TopchladenieScraper, FastTopchladenieScraper, save_to_csv
+from src.services.scraper import TopchladenieScraper, FastTopchladenieScraper, save_to_csv, get_scraped_products
 
 
 def interactive_scraper():
@@ -35,7 +34,7 @@ def interactive_scraper():
                 run_custom_categories()
                 
             else:
-                print("Invalid choice. Please select 1-4.")
+                run_fast_scraper()
                 
         except KeyboardInterrupt:
             print("\n\nScraping interrupted by user.")
@@ -69,7 +68,7 @@ def run_fast_scraper():
         print(f"Using {threads} threads for concurrent scraping...")
         start_time = time.time()
         
-        df = scraper.scrape_all_products()
+        df = get_scraped_products(use_fast_scraper=True, progress_callback=lambda x: print(x))
         
         end_time = time.time()
         

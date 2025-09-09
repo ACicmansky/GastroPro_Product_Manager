@@ -12,6 +12,7 @@ import pandas as pd
 from difflib import SequenceMatcher
 from collections import defaultdict
 from datetime import datetime
+from ..utils.config_loader import load_config
 
 
 def natural_sort_key(s):
