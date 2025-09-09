@@ -202,9 +202,6 @@ class MainWindow(QMainWindow):
             return
 
         selected_categories = [self.category_list.item(i).text() for i in range(self.category_list.count()) if self.category_list.item(i).checkState() == Qt.Checked]
-        if not selected_categories:
-            QMessageBox.warning(self, "Chýbajúci výber", "Vyberte aspoň jednu kategóriu.")
-            return
 
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0)

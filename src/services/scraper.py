@@ -282,7 +282,7 @@ class FastTopchladenieScraper(TopchladenieScraper):
 
         return pd.DataFrame(scraped_products)
 
-def get_scraped_products(progress_callback=None, use_fast_scraper=True):
+def get_scraped_products(progress_callback=None, use_fast_scraper=True) -> pd.DataFrame:
     try:
         logger.info("Starting to scrape products from topchladenie.sk")
         scraper = FastTopchladenieScraper(progress_callback=progress_callback) if use_fast_scraper else TopchladenieScraper(progress_callback=progress_callback)

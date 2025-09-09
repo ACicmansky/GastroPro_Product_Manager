@@ -26,7 +26,10 @@ class DataPipeline:
         try:
             # Step 1: Filter main dataframe
             self._log_progress("Filtering main CSV by selected categories...")
-            filtered_df = main_df[main_df['Hlavna kategória'].isin(selected_categories)].copy()
+            if selected_categories:
+                filtered_df = main_df[main_df['Hlavna kategória'].isin(selected_categories)].copy()
+            else:
+                filtered_df = pd.DataFrame()
             self._log_progress(f"Filtered to {len(filtered_df)} products.")
 
             # Step 2: Category Mapping
@@ -37,12 +40,21 @@ class DataPipeline:
                     filtered_df = map_dataframe_categories(filtered_df, category_mappings)
 
             # Step 3: XML Feeds
-            feed_dataframes, enabled_feeds = self._process_feeds(options)
-            gastromarket_count = len(feed_dataframes[0]) if 'gastromarket' in enabled_feeds else 0
-            forgastro_count = len(feed_dataframes[1]) if 'forgastro' in enabled_feeds else 0
+            if options.get('enable_gastromarket') or options.get('enable_forgastro'):
+                feed_dataframes, enabled_feeds = self._process_feeds(options)
+                gastromarket_count = len(feed_dataframes[0]) if 'gastromarket' in enabled_feeds else 0
+                forgastro_count = len(feed_dataframes[1]) if 'forgastro' in enabled_feeds else 0
+            else:
+                feed_dataframes = [pd.DataFrame(), pd.DataFrame()]
+                gastromarket_count = 0
+                forgastro_count = 0
 
             # Step 4: Scraped Data
-            scraped_df, topchladenie_count = self._process_scraping(options)
+            if options.get('scrape_topchladenie'):
+                scraped_df, topchladenie_count = self._process_scraping(options)
+            else:
+                scraped_df = pd.DataFrame()
+                topchladenie_count = 0
 
             # Step 5: Clean and Merge
             self._log_progress("Cleaning and merging all data sources...")
