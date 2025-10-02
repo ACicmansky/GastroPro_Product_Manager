@@ -61,6 +61,7 @@ class AIEnhancementProcessor:
         products = []
         for _, row in batch_df.iterrows():
             product = {
+                "Kat. číslo": str(row.get('Kat. číslo', '')),
                 "Názov tovaru": str(row.get('Názov tovaru', '')),
                 "Hlavna kategória": str(row.get('Hlavna kategória', '')),
                 "Krátky popis": str(row.get('Krátky popis', '')),
@@ -173,7 +174,7 @@ class AIEnhancementProcessor:
         
         return None
 
-    def find_best_match(self, enhanced_product_name: str, df: pd.DataFrame) -> Optional[int]:
+    def find_best_match(self, enhanced_product_name: str, column_name: str, df: pd.DataFrame) -> Optional[int]:
         """Find the best matching product in the dataframe using fuzzy matching."""
         best_match_idx = None
         best_score = 0
@@ -183,7 +184,7 @@ class AIEnhancementProcessor:
         
         # Check each product in the dataframe
         for idx, row in df.iterrows():
-            df_product_name = str(row['Názov tovaru'])
+            df_product_name = str(row[column_name])
             df_name_lower = df_product_name.lower()
             
             # Calculate similarity scores using different methods
@@ -216,8 +217,11 @@ class AIEnhancementProcessor:
         updated_count = 0
         
         for enhanced_product in enhanced_products:
+            # Find the best matching by Kat. číslo
+            best_match_idx = self.find_best_match(enhanced_product['Kat. číslo'], 'Kat. číslo', df)
+            if best_match_idx is None:
             # Find the best matching product using fuzzy matching
-            best_match_idx = self.find_best_match(enhanced_product['Názov tovaru'], df)
+                best_match_idx = self.find_best_match(enhanced_product['Názov tovaru'], 'Názov tovaru', df)
             
             if best_match_idx is not None:
                 # Update the matched product

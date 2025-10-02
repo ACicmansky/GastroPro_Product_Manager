@@ -262,6 +262,14 @@ class MainWindow(QMainWindow):
                     "<hr>"
                 ]
 
+                if 'merge_stats' in stats and stats['merge_stats']:
+                    report_lines.append("<b>Štatistiky zlučovania:</b>")
+                    for source, counts in stats['merge_stats'].items():
+                        report_lines.append(f"- Zdroj: {source.capitalize()}")
+                        report_lines.append(f"  - Pridaných produktov: {counts.get('added', 0)}")
+                        report_lines.append(f"  - Aktualizovaných cien: {counts.get('updated', 0)}")
+                    report_lines.append("<hr>")
+
                 if 'ai_should_process' in stats:
                     report_lines.extend([
                         "<b>AI vylepšenie:</b>",

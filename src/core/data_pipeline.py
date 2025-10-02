@@ -40,14 +40,9 @@ class DataPipeline:
                     filtered_df = map_dataframe_categories(filtered_df, category_mappings)
 
             # Step 3: XML Feeds
-            if options.get('enable_gastromarket') or options.get('enable_forgastro'):
-                feed_dataframes, enabled_feeds = self._process_feeds(options)
-                gastromarket_count = len(feed_dataframes[0]) if 'gastromarket' in enabled_feeds else 0
-                forgastro_count = len(feed_dataframes[1]) if 'forgastro' in enabled_feeds else 0
-            else:
-                feed_dataframes = [pd.DataFrame(), pd.DataFrame()]
-                gastromarket_count = 0
-                forgastro_count = 0
+            feed_dataframes = self._process_feeds(options)
+            gastromarket_count = len(feed_dataframes.get('gastromarket', []))
+            forgastro_count = len(feed_dataframes.get('forgastro', []))
 
             # Step 4: Scraped Data
             if options.get('scrape_topchladenie'):
@@ -58,7 +53,7 @@ class DataPipeline:
 
             # Step 5: Clean and Merge
             self._log_progress("Cleaning and merging all data sources...")
-            final_df = self._clean_and_merge(filtered_df, feed_dataframes, scraped_df)
+            final_df, merge_stats = self._clean_and_merge(filtered_df, feed_dataframes, scraped_df)
 
             # Step 6: Variant Matching
             if options.get('variant_checkbox'):
@@ -79,7 +74,8 @@ class DataPipeline:
                 'gastromarket': gastromarket_count,
                 'forgastro': forgastro_count,
                 'topchladenie': topchladenie_count,
-                'total': len(final_df)
+                'total': len(final_df),
+                'merge_stats': merge_stats
             }
             statistics.update(ai_stats)
 
@@ -91,7 +87,7 @@ class DataPipeline:
             raise
 
     def _process_feeds(self, options):
-        feed_dataframes = []
+        feed_dataframes = {}
         enabled_feeds = []
         if options.get('enable_gastromarket'):
             enabled_feeds.append('gastromarket')
@@ -100,7 +96,7 @@ class DataPipeline:
 
         if not enabled_feeds:
             self._log_progress("No XML feeds enabled.")
-            return []
+            return {}
 
         self._log_progress(f"Fetching {len(enabled_feeds)} XML feeds...")
         for feed_name in enabled_feeds:
@@ -112,11 +108,11 @@ class DataPipeline:
                     self._log_progress(f"Parsing feed: {feed_name}")
                     df = parse_xml_feed(root, feed_info['root_element'], feed_info['mapping'], feed_name)
                     if df is not None and not df.empty:
-                        feed_dataframes.append(df)
+                        feed_dataframes[feed_name] = df
                         self._log_progress(f"Parsed {len(df)} products from {feed_name}")
             except Exception as e:
                 logger.error(f"Error processing feed {feed_name}: {e}")
-        return feed_dataframes, enabled_feeds
+        return feed_dataframes
 
     def _process_scraping(self, options):
         scraped_df = None
@@ -150,14 +146,15 @@ class DataPipeline:
         if 'Kat. číslo rodiča' in main_df_cleaned.columns:
             main_df_cleaned['Kat. číslo rodiča'] = main_df_cleaned['Kat. číslo rodiča'].replace([0, "0"], "")
 
-        cleaned_feed_dfs = [clean_df(df, f"feed {i}") for i, df in enumerate(feed_dfs)]
+        cleaned_feed_dfs = {name: clean_df(df, name) for name, df in feed_dfs.items()}
         scraped_df_cleaned = clean_df(scraped_df, "scraped data")
 
-        all_dataframes = [main_df_cleaned] + cleaned_feed_dfs
+        # For merging, combine all data sources into one dictionary
+        all_sources_to_merge = cleaned_feed_dfs.copy()
         if scraped_df_cleaned is not None and not scraped_df_cleaned.empty:
-            all_dataframes.append(scraped_df_cleaned)
+            all_sources_to_merge['topchladenie'] = scraped_df_cleaned
 
-        final_df = merge_dataframes(main_df_cleaned, [df for df in all_dataframes[1:] if df is not None], self.config['final_csv_columns'])
+        final_df, merge_stats = merge_dataframes(main_df_cleaned, all_sources_to_merge, self.config['final_csv_columns'])
         
         # Final cleaning
         for col in final_df.columns:
@@ -170,7 +167,7 @@ class DataPipeline:
         
         final_df.loc[final_df['Názov tovaru'].isin([None, ""]), 'Názov tovaru'] = final_df['Kat. číslo']
 
-        return final_df
+        return final_df, merge_stats
 
     def _run_ai_enhancement(self, df):
         self._log_progress("Enhancing product descriptions with AI...")
