@@ -33,10 +33,10 @@
     "enabled": true,
     "model": "gemini-2.5-flash-lite",
     "batch_size": 30,
-    "temperature": 0.25,
+    "temperature": 0.1,
     "retry_attempts": 3,
     "retry_delay": 60,
-    "max_parallel_calls": 4
+    "max_parallel_calls": 5
   },
   "final_csv_columns": [
     "Kat. číslo rodiča",
