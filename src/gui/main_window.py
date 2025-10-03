@@ -8,9 +8,10 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QThread, QStandardPaths
 
-from .widgets import DropArea, TopchladenieCsvDropArea
+from .widgets import DropArea, TopchladenieCsvDropArea, CategoryMappingDialog
 from .worker import Worker
 from ..utils.config_loader import load_config
+from ..utils.category_mapper import get_category_suggestions
 from ..utils.data_loader import load_csv_data
 from ..core.models import PipelineResult
 
@@ -228,6 +229,7 @@ class MainWindow(QMainWindow):
         self.worker.result.connect(self.handle_result)
         self.worker.error.connect(self.show_error_message)
         self.worker.progress.connect(self.update_progress)
+        self.worker.request_category_mapping.connect(self.handle_category_mapping_request)
         
         self.thread.start()
         self.thread.finished.connect(lambda: self.generate_button.setEnabled(True))
@@ -235,6 +237,48 @@ class MainWindow(QMainWindow):
 
     def update_progress(self, message):
         self.progress_bar.setFormat(message)
+    
+    def handle_category_mapping_request(self, original_category):
+        """Handle interactive category mapping request from worker thread."""
+        # Collect existing categories for suggestions
+        existing_categories = set()
+        
+        # 1. Get categories from worker's category manager
+        if hasattr(self, 'worker') and hasattr(self.worker, 'pipeline') and hasattr(self.worker.pipeline, 'category_manager'):
+            category_manager = self.worker.pipeline.category_manager
+            unique_cats = category_manager.get_unique_categories()
+            existing_categories.update(unique_cats)
+        
+        # 2. Get categories from loaded main CSV
+        if self.main_df is not None and 'Hlavna kategória' in self.main_df.columns:
+            csv_categories = self.main_df['Hlavna kategória'].dropna().unique()
+            existing_categories.update(csv_categories)
+        
+        # Get suggestions using similarity matching
+        suggestions = []
+        if existing_categories:
+            suggestions = get_category_suggestions(
+                original_category, 
+                list(existing_categories), 
+                top_n=5
+            )
+        
+        # Get product name from worker
+        product_name = getattr(self.worker, 'current_product_name', None)
+        
+        # Show dialog with suggestions
+        dialog = CategoryMappingDialog(original_category, suggestions, product_name, self)
+        if dialog.exec_():
+            new_category = dialog.get_new_category()
+            
+            # Note: Mapping will be automatically saved by CategoryMappingManager in scraper/feed_processor
+            if new_category and new_category != original_category:
+                self.progress_bar.setFormat(f"Mapovanie kategórie: {original_category[:40]}... -> {new_category[:40]}...")
+            
+            self.worker.set_category_mapping_result(new_category)
+        else:
+            # User cancelled - return original category
+            self.worker.set_category_mapping_result(original_category)
 
     def show_error_message(self, error_info):
         title, message = error_info

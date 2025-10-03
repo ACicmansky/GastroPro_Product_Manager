@@ -30,6 +30,23 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: Dict[str, pd.DataFrame], f
     if join_column not in final_df.columns and not final_df.empty:
         final_df[join_column] = ""
 
+    # CRITICAL: Remove duplicates from main_df before setting as index
+    if not final_df.empty and join_column in final_df.columns:
+        duplicates = final_df[final_df.duplicated(subset=[join_column], keep=False)]
+        if not duplicates.empty:
+            print(f"WARNING: Found {len(duplicates)} duplicate products in main DataFrame")
+            print(f"Duplicate catalog numbers: {duplicates[join_column].unique().tolist()[:10]}...")  # Show first 10
+            # Update prices for duplicates, keep first occurrence
+            for kat_cislo in duplicates[join_column].unique():
+                mask = final_df[join_column] == kat_cislo
+                duplicate_rows = final_df[mask]
+                if len(duplicate_rows) > 1 and 'Bežná cena' in final_df.columns:
+                    first_idx = duplicate_rows.index[0]
+                    last_price = duplicate_rows.iloc[-1]['Bežná cena']
+                    final_df.at[first_idx, 'Bežná cena'] = last_price
+            final_df = final_df.drop_duplicates(subset=[join_column], keep='first')
+            print(f"Removed duplicates from main DataFrame, kept {len(final_df)} unique products")
+
     final_df.set_index(join_column, inplace=True, drop=False)
     
     stats = {}
@@ -38,7 +55,26 @@ def merge_dataframes(main_df: pd.DataFrame, feed_dfs: Dict[str, pd.DataFrame], f
         if feed_df.empty or join_column not in feed_df.columns:
             continue
 
-        feed_df_copy = feed_df.copy().set_index(join_column, drop=False)
+        feed_df_copy = feed_df.copy()
+        
+        # CRITICAL: Remove duplicates from feed DataFrame before setting as index
+        if join_column in feed_df_copy.columns:
+            duplicates = feed_df_copy[feed_df_copy.duplicated(subset=[join_column], keep=False)]
+            if not duplicates.empty:
+                print(f"WARNING: Found {len(duplicates)} duplicate products in {feed_name} feed")
+                print(f"Duplicate catalog numbers: {duplicates[join_column].unique().tolist()[:10]}...")  # Show first 10
+                # Update prices for duplicates, keep first occurrence
+                for kat_cislo in duplicates[join_column].unique():
+                    mask = feed_df_copy[join_column] == kat_cislo
+                    duplicate_rows = feed_df_copy[mask]
+                    if len(duplicate_rows) > 1 and 'Bežná cena' in feed_df_copy.columns:
+                        first_idx = duplicate_rows.index[0]
+                        last_price = duplicate_rows.iloc[-1]['Bežná cena']
+                        feed_df_copy.at[first_idx, 'Bežná cena'] = last_price
+                feed_df_copy = feed_df_copy.drop_duplicates(subset=[join_column], keep='first')
+                print(f"Removed duplicates from {feed_name} feed, kept {len(feed_df_copy)} unique products")
+        
+        feed_df_copy.set_index(join_column, drop=False, inplace=True)
 
         new_products_mask = ~feed_df_copy.index.isin(final_df.index)
         existing_products_mask = feed_df_copy.index.isin(final_df.index)

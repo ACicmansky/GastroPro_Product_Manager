@@ -7,8 +7,6 @@ import html
 import unicodedata
 from bs4 import BeautifulSoup
 from decimal import Decimal
-from .category_mapper import map_category
-from .config_loader import load_category_mappings
 
 def fetch_xml_feed(url: str) -> ET.Element:
     """Downloads XML feed from the given URL and returns the root element."""
@@ -37,7 +35,7 @@ def fetch_xml_feed(url: str) -> ET.Element:
         print(f"Request error for {url}: {e}")
         raise e
 
-def process_gastromarket_text(description, category, category_mappings=None):
+def process_gastromarket_text(description, category, category_manager=None, category_mapping_callback=None, product_name=None):
     """
     Process text content from gastromarket feed.
     Returns a tuple of (processed_description, processed_category)
@@ -66,19 +64,41 @@ def process_gastromarket_text(description, category, category_mappings=None):
             processed_description = re.sub(r'\s+', ' ', description).strip()
     
     if category and isinstance(category, str):
-        if category_mappings:
-            mapped_category = map_category(category, category_mappings)
-            if mapped_category != category:
+        if category_manager:
+            # Check manager's cache first
+            mapped_category = category_manager.find_mapping(category)
+            if mapped_category:
                 return processed_description, mapped_category
+            
+            # No cached mapping - use callback if provided
+            if category_mapping_callback:
+                new_category = category_mapping_callback(category, product_name)
+                if new_category and new_category != category:
+                    # Add to cache immediately
+                    category_manager.add_mapping(category, new_category)
+                    return processed_description, new_category
     
     return processed_description, processed_category
 
-def process_forgastro_category(category, category_mappings=None):
+def process_forgastro_category(category, category_manager=None, category_mapping_callback=None, product_name=None):
     """Process ForGastro category text."""
     if not category or not isinstance(category, str):
         return category
-    if category_mappings:
-        return map_category(category, category_mappings)
+    
+    if category_manager:
+        # Check manager's cache first
+        mapped_category = category_manager.find_mapping(category)
+        if mapped_category:
+            return mapped_category
+        
+        # No cached mapping - use callback if provided
+        if category_mapping_callback:
+            new_category = category_mapping_callback(category, product_name)
+            if new_category and new_category != category:
+                # Add to cache immediately
+                category_manager.add_mapping(category, new_category)
+                return new_category
+    
     return category
 
 def process_forgastro_html(html_content):
@@ -124,12 +144,11 @@ def process_forgastro_html(html_content):
         print(f"Error processing HTML content: {e}")
         return "", ""
 
-def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_name: str = None) -> pd.DataFrame:
+def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_name: str = None, category_manager=None, category_mapping_callback=None) -> pd.DataFrame:
     """Parses XML root element and transforms it into a Pandas DataFrame."""
     if root is None:
         return pd.DataFrame()
     
-    category_mappings = load_category_mappings()
     data = []
     for item in root.findall(f".//{root_element_tag}"):
         row = {}
@@ -149,7 +168,8 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
 
         if feed_name == "forgastro":
             if "Hlavna kategória" in row and row["Hlavna kategória"]:
-                row["Hlavna kategória"] = process_forgastro_category(row["Hlavna kategória"], category_mappings)
+                product_name = row.get("Názov tovaru", "")
+                row["Hlavna kategória"] = process_forgastro_category(row["Hlavna kategória"], category_manager, category_mapping_callback, product_name)
             if product_desc_html:
                 long_desc, params_text = process_forgastro_html(product_desc_html)
                 if "Dlhý popis" in mapping.values():
@@ -160,7 +180,8 @@ def parse_xml_feed(root: ET.Element, root_element_tag: str, mapping: dict, feed_
         elif feed_name == "gastromarket":
             description = row.get("Krátky popis", "")
             category = row.get("Hlavna kategória", "")
-            processed_desc, processed_cat = process_gastromarket_text(description, category, category_mappings)
+            product_name = row.get("Názov tovaru", "")
+            processed_desc, processed_cat = process_gastromarket_text(description, category, category_manager, category_mapping_callback, product_name)
             if processed_desc:
                 row["Krátky popis"] = processed_desc
             if processed_cat:

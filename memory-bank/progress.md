@@ -15,6 +15,11 @@
 - ✅ Setting "Viditeľný" field to "1" for all imported feed products
 - ✅ Universal category mapping system for all data sources
 - ✅ Optional user-controlled CSV category mapping at export time
+- ✅ Interactive real-time category mapping dialog during processing
+- ✅ Automatic saving of new category mappings to categories.json with thread safety
+- ✅ Smart category suggestions using rapidfuzz + hierarchical matching with confidence scores
+- ✅ CategoryMappingManager with centralized caching and single-source-of-truth architecture
+- ✅ Product name context display in category mapping dialog
 - ✅ Category filtering with text search and toggle selection
 - ✅ Progress indicators for long-running operations
 - ✅ Topchladenie.sk web scraping with multi-threading

@@ -94,10 +94,18 @@ src/
    - Grounded web search tool (Google Search) for contextual enrichment when inputs are sparse
    - Structured prompt engineering for B2B tone, HTML formatting, and strict JSON-only outputs
 
-4. **Category Mapping System**:
+6. **Interactive Callback Pattern**:
+   - Thread-safe signal/slot communication between worker and UI threads
+   - QEventLoop for synchronous blocking in worker thread while awaiting user input
+   - Modal dialog pauses pipeline execution for user interaction
+   - Graceful fallback when callback is not provided
+
+7. **Category Mapping System**:
    - Universal JSON array format for mapping definitions
    - Centralized mapping functions for consistent application
    - User-controlled application at export time
+   - Interactive on-the-fly mapping via CategoryMappingDialog
+   - Optional callback mechanism for real-time unmapped category resolution
    - Detailed logging of mapping operations
 
 ## Component Relationships

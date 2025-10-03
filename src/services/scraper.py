@@ -7,7 +7,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from threading import Lock
 from tqdm import tqdm
-from ..utils.config_loader import load_category_mappings
+from ..utils.config_loader import CategoryMappingManager
 
 # Configure logging
 logging.basicConfig(
@@ -59,14 +59,15 @@ class ScrapingConfig:
 
 class TopchladenieScraper:
     """Base class for scraping product data from topchladenie.sk."""
-    def __init__(self, base_url="https://www.topchladenie.sk", progress_callback=None):
+    def __init__(self, base_url="https://www.topchladenie.sk", progress_callback=None, category_manager=None, category_mapping_callback=None):
         self.base_url = base_url
         self.config = ScrapingConfig()
         self.session = requests.Session()
         self.session.headers.update(self.config.get_headers())
         self.session.timeout = self.config.REQUEST_TIMEOUT
         self.progress_callback = progress_callback
-        self.category_mappings = load_category_mappings()
+        self.category_manager = category_manager if category_manager is not None else CategoryMappingManager()
+        self.category_mapping_callback = category_mapping_callback
 
     def _log_progress(self, message):
         if self.progress_callback:
@@ -150,6 +151,7 @@ class TopchladenieScraper:
             if not product_name:
                 return None
             product_data['Kat. číslo'] = product_data['Názov tovaru'] = product_name
+            self.current_product_name = product_name  # Store for callback context
 
             price_elem = soup.find('p', class_=['big', 'red'])
             price = float(price_elem['content']) if price_elem and price_elem.get('content') else 0.0
@@ -213,9 +215,21 @@ class TopchladenieScraper:
             return None
 
     def map_category(self, category_url):
-        for mapping in self.category_mappings:
-            if mapping['oldCategory'] == category_url:
-                return mapping['newCategory']
+        # Check if mapping exists in manager's cache
+        mapped_category = self.category_manager.find_mapping(category_url)
+        if mapped_category:
+            return mapped_category
+        
+        # No mapping found - use interactive callback if provided
+        if self.category_mapping_callback:
+            logger.info(f"Requesting interactive mapping for category URL: {category_url}")
+            product_name = getattr(self, 'current_product_name', None)
+            new_category = self.category_mapping_callback(category_url, product_name)
+            if new_category and new_category != category_url:
+                # Add to manager's cache immediately
+                self.category_manager.add_mapping(category_url, new_category)
+                return new_category
+        
         logger.warning(f"No mapping found for category URL: {category_url}")
         return category_url
 
@@ -240,8 +254,8 @@ class TopchladenieScraper:
 
 class FastTopchladenieScraper(TopchladenieScraper):
     """Multi-threaded scraper for topchladenie.sk"""
-    def __init__(self, base_url="https://www.topchladenie.sk", max_workers=8, progress_callback=None):
-        super().__init__(base_url, progress_callback=progress_callback)
+    def __init__(self, base_url="https://www.topchladenie.sk", max_workers=8, progress_callback=None, category_manager=None, category_mapping_callback=None):
+        super().__init__(base_url, progress_callback=progress_callback, category_manager=category_manager, category_mapping_callback=category_mapping_callback)
         self.max_workers = min(max_workers, ScrapingConfig.MAX_THREADS)
         self.lock = Lock()
 
@@ -282,10 +296,13 @@ class FastTopchladenieScraper(TopchladenieScraper):
 
         return pd.DataFrame(scraped_products)
 
-def get_scraped_products(progress_callback=None, use_fast_scraper=True) -> pd.DataFrame:
+def get_scraped_products(progress_callback=None, use_fast_scraper=True, category_manager=None, category_mapping_callback=None) -> pd.DataFrame:
     try:
         logger.info("Starting to scrape products from topchladenie.sk")
-        scraper = FastTopchladenieScraper(progress_callback=progress_callback) if use_fast_scraper else TopchladenieScraper(progress_callback=progress_callback)
+        if use_fast_scraper:
+            scraper = FastTopchladenieScraper(progress_callback=progress_callback, category_manager=category_manager, category_mapping_callback=category_mapping_callback)
+        else:
+            scraper = TopchladenieScraper(progress_callback=progress_callback, category_manager=category_manager, category_mapping_callback=category_mapping_callback)
         products_df = clean_data(scraper.scrape_all_products())
         logger.info(f"Successfully scraped {len(products_df)} products")
         return products_df
@@ -307,4 +324,33 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
         if col in ['Krátky popis', 'Dlhý popis']:
             df[col] = df[col].apply(lambda x: x.replace('\r\n', '\n').replace('\r', '\n') if isinstance(x, str) else x)
+    
+    # Handle duplicate catalog numbers by updating prices
+    if 'Kat. číslo' in df.columns:
+        duplicates = df[df.duplicated(subset=['Kat. číslo'], keep=False)]
+        if not duplicates.empty:
+            logger.warning(f"Found {len(duplicates)} products with duplicate catalog numbers")
+            logger.warning(f"Duplicate catalog numbers: {duplicates['Kat. číslo'].unique().tolist()}")
+            
+            # For each duplicate catalog number, update the first occurrence's price with the last occurrence's price
+            if 'Bežná cena' in df.columns:
+                for kat_cislo in duplicates['Kat. číslo'].unique():
+                    # Get all rows with this catalog number
+                    mask = df['Kat. číslo'] == kat_cislo
+                    duplicate_rows = df[mask]
+                    
+                    if len(duplicate_rows) > 1:
+                        # Get the first index (original product)
+                        first_idx = duplicate_rows.index[0]
+                        # Get the last price (from the most recent duplicate)
+                        last_price = duplicate_rows.iloc[-1]['Bežná cena']
+                        
+                        # Update the first occurrence's price
+                        df.at[first_idx, 'Bežná cena'] = last_price
+                        logger.info(f"Updated price for '{kat_cislo}' to {last_price}")
+            
+            # Now remove duplicate entries, keeping only the first occurrence
+            df = df.drop_duplicates(subset=['Kat. číslo'], keep='first')
+            logger.info(f"Removed duplicates, kept {len(df)} unique products")
+    
     return df

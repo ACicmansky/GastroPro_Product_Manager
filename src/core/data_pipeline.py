@@ -6,7 +6,7 @@ from .models import PipelineResult
 from ..services.scraper import get_scraped_products
 from ..services.variant_matcher import ProductVariantMatcher
 from ..services.ai_enhancer import AIEnhancementProcessor
-from ..utils.config_loader import load_category_mappings
+from ..utils.config_loader import CategoryMappingManager
 from ..utils.category_mapper import map_dataframe_categories
 from ..utils.feed_processor import fetch_xml_feed, parse_xml_feed
 from ..utils.helpers import merge_dataframes, clean_html_text
@@ -14,9 +14,12 @@ from ..utils.helpers import merge_dataframes, clean_html_text
 logger = logging.getLogger(__name__)
 
 class DataPipeline:
-    def __init__(self, config, progress_callback=None):
+    def __init__(self, config, progress_callback=None, category_mapping_callback=None):
         self.config = config
         self.progress_callback = progress_callback
+        self.category_mapping_callback = category_mapping_callback
+        # Initialize centralized category mapping manager
+        self.category_manager = CategoryMappingManager()
 
     def _log_progress(self, message):
         if self.progress_callback:
@@ -35,7 +38,7 @@ class DataPipeline:
             # Step 2: Category Mapping
             if options.get('map_categories') and 'Hlavna kategória' in filtered_df.columns:
                 self._log_progress("Applying category mappings...")
-                category_mappings = load_category_mappings()
+                category_mappings = self.category_manager.get_all()
                 if category_mappings:
                     filtered_df = map_dataframe_categories(filtered_df, category_mappings)
 
@@ -106,7 +109,14 @@ class DataPipeline:
                 root = fetch_xml_feed(feed_info['url'])
                 if root is not None:
                     self._log_progress(f"Parsing feed: {feed_name}")
-                    df = parse_xml_feed(root, feed_info['root_element'], feed_info['mapping'], feed_name)
+                    df = parse_xml_feed(
+                        root, 
+                        feed_info['root_element'], 
+                        feed_info['mapping'], 
+                        feed_name,
+                        category_manager=self.category_manager,
+                        category_mapping_callback=self.category_mapping_callback
+                    )
                     if df is not None and not df.empty:
                         feed_dataframes[feed_name] = df
                         self._log_progress(f"Parsed {len(df)} products from {feed_name}")
@@ -119,7 +129,12 @@ class DataPipeline:
         topchladenie_count = 0
         if options.get('scrape_topchladenie'):
             self._log_progress("Scraping latest data from Topchladenie.sk...")
-            scraped_df = get_scraped_products(use_fast_scraper=True, progress_callback=lambda x: self._log_progress(x))
+            scraped_df = get_scraped_products(
+                use_fast_scraper=True, 
+                progress_callback=lambda x: self._log_progress(x),
+                category_manager=self.category_manager,
+                category_mapping_callback=self.category_mapping_callback
+            )
             if scraped_df is not None and not scraped_df.empty:
                 topchladenie_count = len(scraped_df)
                 self._log_progress(f"Scraped {topchladenie_count} products.")

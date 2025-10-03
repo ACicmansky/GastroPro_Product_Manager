@@ -9,6 +9,8 @@
 - Enhancing data quality with an LLM agent to generate B2B short/long descriptions and SEO metadata using web search; iterating on prompt engineering and parallel batch execution
 
 ## Recent Changes
+- **CategoryMappingManager**: Implemented centralized category mapping management with in-memory caching. Eliminates duplicate disk I/O, provides immediate availability of new mappings during processing, and ensures no repeated prompts for same category in single run
+- **Interactive Category Mapping with Auto-Save & Smart Suggestions**: Implemented real-time category mapping dialog that pauses processing when unmapped categories are encountered during XML parsing and web scraping. Features include: on-the-fly user input, automatic saving to `categories.json` with thread-safe operations, smart suggestions using rapidfuzz + hierarchical matching showing top 5 similar categories with confidence percentages, and product name context display
 - **Major Codebase Refactoring**: The entire application was refactored into a modular `src` package structure to improve maintainability and adhere to SOLID principles. This involved separating the GUI, core business logic, services, and utilities into distinct modules.
 - Enhanced Topchladenie.sk data acquisition with dual approach:
   - Live scraping with multi-threaded parallel processing
