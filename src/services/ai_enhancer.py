@@ -211,28 +211,59 @@ class AIEnhancementProcessor:
         
         return best_match_idx
     
-    def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, str]]) -> Tuple[pd.DataFrame, int]:
-        """Update dataframe with enhanced descriptions using fuzzy matching."""
-        df = df.copy()
+    def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, str]], valid_indices: pd.Index = None) -> Tuple[pd.DataFrame, int]:
+        """Update dataframe with enhanced descriptions.
+        
+        Args:
+            df: The full dataframe to update
+            enhanced_products: List of enhanced product dicts from API
+            valid_indices: Indices of products that were sent for processing (to limit search scope)
+        """
+        # DO NOT copy - work on the original dataframe to ensure updates persist
         updated_count = 0
         
+        # Create a subset view for searching if valid_indices provided
+        search_df = df.loc[valid_indices] if valid_indices is not None else df
+        
         for enhanced_product in enhanced_products:
-            # Find the best matching by Kat. číslo
-            best_match_idx = self.find_best_match(enhanced_product['Kat. číslo'], 'Kat. číslo', df)
-            if best_match_idx is None:
-            # Find the best matching product using fuzzy matching
-                best_match_idx = self.find_best_match(enhanced_product['Názov tovaru'], 'Názov tovaru', df)
+            best_match_idx = None
+            
+            # Strategy 1: Exact match on 'Kat. číslo' (most reliable)
+            cat_num = str(enhanced_product['Kat. číslo']).strip()
+            exact_matches = search_df[search_df['Kat. číslo'].astype(str).str.strip() == cat_num]
+            
+            if len(exact_matches) == 1:
+                # Perfect - exactly one match
+                best_match_idx = exact_matches.index[0]
+                logger.debug(f"Exact match found for {cat_num}")
+            elif len(exact_matches) > 1:
+                # Multiple exact matches - use the first one and log warning
+                best_match_idx = exact_matches.index[0]
+                logger.warning(f"Multiple exact matches for {cat_num}, using first: {best_match_idx}")
+            else:
+                # Strategy 2: Fuzzy match on catalog number (handles minor variations)
+                best_match_idx = self.find_best_match(enhanced_product['Kat. číslo'], 'Kat. číslo', search_df)
+                if best_match_idx is not None:
+                    logger.info(f"Fuzzy match on catalog number for {cat_num}: {best_match_idx}")
+                else:
+                    # Strategy 3: Fuzzy match on product name (last resort)
+                    best_match_idx = self.find_best_match(enhanced_product['Názov tovaru'], 'Názov tovaru', search_df)
+                    if best_match_idx is not None:
+                        logger.info(f"Fuzzy match on name for {enhanced_product['Názov tovaru']}: {best_match_idx}")
             
             if best_match_idx is not None:
-                # Update the matched product
-                df.loc[best_match_idx, [
-                    'Krátky popis', 'Dlhý popis', 'SEO titulka', 'SEO popis', 'SEO kľúčové slová',
-                    'Spracovane AI', 'AI_Processed_Date'
-                ]] = [
-                    enhanced_product['Krátky popis'], enhanced_product['Dlhý popis'], enhanced_product['SEO titulka'],
-                    enhanced_product['SEO popis'], enhanced_product['SEO kľúčové slová'], True, datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-                ]
+                # Update columns INDIVIDUALLY to preserve dtypes and ensure proper assignment
+                df.at[best_match_idx, 'Krátky popis'] = enhanced_product['Krátky popis']
+                df.at[best_match_idx, 'Dlhý popis'] = enhanced_product['Dlhý popis']
+                df.at[best_match_idx, 'SEO titulka'] = enhanced_product['SEO titulka']
+                df.at[best_match_idx, 'SEO popis'] = enhanced_product['SEO popis']
+                df.at[best_match_idx, 'SEO kľúčové slová'] = enhanced_product['SEO kľúčové slová']
+                # CRITICAL: Set tracking columns separately to preserve boolean type
+                df.at[best_match_idx, 'Spracovane AI'] = True
+                df.at[best_match_idx, 'AI_Processed_Date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 updated_count += 1
+            else:
+                logger.error(f"No match found for product {enhanced_product['Kat. číslo']} or {enhanced_product['Názov tovaru']}")
         
         return df, updated_count
 
@@ -249,8 +280,15 @@ class AIEnhancementProcessor:
         if 'AI_Processed_Date' not in df.columns:
             df['AI_Processed_Date'] = ''
         
-        # Filter products needing processing
-        needs_processing = df[df['Spracovane AI'].isin([False, 'FALSE', ""])]
+        # Normalize 'Spracovane AI' column to handle various data types
+        # Convert string representations of True/False to actual booleans
+        df['Spracovane AI'] = df['Spracovane AI'].apply(
+            lambda x: True if str(x).strip().upper() in ['TRUE', '1', 'YES'] else 
+                     False if str(x).strip().upper() in ['FALSE', '0', 'NO', ''] else x
+        )
+        
+        # Filter products needing processing (only False or empty values)
+        needs_processing = df[df['Spracovane AI'].isin([False, ''])]
         total_products = len(needs_processing)
         
         if total_products == 0:
@@ -259,6 +297,9 @@ class AIEnhancementProcessor:
         
         logger.info(f"Processing {total_products} products with AI enhancement")
         
+        # Store the indices of products that need processing for accurate matching later
+        needs_processing_indices = needs_processing.index
+        
         processed_count = 0
         
         # Process in batches with parallel execution
@@ -266,18 +307,18 @@ class AIEnhancementProcessor:
         for i in range(0, total_products, self.batch_size):
             batch_end = min(i + self.batch_size, total_products)
             # Get indices from original dataframe
-            original_indices = needs_processing.index[i:batch_end]
+            batch_indices = needs_processing.index[i:batch_end]
             # Prepare batch data using the correct slice of the filtered dataframe
             products = self.prepare_batch_data(needs_processing, i, batch_end)
             if products:
-                batches.append((products, original_indices[0], len(batches) + 1))
+                batches.append((products, batch_indices, len(batches) + 1))
         
         # Process batches in parallel
         with ThreadPoolExecutor(max_workers=self.max_parallel_calls) as executor:
             # Submit all batches
             future_to_batch = {
-                executor.submit(self._process_single_batch, batch_data, start_idx, batch_num): batch_num
-                for batch_data, start_idx, batch_num in batches
+                executor.submit(self._process_single_batch, batch_data, batch_indices, batch_num): batch_num
+                for batch_data, batch_indices, batch_num in batches
             }
             
             # Process completed batches
@@ -286,26 +327,30 @@ class AIEnhancementProcessor:
                 try:
                     result = future.result()
                     if result:
-                        enhanced_products = result[0]
-                        df, updated_count = self.update_dataframe(df, enhanced_products)
+                        enhanced_products, batch_indices = result
+                        # Pass the valid indices to limit search scope and ensure accurate matching
+                        df, updated_count = self.update_dataframe(df, enhanced_products, valid_indices=needs_processing_indices)
                         processed_count += updated_count
                         
                         # Save incremental progress
                         tmp_file = os.path.join(self.tmp_dir, 'processed_tmp.csv')
                         try:
+                            # Work on a COPY to avoid corrupting the original dataframe
+                            df_copy = df.copy()
+                            
                             # First try cp1250 with character replacement
                             try:
-                                for col in df.columns:
-                                    if df[col].dtype == 'object':
-                                        df[col] = df[col].astype(str)
-                                        df[col] = df[col].apply(
+                                for col in df_copy.columns:
+                                    if df_copy[col].dtype == 'object':
+                                        df_copy[col] = df_copy[col].astype(str)
+                                        df_copy[col] = df_copy[col].apply(
                                             lambda x: ''.join(c if c.encode('cp1250', errors='replace') != b'?' else ' ' for c in x)
                                         )
                                 
-                                df.to_csv(tmp_file, index=False, encoding='cp1250', sep=';')
+                                df_copy.to_csv(tmp_file, index=False, encoding='cp1250', sep=';')
                             except Exception:
                                 # Fallback to utf-8 if cp1250 fails
-                                df.to_csv(tmp_file, index=False, encoding='utf-8', sep=';')
+                                df_copy.to_csv(tmp_file, index=False, encoding='utf-8', sep=';')
                             
                             logger.info(f"Saved incremental progress for batch {batch_num} to {tmp_file}")
                         except Exception as e:
@@ -322,19 +367,22 @@ class AIEnhancementProcessor:
         # Final save after all processing
         tmp_file = os.path.join(self.tmp_dir, 'processed_tmp.csv')
         try:
+            # Work on a COPY to avoid corrupting the original dataframe
+            df_copy = df.copy()
+            
             # First try cp1250 with character replacement
             try:
-                for col in df.columns:
-                    if df[col].dtype == 'object':
-                        df[col] = df[col].astype(str)
-                        df[col] = df[col].apply(
+                for col in df_copy.columns:
+                    if df_copy[col].dtype == 'object':
+                        df_copy[col] = df_copy[col].astype(str)
+                        df_copy[col] = df_copy[col].apply(
                             lambda x: ''.join(c if c.encode('cp1250', errors='replace') != b'?' else ' ' for c in x)
                         )
                 
-                df.to_csv(tmp_file, index=False, encoding='cp1250', sep=';')
+                df_copy.to_csv(tmp_file, index=False, encoding='cp1250', sep=';')
             except Exception:
                 # Fallback to utf-8 if cp1250 fails
-                df.to_csv(tmp_file, index=False, encoding='utf-8', sep=';')
+                df_copy.to_csv(tmp_file, index=False, encoding='utf-8', sep=';')
                 
             logger.info(f"Saved final progress to {tmp_file}")
         except Exception as e:
@@ -347,9 +395,15 @@ class AIEnhancementProcessor:
         }
         return df, statistics
 
-    def _process_single_batch(self, products: List[Dict[str, str]], start_idx: int, batch_num: int):
-        """Process a single batch of products."""
+    def _process_single_batch(self, products: List[Dict[str, str]], batch_indices: pd.Index, batch_num: int):
+        """Process a single batch of products.
+        
+        Args:
+            products: List of product dicts to process
+            batch_indices: Original DataFrame indices for these products
+            batch_num: Batch number for logging
+        """
         enhanced_products = self.process_batch_with_retry(products)
         if enhanced_products:
-            return enhanced_products, len(enhanced_products)
+            return enhanced_products, batch_indices
         return None

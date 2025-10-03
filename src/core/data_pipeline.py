@@ -171,9 +171,10 @@ class DataPipeline:
 
         final_df, merge_stats = merge_dataframes(main_df_cleaned, all_sources_to_merge, self.config['final_csv_columns'])
         
-        # Final cleaning
+        # Final cleaning - EXCLUDE AI tracking columns to prevent corruption
+        ai_tracking_columns = {'Spracovane AI', 'AI_Processed_Date'}
         for col in final_df.columns:
-            if final_df[col].dtype == 'object':
+            if col not in ai_tracking_columns and final_df[col].dtype == 'object':
                 final_df[col] = final_df[col].fillna("").astype(str).replace("nan", "").str.strip()
 
         for col in ['Krátky popis', 'Dlhý popis', 'Názov tovaru']:
