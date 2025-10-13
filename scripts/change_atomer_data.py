@@ -113,6 +113,52 @@ class AtomerAPIClient:
         except requests.exceptions.RequestException as e:
             print(f"Error updating product data: {e}")
             return None
+    
+    def update_product_seo(
+        self,
+        id_tovar: int,
+        id_kategorie: int,
+        seo_data: Dict[str, str]
+    ) -> Optional[requests.Response]:
+        """
+        Update product SEO data
+        
+        Args:
+            id_tovar: Product ID
+            id_kategorie: Category ID
+            seo_data: Dictionary containing SEO fields (title, description, keywords)
+            
+        Returns:
+            Response object or None if request failed
+        """
+        params = {
+            "modul": "eshop-tovar-kategorie",
+            "id_tovar": id_tovar,
+            "id_kategorie": id_kategorie,
+            "uprav_seo": ""
+        }
+        
+        headers = self.common_headers.copy()
+        headers.update({
+            "content-type": "application/x-www-form-urlencoded",
+            "origin": "https://www.atomer.com",
+            "referer": f"{self.BASE_URL}?modul=eshop-tovar-kategorie&id_tovar={id_tovar}",
+            "sec-fetch-site": "same-origin"
+        })
+        
+        try:
+            response = self.session.post(
+                self.BASE_URL,
+                params=params,
+                headers=headers,
+                data=seo_data,
+                timeout=30
+            )
+            response.raise_for_status()
+            return response
+        except requests.exceptions.RequestException as e:
+            print(f"Error updating SEO data: {e}")
+            return None
 
 
 def create_product_update_payload(
@@ -191,6 +237,35 @@ def create_product_update_payload(
     return payload
 
 
+def create_seo_update_payload(
+    title_sk: str,
+    description_sk: str = "",
+    keywords_sk: str = "",
+    language: str = "SK"
+) -> Dict[str, str]:
+    """
+    Create an SEO update payload
+    
+    Args:
+        title_sk: SEO title in Slovak
+        description_sk: SEO description in Slovak
+        keywords_sk: SEO keywords in Slovak (comma-separated)
+        language: Language code (default: "SK")
+        
+    Returns:
+        Dictionary with SEO form data ready for POST request
+    """
+    payload = {
+        "tbTitulkaSK": title_sk,
+        "tbPopisSK": description_sk,
+        "tbKeywordsSK": keywords_sk,
+        "cbSeoJazyk": language,
+        "btnSeoSave": "Uložiť SEO"
+    }
+    
+    return payload
+
+
 def main():
     """Main execution function"""
     
@@ -213,8 +288,8 @@ def main():
         print(f"GET Request successful! Status: {response.status_code}")
         print(f"Response length: {len(response.text)} characters")
         # You can parse the HTML response here to extract data
-        # with open("product_data.html", "w", encoding="utf-8") as f:
-        #     f.write(response.text)
+        with open("product_data.html", "w", encoding="utf-8") as f:
+            f.write(response.text)
     else:
         print("GET Request failed!")
         return
@@ -223,25 +298,45 @@ def main():
     print("\n" + "="*50)
     print("Preparing product update...")
     
+    # category_id = 1298877
+    # product_data = create_product_update_payload(
+    #     category_id=category_id,
+    #     title_sk="Ohrevný vozík na 100 tanierov",
+    #     alias_sk="ohrevny-vozik-na-100-tanierov-1",
+    #     short_text_sk="<strong>Profesionálny ohrevný vozík</strong> na 100 tanierov, vyrobený z odolného nerezu AISI 445, s presnou reguláciou teploty a dvoma podávacími šachtami s automatickým zdvíhaním tanierov. Ideálne riešenie pre efektívnu a hygienickú výdaj jedál v komerčných kuchyniach a reštauráciách. <br><br><strong>Kľúčové parametre:</strong><br><ul><li>Kapacita: 100 tanierov</li><li>Materiál: Nerez AISI 445</li><li>Regulácia teploty: Áno</li><li>Podávacie šachty: 2 ks s automatickým zdvíhaním</li><li>Rozmery (ŠxHxV): 1000 x 510 x 880 mm</li><li>Výkon: 3 kW / 230 V</li></ul>",
+    #     text_sk="<p>Zabezpečte bezproblémový a efektívny výdaj jedál s týmto profesionálnym ohrevným vozíkom na 100 tanierov. Vyrobený z kvalitnej nehrdzavejúcej ocele AISI 445, tento vozík spĺňa najvyššie štandardy pre <strong>horeca prevádzky</strong> a komerčné kuchyne. Jeho robustná konštrukcia zaručuje dlhú životnosť a jednoduchú údržbu.</p><p><strong>Technické vlastnosti:</strong></p><ul><li><strong>Kapacita:</strong> Navrhnutý na uskladnenie a ohrev až 100 tanierov štandardných rozmerov.</li><li><strong>Materiál:</strong> Celonerezové prevedenie z AISI 445 pre maximálnu hygienu a odolnosť voči korózii.</li><li><strong>Regulácia teploty:</strong> Presný termostat umožňuje nastaviť optimálnu teplotu pre udržanie jedál v ideálnom stave.</li><li><strong>Podávacie šachty:</strong> Dve praktické podávacie šachty s funkciou automatického zdvíhania tanierov výrazne zrýchľujú a zjednodušujú proces výdaja.</li><li><strong>Rozmery:</strong> Kompaktné rozmery 1000 x 510 x 880 mm umožňujú ľahké umiestnenie aj v priestorovo obmedzených kuchyniach.</li><li><strong>Výkon:</strong> S príkonom 3 kW a napájaním 230 V je tento vozík energeticky efektívny a pripravený na okamžité použitie.</li></ul><p><strong>Výhody pre vašu prevádzku:</strong></p><ul><li><strong>Zvýšenie efektivity:</strong> Automatické zdvíhanie tanierov a dostatočná kapacita urýchľujú obsluhu počas špičiek.</li><li><strong>Udržanie kvality jedla:</strong> Konštantná teplota zaisťuje, že jedlo zostane teplé a chutné až do podania.</li><li><strong>Hygiena a bezpečnosť:</strong> Nerezový materiál sa ľahko čistí a spĺňa prísne hygienické normy pre profesionálne kuchyne.</li><li><strong>Dlhodobá investícia:</strong> Kvalitné spracovanie zaručuje spoľahlivosť a dlhú životnosť zariadenia.</li></ul><p>Tento ohrevný vozík je ideálnym doplnkom pre každú <strong>komerčnú kuchyňu</strong>, jedáleň, hotelovú reštauráciu alebo cateringovú spoločnosť, ktorá kladie dôraz na rýchlosť, kvalitu a profesionalitu.</p>",
+    #     price=909.27,
+    #     catalog_id="fc7239a56d27b79893cc58951fb91912"
+    # )
+    
+    # print(f"Updating product ID: {product_id} with category ID: {category_id}")
+    # response = client.update_product_category(product_id, category_id, product_data)
+    
+    # if response:
+    #     print(f"POST Request successful! Status: {response.status_code}")
+    #     print(f"Response length: {len(response.text)} characters")
+    # else:
+    #     print("POST Request failed!")
+    
+    # Example: Update SEO data
+    print("\n" + "="*50)
+    print("Preparing SEO update...")
+    
     category_id = 1298877
-    product_data = create_product_update_payload(
-        category_id=category_id,
-        title_sk="Ohrevný vozík na 100 tanierov",
-        alias_sk="ohrevny-vozik-na-100-tanierov-1",
-        short_text_sk="<strong>Profesionálny ohrevný vozík</strong> na 100 tanierov, vyrobený z odolného nerezu AISI 445, s presnou reguláciou teploty a dvoma podávacími šachtami s automatickým zdvíhaním tanierov. Ideálne riešenie pre efektívnu a hygienickú výdaj jedál v komerčných kuchyniach a reštauráciách. <br><br><strong>Kľúčové parametre:</strong><br><ul><li>Kapacita: 100 tanierov</li><li>Materiál: Nerez AISI 445</li><li>Regulácia teploty: Áno</li><li>Podávacie šachty: 2 ks s automatickým zdvíhaním</li><li>Rozmery (ŠxHxV): 1000 x 510 x 880 mm</li><li>Výkon: 3 kW / 230 V</li></ul>",
-        text_sk="<p>Zabezpečte bezproblémový a efektívny výdaj jedál s týmto profesionálnym ohrevným vozíkom na 100 tanierov. Vyrobený z kvalitnej nehrdzavejúcej ocele AISI 445, tento vozík spĺňa najvyššie štandardy pre <strong>horeca prevádzky</strong> a komerčné kuchyne. Jeho robustná konštrukcia zaručuje dlhú životnosť a jednoduchú údržbu.</p><p><strong>Technické vlastnosti:</strong></p><ul><li><strong>Kapacita:</strong> Navrhnutý na uskladnenie a ohrev až 100 tanierov štandardných rozmerov.</li><li><strong>Materiál:</strong> Celonerezové prevedenie z AISI 445 pre maximálnu hygienu a odolnosť voči korózii.</li><li><strong>Regulácia teploty:</strong> Presný termostat umožňuje nastaviť optimálnu teplotu pre udržanie jedál v ideálnom stave.</li><li><strong>Podávacie šachty:</strong> Dve praktické podávacie šachty s funkciou automatického zdvíhania tanierov výrazne zrýchľujú a zjednodušujú proces výdaja.</li><li><strong>Rozmery:</strong> Kompaktné rozmery 1000 x 510 x 880 mm umožňujú ľahké umiestnenie aj v priestorovo obmedzených kuchyniach.</li><li><strong>Výkon:</strong> S príkonom 3 kW a napájaním 230 V je tento vozík energeticky efektívny a pripravený na okamžité použitie.</li></ul><p><strong>Výhody pre vašu prevádzku:</strong></p><ul><li><strong>Zvýšenie efektivity:</strong> Automatické zdvíhanie tanierov a dostatočná kapacita urýchľujú obsluhu počas špičiek.</li><li><strong>Udržanie kvality jedla:</strong> Konštantná teplota zaisťuje, že jedlo zostane teplé a chutné až do podania.</li><li><strong>Hygiena a bezpečnosť:</strong> Nerezový materiál sa ľahko čistí a spĺňa prísne hygienické normy pre profesionálne kuchyne.</li><li><strong>Dlhodobá investícia:</strong> Kvalitné spracovanie zaručuje spoľahlivosť a dlhú životnosť zariadenia.</li></ul><p>Tento ohrevný vozík je ideálnym doplnkom pre každú <strong>komerčnú kuchyňu</strong>, jedáleň, hotelovú reštauráciu alebo cateringovú spoločnosť, ktorá kladie dôraz na rýchlosť, kvalitu a profesionalitu.</p>",
-        price=909.27,
-        catalog_id="fc7239a56d27b79893cc58951fb91912"
+    seo_data = create_seo_update_payload(
+        title_sk="Ohrevný vozík na 100 tanierov - Nerez AISI 445",
+        description_sk="GastroPro.sk | Ohrevný vozík na 100 tanierov z nerezu s automatickým zdvíhaním. Ideálny pre profesionálne kuchyne. Objednajte teraz!",
+        keywords_sk="ohrevný vozík, vozík na taniere, gastro výdaj, profesionálne gastro vybavenie, ohrev jedla, nerezový vozík"
     )
     
-    print(f"Updating product ID: {product_id} with category ID: {category_id}")
-    response = client.update_product_category(product_id, category_id, product_data)
+    print(f"Updating SEO for product ID: {product_id} with category ID: {category_id}")
+    response = client.update_product_seo(product_id, category_id, seo_data)
     
     if response:
-        print(f"POST Request successful! Status: {response.status_code}")
+        print(f"SEO POST Request successful! Status: {response.status_code}")
         print(f"Response length: {len(response.text)} characters")
     else:
-        print("POST Request failed!")
+        print("SEO POST Request failed!")
 
 
 if __name__ == "__main__":
