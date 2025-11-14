@@ -1,12 +1,11 @@
 # GastroPro Product Manager - Active Context
 
 ## Current Focus
-- Standardizing category mapping across all data sources
-- Optimizing product data processing from multiple feed sources
-- Fine-tuning specialized data extraction and formatting
-- Ensuring proper data merging and export functionality
-- Implementing user-controlled features for flexible workflow
-- Enhancing data quality with an LLM agent to generate B2B short/long descriptions and SEO metadata using web search; iterating on prompt engineering and parallel batch execution
+- **Migration to New 147-Column E-shop Format**: Implementing TDD approach to migrate entire application to use new format for both input and output
+- Writing comprehensive unit tests for current implementation before making changes
+- Refactoring all components to work with new English column names
+- Implementing XLSX as primary file format
+- Removing variant matcher functionality (not used)
 
 ## Recent Changes
 - **CategoryMappingManager**: Implemented centralized category mapping management with in-memory caching. Eliminates duplicate disk I/O, provides immediate availability of new mappings during processing, and ensures no repeated prompts for same category in single run
@@ -32,30 +31,37 @@
 - Improved special character handling and text formatting
 - Introduced AI-based SEO metadata generation (SEO titulka, SEO popis, SEO kľúčové slová) with web search grounding to enrich missing context
 
-## Next Steps
-1. Implement category selection functionality from local CSV
-2. Add support for additional feed sources if needed
-3. Improve error handling and user feedback
-4. Implement data preview functionality
-5. Optimize performance for large datasets
+## Next Steps - Migration to New Format (TDD Approach)
+1. **Phase 0-1**: Set up test infrastructure and write tests for current implementation
+2. **Phase 2**: Create OutputTransformer module with tests
+3. **Phase 3**: Update data loading with XLSX support (tests first)
+4. **Phase 4**: Update XML parser to output new format (tests first)
+5. **Phase 5**: Update data merging with image priority logic (tests first)
+6. **Phase 6**: Update AI enhancement for new columns (tests first)
+7. **Phase 7**: Update category mapper with transformation (tests first)
+8. **Phase 8**: Update data pipeline integration (tests first)
+9. **Phase 9**: Final validation and testing
+10. **Phase 10**: Documentation and cleanup
 
 ## Active Decisions
-- Filtering out products with empty catalog numbers before merging to ensure data integrity
-- Implementing mutual exclusivity between live scraping and CSV loading for Topchladenie data
-- Using semicolon (;) as the default CSV delimiter based on common European CSV format
-- Maintaining UTF-8 as the default encoding for all file operations with cp1250 fallback for export
-- Using feed name to trigger specialized content processing routines
-- Using outer join to ensure all products are included in the final output
-- Setting "Viditelný" field to "1" for all imported products
+- **Migration Strategy**: TDD approach - write tests first, then implement
+- **Format Support**: New 147-column format only (no backward compatibility)
+- **File Format**: XLSX as primary, CSV as fallback
+- **Image Merging**: Use source with most images available
+- **Default Values**: Apply at end of pipeline if cells are empty
+- **Breaking Changes**: Acceptable - clean migration
+- **Variant Matcher**: Skip updates (feature not used)
+- **Code Uppercase**: Apply on load and merge for consistency
+- **Category Transformation**: Add "Tovary a kategórie > " prefix and change "/" to " > "
 - Using Pandas DataFrames as the core data structure for manipulation
 - Providing detailed statistics on data source contributions in export summary
 
 ## Current Challenges
-- Handling complex HTML in product descriptions from various feeds
-- Managing special characters and formatting across different feeds
-- Optimizing performance for large datasets
-- Ensuring consistent behavior across multiple feed formats
-- Implementing robust data validation to prevent errors in data processing
+- **Migration Complexity**: Updating all components to work with new 147-column format
+- **Test Coverage**: Writing comprehensive tests for existing functionality before refactoring
+- **Image Merging Logic**: Implementing priority-based image merging across data sources
+- **Column Name Consistency**: Updating all references from Slovak to English column names
+- **XLSX Integration**: Adding Excel file support throughout the application
 
 ## User Experience Considerations
 - Providing clear feedback during data processing operations

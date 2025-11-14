@@ -1,0 +1,125 @@
+"""
+Pytest configuration and fixtures for GastroPro Product Manager tests.
+"""
+
+import pytest
+import pandas as pd
+import json
+from pathlib import Path
+
+
+@pytest.fixture
+def test_data_dir():
+    """Return path to test data directory."""
+    return Path(__file__).parent / "test_data"
+
+
+@pytest.fixture
+def config():
+    """Load configuration from config.json."""
+    config_path = Path(__file__).parent.parent / "config.json"
+    with open(config_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+@pytest.fixture
+def sample_old_format_df():
+    """Create sample DataFrame in old format."""
+    data = {
+        'Kat. číslo': ['TEST001', 'TEST002', 'TEST003'],
+        'Názov tovaru': ['Product 1', 'Product 2', 'Product 3'],
+        'Bežná cena': ['100.00', '200.00', '300.00'],
+        'Výrobca': ['Manufacturer A', 'Manufacturer B', 'Manufacturer A'],
+        'Hlavna kategória': ['Category1/SubCat1', 'Category2/SubCat2', 'Category1/SubCat1'],
+        'Krátky popis': ['Short desc 1', 'Short desc 2', 'Short desc 3'],
+        'Dlhý popis': ['Long desc 1', 'Long desc 2', 'Long desc 3'],
+        'Váha': ['1.5', '2.0', '0.5'],
+        'Obrázky': ['img1.jpg,img2.jpg', 'img3.jpg', 'img4.jpg,img5.jpg,img6.jpg'],
+        'Viditeľný': ['1', '1', '1'],
+        'Spracovane AI': ['False', 'False', 'False'],
+        'AI_Processed_Date': ['', '', '']
+    }
+    return pd.DataFrame(data)
+
+
+@pytest.fixture
+def sample_new_format_df():
+    """Create sample DataFrame in new format."""
+    data = {
+        'code': ['TEST001', 'TEST002', 'TEST003'],
+        'name': ['Product 1', 'Product 2', 'Product 3'],
+        'price': ['100.00', '200.00', '300.00'],
+        'manufacturer': ['Manufacturer A', 'Manufacturer B', 'Manufacturer A'],
+        'defaultCategory': ['Tovary a kategórie > Category1 > SubCat1', 
+                           'Tovary a kategórie > Category2 > SubCat2',
+                           'Tovary a kategórie > Category1 > SubCat1'],
+        'categoryText': ['Tovary a kategórie > Category1 > SubCat1',
+                        'Tovary a kategórie > Category2 > SubCat2',
+                        'Tovary a kategórie > Category1 > SubCat1'],
+        'shortDescription': ['Short desc 1', 'Short desc 2', 'Short desc 3'],
+        'description': ['Long desc 1', 'Long desc 2', 'Long desc 3'],
+        'weight': ['1.5', '2.0', '0.5'],
+        'defaultImage': ['img1.jpg', 'img3.jpg', 'img4.jpg'],
+        'image': ['img2.jpg', '', 'img5.jpg'],
+        'image2': ['', '', 'img6.jpg'],
+        'aiProcessed': ['False', 'False', 'False'],
+        'aiProcessedDate': ['', '', ''],
+        'currency': ['EUR', 'EUR', 'EUR'],
+        'includingVat': ['1', '1', '1']
+    }
+    return pd.DataFrame(data)
+
+
+@pytest.fixture
+def sample_category_mappings():
+    """Create sample category mappings."""
+    return [
+        {
+            "oldCategory": "Category1/SubCat1",
+            "newCategory": "Mapped Category 1"
+        },
+        {
+            "oldCategory": "Category2/SubCat2",
+            "newCategory": "Mapped Category 2"
+        }
+    ]
+
+
+@pytest.fixture
+def sample_xml_gastromarket():
+    """Sample GastroMarket XML data."""
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<PRODUKTY>
+    <PRODUKT>
+        <KATALOG_CISLO>GM001</KATALOG_CISLO>
+        <MENO>GastroMarket Product 1</MENO>
+        <POPIS>Short description from GM</POPIS>
+        <CENA>150.00</CENA>
+        <VYROBCA>GM Manufacturer</VYROBCA>
+        <KATEGORIA_KOMPLET>GM Category/Subcategory</KATEGORIA_KOMPLET>
+        <OBRAZOK>http://example.com/gm1.jpg</OBRAZOK>
+    </PRODUKT>
+</PRODUKTY>"""
+
+
+@pytest.fixture
+def sample_xml_forgastro():
+    """Sample ForGastro XML data."""
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<products>
+    <product>
+        <product_sku>FG001</product_sku>
+        <product_name>ForGastro Product 1</product_name>
+        <product_price>250.00</product_price>
+        <manufacturer>FG Manufacturer</manufacturer>
+        <category>FG Category</category>
+        <product_s_desc>Short desc from FG</product_s_desc>
+        <product_desc>Long desc from FG</product_desc>
+        <images>
+            <item>
+                <url>http://example.com/fg1.jpg</url>
+            </item>
+        </images>
+        <product_weight>3.5</product_weight>
+    </product>
+</products>"""

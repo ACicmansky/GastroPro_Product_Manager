@@ -51,19 +51,19 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## In Progress
-- 🔄 Error handling improvements
-- 🔄 Performance optimizations for larger datasets
-- 🔄 Testing and validation of variant detection across different product categories
-- 🔄 Monitoring and fine-tuning of AI enhancement quality
+- 🔄 **Migration to New 147-Column Format (TDD Approach)**
+  - Setting up test infrastructure
+  - Writing tests for current implementation
+  - Creating OutputTransformer module
+  - Updating all components to use new format
+  - Implementing XLSX support
+  - Removing variant matcher (not used)
 
 ## Pending
 - ⏳ Data preview functionality
 - ⏳ Enhanced variant difference visualization
 - ⏳ User interface for managing variant extraction rules
 - ⏳ Performance optimizations for large variant groups
-- ⏳ Automated testing for variant detection accuracy
-- ⏳ Integration of output transformer into main data pipeline
-- ⏳ UI option to toggle between old/new output format
 
 ## Known Issues
 - Some minor memory optimization needed for very large datasets

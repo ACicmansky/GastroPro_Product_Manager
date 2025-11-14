@@ -1,0 +1,4 @@
+Kat. číslo;Názov tovaru;Bežná cena;Výrobca;Hlavna kategória;Krátky popis;Dlhý popis;Váha;Obrázky;Viditeľný;Spracovane AI;AI_Processed_Date
+TEST001;Test Product 1;100.50;Test Manufacturer A;Vitríny/Chladiace vitríny;Short description 1;Long description 1;1.5;http://img1.jpg,http://img2.jpg;1;False;
+TEST002;Test Product 2;200.00;Test Manufacturer B;Nerezový nábytok/Pracovné stoly;Short description 2;Long description 2;2.0;http://img3.jpg;1;False;
+TEST003;Test Product 3;300.75;Test Manufacturer A;Vitríny/Chladiace vitríny;Short description 3;Long description 3;0.5;http://img4.jpg,http://img5.jpg,http://img6.jpg;1;True;2025-11-14 10:00:00

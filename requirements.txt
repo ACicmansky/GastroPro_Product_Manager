@@ -10,3 +10,4 @@ python-dotenv
 llm_output_parser
 rapidfuzz>=3.0.0
 openpyxl
+pytest
