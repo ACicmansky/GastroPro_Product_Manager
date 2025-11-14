@@ -3,29 +3,31 @@
     "gastromarket": {
       "url": "https://www.gastromarket.sk/web/content/259710/B2B_product_feed_GastroMarket.xml",
       "root_element": "PRODUKT",
+      "item_element": "PRODUKT",
       "mapping": {
-        "KATALOG_CISLO": "Kat. číslo",
-        "MENO": "Názov tovaru",
-        "POPIS": "Krátky popis",
-        "CENA": "Bežná cena",
-        "VYROBCA": "Výrobca",
-        "KATEGORIA_KOMPLET": "Hlavna kategória",
-        "OBRAZOK": "Obrázky"
+        "KATALOG_CISLO": "code",
+        "MENO": "name",
+        "POPIS": "shortDescription",
+        "CENA": "price",
+        "VYROBCA": "manufacturer",
+        "KATEGORIA_KOMPLET": "defaultCategory",
+        "OBRAZOK": "IMAGE"
       }
     },
     "forgastro": {
       "url": "https://www.forgastro.sk/xml",
       "root_element": "product",
+      "item_element": "product",
       "mapping": {
-        "product_sku": "Kat. číslo",
-        "product_name": "Názov tovaru",
-        "product_price": "Bežná cena",
-        "manufacturer": "Výrobca",
-        "category": "Hlavna kategória",
-        "product_s_desc": "Krátky popis",
-        "product_desc": "Dlhý popis",
-        "images/item/url": "Obrázky",
-        "product_weight": "Váha"
+        "product_sku": "code",
+        "product_name": "name",
+        "product_price": "price",
+        "manufacturer": "manufacturer",
+        "category": "defaultCategory",
+        "product_s_desc": "shortDescription",
+        "product_desc": "description",
+        "images/item/url": "IMAGES",
+        "product_weight": "weight"
       }
     }
   },
