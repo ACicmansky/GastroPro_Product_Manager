@@ -50,6 +50,11 @@
    - Data source configurations
    - Output settings
    - Variant extraction rules (variant_extractions.json)
+   - **Output mapping configuration** (output_mapping section):
+     - Direct column mappings (internal → new format)
+     - Special transformations (category, uppercase, image splitting)
+     - Default values (applied only when empty)
+     - Drop columns list
 
 2. **Local CSV Structure**:
    - Product ID
@@ -61,18 +66,27 @@
    - "AI_Processed_Date" - Timestamp of last AI processing
    - Other product attributes
 
-3. **XML Feed Structure** (Typical):
+3. **New Output Format (147 columns)**:
+   - E-shop compatible format
+   - Includes all product data, variants, pricing, flags, marketplace settings
+   - AI tracking columns: `aiProcessed`, `aiProcessedDate`
+   - Multiple image columns: `defaultImage`, `image`, `image2-7`
+   - Category fields with prefix: "Tovary a kategórie > ..."
+   - Uppercase catalog codes
+   - Raw data (no formatting) - e-shop handles display
+
+4. **XML Feed Structure** (Typical):
    - Product entries
    - Product identifiers
    - Product details (name, price, description, etc.)
    - Category information
 
-4. **Internal Data Representation**:
+5. **Internal Data Representation**:
    - Pandas DataFrames for both local and processed data
    - Dictionary mappings for configuration
    - Standardized column names across data sources
 
-5. **Scraped Data Structure**:
+6. **Scraped Data Structure**:
    - Catalog number ("Kat. číslo") as primary key
    - Product name
    - Price information

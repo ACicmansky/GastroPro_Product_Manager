@@ -42,6 +42,13 @@
 - ✅ Automatic retry with exponential backoff
 - ✅ Incremental progress saving with encoding fallback (cp1250/UTF-8)
 - ✅ Processing status tracking (Spracovane AI, AI_Processed_Date)
+- ✅ **New E-shop Output Format (147 columns)**: Complete configuration and transformation script
+- ✅ Output mapping configuration with direct mappings, special transformations, and default values
+- ✅ Image URL splitting (comma-separated → 8 separate columns)
+- ✅ Category transformation (add prefix, change separator)
+- ✅ Catalog code uppercase transformation
+- ✅ Standalone transformation script (`scripts/transform_to_new_format.py`)
+- ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## In Progress
 - 🔄 Error handling improvements
@@ -55,6 +62,8 @@
 - ⏳ User interface for managing variant extraction rules
 - ⏳ Performance optimizations for large variant groups
 - ⏳ Automated testing for variant detection accuracy
+- ⏳ Integration of output transformer into main data pipeline
+- ⏳ UI option to toggle between old/new output format
 
 ## Known Issues
 - Some minor memory optimization needed for very large datasets
