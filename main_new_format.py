@@ -12,10 +12,10 @@ def main():
     """Run the application."""
     app = QApplication(sys.argv)
     app.setApplicationName("GASTROPRO Product Manager - New Format")
-    
+
     window = MainWindowNewFormat()
     window.show()
-    
+
     sys.exit(app.exec_())
 
 

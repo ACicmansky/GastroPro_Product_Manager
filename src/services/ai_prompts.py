@@ -1,5 +1,3 @@
-
-
 def create_system_prompt() -> str:
     """Create system prompt for AI enhancement."""
     return """Si špecializovaný AI expert copywriter, SEO konzultant a technický poradca pre e-shopy s profesionálnym gastro vybavením, náradím a zariadeniami.

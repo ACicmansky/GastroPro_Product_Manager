@@ -18,7 +18,7 @@ def test_data_dir():
 def config():
     """Load configuration from config.json."""
     config_path = Path(__file__).parent.parent / "config.json"
-    with open(config_path, 'r', encoding='utf-8') as f:
+    with open(config_path, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -26,18 +26,22 @@ def config():
 def sample_old_format_df():
     """Create sample DataFrame in old format."""
     data = {
-        'Kat. číslo': ['TEST001', 'TEST002', 'TEST003'],
-        'Názov tovaru': ['Product 1', 'Product 2', 'Product 3'],
-        'Bežná cena': ['100.00', '200.00', '300.00'],
-        'Výrobca': ['Manufacturer A', 'Manufacturer B', 'Manufacturer A'],
-        'Hlavna kategória': ['Category1/SubCat1', 'Category2/SubCat2', 'Category1/SubCat1'],
-        'Krátky popis': ['Short desc 1', 'Short desc 2', 'Short desc 3'],
-        'Dlhý popis': ['Long desc 1', 'Long desc 2', 'Long desc 3'],
-        'Váha': ['1.5', '2.0', '0.5'],
-        'Obrázky': ['img1.jpg,img2.jpg', 'img3.jpg', 'img4.jpg,img5.jpg,img6.jpg'],
-        'Viditeľný': ['1', '1', '1'],
-        'Spracovane AI': ['False', 'False', 'False'],
-        'AI_Processed_Date': ['', '', '']
+        "Kat. číslo": ["TEST001", "TEST002", "TEST003"],
+        "Názov tovaru": ["Product 1", "Product 2", "Product 3"],
+        "Bežná cena": ["100.00", "200.00", "300.00"],
+        "Výrobca": ["Manufacturer A", "Manufacturer B", "Manufacturer A"],
+        "Hlavna kategória": [
+            "Category1/SubCat1",
+            "Category2/SubCat2",
+            "Category1/SubCat1",
+        ],
+        "Krátky popis": ["Short desc 1", "Short desc 2", "Short desc 3"],
+        "Dlhý popis": ["Long desc 1", "Long desc 2", "Long desc 3"],
+        "Váha": ["1.5", "2.0", "0.5"],
+        "Obrázky": ["img1.jpg,img2.jpg", "img3.jpg", "img4.jpg,img5.jpg,img6.jpg"],
+        "Viditeľný": ["1", "1", "1"],
+        "Spracovane AI": ["False", "False", "False"],
+        "AI_Processed_Date": ["", "", ""],
     }
     return pd.DataFrame(data)
 
@@ -46,26 +50,30 @@ def sample_old_format_df():
 def sample_new_format_df():
     """Create sample DataFrame in new format."""
     data = {
-        'code': ['TEST001', 'TEST002', 'TEST003'],
-        'name': ['Product 1', 'Product 2', 'Product 3'],
-        'price': ['100.00', '200.00', '300.00'],
-        'manufacturer': ['Manufacturer A', 'Manufacturer B', 'Manufacturer A'],
-        'defaultCategory': ['Tovary a kategórie > Category1 > SubCat1', 
-                           'Tovary a kategórie > Category2 > SubCat2',
-                           'Tovary a kategórie > Category1 > SubCat1'],
-        'categoryText': ['Tovary a kategórie > Category1 > SubCat1',
-                        'Tovary a kategórie > Category2 > SubCat2',
-                        'Tovary a kategórie > Category1 > SubCat1'],
-        'shortDescription': ['Short desc 1', 'Short desc 2', 'Short desc 3'],
-        'description': ['Long desc 1', 'Long desc 2', 'Long desc 3'],
-        'weight': ['1.5', '2.0', '0.5'],
-        'defaultImage': ['img1.jpg', 'img3.jpg', 'img4.jpg'],
-        'image': ['img2.jpg', '', 'img5.jpg'],
-        'image2': ['', '', 'img6.jpg'],
-        'aiProcessed': ['False', 'False', 'False'],
-        'aiProcessedDate': ['', '', ''],
-        'currency': ['EUR', 'EUR', 'EUR'],
-        'includingVat': ['1', '1', '1']
+        "code": ["TEST001", "TEST002", "TEST003"],
+        "name": ["Product 1", "Product 2", "Product 3"],
+        "price": ["100.00", "200.00", "300.00"],
+        "manufacturer": ["Manufacturer A", "Manufacturer B", "Manufacturer A"],
+        "defaultCategory": [
+            "Tovary a kategórie > Category1 > SubCat1",
+            "Tovary a kategórie > Category2 > SubCat2",
+            "Tovary a kategórie > Category1 > SubCat1",
+        ],
+        "categoryText": [
+            "Tovary a kategórie > Category1 > SubCat1",
+            "Tovary a kategórie > Category2 > SubCat2",
+            "Tovary a kategórie > Category1 > SubCat1",
+        ],
+        "shortDescription": ["Short desc 1", "Short desc 2", "Short desc 3"],
+        "description": ["Long desc 1", "Long desc 2", "Long desc 3"],
+        "weight": ["1.5", "2.0", "0.5"],
+        "defaultImage": ["img1.jpg", "img3.jpg", "img4.jpg"],
+        "image": ["img2.jpg", "", "img5.jpg"],
+        "image2": ["", "", "img6.jpg"],
+        "aiProcessed": ["False", "False", "False"],
+        "aiProcessedDate": ["", "", ""],
+        "currency": ["EUR", "EUR", "EUR"],
+        "includingVat": ["1", "1", "1"],
     }
     return pd.DataFrame(data)
 
@@ -74,14 +82,8 @@ def sample_new_format_df():
 def sample_category_mappings():
     """Create sample category mappings."""
     return [
-        {
-            "oldCategory": "Category1/SubCat1",
-            "newCategory": "Mapped Category 1"
-        },
-        {
-            "oldCategory": "Category2/SubCat2",
-            "newCategory": "Mapped Category 2"
-        }
+        {"oldCategory": "Category1/SubCat1", "newCategory": "Mapped Category 1"},
+        {"oldCategory": "Category2/SubCat2", "newCategory": "Mapped Category 2"},
     ]
 
 

@@ -2,9 +2,20 @@
 import sys
 import pandas as pd
 from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QPushButton, 
-    QFileDialog, QMessageBox, QListWidget, QListWidgetItem, QDesktopWidget, 
-    QLineEdit, QProgressBar, QCheckBox, QGroupBox
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QPushButton,
+    QFileDialog,
+    QMessageBox,
+    QListWidget,
+    QListWidgetItem,
+    QDesktopWidget,
+    QLineEdit,
+    QProgressBar,
+    QCheckBox,
+    QGroupBox,
 )
 from PyQt5.QtCore import Qt, QThread, QStandardPaths
 
@@ -14,6 +25,7 @@ from ..utils.config_loader import load_config
 from ..utils.category_mapper import get_category_suggestions
 from ..utils.data_loader import load_csv_data
 from ..core.models import PipelineResult
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -26,16 +38,20 @@ class MainWindow(QMainWindow):
         self.last_statistics = None
 
         if not self.config:
-            QMessageBox.critical(self, "Chyba konfigurácie", "Nepodarilo sa načítať konfiguračný súbor. Aplikácia sa ukončí.")
+            QMessageBox.critical(
+                self,
+                "Chyba konfigurácie",
+                "Nepodarilo sa načítať konfiguračný súbor. Aplikácia sa ukončí.",
+            )
             sys.exit(1)
-        
+
         self.init_ui()
         self.center_window()
         self.load_stylesheet()
 
     def load_stylesheet(self):
         try:
-            with open('styles/main.qss', 'r') as f:
+            with open("styles/main.qss", "r") as f:
                 self.setStyleSheet(f.read())
         except FileNotFoundError:
             print("Stylesheet not found.")
@@ -65,17 +81,17 @@ class MainWindow(QMainWindow):
     def _create_category_filter(self):
         self.filter_group = QGroupBox("Vyberte kategórie na export:")
         filter_layout = QVBoxLayout(self.filter_group)
-        
+
         self.search_bar = QLineEdit()
         self.search_bar.setPlaceholderText("Hľadať kategórie...")
         self.search_bar.textChanged.connect(self.filter_categories)
-        
+
         buttons_layout = QHBoxLayout()
         self.toggle_filtered_button = QPushButton("Prepnúť filtrované")
         self.toggle_filtered_button.clicked.connect(self.toggle_filtered_categories)
         buttons_layout.addWidget(self.toggle_filtered_button)
         buttons_layout.addStretch(1)
-        
+
         self.category_list = QListWidget()
         filter_layout.addWidget(self.search_bar)
         filter_layout.addLayout(buttons_layout)
@@ -91,7 +107,7 @@ class MainWindow(QMainWindow):
     def _create_options_group(self):
         self.options_group = QGroupBox("Možnosti exportu")
         options_layout = QVBoxLayout(self.options_group)
-        
+
         self.map_categories_checkbox = QCheckBox("Migrovať pôvodné CSV kategórie")
         self.variant_checkbox = QCheckBox("Analyzovať produkty na varianty")
         self.ai_enhancement_checkbox = QCheckBox("Použiť AI vylepšenie")
@@ -101,7 +117,9 @@ class MainWindow(QMainWindow):
         self.topchladenie_csv_drop_area = TopchladenieCsvDropArea(self.central_widget)
 
         self.ai_enhancement_checkbox.setChecked(True)
-        self.scrape_topchladenie_checkbox.stateChanged.connect(self.on_scrape_topchladenie_changed)
+        self.scrape_topchladenie_checkbox.stateChanged.connect(
+            self.on_scrape_topchladenie_changed
+        )
 
         row1 = QHBoxLayout()
         row1.addWidget(self.map_categories_checkbox)
@@ -147,25 +165,42 @@ class MainWindow(QMainWindow):
                 item.setCheckState(new_state)
 
     def select_csv_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte CSV súbor", QStandardPaths.writableLocation(QStandardPaths.DownloadLocation), "CSV files (*.csv)")
+        file_path, _ = QFileDialog.getOpenFileName(
+            self,
+            "Vyberte CSV súbor",
+            QStandardPaths.writableLocation(QStandardPaths.DownloadLocation),
+            "CSV files (*.csv)",
+        )
         if file_path:
             self.load_csv_file(file_path)
 
     def load_csv_file(self, file_path):
         try:
             self.main_df = load_csv_data(file_path)
-            if self.main_df is None or self.main_df.empty or 'Hlavna kategória' not in self.main_df.columns:
-                QMessageBox.warning(self, "Chyba súboru", "CSV súbor je prázdny alebo neobsahuje stĺpec 'Hlavna kategória'.")
+            if (
+                self.main_df is None
+                or self.main_df.empty
+                or "Hlavna kategória" not in self.main_df.columns
+            ):
+                QMessageBox.warning(
+                    self,
+                    "Chyba súboru",
+                    "CSV súbor je prázdny alebo neobsahuje stĺpec 'Hlavna kategória'.",
+                )
                 return
 
             self.drop_area.label.setText(f"Nahraný súbor: {file_path.split('/')[-1]}")
-            self.categories = sorted(self.main_df['Hlavna kategória'].dropna().unique().tolist())
+            self.categories = sorted(
+                self.main_df["Hlavna kategória"].dropna().unique().tolist()
+            )
             self.populate_category_list()
             self.filter_group.setVisible(True)
             self.options_group.setVisible(True)
             self.generate_button.setVisible(True)
         except Exception as e:
-            QMessageBox.critical(self, "Chyba načítania", f"Nepodarilo sa načítať CSV súbor.\nChyba: {e}")
+            QMessageBox.critical(
+                self, "Chyba načítania", f"Nepodarilo sa načítať CSV súbor.\nChyba: {e}"
+            )
 
     def populate_category_list(self):
         self.category_list.clear()
@@ -180,42 +215,58 @@ class MainWindow(QMainWindow):
             self.topchladenie_csv_drop_area.clear_file()
 
     def select_topchladenie_csv_file(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Vyberte Topchladenie.sk CSV súbor", "", "CSV Files (*.csv)")
+        file_path, _ = QFileDialog.getOpenFileName(
+            self, "Vyberte Topchladenie.sk CSV súbor", "", "CSV Files (*.csv)"
+        )
         if file_path:
             self.load_topchladenie_csv_file(file_path)
 
     def load_topchladenie_csv_file(self, file_path):
         try:
-            df = pd.read_csv(file_path, sep=';', encoding='utf-8', dtype=str, keep_default_na=False)
+            df = pd.read_csv(
+                file_path, sep=";", encoding="utf-8", dtype=str, keep_default_na=False
+            )
             if df.empty:
-                QMessageBox.warning(self, "Prázdny súbor", "Vybraný CSV súbor je prázdny.")
+                QMessageBox.warning(
+                    self, "Prázdny súbor", "Vybraný CSV súbor je prázdny."
+                )
                 return
             self.topchladenie_csv_drop_area.topchladenie_df = df
-            filename = file_path.split('/')[-1]
-            self.topchladenie_csv_drop_area.label.setText(f"Načítaný súbor: {filename} ({len(df)} produktov)")
+            filename = file_path.split("/")[-1]
+            self.topchladenie_csv_drop_area.label.setText(
+                f"Načítaný súbor: {filename} ({len(df)} produktov)"
+            )
             self.scrape_topchladenie_checkbox.setChecked(False)
         except Exception as e:
-            QMessageBox.critical(self, "Chyba", f"Nepodarilo sa načítať CSV súbor:\n{e}")
+            QMessageBox.critical(
+                self, "Chyba", f"Nepodarilo sa načítať CSV súbor:\n{e}"
+            )
 
     def generate_and_export_csv(self):
         if self.main_df is None:
-            QMessageBox.warning(self, "Chýbajúce dáta", "Najprv nahrajte hlavný CSV súbor.")
+            QMessageBox.warning(
+                self, "Chýbajúce dáta", "Najprv nahrajte hlavný CSV súbor."
+            )
             return
 
-        selected_categories = [self.category_list.item(i).text() for i in range(self.category_list.count()) if self.category_list.item(i).checkState() == Qt.Checked]
+        selected_categories = [
+            self.category_list.item(i).text()
+            for i in range(self.category_list.count())
+            if self.category_list.item(i).checkState() == Qt.Checked
+        ]
 
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0)
         self.generate_button.setEnabled(False)
 
         options = {
-            'map_categories': self.map_categories_checkbox.isChecked(),
-            'variant_checkbox': self.variant_checkbox.isChecked(),
-            'ai_enhancement_checkbox': self.ai_enhancement_checkbox.isChecked(),
-            'enable_gastromarket': self.gastromarket_checkbox.isChecked(),
-            'enable_forgastro': self.forgastro_checkbox.isChecked(),
-            'scrape_topchladenie': self.scrape_topchladenie_checkbox.isChecked(),
-            'topchladenie_csv_df': self.topchladenie_csv_drop_area.topchladenie_df
+            "map_categories": self.map_categories_checkbox.isChecked(),
+            "variant_checkbox": self.variant_checkbox.isChecked(),
+            "ai_enhancement_checkbox": self.ai_enhancement_checkbox.isChecked(),
+            "enable_gastromarket": self.gastromarket_checkbox.isChecked(),
+            "enable_forgastro": self.forgastro_checkbox.isChecked(),
+            "scrape_topchladenie": self.scrape_topchladenie_checkbox.isChecked(),
+            "topchladenie_csv_df": self.topchladenie_csv_drop_area.topchladenie_df,
         }
 
         self.thread = QThread()
@@ -229,52 +280,60 @@ class MainWindow(QMainWindow):
         self.worker.result.connect(self.handle_result)
         self.worker.error.connect(self.show_error_message)
         self.worker.progress.connect(self.update_progress)
-        self.worker.request_category_mapping.connect(self.handle_category_mapping_request)
-        
+        self.worker.request_category_mapping.connect(
+            self.handle_category_mapping_request
+        )
+
         self.thread.start()
         self.thread.finished.connect(lambda: self.generate_button.setEnabled(True))
         self.thread.finished.connect(lambda: self.progress_bar.setVisible(False))
 
     def update_progress(self, message):
         self.progress_bar.setFormat(message)
-    
+
     def handle_category_mapping_request(self, original_category):
         """Handle interactive category mapping request from worker thread."""
         # Collect existing categories for suggestions
         existing_categories = set()
-        
+
         # 1. Get categories from worker's category manager
-        if hasattr(self, 'worker') and hasattr(self.worker, 'pipeline') and hasattr(self.worker.pipeline, 'category_manager'):
+        if (
+            hasattr(self, "worker")
+            and hasattr(self.worker, "pipeline")
+            and hasattr(self.worker.pipeline, "category_manager")
+        ):
             category_manager = self.worker.pipeline.category_manager
             unique_cats = category_manager.get_unique_categories()
             existing_categories.update(unique_cats)
-        
+
         # 2. Get categories from loaded main CSV
-        if self.main_df is not None and 'Hlavna kategória' in self.main_df.columns:
-            csv_categories = self.main_df['Hlavna kategória'].dropna().unique()
+        if self.main_df is not None and "Hlavna kategória" in self.main_df.columns:
+            csv_categories = self.main_df["Hlavna kategória"].dropna().unique()
             existing_categories.update(csv_categories)
-        
+
         # Get suggestions using similarity matching
         suggestions = []
         if existing_categories:
             suggestions = get_category_suggestions(
-                original_category, 
-                list(existing_categories), 
-                top_n=5
+                original_category, list(existing_categories), top_n=5
             )
-        
+
         # Get product name from worker
-        product_name = getattr(self.worker, 'current_product_name', None)
-        
+        product_name = getattr(self.worker, "current_product_name", None)
+
         # Show dialog with suggestions
-        dialog = CategoryMappingDialog(original_category, suggestions, product_name, self)
+        dialog = CategoryMappingDialog(
+            original_category, suggestions, product_name, self
+        )
         if dialog.exec_():
             new_category = dialog.get_new_category()
-            
+
             # Note: Mapping will be automatically saved by CategoryMappingManager in scraper/feed_processor
             if new_category and new_category != original_category:
-                self.progress_bar.setFormat(f"Mapovanie kategórie: {original_category[:40]}... -> {new_category[:40]}...")
-            
+                self.progress_bar.setFormat(
+                    f"Mapovanie kategórie: {original_category[:40]}... -> {new_category[:40]}..."
+                )
+
             self.worker.set_category_mapping_result(new_category)
         else:
             # User cancelled - return original category
@@ -283,16 +342,24 @@ class MainWindow(QMainWindow):
     def show_error_message(self, error_info):
         title, message = error_info
         QMessageBox.critical(self, title, message)
-    
+
     def handle_result(self, result: PipelineResult):
         self.last_statistics = result.statistics
         self.save_final_csv(result.dataframe)
 
     def save_final_csv(self, final_df):
-        save_path, _ = QFileDialog.getSaveFileName(self, "Uložiť výsledný CSV súbor", QStandardPaths.writableLocation(QStandardPaths.DownloadLocation) + "/Merged.csv", "CSV files (*.csv)")
+        save_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Uložiť výsledný CSV súbor",
+            QStandardPaths.writableLocation(QStandardPaths.DownloadLocation)
+            + "/Merged.csv",
+            "CSV files (*.csv)",
+        )
         if save_path:
             try:
-                final_df.to_csv(save_path, index=False, sep=';', encoding='cp1250', errors='replace')
+                final_df.to_csv(
+                    save_path, index=False, sep=";", encoding="cp1250", errors="replace"
+                )
                 stats = self.last_statistics or {}
                 report_lines = [
                     f"Dáta boli úspešne exportované do: {save_path}",
@@ -303,26 +370,32 @@ class MainWindow(QMainWindow):
                     f"- Počet produktov z ForGastro XML: {stats.get('forgastro', 0)}",
                     f"- Počet produktov z Topchladenie.sk: {stats.get('topchladenie', 0)}",
                     f"<b>- Celkový počet produktov: {stats.get('total', 0)}</b>",
-                    "<hr>"
+                    "<hr>",
                 ]
 
-                if 'merge_stats' in stats and stats['merge_stats']:
+                if "merge_stats" in stats and stats["merge_stats"]:
                     report_lines.append("<b>Štatistiky zlučovania:</b>")
-                    for source, counts in stats['merge_stats'].items():
+                    for source, counts in stats["merge_stats"].items():
                         report_lines.append(f"- Zdroj: {source.capitalize()}")
-                        report_lines.append(f"  - Pridaných produktov: {counts.get('added', 0)}")
-                        report_lines.append(f"  - Aktualizovaných cien: {counts.get('updated', 0)}")
+                        report_lines.append(
+                            f"  - Pridaných produktov: {counts.get('added', 0)}"
+                        )
+                        report_lines.append(
+                            f"  - Aktualizovaných cien: {counts.get('updated', 0)}"
+                        )
                     report_lines.append("<hr>")
 
-                if 'ai_should_process' in stats:
-                    report_lines.extend([
-                        "<b>AI vylepšenie:</b>",
-                        f"- Produktov na spracovanie: {stats.get('ai_should_process', 0)}",
-                        f"- Úspešne spracovaných: {stats.get('ai_processed', 0)}"
-                    ])
+                if "ai_should_process" in stats:
+                    report_lines.extend(
+                        [
+                            "<b>AI vylepšenie:</b>",
+                            f"- Produktov na spracovanie: {stats.get('ai_should_process', 0)}",
+                            f"- Úspešne spracovaných: {stats.get('ai_processed', 0)}",
+                        ]
+                    )
 
                 report_message = "<br>".join(report_lines)
-                
+
                 msg_box = QMessageBox()
                 msg_box.setIcon(QMessageBox.Information)
                 msg_box.setText(report_message)
@@ -330,4 +403,8 @@ class MainWindow(QMainWindow):
                 msg_box.setTextFormat(Qt.RichText)
                 msg_box.exec_()
             except Exception as e:
-                QMessageBox.critical(self, "Chyba pri ukladaní", f"Nepodarilo sa uložiť súbor.\nChyba: {e}")
+                QMessageBox.critical(
+                    self,
+                    "Chyba pri ukladaní",
+                    f"Nepodarilo sa uložiť súbor.\nChyba: {e}",
+                )
