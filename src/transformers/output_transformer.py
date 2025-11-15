@@ -197,8 +197,9 @@ class OutputTransformer:
             if category and category != "nan":
                 # Replace "/" with " > "
                 category = category.replace("/", " > ")
-                # Add prefix
-                category = "Tovary a kategórie > " + category
+                # Add prefix only if not already present
+                if not category.startswith("Tovary a kategórie > "):
+                    category = "Tovary a kategórie > " + category
             else:
                 category = "Tovary a kategórie > "
 

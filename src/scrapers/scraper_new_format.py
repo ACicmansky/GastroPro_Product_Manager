@@ -342,14 +342,16 @@ class ScraperNewFormat:
             )
             if article_section:
                 for section in article_section.find_all("section"):
-                    # Get all text from section (includes heading)
-                    section_text = section.get_text(strip=True)
-                    
-                    # Clean up whitespace characters
-                    section_text = section_text.replace("\xa0", " ").replace("&nbsp;", " ")
-                    
-                    if section_text:
-                        long_desc_parts.append(section_text)
+                    inner_section = section.findChild("section")
+                    if inner_section:                        
+                        # Get h3 text
+                        h3_text = inner_section.h3.get_text(strip=True)
+                        # Get the rest of the text (excluding h3)
+                        section_text = inner_section.get_text(strip=True).replace(h3_text, '', 1).strip()
+                        # Clean up whitespace characters
+                        section_text = section_text.replace("\xa0", " ").replace("&nbsp;", " ")                        
+                        if section_text:
+                            long_desc_parts.append(section_text)
             
             product_data["description"] = "\n\n".join(long_desc_parts)
             

@@ -58,8 +58,11 @@ class CategoryMapperNewFormat:
         # Handle spaces around slashes
         category = re.sub(r"\s*/\s*", " > ", category)
 
-        # Add prefix
-        result = self.prefix + category
+        # Add prefix only if not already present
+        if not category.startswith(self.prefix):
+            result = self.prefix + category
+        else:
+            result = category
 
         return result
 

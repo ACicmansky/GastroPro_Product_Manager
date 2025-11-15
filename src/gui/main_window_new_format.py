@@ -20,12 +20,18 @@ from PyQt5.QtWidgets import (
     QGroupBox,
     QLabel,
     QTextEdit,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QAbstractItemView,
+    QListView,
 )
 from PyQt5.QtCore import Qt, QThread, QStandardPaths
 
 from .worker_new_format import WorkerNewFormat
 from ..utils.config_loader import load_config
 from src.loaders.data_loader_factory import DataLoaderFactory
+from src.filters.category_filter import CategoryFilter
 
 
 class MainWindowNewFormat(QMainWindow):
@@ -39,6 +45,9 @@ class MainWindowNewFormat(QMainWindow):
         self.config = load_config()
         self.last_statistics = None
         self.result_df = None
+        self.category_filter = CategoryFilter()
+        self.all_categories = []
+        self.main_data_df = None
 
         if not self.config:
             QMessageBox.critical(
@@ -83,6 +92,9 @@ class MainWindowNewFormat(QMainWindow):
         # Main data section
         self._create_main_data_section()
 
+        # Category filter section (hidden by default)
+        self._create_category_filter_section()
+
         # XML feeds section
         self._create_xml_feeds_section()
 
@@ -121,6 +133,50 @@ class MainWindowNewFormat(QMainWindow):
         layout.addLayout(button_layout)
 
         self.layout.addWidget(group)
+
+    def _create_category_filter_section(self):
+        """Create category filtering section."""
+        self.category_filter_group = QGroupBox("Filter kategórií")
+        layout = QVBoxLayout(self.category_filter_group)
+
+        # Search bar
+        search_layout = QHBoxLayout()
+        search_label = QLabel("Hľadať:")
+        self.category_search = QLineEdit()
+        self.category_search.setPlaceholderText("Zadajte text pre filtrovanie kategórií...")
+        self.category_search.textChanged.connect(self._filter_category_list)
+        search_layout.addWidget(search_label)
+        search_layout.addWidget(self.category_search)
+        layout.addLayout(search_layout)
+
+        # Toggle button
+        toggle_layout = QHBoxLayout()
+        self.toggle_categories_button = QPushButton("Prepnúť filtrované")
+        self.toggle_categories_button.clicked.connect(self._toggle_filtered_categories)
+        self.select_all_button = QPushButton("Vybrať všetky")
+        self.select_all_button.clicked.connect(self._select_all_categories)
+        self.deselect_all_button = QPushButton("Zrušiť výber")
+        self.deselect_all_button.clicked.connect(self._deselect_all_categories)
+        toggle_layout.addWidget(self.toggle_categories_button)
+        toggle_layout.addWidget(self.select_all_button)
+        toggle_layout.addWidget(self.deselect_all_button)
+        layout.addLayout(toggle_layout)
+
+        # Category list with checkboxes
+        self.category_list = QListWidget()
+        self.category_list.setSelectionMode(QAbstractItemView.NoSelection)
+        self.category_list.setResizeMode(QListView.Adjust)
+        layout.addWidget(self.category_list)
+
+        # Info label
+        self.category_info_label = QLabel("")
+        self.category_info_label.setStyleSheet("color: gray; font-size: 10pt;")
+        layout.addWidget(self.category_info_label)
+
+        self.layout.addWidget(self.category_filter_group)
+        
+        # Hide by default (show when main data loaded)
+        self.category_filter_group.setVisible(False)
 
     def _create_xml_feeds_section(self):
         """Create XML feeds selection section."""
@@ -220,6 +276,7 @@ class MainWindowNewFormat(QMainWindow):
                 return
 
             self.main_data_file = file_path
+            self.main_data_df = df
             filename = Path(file_path).name
             self.main_data_label.setText(
                 f"<b>{filename}</b><br>"
@@ -227,6 +284,9 @@ class MainWindowNewFormat(QMainWindow):
             )
             self.main_data_label.setStyleSheet("color: green;")
             self.clear_main_button.setEnabled(True)
+
+            # Extract and display categories
+            self._extract_and_display_categories(df)
 
         except Exception as e:
             QMessageBox.critical(
@@ -236,9 +296,15 @@ class MainWindowNewFormat(QMainWindow):
     def clear_main_data(self):
         """Clear main data file selection."""
         self.main_data_file = None
+        self.main_data_df = None
         self.main_data_label.setText("Žiadny súbor nie je načítaný")
         self.main_data_label.setStyleSheet("color: gray;")
         self.clear_main_button.setEnabled(False)
+        
+        # Hide category filter section
+        self.category_filter_group.setVisible(False)
+        self.all_categories = []
+        self.category_list.clear()
 
     def process_and_export(self):
         """Process data and export results."""
@@ -260,6 +326,7 @@ class MainWindowNewFormat(QMainWindow):
             "enable_web_scraping": self.web_scraping_checkbox.isChecked(),
             "enable_ai_enhancement": self.ai_enhancement_checkbox.isChecked(),
             "main_data_file": self.main_data_file,
+            "selected_categories": self.get_selected_categories() if self.main_data_file else None,
         }
 
         # Show progress
@@ -363,6 +430,123 @@ class MainWindowNewFormat(QMainWindow):
                     "Chyba pri ukladaní",
                     f"Nepodarilo sa uložiť súbor.\nChyba: {e}",
                 )
+
+    def _extract_and_display_categories(self, df: pd.DataFrame):
+        """Extract categories from DataFrame and display in list."""
+        # Extract categories
+        self.all_categories = self.category_filter.extract_categories(df)
+        
+        if not self.all_categories:
+            # No categories found
+            self.category_filter_group.setVisible(False)
+            return
+        
+        # Populate category list
+        self._populate_category_list(self.all_categories)
+        
+        # Show category filter section
+        self.category_filter_group.setVisible(True)
+        
+        # Update info label
+        self._update_category_info()
+
+    def _populate_category_list(self, categories: list):
+        """Populate category list with checkboxes."""
+        self.category_list.clear()
+        
+        for category in categories:
+            item = QListWidgetItem(category)
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            item.setCheckState(Qt.Checked)  # Check all by default
+            self.category_list.addItem(item)
+
+    def _filter_category_list(self):
+        """Filter category list based on search text."""
+        search_text = self.category_search.text()
+        
+        if not search_text:
+            # Show all categories
+            filtered_categories = self.all_categories
+        else:
+            # Filter categories
+            filtered_categories = self.category_filter.search_categories(
+                self.all_categories, search_text
+            )
+        
+        # Repopulate list with filtered categories
+        self._populate_category_list(filtered_categories)
+        
+        # Update info
+        self._update_category_info()
+
+    def _toggle_filtered_categories(self):
+        """Toggle check state of all visible categories."""
+        # Check if any visible items are checked
+        any_checked = False
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            if item.checkState() == Qt.Checked:
+                any_checked = True
+                break
+        
+        # Toggle: if any checked, uncheck all; otherwise check all
+        new_state = Qt.Unchecked if any_checked else Qt.Checked
+        
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            item.setCheckState(new_state)
+        
+        self._update_category_info()
+
+    def _select_all_categories(self):
+        """Select all visible categories."""
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            item.setCheckState(Qt.Checked)
+        
+        self._update_category_info()
+
+    def _deselect_all_categories(self):
+        """Deselect all visible categories."""
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            item.setCheckState(Qt.Unchecked)
+        
+        self._update_category_info()
+
+    def _update_category_info(self):
+        """Update category info label."""
+        selected_count = self._get_selected_categories_count()
+        total_count = len(self.all_categories)
+        visible_count = self.category_list.count()
+        
+        if visible_count < total_count:
+            self.category_info_label.setText(
+                f"Zobrazené: {visible_count} z {total_count} kategórií | "
+                f"Vybrané: {selected_count}"
+            )
+        else:
+            self.category_info_label.setText(
+                f"Celkom: {total_count} kategórií | Vybrané: {selected_count}"
+            )
+
+    def _get_selected_categories_count(self) -> int:
+        """Get count of selected categories."""
+        count = 0
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            if item.checkState() == Qt.Checked:
+                count += 1
+        return count
+
+    def get_selected_categories(self) -> list:
+        """Get list of selected category names."""
+        selected = []
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            if item.checkState() == Qt.Checked:
+                selected.append(item.text())
+        return selected
 
     def show_error_message(self, error_info):
         """Show error message."""
