@@ -16,7 +16,7 @@
     },
     "forgastro": {
       "url": "https://www.forgastro.sk/xml",
-      "root_element": "product",
+      "root_element": "products",
       "item_element": "product",
       "mapping": {
         "product_sku": "code",

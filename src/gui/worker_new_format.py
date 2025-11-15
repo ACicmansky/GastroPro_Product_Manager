@@ -9,6 +9,7 @@ from typing import Dict, Optional
 
 from src.pipeline.pipeline_new_format import PipelineNewFormat
 from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
+from src.scrapers.scraper_new_format import EnhancedScraperNewFormat
 
 
 class WorkerNewFormat(QObject):
@@ -40,14 +41,21 @@ class WorkerNewFormat(QObject):
 
             # Prepare XML feeds
             xml_feeds = self._prepare_xml_feeds()
+            
+            # Prepare scraped data if requested
+            scraped_data = None
+            if self.options.get("enable_web_scraping", False):
+                scraped_data = self._scrape_products()
 
             # Get main data file if provided
             main_data_file = self.options.get("main_data_file")
 
             # Run pipeline
-            self.progress.emit("Spracovanie XML feedov...")
+            self.progress.emit("Spracovanie feedov...")
             result_df, stats = self.pipeline.run_with_stats(
-                xml_feeds=xml_feeds, main_data_file=main_data_file
+                xml_feeds=xml_feeds, 
+                main_data_file=main_data_file,
+                scraped_data=scraped_data
             )
 
             # Apply AI enhancement if requested
@@ -119,6 +127,33 @@ class WorkerNewFormat(QObject):
             self.progress.emit(f"Chyba sťahovania XML: {e}")
             return None
 
+    def _scrape_products(self) -> Optional[pd.DataFrame]:
+        """
+        Scrape products from TopChladenie.sk.
+        
+        Returns:
+            DataFrame with scraped products or None
+        """
+        try:
+            self.progress.emit("Web scraping: inicializácia...")
+            
+            # Create scraper with progress callback
+            scraper = EnhancedScraperNewFormat(
+                config=self.config,
+                progress_callback=lambda msg: self.progress.emit(f"Web scraping: {msg}"),
+                max_threads=8
+            )
+            
+            self.progress.emit("Web scraping: spúšťam...")
+            scraped_df = scraper.scrape_products()
+            
+            self.progress.emit(f"Web scraping: dokončené ({len(scraped_df)} produktov)")
+            return scraped_df
+            
+        except Exception as e:
+            self.progress.emit(f"Web scraping: chyba - {str(e)}")
+            return None
+    
     def _apply_ai_enhancement(self, df: pd.DataFrame, stats: Dict) -> pd.DataFrame:
         """
         Apply AI enhancement to products.

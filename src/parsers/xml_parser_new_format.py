@@ -34,7 +34,6 @@ class XMLParserNewFormat:
         print("\nParsing Gastromarket XML feed...")
 
         feed_config = self.xml_feeds.get("gastromarket", {})
-        root_element = feed_config.get("root_element", "PRODUKTY")
         item_element = feed_config.get("item_element", "PRODUKT")
         mapping = feed_config.get("mapping", {})
 
@@ -84,7 +83,6 @@ class XMLParserNewFormat:
         print("\nParsing ForGastro XML feed...")
 
         feed_config = self.xml_feeds.get("forgastro", {})
-        root_element = feed_config.get("root_element", "products")
         item_element = feed_config.get("item_element", "product")
         mapping = feed_config.get("mapping", {})
 

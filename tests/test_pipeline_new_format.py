@@ -120,8 +120,8 @@ class TestPipelineSteps:
 
         result = pipeline.apply_transformation(df)
 
-        # Code should be uppercase
-        assert result.loc[0, "code"] == "PROD001"
+        # Code should be preserved as-is (no automatic uppercasing)
+        assert result.loc[0, "code"] == "prod001"
         # Should have all 138 columns
         assert len(result.columns) >= 100
 

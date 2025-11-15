@@ -154,14 +154,11 @@ class MainWindowNewFormat(QMainWindow):
         self.ai_enhancement_checkbox = QCheckBox("Použiť AI vylepšenie")
         self.ai_enhancement_checkbox.setChecked(False)
 
-        layout.addWidget(self.ai_enhancement_checkbox)
+        self.web_scraping_checkbox = QCheckBox("Web scraping (TopChladenie.sk)")
+        self.web_scraping_checkbox.setChecked(False)
 
-        info_label = QLabel(
-            "<small><i>Poznámka: Kategórie sa automaticky transformujú do nového formátu. "
-            "Kódy produktov sa automaticky prevedú na veľké písmená.</i></small>"
-        )
-        info_label.setWordWrap(True)
-        layout.addWidget(info_label)
+        layout.addWidget(self.ai_enhancement_checkbox)
+        layout.addWidget(self.web_scraping_checkbox)
 
         self.layout.addWidget(group)
 
@@ -245,13 +242,14 @@ class MainWindowNewFormat(QMainWindow):
 
     def process_and_export(self):
         """Process data and export results."""
-        # Validate: at least one XML feed must be selected
+        # Validate: at least one data source must be selected
         if (
             not self.gastromarket_checkbox.isChecked()
             and not self.forgastro_checkbox.isChecked()
+            and not self.web_scraping_checkbox.isChecked()
         ):
             QMessageBox.warning(
-                self, "Chýbajúce dáta", "Vyberte aspoň jeden XML feed na spracovanie."
+                self, "Chýbajúce dáta", "Vyberte aspoň jeden zdroj dát na spracovanie (XML feed alebo web scraping)."
             )
             return
 
@@ -259,6 +257,7 @@ class MainWindowNewFormat(QMainWindow):
         options = {
             "enable_gastromarket": self.gastromarket_checkbox.isChecked(),
             "enable_forgastro": self.forgastro_checkbox.isChecked(),
+            "enable_web_scraping": self.web_scraping_checkbox.isChecked(),
             "enable_ai_enhancement": self.ai_enhancement_checkbox.isChecked(),
             "main_data_file": self.main_data_file,
         }

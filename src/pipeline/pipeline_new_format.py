@@ -187,6 +187,7 @@ class PipelineNewFormat:
         xml_feeds: Dict[str, str],
         output_file: Optional[str] = None,
         main_data_file: Optional[str] = None,
+        scraped_data: Optional[pd.DataFrame] = None,
         apply_categories: bool = True,
         apply_transformation: bool = True,
     ) -> pd.DataFrame:
@@ -197,6 +198,7 @@ class PipelineNewFormat:
             xml_feeds: Dictionary of feed_name -> xml_content
             output_file: Optional output file path
             main_data_file: Optional main data file to merge with
+            scraped_data: Optional scraped data DataFrame
             apply_categories: Whether to apply category mapping
             apply_transformation: Whether to apply final transformation
 
@@ -221,6 +223,11 @@ class PipelineNewFormat:
             df = self.parse_xml(feed_name, xml_content)
             feed_dfs[feed_name] = df
             print(f"  Parsed {feed_name}: {len(df)} products")
+        
+        # Add scraped data if provided
+        if scraped_data is not None and not scraped_data.empty:
+            feed_dfs["web_scraping"] = scraped_data
+            print(f"  Added scraped data: {len(scraped_data)} products")
 
         # Step 3: Merge data
         print("\nMerging data with image priority...")
@@ -254,6 +261,7 @@ class PipelineNewFormat:
         xml_feeds: Dict[str, str],
         output_file: Optional[str] = None,
         main_data_file: Optional[str] = None,
+        scraped_data: Optional[pd.DataFrame] = None,
     ) -> Tuple[pd.DataFrame, Dict]:
         """
         Run pipeline and return statistics.
@@ -262,12 +270,13 @@ class PipelineNewFormat:
             xml_feeds: Dictionary of feed_name -> xml_content
             output_file: Optional output file path
             main_data_file: Optional main data file
+            scraped_data: Optional scraped data DataFrame
 
         Returns:
             Tuple of (result DataFrame, statistics dict)
         """
         # Run pipeline
-        result_df = self.run(xml_feeds, output_file, main_data_file)
+        result_df = self.run(xml_feeds, output_file, main_data_file, scraped_data)
 
         # Calculate statistics
         stats = {
