@@ -1,5 +1,5 @@
 """
-AI Enhancer for new 147-column format.
+AI Enhancer for new 138-column format.
 Enhances product descriptions using AI while tracking processing status.
 """
 

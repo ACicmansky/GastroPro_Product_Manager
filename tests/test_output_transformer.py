@@ -1,5 +1,5 @@
 """
-Tests for OutputTransformer module (new 147-column format).
+Tests for OutputTransformer module (new 138-column format).
 Following TDD approach: Write tests first, then implement.
 """
 
@@ -288,7 +288,7 @@ class TestFullTransformation:
         # Check result is DataFrame
         assert isinstance(result, pd.DataFrame)
 
-        # Check has 147 columns (or at least 138 if some are missing)
+        # Check has 138 columns (or at least 138 if some are missing)
         assert len(result.columns) >= 138
 
         # Check key columns exist
@@ -310,7 +310,7 @@ class TestFullTransformation:
         assert len(result) == len(sample_old_format_df)
 
     def test_transform_all_columns_present(self, sample_old_format_df, config):
-        """Test that all 147 columns are present after transformation."""
+        """Test that all 138 columns are present after transformation."""
         from src.transformers.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)

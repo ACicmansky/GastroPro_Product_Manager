@@ -1,5 +1,5 @@
 """
-Tests for AI enhancement with new 147-column format.
+Tests for AI enhancement with new 138-column format.
 Following TDD approach: Write tests first, then implement.
 """
 

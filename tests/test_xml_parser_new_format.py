@@ -1,5 +1,5 @@
 """
-Tests for XML parser outputting to new 147-column format.
+Tests for XML parser outputting to new 138-column format.
 Following TDD approach: Write tests first, then implement.
 """
 
@@ -12,7 +12,7 @@ class TestXMLParserNewFormat:
     """Test XML parser with new format output."""
 
     def test_parse_gastromarket_to_new_format(self, sample_xml_gastromarket, config):
-        """Test parsing Gastromarket XML to new 147-column format."""
+        """Test parsing Gastromarket XML to new 138-column format."""
         from src.parsers.xml_parser_new_format import XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
@@ -29,7 +29,7 @@ class TestXMLParserNewFormat:
         assert "xmlFeedName" in result.columns
 
     def test_parse_forgastro_to_new_format(self, sample_xml_forgastro, config):
-        """Test parsing ForGastro XML to new 147-column format."""
+        """Test parsing ForGastro XML to new 138-column format."""
         from src.parsers.xml_parser_new_format import XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)

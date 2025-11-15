@@ -1,5 +1,5 @@
 """
-Data Merger for new 147-column format with image priority.
+Data Merger for new 138-column format with image priority.
 Merges main data with multiple feed sources, prioritizing sources with more images.
 """
 

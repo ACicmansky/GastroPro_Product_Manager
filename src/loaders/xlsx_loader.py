@@ -1,6 +1,6 @@
 """
 XLSX Loader for reading and writing Excel files.
-Primary format for new 147-column e-shop data.
+Primary format for new 138-column e-shop data.
 """
 
 import pandas as pd

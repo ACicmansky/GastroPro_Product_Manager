@@ -71,7 +71,7 @@
    - "AI_Processed_Date" - Timestamp of last AI processing
    - Other product attributes
 
-3. **New Output Format (147 columns)**:
+3. **New Output Format (138 columns)**:
    - E-shop compatible format
    - Includes all product data, variants, pricing, flags, marketplace settings
    - AI tracking columns: `aiProcessed`, `aiProcessedDate`
@@ -139,7 +139,7 @@ The application is organized into a `src` package to ensure clear separation of 
 - **src/services/**: External services (scraper, old ai_enhancer, variant_matcher)
 - **src/utils/**: Helper modules (data_loader, config_loader, category_mapper)
 
-### New Format Structure (147-Column)
+### New Format Structure (138-Column)
 - **main_new_format.py**: New application entry point
 - **src/parsers/**: XML parsing for new format
   - `xml_parser_new_format.py` - Gastromarket & ForGastro parsers

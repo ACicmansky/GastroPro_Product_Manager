@@ -8,7 +8,7 @@ import pandas as pd
 
 
 class TestNewFormatMerging:
-    """Test data merging with new 147-column format."""
+    """Test data merging with new 138-column format."""
 
     def test_merge_main_with_feed_new_format(self, config):
         """Test merging main DataFrame with feed data in new format."""

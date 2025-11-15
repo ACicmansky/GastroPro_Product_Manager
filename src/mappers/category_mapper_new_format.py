@@ -1,5 +1,5 @@
 """
-Category Mapper for new 147-column format.
+Category Mapper for new 138-column format.
 Applies category transformation: adds prefix and changes separator.
 """
 

@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 class TestPipelineNewFormat:
-    """Test complete pipeline with new 147-column format."""
+    """Test complete pipeline with new 138-column format."""
 
     def test_pipeline_initialization(self, config):
         """Test pipeline initializes with config."""
@@ -122,7 +122,7 @@ class TestPipelineSteps:
 
         # Code should be uppercase
         assert result.loc[0, "code"] == "PROD001"
-        # Should have all 147 columns
+        # Should have all 138 columns
         assert len(result.columns) >= 100
 
 
@@ -205,7 +205,7 @@ class TestPipelineOutput:
         assert len(loaded) == 1
 
     def test_output_has_all_columns(self, config):
-        """Test that output has all 147 columns."""
+        """Test that output has all 138 columns."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
         pipeline = PipelineNewFormat(config)

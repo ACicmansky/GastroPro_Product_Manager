@@ -1,7 +1,7 @@
 # Migration Plan: TDD Approach - November 14, 2025
 
 ## Overview
-Created comprehensive migration plan using Test-Driven Development (TDD) approach to migrate entire application from old format to new 147-column e-shop format.
+Created comprehensive migration plan using Test-Driven Development (TDD) approach to migrate entire application from old format to new 138-column e-shop format.
 
 ## Key Decisions Made
 
@@ -11,7 +11,7 @@ Created comprehensive migration plan using Test-Driven Development (TDD) approac
 - **Incremental Migration**: Phase by phase, one component at a time
 
 ### 2. Format Decisions
-- **Input/Output**: New 147-column format for both
+- **Input/Output**: New 138-column format for both
 - **File Format**: XLSX as primary, CSV as fallback
 - **Breaking Changes**: Acceptable - clean migration
 
@@ -24,7 +24,7 @@ Created comprehensive migration plan using Test-Driven Development (TDD) approac
 ### 4. Technical Decisions
 - **Category Transformation**: Add "Tovary a kategórie > " prefix, change "/" to " > "
 - **Column Names**: English names throughout (code, name, price, etc.)
-- **All 147 Columns**: Always present, even if empty
+- **All 138 Columns**: Always present, even if empty
 
 ## Migration Plan Structure
 
@@ -146,7 +146,7 @@ pytest --lf
 ✅ All new tests pass (Phases 2-8)
 ✅ Code coverage > 80%
 ✅ No regressions in functionality
-✅ Load XLSX with 147 columns
+✅ Load XLSX with 138 columns
 ✅ Process feeds → new format
 ✅ Merge with image priority
 ✅ AI enhancement works

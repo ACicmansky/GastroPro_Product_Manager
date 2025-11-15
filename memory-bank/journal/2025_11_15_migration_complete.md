@@ -1,4 +1,4 @@
-# Migration to 147-Column Format - Complete Success
+# Migration to 138-Column Format - Complete Success
 
 **Date**: November 15, 2025  
 **Status**: ✅ COMPLETE - All 8 Phases Done  
@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-Successfully completed full migration to new 147-column e-shop format using Test-Driven Development (TDD) approach. All components tested, integrated, and ready for production deployment. New GUI implemented for manual testing.
+Successfully completed full migration to new 138-column e-shop format using Test-Driven Development (TDD) approach. All components tested, integrated, and ready for production deployment. New GUI implemented for manual testing.
 
 ---
 
@@ -21,7 +21,7 @@ Successfully completed full migration to new 147-column e-shop format using Test
 - **Breaking changes acceptable** - fresh start
 
 ### Key Decisions Made
-1. ✅ **Format**: New 147-column format only (no old format support)
+1. ✅ **Format**: New 138-column format only (no old format support)
 2. ✅ **File Type**: XLSX primary, CSV fallback
 3. ✅ **Image Merging**: Use source with most images (priority logic)
 4. ✅ **Default Values**: Apply at end if empty (non-destructive)
@@ -68,7 +68,7 @@ Successfully completed full migration to new 147-column e-shop format using Test
 3. **Category Transformation**: Add prefix, change separator
 4. **Code Uppercase**: Convert all codes to uppercase
 5. **Default Values**: Apply to empty cells only
-6. **Column Validation**: Ensure all 147 columns present
+6. **Column Validation**: Ensure all 138 columns present
 
 **Test Coverage**:
 - Basic initialization
@@ -122,8 +122,8 @@ Successfully completed full migration to new 147-column e-shop format using Test
 - `src/parsers/xml_parser_factory.py` - Parser factory
 
 **Features Implemented**:
-1. **Gastromarket Parsing**: XML → 147-column DataFrame
-2. **ForGastro Parsing**: XML → 147-column DataFrame
+1. **Gastromarket Parsing**: XML → 138-column DataFrame
+2. **ForGastro Parsing**: XML → 138-column DataFrame
 3. **Dynamic Field Mapping**: Config-driven column mapping
 4. **Image Splitting**: Automatic split into 8 columns
 5. **Price Cleaning**: Comma to dot conversion
@@ -305,7 +305,7 @@ Successfully completed full migration to new 147-column e-shop format using Test
 - Codes: Automatic uppercase
 - Images: Split into 8 columns
 - Defaults: Applied to empty cells
-- All 147 columns: Ensured in output
+- All 138 columns: Ensured in output
 
 ---
 
@@ -471,7 +471,7 @@ src/
 5. **journal/2025_11_15_migration_complete.md** - This file
 
 ### Persistent Memories
-1. "TDD Migration to 147-Column Format - Complete Success"
+1. "TDD Migration to 138-Column Format - Complete Success"
 2. "New Format GUI Implementation Complete"
 
 ---
@@ -536,7 +536,7 @@ src/
 - ✅ 158 tests passing (100% pass rate)
 - ✅ 0 test failures
 - ✅ 8 phases completed on schedule
-- ✅ 147 columns in output (100% coverage)
+- ✅ 138 columns in output (100% coverage)
 - ✅ 7 new module categories created
 - ✅ 2 GUI components implemented
 
@@ -552,7 +552,7 @@ src/
 
 ## Conclusion
 
-The migration to the new 147-column format has been completed successfully using a Test-Driven Development approach. All components have been thoroughly tested, integrated, and documented. The new GUI provides a modern, simplified interface for manual testing and production use.
+The migration to the new 138-column format has been completed successfully using a Test-Driven Development approach. All components have been thoroughly tested, integrated, and documented. The new GUI provides a modern, simplified interface for manual testing and production use.
 
 **Key Achievement**: Delivered a production-ready system with 158 passing tests, comprehensive documentation, and a user-friendly GUI, all while maintaining code quality and following best practices.
 

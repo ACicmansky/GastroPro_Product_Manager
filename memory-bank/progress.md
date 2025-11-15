@@ -42,7 +42,7 @@
 - ✅ Automatic retry with exponential backoff
 - ✅ Incremental progress saving with encoding fallback (cp1250/UTF-8)
 - ✅ Processing status tracking (Spracovane AI, AI_Processed_Date)
-- ✅ **New E-shop Output Format (147 columns)**: Complete configuration and transformation script
+- ✅ **New E-shop Output Format (138 columns)**: Complete configuration and transformation script
 - ✅ Output mapping configuration with direct mappings, special transformations, and default values
 - ✅ Image URL splitting (comma-separated → 8 separate columns)
 - ✅ Category transformation (add prefix, change separator)
@@ -51,7 +51,7 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (November 2025)
-- ✅ **Complete Migration to New 147-Column Format (TDD Approach - Phases 0-8)**
+- ✅ **Complete Migration to New 138-Column Format (TDD Approach - Phases 0-8)**
   - Phase 0-1: Test infrastructure and current implementation tests (110 tests)
   - Phase 2: OutputTransformer module with image splitting, category transformation
   - Phase 3: XLSX/CSV data loading with DataLoaderFactory

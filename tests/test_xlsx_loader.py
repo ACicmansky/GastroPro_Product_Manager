@@ -284,7 +284,7 @@ class TestDataLoadingIntegration:
     """Test integration of data loading with new format."""
 
     def test_load_new_format_xlsx(self, test_data_dir, config):
-        """Test loading new 147-column format from XLSX."""
+        """Test loading new 138-column format from XLSX."""
         from src.loaders.data_loader_factory import DataLoaderFactory
 
         xlsx_path = test_data_dir / "new_format.xlsx"

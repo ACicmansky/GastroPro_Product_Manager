@@ -1,5 +1,5 @@
 """
-Complete pipeline for new 147-column format.
+Complete pipeline for new 138-column format.
 Integrates all components: XML parsing, merging, category mapping, transformation.
 """
 
@@ -155,7 +155,7 @@ class PipelineNewFormat:
             df: DataFrame to finalize
 
         Returns:
-            Finalized DataFrame with all 147 columns
+            Finalized DataFrame with all 138 columns
         """
         return self.apply_transformation(df)
 

@@ -1,5 +1,5 @@
 """
-Main Window for new 147-column format GUI.
+Main Window for new 138-column format GUI.
 Simplified interface focused on XML feed processing and AI enhancement.
 """
 
@@ -29,7 +29,7 @@ from src.loaders.data_loader_factory import DataLoaderFactory
 
 
 class MainWindowNewFormat(QMainWindow):
-    """Main window for new 147-column format processing."""
+    """Main window for new 138-column format processing."""
 
     def __init__(self):
         super().__init__()
@@ -75,7 +75,7 @@ class MainWindowNewFormat(QMainWindow):
 
         # Title
         title = QLabel(
-            "<h2>GASTROPRO Product Manager</h2><p>Nový 147-stĺpcový formát</p>"
+            "<h2>GASTROPRO Product Manager</h2><p>Nový 138-stĺpcový formát</p>"
         )
         title.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(title)
@@ -347,7 +347,7 @@ class MainWindowNewFormat(QMainWindow):
                     f"<b>Súbor:</b> {save_path}<br>"
                     f"<b>Produktov:</b> {len(self.result_df)}<br>"
                     f"<b>Stĺpcov:</b> {len(self.result_df.columns)}<br><br>"
-                    f"<b>Formát:</b> Nový 147-stĺpcový formát<br>"
+                    f"<b>Formát:</b> Nový 138-stĺpcový formát<br>"
                     f"<b>Typ súboru:</b> {'XLSX' if save_path.endswith('.xlsx') else 'CSV'}"
                 )
 

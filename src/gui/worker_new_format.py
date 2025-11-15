@@ -1,5 +1,5 @@
 """
-Worker for new 147-column format pipeline.
+Worker for new 138-column format pipeline.
 Handles background processing with progress updates.
 """
 
@@ -12,7 +12,7 @@ from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
 
 
 class WorkerNewFormat(QObject):
-    """Worker for processing data in new 147-column format."""
+    """Worker for processing data in new 138-column format."""
 
     finished = pyqtSignal()
     error = pyqtSignal(tuple)  # (title, message)

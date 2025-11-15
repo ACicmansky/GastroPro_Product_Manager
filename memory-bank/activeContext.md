@@ -50,7 +50,7 @@
 
 ## Active Decisions
 - **Migration Strategy**: TDD approach - write tests first, then implement
-- **Format Support**: New 147-column format only (no backward compatibility)
+- **Format Support**: New 138-column format only (no backward compatibility)
 - **File Format**: XLSX as primary, CSV as fallback
 - **Image Merging**: Use source with most images available
 - **Default Values**: Apply at end of pipeline if cells are empty

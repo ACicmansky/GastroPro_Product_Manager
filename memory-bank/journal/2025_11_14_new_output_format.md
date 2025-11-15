@@ -1,7 +1,7 @@
 # New Output Format Implementation - November 14, 2025
 
 ## Overview
-Implemented comprehensive configuration and transformation script for new 147-column e-shop output format.
+Implemented comprehensive configuration and transformation script for new 138-column e-shop output format.
 
 ## Changes Made
 
@@ -52,7 +52,7 @@ Applied only when column is empty or missing:
 **d) Drop Columns**
 - `SEO kľúčové slová` - not needed in new format
 
-#### New Output Columns (147 total)
+#### New Output Columns (138 total)
 - Added complete list of all required e-shop columns
 - Includes AI tracking: `aiProcessed`, `aiProcessedDate`
 - Multiple image columns: `defaultImage`, `image`, `image2-7`
@@ -62,7 +62,7 @@ Applied only when column is empty or missing:
 
 **File**: `scripts/transform_to_new_format.py`
 
-**Purpose**: Convert old CSV format to new 147-column XLSX format
+**Purpose**: Convert old CSV format to new 138-column XLSX format
 
 **Key Features**:
 1. **Configuration-Driven**: Reads all mappings from `config.json`
@@ -71,7 +71,7 @@ Applied only when column is empty or missing:
 4. **Category Transformation**: Adds prefix and changes separators
 5. **Code Uppercase**: Converts catalog codes to uppercase
 6. **Default Values**: Applies defaults only to empty cells
-7. **Column Completeness**: Ensures all 147 columns present
+7. **Column Completeness**: Ensures all 138 columns present
 8. **Progress Logging**: Detailed console output of transformation steps
 
 **Input**: CSV file (semicolon-separated, cp1250/UTF-8 encoding)
@@ -158,7 +158,7 @@ class OutputTransformer:
 4. Split images into multiple columns
 5. Apply category transformation
 6. Apply code uppercase
-7. Ensure all 147 columns exist
+7. Ensure all 138 columns exist
 8. Apply default values to empty cells
 9. Reorder columns to match `new_output_columns`
 10. Save to XLSX
@@ -175,7 +175,7 @@ def split_images(image_string):
 ## Testing Results
 
 ✅ Script successfully transforms sample data
-✅ All 147 columns present in output
+✅ All 138 columns present in output
 ✅ Image splitting works correctly (3 images → 3 columns)
 ✅ Category transformation applied correctly
 ✅ Catalog codes uppercased

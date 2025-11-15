@@ -1,5 +1,5 @@
 """
-OutputTransformer module for converting internal format to new 147-column e-shop format.
+OutputTransformer module for converting internal format to new 138-column e-shop format.
 
 This module handles:
 - Direct column mappings
@@ -7,7 +7,7 @@ This module handles:
 - Category transformation (prefix + separator replacement)
 - Code uppercase conversion
 - Default value application
-- Ensuring all 147 columns exist
+- Ensuring all 138 columns exist
 """
 
 import pandas as pd
@@ -15,7 +15,7 @@ from typing import Dict, List
 
 
 class OutputTransformer:
-    """Transforms internal data format to new 147-column e-shop output format."""
+    """Transforms internal data format to new 138-column e-shop output format."""
 
     def __init__(self, config: Dict):
         """
@@ -32,13 +32,13 @@ class OutputTransformer:
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Complete transformation from old format to new 147-column format.
+        Complete transformation from old format to new 138-column format.
 
         Args:
             df: Input DataFrame with old format
 
         Returns:
-            DataFrame with new 147-column format
+            DataFrame with new 138-column format
         """
         print("\n" + "=" * 60)
         print("OUTPUT TRANSFORMATION PROCESS")
@@ -256,7 +256,7 @@ class OutputTransformer:
 
     def _ensure_all_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Ensure all 147 columns exist in the output DataFrame.
+        Ensure all 138 columns exist in the output DataFrame.
 
         Args:
             df: DataFrame to check

@@ -1,5 +1,5 @@
 """
-Main entry point for GastroPro Product Manager - New 147-Column Format.
+Main entry point for GastroPro Product Manager - New 138-Column Format.
 This is the GUI application for manual testing of the new format pipeline.
 """
 

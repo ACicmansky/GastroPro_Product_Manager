@@ -7,7 +7,7 @@ This script:
 3. Splits multiple image URLs into separate columns
 4. Applies category transformations and code uppercase
 5. Applies default values where empty
-6. Outputs XLSX file with new 147-column structure
+6. Outputs XLSX file with new 138-column structure
 """
 
 import pandas as pd
@@ -212,7 +212,7 @@ def transform_to_new_format(df, config):
         config: Configuration dictionary from config.json
 
     Returns:
-        DataFrame with new 147-column format
+        DataFrame with new 138-column format
     """
     print("\n" + "=" * 60)
     print("TRANSFORMATION PROCESS")

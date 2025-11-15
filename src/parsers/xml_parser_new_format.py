@@ -1,5 +1,5 @@
 """
-XML Parser for new 147-column format.
+XML Parser for new 138-column format.
 Parses XML feeds directly to new e-shop format.
 """
 
@@ -9,7 +9,7 @@ from typing import Dict
 
 
 class XMLParserNewFormat:
-    """Parser for XML feeds outputting to new 147-column format."""
+    """Parser for XML feeds outputting to new 138-column format."""
 
     def __init__(self, config: Dict):
         """
