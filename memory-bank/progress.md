@@ -50,14 +50,29 @@
 - ✅ Standalone transformation script (`scripts/transform_to_new_format.py`)
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
+## Recently Completed (November 2025)
+- ✅ **Complete Migration to New 147-Column Format (TDD Approach - Phases 0-8)**
+  - Phase 0-1: Test infrastructure and current implementation tests (110 tests)
+  - Phase 2: OutputTransformer module with image splitting, category transformation
+  - Phase 3: XLSX/CSV data loading with DataLoaderFactory
+  - Phase 4: XML parser for new format (Gastromarket, ForGastro)
+  - Phase 5: Data merging with image priority logic
+  - Phase 6: AI enhancement for new format with tracking
+  - Phase 7: Category mapper with automatic transformation
+  - Phase 8: Complete pipeline integration
+  - **Total: 158 tests passing, 0 failures**
+- ✅ **New GUI for Manual Testing**
+  - Modern simplified interface (`main_new_format.py`)
+  - Background processing with progress updates
+  - XLSX primary, CSV fallback support
+  - XML feed auto-download and processing
+  - AI enhancement integration
+  - Statistics display
+  - Ready for production deployment
+
 ## In Progress
-- 🔄 **Migration to New 147-Column Format (TDD Approach)**
-  - Setting up test infrastructure
-  - Writing tests for current implementation
-  - Creating OutputTransformer module
-  - Updating all components to use new format
-  - Implementing XLSX support
-  - Removing variant matcher (not used)
+- 🔄 Manual testing of new GUI with real data
+- 🔄 Production deployment preparation
 
 ## Pending
 - ⏳ Data preview functionality

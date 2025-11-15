@@ -1,9 +1,10 @@
 # GastroPro Product Manager - Technical Context
 
 ## Technology Stack
-- **Python 3.x**: Core programming language
+- **Python 3.13**: Core programming language
 - **PyQt5**: GUI framework for desktop application
 - **Pandas**: Data manipulation library for CSV and data processing
+- **openpyxl**: Excel file (XLSX) reading and writing
 - **Requests**: HTTP client for XML feed fetching and web scraping
 - **BeautifulSoup4**: HTML parsing for web scraping
 - **ElementTree**: XML parsing library (built into Python standard library)
@@ -13,6 +14,7 @@
 - **google-generativeai**: For AI-powered product description enhancement
 - **python-dotenv**: For managing environment variables (API keys)
 - **threading**: For thread-safe quota management
+- **pytest**: Testing framework (158 tests)
 
 ## Development Setup
 - **Environment**: Windows operating system
@@ -34,15 +36,18 @@
   - Automatic retry with exponential backoff
 
 ## Dependencies
-- Python 3.x
+- Python 3.13
 - PyQt5
 - pandas
+- openpyxl (XLSX support)
 - requests
 - beautifulsoup4
 - tqdm (for progress reporting)
 - regex (for advanced pattern matching)
 - google-generativeai>=0.5.0
 - python-dotenv>=1.0.0
+- pytest (testing framework)
+- rapidfuzz (category matching)
 
 ## Data Structures
 1. **Configuration (JSON)**:
@@ -127,11 +132,39 @@
 ## File Structure
 The application is organized into a `src` package to ensure clear separation of concerns:
 
-- **main.py**: Application entry point.
-- **src/core/**: Contains the core business logic, including the main `DataPipeline`.
-- **src/gui/**: All PyQt5 user interface components, including the `MainWindow`, custom widgets, and the background `Worker` thread.
-- **src/services/**: Houses modules for interacting with external services, such as `scraper`, `ai_enhancer`, and `variant_matcher`.
-- **src/utils/**: A collection of helper modules for common tasks like loading data and configurations, processing feeds, and mapping categories.
+### Legacy Structure (Old Format)
+- **main.py**: Original application entry point
+- **src/core/**: Core business logic with old `DataPipeline`
+- **src/gui/**: Original PyQt5 UI (`MainWindow`, `Worker`)
+- **src/services/**: External services (scraper, old ai_enhancer, variant_matcher)
+- **src/utils/**: Helper modules (data_loader, config_loader, category_mapper)
+
+### New Format Structure (147-Column)
+- **main_new_format.py**: New application entry point
+- **src/parsers/**: XML parsing for new format
+  - `xml_parser_new_format.py` - Gastromarket & ForGastro parsers
+  - `xml_parser_factory.py` - Parser factory
+- **src/mergers/**: Smart data merging
+  - `data_merger_new_format.py` - Image priority merging
+- **src/mappers/**: Category transformation
+  - `category_mapper_new_format.py` - Category formatting
+- **src/transformers/**: Output transformation
+  - `output_transformer.py` - Final format transformation
+- **src/ai/**: AI enhancement
+  - `ai_enhancer_new_format.py` - Description generation with tracking
+- **src/loaders/**: File I/O
+  - `csv_loader.py` - CSV operations
+  - `xlsx_loader.py` - XLSX operations
+  - `data_loader_factory.py` - Format detection
+- **src/pipeline/**: Complete integration
+  - `pipeline_new_format.py` - End-to-end pipeline
+- **src/gui/**: New GUI components
+  - `main_window_new_format.py` - Modern interface
+  - `worker_new_format.py` - Background processing
+- **tests/**: Comprehensive test suite (158 tests)
+  - Test files for each component
+  - Integration tests
+  - Edge case coverage
 
 ## AI Enhancement Architecture
 
