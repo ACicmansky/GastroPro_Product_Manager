@@ -256,7 +256,7 @@
     "relatedVideo",
     "allowsIPlatba",
     "allowsPayOnline",
-    "xmlFeedName",
+    "source",
     "seoTitle",
     "heurekaHidden",
     "heurekaCartHidden",
@@ -283,6 +283,7 @@
     "googleCategoryId",
     "glamiCategoryId",
     "aiProcessed",
-    "aiProcessedDate"
+    "aiProcessedDate",
+    "last_updated"
   ]
 }

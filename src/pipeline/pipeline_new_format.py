@@ -190,6 +190,7 @@ class PipelineNewFormat:
         scraped_data: Optional[pd.DataFrame] = None,
         apply_categories: bool = True,
         apply_transformation: bool = True,
+        selected_categories: Optional[list] = None,
     ) -> pd.DataFrame:
         """
         Run complete pipeline.
@@ -201,6 +202,7 @@ class PipelineNewFormat:
             scraped_data: Optional scraped data DataFrame
             apply_categories: Whether to apply category mapping
             apply_transformation: Whether to apply final transformation
+            selected_categories: Optional list of selected categories for filtering
 
         Returns:
             Final DataFrame
@@ -230,8 +232,15 @@ class PipelineNewFormat:
             print(f"  Added scraped data: {len(scraped_data)} products")
 
         # Step 3: Merge data
-        print("\nMerging data with image priority...")
-        merged_df = self.merger.merge(main_df, feed_dfs)
+        self._last_merge_stats = {}
+        if selected_categories is not None:
+            print("\nMerging data with category filtering...")
+            merged_df, self._last_merge_stats = self.merger.merge_with_category_filter_and_stats(
+                main_df, feed_dfs, selected_categories
+            )
+        else:
+            print("\nMerging data with image priority...")
+            merged_df = self.merger.merge(main_df, feed_dfs)
         print(f"  Total products after merge: {len(merged_df)}")
 
         # Step 4: Map categories (optional)
@@ -262,6 +271,7 @@ class PipelineNewFormat:
         output_file: Optional[str] = None,
         main_data_file: Optional[str] = None,
         scraped_data: Optional[pd.DataFrame] = None,
+        selected_categories: Optional[list] = None,
     ) -> Tuple[pd.DataFrame, Dict]:
         """
         Run pipeline and return statistics.
@@ -271,12 +281,16 @@ class PipelineNewFormat:
             output_file: Optional output file path
             main_data_file: Optional main data file
             scraped_data: Optional scraped data DataFrame
+            selected_categories: Optional list of selected categories for filtering
 
         Returns:
             Tuple of (result DataFrame, statistics dict)
         """
         # Run pipeline
-        result_df = self.run(xml_feeds, output_file, main_data_file, scraped_data)
+        result_df = self.run(
+            xml_feeds, output_file, main_data_file, scraped_data, 
+            selected_categories=selected_categories
+        )
 
         # Calculate statistics
         stats = {
@@ -292,5 +306,9 @@ class PipelineNewFormat:
                 else 0
             ),
         }
+        
+        # Add merge statistics if available
+        if hasattr(self, '_last_merge_stats') and self._last_merge_stats:
+            stats.update(self._last_merge_stats)
 
         return result_df, stats

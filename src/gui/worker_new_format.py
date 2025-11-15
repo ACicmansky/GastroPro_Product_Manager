@@ -10,7 +10,6 @@ from typing import Dict, Optional
 from src.pipeline.pipeline_new_format import PipelineNewFormat
 from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
 from src.scrapers.scraper_new_format import EnhancedScraperNewFormat
-from src.filters.category_filter import CategoryFilter
 
 
 class WorkerNewFormat(QObject):
@@ -51,51 +50,20 @@ class WorkerNewFormat(QObject):
             # Get main data file if provided
             main_data_file = self.options.get("main_data_file")
 
-            # Run pipeline
+            # Get selected categories
+            selected_categories = self.options.get("selected_categories")
+            
+            # Run pipeline with category filtering
             self.progress.emit("Spracovanie feedov...")
             result_df, stats = self.pipeline.run_with_stats(
                 xml_feeds=xml_feeds, 
                 main_data_file=main_data_file,
-                scraped_data=scraped_data
+                scraped_data=scraped_data,
+                selected_categories=selected_categories
             )
-
-            # Apply category filtering if selected categories provided
-            selected_categories = self.options.get("selected_categories")
-            if selected_categories and main_data_file:
-                self.progress.emit("Filtrovanie kategórií...")
-                category_filter = CategoryFilter()
-                initial_count = len(result_df)
-                
-                # Debug: Check what categories exist in result_df
-                if "defaultCategory" in result_df.columns:
-                    actual_categories = result_df["defaultCategory"].dropna().unique().tolist()
-                    print(f"\n{'='*60}")
-                    print("CATEGORY FILTERING DEBUG")
-                    print(f"{'='*60}")
-                    print(f"Selected categories ({len(selected_categories)}):")
-                    for cat in selected_categories[:5]:  # Show first 5
-                        print(f"  - {cat}")
-                    if len(selected_categories) > 5:
-                        print(f"  ... and {len(selected_categories) - 5} more")
-                    print(f"\nActual categories in result_df ({len(actual_categories)}):")
-                    for cat in actual_categories[:5]:  # Show first 5
-                        print(f"  - {cat}")
-                    if len(actual_categories) > 5:
-                        print(f"  ... and {len(actual_categories) - 5} more")
-                    
-                    # Check for matches
-                    matches = set(selected_categories) & set(actual_categories)
-                    print(f"\nMatching categories: {len(matches)}")
-                    print(f"{'='*60}\n")
-                
-                result_df = category_filter.filter_by_categories(result_df, selected_categories)
-                filtered_count = len(result_df)
-                self.progress.emit(
-                    f"Filtrované: {initial_count} → {filtered_count} produktov "
-                    f"({len(selected_categories)} kategórií)"
-                )
-                # Update stats
-                stats["filtered_products"] = filtered_count
+            
+            # Update stats with category info
+            if selected_categories:
                 stats["filtered_categories"] = len(selected_categories)
 
             # Apply AI enhancement if requested

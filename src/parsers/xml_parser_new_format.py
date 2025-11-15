@@ -50,7 +50,7 @@ class XMLParserNewFormat:
                 row[new_field] = value
 
             # Add feed name
-            row["xmlFeedName"] = "gastromarket"
+            row["source"] = "gastromarket"
             data.append(row)
 
         df = pd.DataFrame(data)
@@ -99,7 +99,7 @@ class XMLParserNewFormat:
                 row[new_field] = value
 
             # Add feed name
-            row["xmlFeedName"] = "forgastro"
+            row["source"] = "forgastro"
             data.append(row)
 
         df = pd.DataFrame(data)

@@ -108,6 +108,18 @@ src/
    - Optional callback mechanism for real-time unmapped category resolution
    - Detailed logging of mapping operations
 
+8. **Advanced Merging Logic with Category Filtering**:
+   - **Feed Priority**: Products from XML feeds and web scraping always included
+   - **Smart Updates**: Feed products update price and images in main data (if more images)
+   - **Category Filtering**: Main data products filtered by selected categories
+   - **Removal Logic**: Main data products in unchecked categories removed (unless updated by feeds)
+   - **Source Tracking**: Every product tagged with origin (gastromarket, forgastro, web_scraping, core)
+   - **Timestamp Tracking**: All products have last_updated timestamp
+   - **Detailed Statistics**: Track created/updated/kept/removed counts by source
+   - **Two-Step Process**:
+     1. Process feed/scraped products (always included, update existing)
+     2. Process main data products (category filtered, skip if already processed)
+
 ## Component Relationships
 - **main.py**: The main entry point of the application; initializes and runs the GUI.
 - **src/gui/main_window.py**: Contains the `MainWindow` class, which manages the entire UI, its state, and user interactions. It delegates data processing to the `worker`.

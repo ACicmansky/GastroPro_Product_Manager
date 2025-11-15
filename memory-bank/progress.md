@@ -99,11 +99,51 @@
 - **Multi-threaded**: 8 parallel workers for 5x performance improvement
 - **Duplicate Handling**: Automatic price updates and deduplication
 
-## In Progress
-- 🔄 **Phase 12: Category Filtering GUI**
-  - Add category list widget to new GUI
-  - Implement search/filter functionality
-  - Export only selected categories
+## Recently Completed (November 16, 2025)
+- ✅ **Phase 12: Category Filtering & Advanced Merging Logic ✅ COMPLETE**
+
+**Status**: Production Ready  
+**Tests**: 194/194 passing (18 new category filter tests)
+
+### Implementation
+- ✅ Created `src/filters/category_filter.py` - Category extraction and filtering
+- ✅ GUI integration with category list, search, and toggle selection
+- ✅ Advanced merging logic with category filtering
+- ✅ Source tracking (`source` column: gastromarket, forgastro, web_scraping, core)
+- ✅ Timestamp tracking (`last_updated` column)
+- ✅ Enhanced statistics display with breakdown by source
+
+### New Merging Logic
+**Requirements Implemented**:
+1. **Feed/Scraped Products Always Included**
+   - New products from feeds → Add to final set
+   - Existing products from feeds → Update `price` and `images` (if more images)
+2. **Main Data Products Category Filtered**
+   - Only include if in selected categories
+3. **Removal Logic**
+   - Remove main data products in unchecked categories (unless updated by feeds)
+4. **Source Tracking**
+   - Track origin: gastromarket, forgastro, web_scraping, core
+5. **Timestamp Tracking**
+   - Track last update time for all products
+
+### Bug Fixes
+- ✅ Fixed category prefix duplication (was adding "Tovary a kategórie > " multiple times)
+- ✅ Added prefix checks in `OutputTransformer` and `CategoryMapper`
+
+### Enhanced Statistics
+- Created/Updated/Kept/Removed counts
+- Breakdown by source (created and updated)
+- Detailed GUI display with sections
+
+### Files Modified
+- `src/mergers/data_merger_new_format.py` - New `merge_with_category_filter_and_stats()` method
+- `src/pipeline/pipeline_new_format.py` - Added `selected_categories` parameter
+- `src/gui/main_window_new_format.py` - Category filtering UI and enhanced stats display
+- `src/gui/worker_new_format.py` - Pass categories to pipeline
+- `src/transformers/output_transformer.py` - Prefix duplication fix
+- `src/mappers/category_mapper_new_format.py` - Prefix duplication fix
+- `config.json` - Added `source` and `last_updated` columns
 
 ## Pending
 - ⏳ **Phase 13: Real AI Enhancement Migration**

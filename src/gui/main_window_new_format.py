@@ -369,15 +369,41 @@ class MainWindowNewFormat(QMainWindow):
         stats_text = []
         stats_text.append("=== ŠTATISTIKY SPRACOVANIA ===\n")
         stats_text.append(f"Celkový počet produktov: {stats.get('total_products', 0)}")
+        
+        # Show detailed merge statistics if available
+        if "total_created" in stats or "total_updated" in stats:
+            stats_text.append(f"\n--- Zmeny produktov ---")
+            stats_text.append(f"Vytvorených: {stats.get('total_created', 0)}")
+            stats_text.append(f"Aktualizovaných: {stats.get('total_updated', 0)}")
+            stats_text.append(f"Zachovaných: {stats.get('total_kept', 0)}")
+            stats_text.append(f"Odstránených: {stats.get('removed', 0)}")
+            
+            # Show breakdown by source
+            if "created" in stats and stats["created"]:
+                stats_text.append(f"\n--- Vytvorené podľa zdroja ---")
+                for source, count in stats["created"].items():
+                    if count > 0:
+                        stats_text.append(f"  {source}: {count}")
+            
+            if "updated" in stats and stats["updated"]:
+                stats_text.append(f"\n--- Aktualizované podľa zdroja ---")
+                for source, count in stats["updated"].items():
+                    if count > 0:
+                        stats_text.append(f"  {source}: {count}")
+        
+        stats_text.append(f"\n--- Ostatné ---")
         stats_text.append(f"Spracovaných feedov: {stats.get('feeds_processed', 0)}")
         stats_text.append(
             f"Kategórií transformovaných: {stats.get('categories_mapped', 0)}"
         )
+        
+        if stats.get('filtered_categories'):
+            stats_text.append(f"Filtrovaných kategórií: {stats.get('filtered_categories', 0)}")
 
         if "ai_processed" in stats:
-            stats_text.append(f"\nAI vylepšenie:")
-            stats_text.append(f"  - Novo spracovaných: {stats.get('ai_processed', 0)}")
-            stats_text.append(f"  - Celkom spracovaných: {stats.get('ai_total', 0)}")
+            stats_text.append(f"\n--- AI vylepšenie ---")
+            stats_text.append(f"Novo spracovaných: {stats.get('ai_processed', 0)}")
+            stats_text.append(f"Celkom spracovaných: {stats.get('ai_total', 0)}")
 
         self.stats_display.setPlainText("\n".join(stats_text))
         self.stats_group.setVisible(True)

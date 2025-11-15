@@ -32,7 +32,7 @@ class TestPipelineNewFormat:
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
         assert "code" in result.columns
-        assert "xmlFeedName" in result.columns
+        assert "source" in result.columns
 
     def test_pipeline_merges_multiple_feeds(
         self, config, sample_xml_gastromarket, sample_xml_forgastro
@@ -52,7 +52,7 @@ class TestPipelineNewFormat:
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
         # Should have products from both feeds
-        assert "xmlFeedName" in result.columns
+        assert "source" in result.columns
 
 
 class TestPipelineSteps:

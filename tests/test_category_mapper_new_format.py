@@ -257,22 +257,22 @@ class TestCategoryMappingIntegration:
                     assert "Tovary a kategórie > " in cat or cat == ""
 
     def test_map_preserves_feed_name(self, config):
-        """Test that category mapping preserves xmlFeedName."""
+        """Test that category mapping preserves source."""
         from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
 
         df = pd.DataFrame(
             {
                 "code": ["PROD001"],
                 "defaultCategory": ["Vitríny"],
-                "xmlFeedName": ["gastromarket"],
+                "source": ["gastromarket"],
             }
         )
 
         mapper = CategoryMapperNewFormat(config)
         result = mapper.map_dataframe(df)
 
-        # xmlFeedName should be preserved
-        assert result.loc[0, "xmlFeedName"] == "gastromarket"
+        # source should be preserved
+        assert result.loc[0, "source"] == "gastromarket"
 
     def test_map_works_with_merged_data(self, config):
         """Test category mapping works with merged data."""
@@ -284,7 +284,7 @@ class TestCategoryMappingIntegration:
                 "code": ["PROD001", "PROD002", "PROD003"],
                 "name": ["P1", "P2", "P3"],
                 "defaultCategory": ["Cat1/Sub1", "Cat2/Sub2", "Cat3"],
-                "xmlFeedName": ["feed1", "feed2", ""],
+                "source": ["feed1", "feed2", ""],
             }
         )
 

@@ -21,7 +21,7 @@ class TestNewFormatMerging:
                 "name": ["Product 1", "Product 2"],
                 "price": ["100.00", "200.00"],
                 "defaultImage": ["http://main.com/img1.jpg", ""],
-                "xmlFeedName": ["", ""],
+                "source": ["", ""],
             }
         )
 
@@ -35,7 +35,7 @@ class TestNewFormatMerging:
                     "http://feed.com/img2.jpg",
                     "http://feed.com/img3.jpg",
                 ],
-                "xmlFeedName": ["gastromarket", "gastromarket"],
+                "source": ["gastromarket", "gastromarket"],
             }
         )
 
@@ -127,7 +127,7 @@ class TestImagePriorityMerging:
                 "defaultImage": ["http://feed1.com/img1.jpg"],
                 "image": ["http://feed1.com/img2.jpg"],
                 "image2": [""],
-                "xmlFeedName": ["feed1"],
+                "source": ["feed1"],
             }
         )
 
@@ -141,7 +141,7 @@ class TestImagePriorityMerging:
                 "image": ["http://feed2.com/img2.jpg"],
                 "image2": ["http://feed2.com/img3.jpg"],
                 "image3": ["http://feed2.com/img4.jpg"],
-                "xmlFeedName": ["feed2"],
+                "source": ["feed2"],
             }
         )
 
@@ -219,7 +219,7 @@ class TestImagePriorityMerging:
                 "defaultImage": ["http://main.com/img1.jpg"],
                 "image": ["http://main.com/img2.jpg"],
                 "image2": ["http://main.com/img3.jpg"],
-                "xmlFeedName": [""],
+                "source": [""],
             }
         )
 
@@ -231,7 +231,7 @@ class TestImagePriorityMerging:
                 "price": ["150.00"],
                 "defaultImage": ["http://feed.com/img1.jpg"],
                 "image": [""],
-                "xmlFeedName": ["feed"],
+                "source": ["feed"],
             }
         )
 
@@ -293,7 +293,7 @@ class TestMultipleFeedMerging:
         }
 
     def test_merge_tracks_feed_source(self, config):
-        """Test that xmlFeedName tracks the source feed."""
+        """Test that source tracks the source feed."""
         from src.mergers.data_merger_new_format import DataMergerNewFormat
 
         feed1 = pd.DataFrame(
@@ -301,7 +301,7 @@ class TestMultipleFeedMerging:
                 "code": ["PROD001"],
                 "name": ["P1"],
                 "price": ["100"],
-                "xmlFeedName": ["gastromarket"],
+                "source": ["gastromarket"],
             }
         )
 
@@ -310,7 +310,7 @@ class TestMultipleFeedMerging:
                 "code": ["PROD002"],
                 "name": ["P2"],
                 "price": ["200"],
-                "xmlFeedName": ["forgastro"],
+                "source": ["forgastro"],
             }
         )
 
@@ -323,8 +323,8 @@ class TestMultipleFeedMerging:
         prod1 = result[result["code"] == "PROD001"].iloc[0]
         prod2 = result[result["code"] == "PROD002"].iloc[0]
 
-        assert prod1["xmlFeedName"] == "gastromarket"
-        assert prod2["xmlFeedName"] == "forgastro"
+        assert prod1["source"] == "gastromarket"
+        assert prod2["source"] == "forgastro"
 
 
 class TestMergeStatistics:

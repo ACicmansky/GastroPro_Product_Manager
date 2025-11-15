@@ -26,7 +26,7 @@ class TestXMLParserNewFormat:
         assert "name" in result.columns
         assert "price" in result.columns
         assert "defaultImage" in result.columns
-        assert "xmlFeedName" in result.columns
+        assert "source" in result.columns
 
     def test_parse_forgastro_to_new_format(self, sample_xml_forgastro, config):
         """Test parsing ForGastro XML to new 138-column format."""
@@ -44,15 +44,15 @@ class TestXMLParserNewFormat:
         assert "price" in result.columns
 
     def test_xml_feed_name_added(self, sample_xml_gastromarket, config):
-        """Test that xmlFeedName is added to parsed data."""
+        """Test that source is added to parsed data."""
         from src.parsers.xml_parser_new_format import XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_gastromarket(sample_xml_gastromarket)
 
         # All rows should have feed name
-        assert "xmlFeedName" in result.columns
-        assert all(result["xmlFeedName"] == "gastromarket")
+        assert "source" in result.columns
+        assert all(result["source"] == "gastromarket")
 
     def test_parse_maps_to_new_column_names(self, sample_xml_gastromarket, config):
         """Test that XML fields are mapped to new column names."""
@@ -165,8 +165,8 @@ class TestXMLToNewFormatMapping:
         new_columns = config.get("new_output_columns", [])
 
         for col in result.columns:
-            # Column should either be in new format, be xmlFeedName, or be a temporary column
-            assert col in new_columns or col == "xmlFeedName" or col.startswith("_temp")
+            # Column should either be in new format, be source, or be a temporary column
+            assert col in new_columns or col == "source" or col.startswith("_temp")
 
 
 class TestXMLParserImageHandling:
@@ -272,7 +272,7 @@ class TestXMLParserIntegration:
         forgastro_cols = set(forgastro_df.columns)
 
         # Core columns should be present in both
-        core_columns = {"code", "name", "price", "xmlFeedName"}
+        core_columns = {"code", "name", "price", "source"}
         assert core_columns.issubset(gastro_cols)
         assert core_columns.issubset(forgastro_cols)
 

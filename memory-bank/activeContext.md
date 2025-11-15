@@ -2,19 +2,27 @@
 
 ## Current Focus
 
-**Phase 11: Web Scraping** ✅ COMPLETE (January 15, 2025)
-- Scraper refactored to be lean and efficient
-- Direct new format output (no transformation step)
-- Detailed terminal logging added
-- All 176 tests passing
+**Phase 12: Category Filtering & Advanced Merging** ✅ COMPLETE (November 16, 2025)
+- Category filtering GUI with search and toggle
+- Advanced merging logic with source tracking
+- Enhanced statistics display
+- All 194 tests passing
 
-**Phase 12: Category Filtering GUI** (Next up)
-- Add category list widget to new GUI
-- Implement search/filter functionality  
-- Export only selected categories
-- Expected: ~10-15 new tests
+**Phase 13: Real AI Enhancement Migration** (Next up)
+- Migrate full Gemini API implementation
+- Quota management and batch processing
+- Retry logic and fuzzy matching
+- Expected: ~15-20 new tests
 
 ## Recent Changes
+
+**Phase 12 Complete (November 16, 2025)**:
+- **Category Filtering GUI**: Added category list widget with search, toggle all/none, and selection tracking
+- **Advanced Merging Logic**: Implemented new requirements - feeds always included, main data filtered by category, source tracking
+- **Source Tracking**: Added `source` column (gastromarket, forgastro, web_scraping, core) and `last_updated` timestamp
+- **Enhanced Statistics**: Detailed breakdown showing created/updated/kept/removed counts by source
+- **Bug Fix**: Fixed category prefix duplication issue (was adding "Tovary a kategórie > " multiple times)
+- **Tests**: All 194 tests passing (18 new category filter tests, 176 previous tests)
 
 **Phase 11 Complete (January 15, 2025)**:
 - **Web Scraping Refactored**: Removed 170+ lines of obsolete code, scraper now produces new format directly
@@ -71,23 +79,27 @@
 
 ## Next Steps
 1. ✅ Phase 11: Web Scraping - COMPLETE
-2. 🔄 Phase 12: Category Filtering GUI - IN PROGRESS
-3. ⏳ Phase 13: Real AI Enhancement Migration
+2. ✅ Phase 12: Category Filtering & Advanced Merging - COMPLETE
+3. 🔄 Phase 13: Real AI Enhancement Migration - NEXT
 4. ⏳ Manual testing with all features
 5. ⏳ Deploy to production
 
 ## Active Decisions
 - **Migration Strategy**: TDD approach - write tests first, then implement
-- **Format Support**: New 138-column format only (no backward compatibility)
+- **Format Support**: New 139-column format (138 + source + last_updated)
 - **File Format**: XLSX as primary, CSV as fallback
 - **Image Merging**: Use source with most images available
+- **Merging Logic**: Feed products always included, main data filtered by category
+- **Source Tracking**: Track origin (gastromarket, forgastro, web_scraping, core)
+- **Timestamp Tracking**: Track last_updated for all products
 - **Default Values**: Apply at end of pipeline if cells are empty
 - **Breaking Changes**: Acceptable - clean migration
 - **Variant Matcher**: Skip updates (feature not used)
 - **Code Uppercase**: Apply on load and merge for consistency
-- **Category Transformation**: Add "Tovary a kategórie > " prefix and change "/" to " > "
+- **Category Transformation**: Add "Tovary a kategórie > " prefix once (check for duplicates)
+- **Category Filtering**: Filter main data by selected categories, feeds always included
 - Using Pandas DataFrames as the core data structure for manipulation
-- Providing detailed statistics on data source contributions in export summary
+- Providing detailed statistics with breakdown by source (created/updated/kept/removed)
 
 ## Current Challenges
 - **Production Configuration**: Setting up real XML feed URLs

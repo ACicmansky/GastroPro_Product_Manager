@@ -127,7 +127,7 @@ Successfully completed full migration to new 138-column e-shop format using Test
 3. **Dynamic Field Mapping**: Config-driven column mapping
 4. **Image Splitting**: Automatic split into 8 columns
 5. **Price Cleaning**: Comma to dot conversion
-6. **Feed Tracking**: Add `xmlFeedName` column
+6. **Feed Tracking**: Add `source` column
 7. **Factory Pattern**: Automatic feed detection
 
 **Test Coverage**:
@@ -154,7 +154,7 @@ Successfully completed full migration to new 138-column e-shop format using Test
 2. **Price Updates**: Update prices from feeds
 3. **Main Data Preservation**: Keep non-price fields from main data
 4. **Multi-Feed Support**: Merge from multiple sources
-5. **Feed Tracking**: Track source in `xmlFeedName`
+5. **Feed Tracking**: Track source in `source`
 6. **Statistics**: Track new/updated products
 
 **Test Coverage**:
