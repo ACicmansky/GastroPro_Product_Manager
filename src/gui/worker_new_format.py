@@ -3,7 +3,7 @@ Worker for new 138-column format pipeline.
 Handles background processing with progress updates.
 """
 
-from PyQt5.QtCore import QObject, pyqtSignal
+from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop
 import pandas as pd
 from typing import Dict, Optional
 
@@ -20,6 +20,7 @@ class WorkerNewFormat(QObject):
     progress = pyqtSignal(str)  # progress message
     result = pyqtSignal(object)  # result DataFrame
     statistics = pyqtSignal(dict)  # statistics dict
+    category_mapping_request = pyqtSignal(str, str)  # (original_category, product_name)
 
     def __init__(self, config: Dict, options: Dict):
         """
@@ -33,11 +34,16 @@ class WorkerNewFormat(QObject):
         self.config = config
         self.options = options
         self.pipeline = PipelineNewFormat(config)
+        self.category_mapping_result = None
+        self.category_mapping_event_loop = None
 
     def run(self):
         """Run the complete pipeline."""
         try:
             self.progress.emit("Inicializácia...")
+            
+            # Set up interactive category mapping callback
+            self.pipeline.category_mapper.set_interactive_callback(self._request_category_mapping)
 
             # Prepare XML feeds
             xml_feeds = self._prepare_xml_feeds()
@@ -53,13 +59,14 @@ class WorkerNewFormat(QObject):
             # Get selected categories
             selected_categories = self.options.get("selected_categories")
             
-            # Run pipeline with category filtering
+            # Run pipeline with category filtering and interactive mapping
             self.progress.emit("Spracovanie feedov...")
             result_df, stats = self.pipeline.run_with_stats(
                 xml_feeds=xml_feeds, 
                 main_data_file=main_data_file,
                 scraped_data=scraped_data,
-                selected_categories=selected_categories
+                selected_categories=selected_categories,
+                enable_interactive_mapping=True  # Enable interactive category mapping dialogs
             )
             
             # Update stats with category info
@@ -194,3 +201,44 @@ class WorkerNewFormat(QObject):
         else:
             self.progress.emit("AI vylepšenie: všetky produkty už spracované")
             return df
+    
+    def _request_category_mapping(self, original_category: str, product_name: Optional[str] = None) -> str:
+        """
+        Request interactive category mapping from GUI.
+        
+        This method blocks the worker thread until the user responds in the GUI.
+        
+        Args:
+            original_category: The unmapped category
+            product_name: Optional product name for context
+        
+        Returns:
+            New category name from user or original if cancelled
+        """
+        # Reset result
+        self.category_mapping_result = None
+        
+        # Emit signal to GUI (runs in main thread)
+        self.category_mapping_request.emit(original_category, product_name or "")
+        
+        # Create event loop to wait for response
+        self.category_mapping_event_loop = QEventLoop()
+        self.category_mapping_event_loop.exec_()  # Block until set_category_mapping_result is called
+        
+        # Return result (or original if None)
+        return self.category_mapping_result if self.category_mapping_result else original_category
+    
+    def set_category_mapping_result(self, new_category: str):
+        """
+        Set the category mapping result from GUI.
+        
+        This unblocks the worker thread.
+        
+        Args:
+            new_category: The new category name from user
+        """
+        self.category_mapping_result = new_category
+        
+        # Quit the event loop to unblock worker thread
+        if self.category_mapping_event_loop:
+            self.category_mapping_event_loop.quit()

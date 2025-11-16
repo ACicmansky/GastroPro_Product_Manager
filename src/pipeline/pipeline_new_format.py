@@ -109,17 +109,18 @@ class PipelineNewFormat:
         """
         return self.merger.merge(main_df, feed_dfs)
 
-    def map_categories(self, df: pd.DataFrame) -> pd.DataFrame:
+    def map_categories(self, df: pd.DataFrame, enable_interactive: bool = True) -> pd.DataFrame:
         """
         Map and transform categories.
 
         Args:
             df: DataFrame with categories
+            enable_interactive: If True, prompts user for unmapped categories
 
         Returns:
             DataFrame with transformed categories
         """
-        return self.category_mapper.map_dataframe(df)
+        return self.category_mapper.map_dataframe(df, enable_interactive=enable_interactive)
 
     def apply_transformation(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -191,6 +192,7 @@ class PipelineNewFormat:
         apply_categories: bool = True,
         apply_transformation: bool = True,
         selected_categories: Optional[list] = None,
+        enable_interactive_mapping: bool = True,
     ) -> pd.DataFrame:
         """
         Run complete pipeline.
@@ -203,6 +205,7 @@ class PipelineNewFormat:
             apply_categories: Whether to apply category mapping
             apply_transformation: Whether to apply final transformation
             selected_categories: Optional list of selected categories for filtering
+            enable_interactive_mapping: Whether to enable interactive category mapping dialogs
 
         Returns:
             Final DataFrame
@@ -246,7 +249,7 @@ class PipelineNewFormat:
         # Step 4: Map categories (optional)
         if apply_categories:
             print("\nMapping categories...")
-            merged_df = self.map_categories(merged_df)
+            merged_df = self.map_categories(merged_df, enable_interactive=enable_interactive_mapping)
 
         # Step 5: Apply transformation (optional)
         if apply_transformation:
@@ -272,6 +275,7 @@ class PipelineNewFormat:
         main_data_file: Optional[str] = None,
         scraped_data: Optional[pd.DataFrame] = None,
         selected_categories: Optional[list] = None,
+        enable_interactive_mapping: bool = True,
     ) -> Tuple[pd.DataFrame, Dict]:
         """
         Run pipeline and return statistics.
@@ -282,6 +286,7 @@ class PipelineNewFormat:
             main_data_file: Optional main data file
             scraped_data: Optional scraped data DataFrame
             selected_categories: Optional list of selected categories for filtering
+            enable_interactive_mapping: Whether to enable interactive category mapping dialogs
 
         Returns:
             Tuple of (result DataFrame, statistics dict)
@@ -289,7 +294,8 @@ class PipelineNewFormat:
         # Run pipeline
         result_df = self.run(
             xml_feeds, output_file, main_data_file, scraped_data, 
-            selected_categories=selected_categories
+            selected_categories=selected_categories,
+            enable_interactive_mapping=enable_interactive_mapping
         )
 
         # Calculate statistics

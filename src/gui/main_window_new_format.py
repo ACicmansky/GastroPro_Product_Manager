@@ -29,7 +29,9 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QThread, QStandardPaths
 
 from .worker_new_format import WorkerNewFormat
+from .widgets import CategoryMappingDialog
 from ..utils.config_loader import load_config
+from ..utils.category_mapper import get_category_suggestions
 from src.loaders.data_loader_factory import DataLoaderFactory
 from src.filters.category_filter import CategoryFilter
 
@@ -347,8 +349,10 @@ class MainWindowNewFormat(QMainWindow):
         self.thread.finished.connect(self.thread.deleteLater)
         self.worker.result.connect(self.handle_result)
         self.worker.statistics.connect(self.handle_statistics)
+        self.worker.category_mapping_request.connect(self.handle_category_mapping_request)
         self.worker.error.connect(self.show_error_message)
         self.worker.progress.connect(self.update_progress)
+        self.worker.category_mapping_request.connect(self.handle_category_mapping_request)
 
         # Cleanup
         self.thread.finished.connect(lambda: self.process_button.setEnabled(True))
@@ -573,6 +577,63 @@ class MainWindowNewFormat(QMainWindow):
             if item.checkState() == Qt.Checked:
                 selected.append(item.text())
         return selected
+
+    def handle_category_mapping_request(self, original_category, product_name):
+        """
+        Handle interactive category mapping request from worker thread.
+        
+        Args:
+            original_category: The unmapped category
+            product_name: Product name for context
+        """
+        # Collect existing categories for suggestions
+        existing_categories = set()
+        
+        # 1. Get categories from worker's category manager
+        if (
+            hasattr(self, "worker")
+            and hasattr(self.worker, "pipeline")
+            and hasattr(self.worker.pipeline, "category_mapper")
+            and hasattr(self.worker.pipeline.category_mapper, "category_manager")
+        ):
+            category_manager = self.worker.pipeline.category_mapper.category_manager
+            unique_cats = category_manager.get_unique_categories()
+            existing_categories.update(unique_cats)
+        
+        # 2. Get categories from loaded main data
+        if self.main_data_df is not None and "defaultCategory" in self.main_data_df.columns:
+            main_categories = self.main_data_df["defaultCategory"].dropna().unique()
+            existing_categories.update(main_categories)
+        
+        # 3. Get categories from all_categories list
+        if self.all_categories:
+            existing_categories.update(self.all_categories)
+        
+        # Get suggestions using similarity matching
+        suggestions = []
+        if existing_categories:
+            suggestions = get_category_suggestions(
+                original_category, list(existing_categories), top_n=5
+            )
+        
+        # Show dialog with suggestions
+        dialog = CategoryMappingDialog(
+            original_category, suggestions, product_name, self
+        )
+        if dialog.exec_():
+            new_category = dialog.get_new_category()
+            
+            # Update progress bar with mapping info
+            if new_category and new_category != original_category:
+                self.progress_bar.setFormat(
+                    f"Mapovanie kategórie: {original_category[:40]}... -> {new_category[:40]}..."
+                )
+            
+            # Send result back to worker
+            self.worker.set_category_mapping_result(new_category)
+        else:
+            # User cancelled - return original category
+            self.worker.set_category_mapping_result(original_category)
 
     def show_error_message(self, error_info):
         """Show error message."""
