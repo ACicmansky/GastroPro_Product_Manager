@@ -145,12 +145,91 @@
 - `src/mappers/category_mapper_new_format.py` - Prefix duplication fix
 - `config.json` - Added `source` and `last_updated` columns
 
+## Recently Completed (November 16, 2025)
+- ✅ **Phase 13: Real AI Enhancement Implementation ✅ COMPLETE**
+
+**Status**: Production Ready  
+**Tests**: 217/217 passing (38 AI enhancement tests, 23 new)
+
+### Implementation
+- ✅ Full Gemini API integration with `google-genai`
+- ✅ Web search grounding tool for contextual enrichment
+- ✅ English prompts in `ai_prompts_new_format.py`
+- ✅ Thread-safe quota management (15 calls/min, 250K tokens/min)
+- ✅ Parallel batch processing with ThreadPoolExecutor (5 workers)
+- ✅ Retry logic with exponential backoff (3 attempts)
+- ✅ Fuzzy matching with RapidFuzz (3 strategies: exact code, fuzzy code, fuzzy name)
+- ✅ Incremental saving to tmp directory
+- ✅ DataFrame update with 5 fields (shortDescription, description, seoTitle, seoDescription, seoKeywords)
+
+### Column Name Migration (Slovak → English)
+- `code` (was: Kat. číslo)
+- `name` (was: Názov tovaru)
+- `defaultCategory` (was: Hlavna kategória)
+- `shortDescription` (was: Krátky popis)
+- `description` (was: Dlhý popis)
+- `seoTitle` (was: SEO titulka)
+- `seoDescription` (was: SEO popis)
+- `seoKeywords` (was: SEO kľúčové slová)
+
+### Features Implemented
+1. **Quota Management**
+   - Thread-safe counters with locks
+   - Automatic waiting when limits reached
+   - Counter reset every minute
+   - Actual token tracking from API responses
+
+2. **Batch Processing**
+   - Configurable batch size (default: 45 products)
+   - JSON serialization for API
+   - Clean response parsing (handles markdown code blocks)
+
+3. **Retry Logic**
+   - Rate limit detection and 60s wait
+   - Exponential backoff for other errors (2^attempt seconds)
+   - Graceful error handling
+
+4. **Fuzzy Matching**
+   - Exact code match (most reliable)
+   - Fuzzy code match (handles variations)
+   - Fuzzy name match (last resort)
+   - Configurable similarity threshold (default: 85%)
+
+5. **Parallel Processing**
+   - ThreadPoolExecutor for concurrent batches
+   - Configurable max workers (default: 5)
+   - Thread-safe operations
+   - Progress tracking across threads
+
+6. **Incremental Saving**
+   - Save progress after each batch
+   - UTF-8 encoding (with cp1250 fallback)
+   - Tmp directory for recovery
+
+### Files Created/Modified
+- `src/ai/ai_enhancer_new_format.py` - Full implementation (~530 lines)
+- `src/ai/ai_prompts_new_format.py` - English prompts
+- `tests/test_ai_enhancer_new_format.py` - 38 comprehensive tests
+- `pytest.ini` - Added ai_enhancement marker
+
+### Configuration
+```json
+{
+  "ai_enhancement": {
+    "model": "gemini-2.5-flash-lite",
+    "temperature": 0.1,
+    "batch_size": 45,
+    "retry_delay": 60,
+    "retry_attempts": 3,
+    "max_parallel_calls": 5,
+    "similarity_threshold": 85
+  }
+}
+```
+
 ## Pending
-- ⏳ **Phase 13: Real AI Enhancement Migration**
-  - Migrate full Gemini API implementation
-  - Quota management (15 calls/min, 250K tokens/min)
-  - Batch processing and retry logic
-  - Fuzzy matching for product identification
+- ⏳ **Phase 14**: Continue with remaining features
+- ⏳ Manual testing with real Gemini API key
 - ⏳ Data preview functionality
 - ⏳ Enhanced variant difference visualization
 - ⏳ User interface for managing variant extraction rules

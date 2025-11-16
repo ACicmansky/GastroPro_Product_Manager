@@ -120,6 +120,18 @@ src/
      1. Process feed/scraped products (always included, update existing)
      2. Process main data products (category filtered, skip if already processed)
 
+9. **AI Enhancement System (Phase 13)**:
+   - **Full Gemini API Integration**: Real API client with web search grounding
+   - **Quota Management**: Thread-safe tracking (15 calls/min, 250K tokens/min)
+   - **Batch Processing**: Configurable batch size (45 products), parallel execution
+   - **Retry Logic**: 3 attempts with exponential backoff, rate limit detection
+   - **Fuzzy Matching**: 3-strategy matching (exact code, fuzzy code, fuzzy name)
+   - **Parallel Processing**: ThreadPoolExecutor with 5 workers
+   - **Incremental Saving**: Progress saved after each batch
+   - **Column Name Migration**: Slovak → English (code, name, shortDescription, etc.)
+   - **Enhanced Fields**: shortDescription, description, seoTitle, seoDescription, seoKeywords
+   - **Processing Tracking**: aiProcessed flag, aiProcessedDate timestamp
+
 ## Component Relationships
 - **main.py**: The main entry point of the application; initializes and runs the GUI.
 - **src/gui/main_window.py**: Contains the `MainWindow` class, which manages the entire UI, its state, and user interactions. It delegates data processing to the `worker`.
