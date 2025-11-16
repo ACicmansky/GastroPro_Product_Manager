@@ -356,13 +356,9 @@ class AIEnhancerNewFormat:
                     ]
                 if "seoTitle" in enhanced_product:
                     df.at[best_match_idx, "seoTitle"] = enhanced_product["seoTitle"]
-                if "seoDescription" in enhanced_product:
-                    df.at[best_match_idx, "seoDescription"] = enhanced_product[
-                        "seoDescription"
-                    ]
-                if "seoKeywords" in enhanced_product:
-                    df.at[best_match_idx, "seoKeywords"] = enhanced_product[
-                        "seoKeywords"
+                if "metaDescription" in enhanced_product:
+                    df.at[best_match_idx, "metaDescription"] = enhanced_product[
+                        "metaDescription"
                     ]
 
                 # Set tracking columns
