@@ -138,7 +138,7 @@ class TestXMLToNewFormatMapping:
 
         mapping = parser.config["xml_feeds"]["gastromarket"]["mapping"]
 
-        # Check key mappings exist (using actual field names from config)
+        # Check key mappings exist (plain field names, namespace handled by parser)
         assert "KATALOG_CISLO" in mapping
         assert mapping["KATALOG_CISLO"] == "code"
 

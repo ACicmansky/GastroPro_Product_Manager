@@ -89,19 +89,27 @@ def sample_category_mappings():
 
 @pytest.fixture
 def sample_xml_gastromarket():
-    """Sample GastroMarket XML data."""
+    """Sample GastroMarket XML data with Google Base namespace (prefixed)."""
     return """<?xml version="1.0" encoding="UTF-8"?>
-<PRODUKTY>
-    <PRODUKT>
-        <KATALOG_CISLO>GM001</KATALOG_CISLO>
-        <MENO>GastroMarket Product 1</MENO>
-        <POPIS>Short description from GM</POPIS>
-        <CENA>150.00</CENA>
-        <VYROBCA>GM Manufacturer</VYROBCA>
-        <KATEGORIA_KOMPLET>GM Category/Subcategory</KATEGORIA_KOMPLET>
-        <OBRAZOK>http://example.com/gm1.jpg</OBRAZOK>
-    </PRODUKT>
-</PRODUKTY>"""
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+<channel>
+    <title>Partner Feed SK</title>
+    <description>Partner Feed SK</description>
+    <link>https://www.gastromarket.sk</link>
+    <item>
+        <g:UPDATE>2025-11-06 14:19:34.297869</g:UPDATE>
+        <g:KATALOG_CISLO>GM001</g:KATALOG_CISLO>
+        <g:MENO>GastroMarket Product 1</g:MENO>
+        <g:POPIS>Short description from GM</g:POPIS>
+        <g:CENA_KATALOG>150.00</g:CENA_KATALOG>
+        <g:KATEGORIA_KOMPLET>GM Category | Subcategory</g:KATEGORIA_KOMPLET>
+        <g:OBRAZOK_1>http://example.com/gm1.jpg</g:OBRAZOK_1>
+        <g:META_POPIS>Meta description</g:META_POPIS>
+        <g:DOSTUPNOST>11.0</g:DOSTUPNOST>
+        <g:META_TITUL>Meta title</g:META_TITUL>
+    </item>
+</channel>
+</rss>"""
 
 
 @pytest.fixture

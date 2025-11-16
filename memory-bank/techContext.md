@@ -80,11 +80,14 @@
    - Uppercase catalog codes
    - Raw data (no formatting) - e-shop handles display
 
-4. **XML Feed Structure** (Typical):
-   - Product entries
-   - Product identifiers
-   - Product details (name, price, description, etc.)
-   - Category information
+4. **XML Feed Structure**:
+   - **Gastromarket Feed**: RSS 2.0 with Google Base namespace
+     - Prefixed namespace: `xmlns:g="http://base.google.com/ns/1.0"`
+     - RSS structure elements (`<rss>`, `<channel>`, `<item>`) are NOT namespaced
+     - Data elements use `g:` prefix: `<g:KATALOG_CISLO>`, `<g:MENO>`, etc.
+     - Parsed using ElementTree with namespace dictionary
+   - **ForGastro Feed**: Standard XML without namespace
+   - Product entries with identifiers, details, and category information
 
 5. **Internal Data Representation**:
    - Pandas DataFrames for both local and processed data
@@ -142,8 +145,9 @@ The application is organized into a `src` package to ensure clear separation of 
 ### New Format Structure (138-Column)
 - **main_new_format.py**: New application entry point
 - **src/parsers/**: XML parsing for new format
-  - `xml_parser_new_format.py` - Gastromarket & ForGastro parsers
+  - `xml_parser_new_format.py` - Gastromarket & ForGastro parsers with namespace support
   - `xml_parser_factory.py` - Parser factory
+  - **Namespace Handling**: Proper ElementTree prefix-based namespace parsing for Gastromarket RSS feed
 - **src/mergers/**: Smart data merging
   - `data_merger_new_format.py` - Image priority merging
 - **src/mappers/**: Category transformation

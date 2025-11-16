@@ -1,17 +1,17 @@
 {
   "xml_feeds": {
     "gastromarket": {
-      "url": "https://www.gastromarket.sk/web/content/259710/B2B_product_feed_GastroMarket.xml",
-      "root_element": "PRODUKT",
-      "item_element": "PRODUKT",
+      "url": "https://www.gastromarket.sk/product_data/partner_feed_sk.xml",
+      "root_element": "channel",
+      "item_element": "item",
+      "namespace": "http://base.google.com/ns/1.0",
       "mapping": {
         "KATALOG_CISLO": "code",
         "MENO": "name",
         "POPIS": "shortDescription",
-        "CENA": "price",
-        "VYROBCA": "manufacturer",
+        "CENA_KATALOG": "price",
         "KATEGORIA_KOMPLET": "defaultCategory",
-        "OBRAZOK": "IMAGE"
+        "OBRAZOK_1": "IMAGE"
       }
     },
     "forgastro": {

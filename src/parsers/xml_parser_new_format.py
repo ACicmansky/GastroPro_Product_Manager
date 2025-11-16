@@ -34,18 +34,33 @@ class XMLParserNewFormat:
         print("\nParsing Gastromarket XML feed...")
 
         feed_config = self.xml_feeds.get("gastromarket", {})
-        item_element = feed_config.get("item_element", "PRODUKT")
+        root_element = feed_config.get("root_element", "channel")
+        item_element = feed_config.get("item_element", "item")
         mapping = feed_config.get("mapping", {})
+        namespace_url = feed_config.get("namespace")
 
-        # Parse XML
-        root = ET.fromstring(xml_content)
+        xml_root = ET.fromstring(xml_content)
+        
+        # Register namespace if provided
+        namespaces = {}
+        if namespace_url:
+            namespaces = {"g": namespace_url}
+            # Register namespace for ElementTree
+            ET.register_namespace("g", namespace_url)
+        
+        root = xml_root.find(root_element)
 
         # Extract data
         data = []
         for item in root.findall(f".//{item_element}"):
             row = {}
             for xml_field, new_field in mapping.items():
-                element = item.find(xml_field)
+                # Use namespace prefix if configured
+                if namespace_url:
+                    element = item.find(f"g:{xml_field}", namespaces)
+                else:
+                    element = item.find(xml_field)
+                
                 value = element.text if element is not None and element.text else ""
                 row[new_field] = value
 

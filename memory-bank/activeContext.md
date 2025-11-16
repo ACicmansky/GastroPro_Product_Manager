@@ -17,6 +17,15 @@
 
 ## Recent Changes
 
+**XML Namespace Parsing Fix (November 16, 2025)**:
+- **Critical Bug Fix**: Fixed Gastromarket XML parser failing with production feed
+- **Root Cause**: Real feed uses prefixed namespace (`xmlns:g=`) not default namespace
+- **Solution**: Implemented proper prefix-based namespace handling with ElementTree
+- **Config Cleanup**: Removed `g:` prefixes from field names, added namespace URL to config
+- **Production Validation**: Successfully parsed 3,934 products from live Gastromarket feed
+- **Tests**: All 217 tests passing, zero regressions
+- **Pipeline Success**: Complete end-to-end processing with real data
+
 **Phase 13 Complete (November 16, 2025)**:
 - **Full Gemini API Integration**: Real API client with web search grounding tool
 - **Quota Management**: Thread-safe tracking (15 calls/min, 250K tokens/min) with automatic waiting
