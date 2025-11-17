@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 
 # Hardcoded file path - change this to your input file
-INPUT_FILE = r"c:\Source\Python\GastroPro_Product_Manager\data\2025_10_03_Merged_AI.csv"
+INPUT_FILE = r"c:\Source\Python\GastroPro_Product_Manager\data\old_data_format.csv"
 
 
 def load_config():

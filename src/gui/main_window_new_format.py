@@ -352,7 +352,6 @@ class MainWindowNewFormat(QMainWindow):
         self.worker.category_mapping_request.connect(self.handle_category_mapping_request)
         self.worker.error.connect(self.show_error_message)
         self.worker.progress.connect(self.update_progress)
-        self.worker.category_mapping_request.connect(self.handle_category_mapping_request)
 
         # Cleanup
         self.thread.finished.connect(lambda: self.process_button.setEnabled(True))

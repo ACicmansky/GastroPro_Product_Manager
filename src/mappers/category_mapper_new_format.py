@@ -107,10 +107,17 @@ class CategoryMapperNewFormat:
             print(f"  [INTERACTIVE] Requesting user input...")
             new_category = self.interactive_callback(original_category, product_name)
             print(f"  [INTERACTIVE] User response: '{new_category}'")
+            
+            # Always save the mapping (even if user cancelled or kept original)
+            # This prevents asking for the same category multiple times
             if new_category and new_category != original_category:
-                # Save the mapping
+                # User provided a new category
                 self.category_manager.add_mapping(original_category, new_category)
                 mapped_category = new_category
+            else:
+                # User cancelled or kept original - save original→original to avoid re-asking
+                self.category_manager.add_mapping(original_category, original_category)
+                mapped_category = original_category
         else:
             # No mapping found and no interactive callback
             if original_category:
@@ -150,13 +157,11 @@ class CategoryMapperNewFormat:
         print(f"  Interactive callback: {'SET' if self.interactive_callback else 'NOT SET'}")
         if enable_interactive:
             # Map with interactive callback (includes transformation)
-            result_df["defaultCategory"] = result_df.apply(
-                lambda row: self.map_category(
-                    str(row["defaultCategory"]) if pd.notna(row.get("defaultCategory")) else "",
-                    str(row.get("name", "")) if pd.notna(row.get("name")) else None
-                ),
-                axis=1
-            )
+            # Process row by row to ensure new mappings are immediately available
+            for idx in result_df.index:
+                category = str(result_df.at[idx, "defaultCategory"]) if pd.notna(result_df.at[idx, "defaultCategory"]) else ""
+                product_name = str(result_df.at[idx, "name"]) if pd.notna(result_df.at[idx, "name"]) else None
+                result_df.at[idx, "defaultCategory"] = self.map_category(category, product_name)
         else:
             # Just transform (no interactive mapping)
             result_df["defaultCategory"] = result_df["defaultCategory"].apply(
