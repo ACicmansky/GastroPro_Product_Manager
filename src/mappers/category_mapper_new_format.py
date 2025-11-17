@@ -75,6 +75,7 @@ class CategoryMapperNewFormat:
         Map category using mappings, then apply transformation.
         
         Mapping priority:
+        0. If category already has correct format (starts with prefix), return as-is
         1. Check CategoryMappingManager (loaded from categories.json)
         2. Check custom mappings
         3. If not found and interactive_callback is set, prompt user
@@ -91,6 +92,13 @@ class CategoryMapperNewFormat:
             return ""
         
         original_category = str(category).strip()
+        
+        # 0. Check if category is already in correct format (from loaded XLSX)
+        # Categories from main data file already have "Tovary a kategórie >" prefix
+        if original_category.startswith(self.prefix):
+            print(f"  [SKIP] Category already in correct format: '{original_category[:60]}...'")
+            return original_category  # Return as-is, no mapping or transformation needed
+        
         mapped_category = original_category
         
         # 1. Check CategoryMappingManager first
