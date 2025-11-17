@@ -2521,27 +2521,27 @@
   },
   {
     "oldCategory": "/e-shop/samostatne-chladnicky/bez-mraznicky-vnutri",
-    "newCategory": "Chladenie a mrazenie/Chladničky/Skriňové chladničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Chladničky/Skriňové chladničky"
   },
   {
     "oldCategory": "/e-shop/samostatne-chladnicky/s-mraznickou-vo-vnutri",
-    "newCategory": "Chladenie a mrazenie/Kombinované chladničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Kombinované chladničky"
   },
   {
     "oldCategory": "/e-shop/chladnicky-s-mraznickou/s-mraznickou-hore",
-    "newCategory": "Chladenie a mrazenie/Kombinované chladničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Kombinované chladničky"
   },
   {
     "oldCategory": "/e-shop/chladnicky-s-mraznickou/s-mraznickou-dole",
-    "newCategory": "Chladenie a mrazenie/Kombinované chladničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Kombinované chladničky"
   },
   {
     "oldCategory": "/e-shop/americke-chladnicky",
-    "newCategory": "Chladenie a mrazenie/Americké chladničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Americké chladničky"
   },
   {
     "oldCategory": "/e-shop/mraznicky/pultove",
-    "newCategory": "Chladenie a mrazenie/Mrazničky/Truhlicové mrazničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Mrazničky/Truhlicové mrazničky"
   },
   {
     "oldCategory": "/e-shop/gastro-zariadenie/pultove-mraznicky",
@@ -2549,35 +2549,35 @@
   },
   {
     "oldCategory": "/e-shop/mraznicky/suplikove",
-    "newCategory": "Chladenie a mrazenie/Mrazničky/Skriňové mrazničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Mrazničky/Skriňové mrazničky"
   },
   {
     "oldCategory": "/e-shop/vstavane-spotrebice/chladnicky-na-vino",
-    "newCategory": "Bar a kaviareň/Vínotéky a humidory"
+    "newCategory": "Bar a kaviareň/Pre domácnosť/Vínotéky a humidory"
   },
   {
     "oldCategory": "/e-shop/vstavane-spotrebice/mraznicky",
-    "newCategory": "Chladenie a mrazenie/Mrazničky/Vstavané mrazničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Mrazničky/Vstavané mrazničky"
   },
   {
     "oldCategory": "/e-shop/vstavane-spotrebice/chladnicky",
-    "newCategory": "Chladenie a mrazenie/Chladničky/Vstavané chladničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Chladničky/Vstavané chladničky"
   },
   {
     "oldCategory": "/e-shop/vstavane-spotrebice/kombinovane-chladnicky",
-    "newCategory": "Chladenie a mrazenie/Kombinované chladničky"
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Kombinované chladničky"
   },
   {
     "oldCategory": "/e-shop/domace-vinoteky/temperovane",
-    "newCategory": "Bar a kaviareň/Vínotéky a humidory"
+    "newCategory": "Bar a kaviareň/Pre domácnosť/Vínotéky a humidory"
   },
   {
     "oldCategory": "/e-shop/domace-vinoteky/klimatizovane",
-    "newCategory": "Bar a kaviareň/Vínotéky a humidory"
+    "newCategory": "Bar a kaviareň/Pre domácnosť/Vínotéky a humidory"
   },
   {
     "oldCategory": "/e-shop/humidory",
-    "newCategory": "Bar a kaviareň/Vínotéky a humidory"
+    "newCategory": "Bar a kaviareň/Pre domácnosť/Vínotéky a humidory"
   },
   {
     "oldCategory": "/e-shop/komercne-zariadenia/gastro-zariadenie",
@@ -2686,5 +2686,53 @@
   {
     "oldCategory": "Kuchynské mixéry",
     "newCategory": "Príprava surovín/Varné kutre"
+  },
+  {
+    "oldCategory": "Chladenie a mrazenie/Chladničky/Skriňové chladničky",
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Chladničky/Skriňové chladničky"
+  },
+  {
+    "oldCategory": "Chladenie a mrazenie/Kombinované chladničky",
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Kombinované chladničky"
+  },
+  {
+    "oldCategory": "Chladenie a mrazenie/Americké chladničky",
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Americké chladničky"
+  },
+  {
+    "oldCategory": "Chladenie a mrazenie/Mrazničky/Truhlicové mrazničky",
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Mrazničky/Truhlicové mrazničky"
+  },
+  {
+    "oldCategory": "Chladenie a mrazenie/Mrazničky/Skriňové mrazničky",
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Mrazničky/Skriňové mrazničky"
+  },
+  {
+    "oldCategory": "Bar a kaviareň/Vínotéky a humidory",
+    "newCategory": "Bar a kaviareň/Pre domácnosť/Vínotéky a humidory"
+  },
+  {
+    "oldCategory": "Chladenie a mrazenie/Mrazničky/Vstavané mrazničky",
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Mrazničky/Vstavané mrazničky"
+  },
+  {
+    "oldCategory": "Chladenie a mrazenie/Chladničky/Vstavané chladničky",
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Chladničky/Vstavané chladničky"
+  },
+  {
+    "oldCategory": "Chladenie a mrazenie/Kombinované chladničky",
+    "newCategory": "Chladenie a mrazenie/Pre domácnosť/Kombinované chladničky"
+  },
+  {
+    "oldCategory": "Bar a kaviareň/Vínotéky a humidory",
+    "newCategory": "Bar a kaviareň/Pre domácnosť/Vínotéky a humidory"
+  },
+  {
+    "oldCategory": "Chladiace vitríny - samostatne stojace",
+    "newCategory": "Vitríny a výdaj/Chladiace vitríny"
+  },
+  {
+    "oldCategory": "Chladiace vitríny - pultové",
+    "newCategory": "Vitríny a výdaj/Chladiace vitríny"
   }
 ]
