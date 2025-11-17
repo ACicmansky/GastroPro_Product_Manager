@@ -133,3 +133,26 @@ def sample_xml_forgastro():
         <product_weight>3.5</product_weight>
     </product>
 </products>"""
+
+
+@pytest.fixture
+def sample_xml_forgastro_with_html():
+    """Sample ForGastro XML data with HTML content in description."""
+    return """<?xml version="1.0" encoding="UTF-8"?>
+<products>
+    <product>
+        <product_sku>FG002</product_sku>
+        <product_name>ForGastro Product with HTML</product_name>
+        <product_price>350.00</product_price>
+        <manufacturer>FG Manufacturer</manufacturer>
+        <category>FG Category</category>
+        <product_s_desc>Initial short desc</product_s_desc>
+        <product_desc>{tab title="popis"}&lt;p&gt;This is a professional gastronomy product with excellent features.&lt;/p&gt;{tab title="parametre"}&lt;table&gt;&lt;tr&gt;&lt;th&gt;Parameter&lt;/th&gt;&lt;th&gt;Value&lt;/th&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Width&lt;/td&gt;&lt;td&gt;600mm&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;Height&lt;/td&gt;&lt;td&gt;850mm&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;{/tabs}</product_desc>
+        <images>
+            <item>
+                <url>http://example.com/fg2.jpg</url>
+            </item>
+        </images>
+        <product_weight>5.0</product_weight>
+    </product>
+</products>"""

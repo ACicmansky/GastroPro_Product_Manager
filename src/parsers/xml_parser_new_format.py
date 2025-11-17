@@ -6,6 +6,9 @@ Parses XML feeds directly to new e-shop format.
 import pandas as pd
 import xml.etree.ElementTree as ET
 from typing import Dict
+import html
+import re
+from bs4 import BeautifulSoup
 
 
 class XMLParserNewFormat:
@@ -119,6 +122,10 @@ class XMLParserNewFormat:
 
         df = pd.DataFrame(data)
 
+        # Process HTML content in description field
+        if "description" in df.columns:
+            df = self._process_forgastro_html(df)
+
         # Process images - check if IMAGES column exists in result
         if "IMAGES" in df.columns:
             df = self._split_images(df, "IMAGES")
@@ -201,4 +208,94 @@ class XMLParserNewFormat:
             # Remove any currency symbols
             df["price"] = df["price"].str.replace("€", "", regex=False).str.strip()
 
+        return df
+
+    def _process_forgastro_html(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Process HTML content from ForGastro feed.
+        Extracts clean text from 'popis' tab for description (long desc)
+        and parameters from 'parametre' tab for shortDescription (appended if exists).
+        If no tabs present, extracts clean text from entire HTML to description.
+
+        Args:
+            df: DataFrame with description column containing HTML
+
+        Returns:
+            DataFrame with processed shortDescription and description
+        """
+        for idx, row in df.iterrows():
+            html_content = row.get("description", "")
+            
+            if not html_content or not isinstance(html_content, str):
+                continue
+            
+            try:
+                decoded_html = html.unescape(html_content)
+                
+                # Check if content has tab structure
+                has_tabs = "{tab title=" in decoded_html
+                
+                if has_tabs:
+                    # Extract content from tabs
+                    popis_pattern = re.compile(
+                        r'\{tab title="popis"\}(.*?)(?:\{tab title|\{/tabs\}|$)', re.DOTALL
+                    )
+                    parametre_pattern = re.compile(
+                        r'\{tab title="parametre"\}(.*?)(?:\{tab title|\{/tabs\}|$)', re.DOTALL
+                    )
+
+                    popis_match = popis_pattern.search(decoded_html)
+                    parametre_match = parametre_pattern.search(decoded_html)
+
+                    popis_content = popis_match.group(1) if popis_match else ""
+                    parametre_content = parametre_match.group(1) if parametre_match else ""
+
+                    popis_text = (
+                        BeautifulSoup(popis_content, "html.parser").get_text(
+                            separator=" ", strip=True
+                        )
+                        if popis_content
+                        else ""
+                    )
+
+                    params_text = ""
+                    if parametre_content:
+                        soup_params = BeautifulSoup(parametre_content, "html.parser")
+                        tables = soup_params.find_all("table")
+                        if tables:
+                            param_lines = []
+                            for table_row in tables[0].find_all("tr")[1:]:
+                                cols = table_row.find_all(["td", "th"])
+                                if len(cols) >= 2:
+                                    param_name = cols[0].get_text(strip=True)
+                                    param_value = cols[1].get_text(strip=True)
+                                    if param_value:
+                                        param_lines.append(f"{param_name} {param_value}")
+                            params_text = "\n".join(param_lines)
+                        else:
+                            params_text = soup_params.get_text(separator=" ", strip=True)
+                else:
+                    # No tabs - extract clean text from entire HTML content
+                    popis_text = BeautifulSoup(decoded_html, "html.parser").get_text(
+                        separator=" ", strip=True
+                    )
+                    params_text = ""
+                
+                # Update DataFrame - matching old version behavior:
+                # 1. popis_text goes to description (Dlhý popis)
+                if "description" in df.columns and popis_text:
+                    df.at[idx, "description"] = popis_text
+                
+                # 2. params_text goes to shortDescription (Krátky popis), appended if exists
+                if "shortDescription" in df.columns and params_text:
+                    current_short = str(row.get("shortDescription", "")).strip()
+                    if current_short and current_short not in ["nan", "None", ""]:
+                        df.at[idx, "shortDescription"] = f"{current_short}\n{params_text}"
+                    else:
+                        df.at[idx, "shortDescription"] = params_text
+                
+            except Exception as e:
+                print(f"  Warning: Error processing HTML for product at index {idx}: {e}")
+                continue
+        
         return df
