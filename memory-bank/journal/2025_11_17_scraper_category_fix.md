@@ -309,7 +309,61 @@ The scraper now correctly provides raw data, allowing the category mapper to han
 
 ---
 
+---
+
+## Follow-up Fix: Filter Prefixed Categories from Suggestions
+
+**Date**: November 18, 2025  
+**Issue**: Interactive dialog showed suggestions with "Tovary a kategórie >" prefix
+
+### Problem
+When interactive mapping dialog appeared, suggestions included categories that were already in the final format:
+- ❌ `"Tovary a kategórie > Chladenie a mrazenie > Pre domácnosť > Chladničky"`
+- These are final-format categories, not raw categories for mapping
+- Confusing for users (should only see raw category names)
+
+### Root Cause
+In `main_window_new_format.py`, the `handle_category_mapping_request` method collected suggestions from three sources:
+1. ✅ `category_manager.get_unique_categories()` - Returns `newCategory` values WITHOUT prefix
+2. ❌ `main_data_df["defaultCategory"]` - Contains categories WITH prefix (already formatted)
+3. ❌ `all_categories` list - May contain categories WITH prefix
+
+The code added ALL categories without filtering, mixing raw and formatted categories.
+
+### Fix Applied
+Added filtering to exclude categories that already have the prefix:
+
+```python
+# 2. Get categories from loaded main data (filter out already-formatted ones)
+if self.main_data_df is not None and "defaultCategory" in self.main_data_df.columns:
+    main_categories = self.main_data_df["defaultCategory"].dropna().unique()
+    # Only add categories WITHOUT the prefix (raw categories for mapping)
+    for cat in main_categories:
+        if not str(cat).startswith("Tovary a kategórie >"):
+            existing_categories.add(cat)
+
+# 3. Get categories from all_categories list (filter out already-formatted ones)
+if self.all_categories:
+    for cat in self.all_categories:
+        if not str(cat).startswith("Tovary a kategórie >"):
+            existing_categories.add(cat)
+```
+
+### Result
+Suggestions now only include raw category names:
+- ✅ `"Chladenie a mrazenie/Pre domácnosť/Chladničky"`
+- ✅ `"Kuchynský riad/Panvice"`
+- ✅ `"Gastronádoby/GN nádoby"`
+
+No more confusing prefixed categories in suggestions!
+
+### Files Modified
+- `src/gui/main_window_new_format.py` (filter prefixed categories from suggestions)
+
+---
+
 **Prepared by**: Cascade AI Assistant  
-**Date**: November 17, 2025  
+**Date**: November 17-18, 2025  
 **Issue**: Scraped categories had prefix but wrong format, bypassed mapper  
-**Resolution**: Scraper saves raw URLs, mapper handles all transformations
+**Resolution**: Scraper saves raw URLs, mapper handles all transformations  
+**Follow-up**: Filter prefixed categories from interactive dialog suggestions

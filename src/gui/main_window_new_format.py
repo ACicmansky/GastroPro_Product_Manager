@@ -599,14 +599,20 @@ class MainWindowNewFormat(QMainWindow):
             unique_cats = category_manager.get_unique_categories()
             existing_categories.update(unique_cats)
         
-        # 2. Get categories from loaded main data
+        # 2. Get categories from loaded main data (filter out already-formatted ones)
         if self.main_data_df is not None and "defaultCategory" in self.main_data_df.columns:
             main_categories = self.main_data_df["defaultCategory"].dropna().unique()
-            existing_categories.update(main_categories)
+            # Only add categories WITHOUT the prefix (raw categories for mapping)
+            # Categories with prefix are already in final format and shouldn't be used as suggestions
+            for cat in main_categories:
+                if not str(cat).startswith("Tovary a kategórie >"):
+                    existing_categories.add(cat)
         
-        # 3. Get categories from all_categories list
+        # 3. Get categories from all_categories list (filter out already-formatted ones)
         if self.all_categories:
-            existing_categories.update(self.all_categories)
+            for cat in self.all_categories:
+                if not str(cat).startswith("Tovary a kategórie >"):
+                    existing_categories.add(cat)
         
         # Get suggestions using similarity matching
         suggestions = []
