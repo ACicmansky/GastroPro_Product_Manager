@@ -13,28 +13,32 @@ from pathlib import Path
 @pytest.fixture
 def sample_data():
     """Create sample DataFrame with categories."""
-    return pd.DataFrame({
-        "code": ["PROD001", "PROD002", "PROD003", "PROD004", "PROD005"],
-        "name": ["Product 1", "Product 2", "Product 3", "Product 4", "Product 5"],
-        "price": ["100", "200", "300", "400", "500"],
-        "defaultCategory": [
-            "Tovary a kategórie > Chladenie > Chladničky",
-            "Tovary a kategórie > Chladenie > Mrazničky",
-            "Tovary a kategórie > Chladenie > Chladničky",
-            "Tovary a kategórie > Gastro > Sporáky",
-            "Tovary a kategórie > Gastro > Rúry",
-        ],
-    })
+    return pd.DataFrame(
+        {
+            "code": ["PROD001", "PROD002", "PROD003", "PROD004", "PROD005"],
+            "name": ["Product 1", "Product 2", "Product 3", "Product 4", "Product 5"],
+            "price": ["100", "200", "300", "400", "500"],
+            "defaultCategory": [
+                "Tovary a kategórie > Chladenie > Chladničky",
+                "Tovary a kategórie > Chladenie > Mrazničky",
+                "Tovary a kategórie > Chladenie > Chladničky",
+                "Tovary a kategórie > Gastro > Sporáky",
+                "Tovary a kategórie > Gastro > Rúry",
+            ],
+        }
+    )
 
 
 @pytest.fixture
 def empty_data():
     """Create DataFrame with no categories."""
-    return pd.DataFrame({
-        "code": ["PROD001", "PROD002"],
-        "name": ["Product 1", "Product 2"],
-        "price": ["100", "200"],
-    })
+    return pd.DataFrame(
+        {
+            "code": ["PROD001", "PROD002"],
+            "name": ["Product 1", "Product 2"],
+            "price": ["100", "200"],
+        }
+    )
 
 
 class TestCategoryExtraction:
@@ -88,14 +92,16 @@ class TestCategoryExtraction:
         """Test handling NaN values in categories."""
         from src.filters.category_filter import CategoryFilter
 
-        df = pd.DataFrame({
-            "code": ["PROD001", "PROD002", "PROD003"],
-            "defaultCategory": [
-                "Tovary a kategórie > Category 1",
-                None,
-                "Tovary a kategórie > Category 2",
-            ],
-        })
+        df = pd.DataFrame(
+            {
+                "code": ["PROD001", "PROD002", "PROD003"],
+                "defaultCategory": [
+                    "Tovary a kategórie > Category 1",
+                    None,
+                    "Tovary a kategórie > Category 2",
+                ],
+            }
+        )
 
         filter = CategoryFilter()
         categories = filter.extract_categories(df)
@@ -108,14 +114,16 @@ class TestCategoryExtraction:
         """Test handling empty string categories."""
         from src.filters.category_filter import CategoryFilter
 
-        df = pd.DataFrame({
-            "code": ["PROD001", "PROD002", "PROD003"],
-            "defaultCategory": [
-                "Tovary a kategórie > Category 1",
-                "",
-                "Tovary a kategórie > Category 2",
-            ],
-        })
+        df = pd.DataFrame(
+            {
+                "code": ["PROD001", "PROD002", "PROD003"],
+                "defaultCategory": [
+                    "Tovary a kategórie > Category 1",
+                    "",
+                    "Tovary a kategórie > Category 2",
+                ],
+            }
+        )
 
         filter = CategoryFilter()
         categories = filter.extract_categories(df)
@@ -134,7 +142,7 @@ class TestCategoryFiltering:
 
         filter = CategoryFilter()
         selected = ["Tovary a kategórie > Chladenie > Chladničky"]
-        
+
         result = filter.filter_by_categories(sample_data, selected)
 
         # Should return only products in selected category
@@ -150,7 +158,7 @@ class TestCategoryFiltering:
             "Tovary a kategórie > Chladenie > Chladničky",
             "Tovary a kategórie > Gastro > Sporáky",
         ]
-        
+
         result = filter.filter_by_categories(sample_data, selected)
 
         # Should return products in any of selected categories
@@ -183,12 +191,12 @@ class TestCategoryFiltering:
 
         filter = CategoryFilter()
         selected = ["Tovary a kategórie > Chladenie > Chladničky"]
-        
+
         result = filter.filter_by_categories(sample_data, selected)
 
         # Should preserve all columns
         assert list(result.columns) == list(sample_data.columns)
-        
+
         # Should preserve data in other columns
         assert result.iloc[0]["code"] == "PROD001"
         assert result.iloc[0]["name"] == "Product 1"
@@ -199,7 +207,7 @@ class TestCategoryFiltering:
 
         filter = CategoryFilter()
         selected = ["Tovary a kategórie > Nonexistent > Category"]
-        
+
         result = filter.filter_by_categories(sample_data, selected)
 
         # Should return empty DataFrame
@@ -211,7 +219,7 @@ class TestCategoryFiltering:
 
         filter = CategoryFilter()
         selected = ["Tovary a kategórie > Chladenie > Chladničky"]
-        
+
         result = filter.filter_by_categories(sample_data, selected)
 
         # Should maintain original indices (0 and 2)

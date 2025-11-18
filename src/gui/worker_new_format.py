@@ -41,13 +41,15 @@ class WorkerNewFormat(QObject):
         """Run the complete pipeline."""
         try:
             self.progress.emit("Inicializácia...")
-            
+
             # Set up interactive category mapping callback
-            self.pipeline.category_mapper.set_interactive_callback(self._request_category_mapping)
+            self.pipeline.category_mapper.set_interactive_callback(
+                self._request_category_mapping
+            )
 
             # Prepare XML feeds
             xml_feeds = self._prepare_xml_feeds()
-            
+
             # Prepare scraped data if requested
             scraped_data = None
             if self.options.get("enable_web_scraping", False):
@@ -58,17 +60,17 @@ class WorkerNewFormat(QObject):
 
             # Get selected categories
             selected_categories = self.options.get("selected_categories")
-            
+
             # Run pipeline with category filtering and interactive mapping
             self.progress.emit("Spracovanie feedov...")
             result_df, stats = self.pipeline.run_with_stats(
-                xml_feeds=xml_feeds, 
+                xml_feeds=xml_feeds,
                 main_data_file=main_data_file,
                 scraped_data=scraped_data,
                 selected_categories=selected_categories,
-                enable_interactive_mapping=True  # Enable interactive category mapping dialogs
+                enable_interactive_mapping=True,  # Enable interactive category mapping dialogs
             )
-            
+
             # Update stats with category info
             if selected_categories:
                 stats["filtered_categories"] = len(selected_categories)
@@ -145,30 +147,32 @@ class WorkerNewFormat(QObject):
     def _scrape_products(self) -> Optional[pd.DataFrame]:
         """
         Scrape products from TopChladenie.sk.
-        
+
         Returns:
             DataFrame with scraped products or None
         """
         try:
             self.progress.emit("Web scraping: inicializácia...")
-            
+
             # Create scraper with progress callback
             scraper = EnhancedScraperNewFormat(
                 config=self.config,
-                progress_callback=lambda msg: self.progress.emit(f"Web scraping: {msg}"),
-                max_threads=8
+                progress_callback=lambda msg: self.progress.emit(
+                    f"Web scraping: {msg}"
+                ),
+                max_threads=8,
             )
-            
+
             self.progress.emit("Web scraping: spúšťam...")
             scraped_df = scraper.scrape_products()
-            
+
             self.progress.emit(f"Web scraping: dokončené ({len(scraped_df)} produktov)")
             return scraped_df
-            
+
         except Exception as e:
             self.progress.emit(f"Web scraping: chyba - {str(e)}")
             return None
-    
+
     def _apply_ai_enhancement(self, df: pd.DataFrame, stats: Dict) -> pd.DataFrame:
         """
         Apply AI enhancement to products.
@@ -201,44 +205,50 @@ class WorkerNewFormat(QObject):
         else:
             self.progress.emit("AI vylepšenie: všetky produkty už spracované")
             return df
-    
-    def _request_category_mapping(self, original_category: str, product_name: Optional[str] = None) -> str:
+
+    def _request_category_mapping(
+        self, original_category: str, product_name: Optional[str] = None
+    ) -> str:
         """
         Request interactive category mapping from GUI.
-        
+
         This method blocks the worker thread until the user responds in the GUI.
-        
+
         Args:
             original_category: The unmapped category
             product_name: Optional product name for context
-        
+
         Returns:
             New category name from user or original if cancelled
         """
         # Reset result
         self.category_mapping_result = None
-        
+
         # Emit signal to GUI (runs in main thread)
         self.category_mapping_request.emit(original_category, product_name or "")
-        
+
         # Create event loop to wait for response
         self.category_mapping_event_loop = QEventLoop()
         self.category_mapping_event_loop.exec_()  # Block until set_category_mapping_result is called
-        
+
         # Return result (or original if None)
-        return self.category_mapping_result if self.category_mapping_result else original_category
-    
+        return (
+            self.category_mapping_result
+            if self.category_mapping_result
+            else original_category
+        )
+
     def set_category_mapping_result(self, new_category: str):
         """
         Set the category mapping result from GUI.
-        
+
         This unblocks the worker thread.
-        
+
         Args:
             new_category: The new category name from user
         """
         self.category_mapping_result = new_category
-        
+
         # Quit the event loop to unblock worker thread
         if self.category_mapping_event_loop:
             self.category_mapping_event_loop.quit()

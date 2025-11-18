@@ -73,7 +73,7 @@ class CategoryMapperNewFormat:
     def map_category(self, category: str, product_name: Optional[str] = None) -> str:
         """
         Map category using mappings, then apply transformation.
-        
+
         Mapping priority:
         0. If category already has correct format (starts with prefix), return as-is
         1. Check CategoryMappingManager (loaded from categories.json)
@@ -90,22 +90,26 @@ class CategoryMapperNewFormat:
         """
         if not category or category in ["", "nan", "None"]:
             return ""
-        
+
         original_category = str(category).strip()
-        
+
         # 0. Check if category is already in correct format (from loaded XLSX)
         # Categories from main data file already have "Tovary a kategórie >" prefix
         if original_category.startswith(self.prefix):
-            print(f"  [SKIP] Category already in correct format: '{original_category[:60]}...'")
-            return original_category  # Return as-is, no mapping or transformation needed
-        
+            print(
+                f"  [SKIP] Category already in correct format: '{original_category[:60]}...'"
+            )
+            return (
+                original_category  # Return as-is, no mapping or transformation needed
+            )
+
         # If category is a raw URL from scraper, keep it for mapping lookup
         # The mapping file should have entries like "/e-shop/..." -> "Category > Subcategory"
         # This allows proper mapping through categories.json
         lookup_category = original_category
-        
+
         mapped_category = original_category
-        
+
         # 1. Check CategoryMappingManager first
         manager_mapping = self.category_manager.find_mapping(original_category)
         if manager_mapping:
@@ -120,7 +124,7 @@ class CategoryMapperNewFormat:
             print(f"  [INTERACTIVE] Requesting user input...")
             new_category = self.interactive_callback(original_category, product_name)
             print(f"  [INTERACTIVE] User response: '{new_category}'")
-            
+
             # Always save the mapping (even if user cancelled or kept original)
             # This prevents asking for the same category multiple times
             if new_category and new_category != original_category:
@@ -134,12 +138,16 @@ class CategoryMapperNewFormat:
         else:
             # No mapping found and no interactive callback
             if original_category:
-                print(f"  [WARNING] No mapping for '{original_category}' and no interactive callback set")
+                print(
+                    f"  [WARNING] No mapping for '{original_category}' and no interactive callback set"
+                )
 
         # Apply transformation
         return self.transform_category(mapped_category)
 
-    def map_dataframe(self, df: pd.DataFrame, enable_interactive: bool = True) -> pd.DataFrame:
+    def map_dataframe(
+        self, df: pd.DataFrame, enable_interactive: bool = True
+    ) -> pd.DataFrame:
         """
         Map categories in DataFrame.
 
@@ -166,15 +174,29 @@ class CategoryMapperNewFormat:
 
         # Map and transform defaultCategory
         print("\nMapping and transforming categories...")
-        print(f"  Interactive mapping: {'ENABLED' if enable_interactive else 'DISABLED'}")
-        print(f"  Interactive callback: {'SET' if self.interactive_callback else 'NOT SET'}")
+        print(
+            f"  Interactive mapping: {'ENABLED' if enable_interactive else 'DISABLED'}"
+        )
+        print(
+            f"  Interactive callback: {'SET' if self.interactive_callback else 'NOT SET'}"
+        )
         if enable_interactive:
             # Map with interactive callback (includes transformation)
             # Process row by row to ensure new mappings are immediately available
             for idx in result_df.index:
-                category = str(result_df.at[idx, "defaultCategory"]) if pd.notna(result_df.at[idx, "defaultCategory"]) else ""
-                product_name = str(result_df.at[idx, "name"]) if pd.notna(result_df.at[idx, "name"]) else None
-                result_df.at[idx, "defaultCategory"] = self.map_category(category, product_name)
+                category = (
+                    str(result_df.at[idx, "defaultCategory"])
+                    if pd.notna(result_df.at[idx, "defaultCategory"])
+                    else ""
+                )
+                product_name = (
+                    str(result_df.at[idx, "name"])
+                    if pd.notna(result_df.at[idx, "name"])
+                    else None
+                )
+                result_df.at[idx, "defaultCategory"] = self.map_category(
+                    category, product_name
+                )
         else:
             # Just transform (no interactive mapping)
             result_df["defaultCategory"] = result_df["defaultCategory"].apply(
@@ -192,17 +214,19 @@ class CategoryMapperNewFormat:
 
         return result_df
 
-    def set_interactive_callback(self, callback: Optional[Callable[[str, Optional[str]], str]]):
+    def set_interactive_callback(
+        self, callback: Optional[Callable[[str, Optional[str]], str]]
+    ):
         """
         Set callback function for interactive category mapping.
-        
+
         The callback should accept (original_category, product_name) and return new_category.
-        
+
         Args:
             callback: Function(original_category: str, product_name: Optional[str]) -> str
         """
         self.interactive_callback = callback
-    
+
     def set_custom_mappings(self, mappings: Dict[str, str]):
         """
         Set custom category mappings.
@@ -212,7 +236,7 @@ class CategoryMapperNewFormat:
         """
         self.custom_mappings = mappings
         print(f"Loaded {len(mappings)} custom category mappings")
-    
+
     def reload_mappings(self):
         """
         Reload category mappings from disk.

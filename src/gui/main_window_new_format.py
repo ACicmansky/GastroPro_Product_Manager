@@ -145,7 +145,9 @@ class MainWindowNewFormat(QMainWindow):
         search_layout = QHBoxLayout()
         search_label = QLabel("Hľadať:")
         self.category_search = QLineEdit()
-        self.category_search.setPlaceholderText("Zadajte text pre filtrovanie kategórií...")
+        self.category_search.setPlaceholderText(
+            "Zadajte text pre filtrovanie kategórií..."
+        )
         self.category_search.textChanged.connect(self._filter_category_list)
         search_layout.addWidget(search_label)
         search_layout.addWidget(self.category_search)
@@ -176,7 +178,7 @@ class MainWindowNewFormat(QMainWindow):
         layout.addWidget(self.category_info_label)
 
         self.layout.addWidget(self.category_filter_group)
-        
+
         # Hide by default (show when main data loaded)
         self.category_filter_group.setVisible(False)
 
@@ -302,7 +304,7 @@ class MainWindowNewFormat(QMainWindow):
         self.main_data_label.setText("Žiadny súbor nie je načítaný")
         self.main_data_label.setStyleSheet("color: gray;")
         self.clear_main_button.setEnabled(False)
-        
+
         # Hide category filter section
         self.category_filter_group.setVisible(False)
         self.all_categories = []
@@ -317,7 +319,9 @@ class MainWindowNewFormat(QMainWindow):
             and not self.web_scraping_checkbox.isChecked()
         ):
             QMessageBox.warning(
-                self, "Chýbajúce dáta", "Vyberte aspoň jeden zdroj dát na spracovanie (XML feed alebo web scraping)."
+                self,
+                "Chýbajúce dáta",
+                "Vyberte aspoň jeden zdroj dát na spracovanie (XML feed alebo web scraping).",
             )
             return
 
@@ -328,7 +332,9 @@ class MainWindowNewFormat(QMainWindow):
             "enable_web_scraping": self.web_scraping_checkbox.isChecked(),
             "enable_ai_enhancement": self.ai_enhancement_checkbox.isChecked(),
             "main_data_file": self.main_data_file,
-            "selected_categories": self.get_selected_categories() if self.main_data_file else None,
+            "selected_categories": (
+                self.get_selected_categories() if self.main_data_file else None
+            ),
         }
 
         # Show progress
@@ -349,7 +355,9 @@ class MainWindowNewFormat(QMainWindow):
         self.thread.finished.connect(self.thread.deleteLater)
         self.worker.result.connect(self.handle_result)
         self.worker.statistics.connect(self.handle_statistics)
-        self.worker.category_mapping_request.connect(self.handle_category_mapping_request)
+        self.worker.category_mapping_request.connect(
+            self.handle_category_mapping_request
+        )
         self.worker.error.connect(self.show_error_message)
         self.worker.progress.connect(self.update_progress)
 
@@ -372,7 +380,7 @@ class MainWindowNewFormat(QMainWindow):
         stats_text = []
         stats_text.append("=== ŠTATISTIKY SPRACOVANIA ===\n")
         stats_text.append(f"Celkový počet produktov: {stats.get('total_products', 0)}")
-        
+
         # Show detailed merge statistics if available
         if "total_created" in stats or "total_updated" in stats:
             stats_text.append(f"\n--- Zmeny produktov ---")
@@ -380,28 +388,30 @@ class MainWindowNewFormat(QMainWindow):
             stats_text.append(f"Aktualizovaných: {stats.get('total_updated', 0)}")
             stats_text.append(f"Zachovaných: {stats.get('total_kept', 0)}")
             stats_text.append(f"Odstránených: {stats.get('removed', 0)}")
-            
+
             # Show breakdown by source
             if "created" in stats and stats["created"]:
                 stats_text.append(f"\n--- Vytvorené podľa zdroja ---")
                 for source, count in stats["created"].items():
                     if count > 0:
                         stats_text.append(f"  {source}: {count}")
-            
+
             if "updated" in stats and stats["updated"]:
                 stats_text.append(f"\n--- Aktualizované podľa zdroja ---")
                 for source, count in stats["updated"].items():
                     if count > 0:
                         stats_text.append(f"  {source}: {count}")
-        
+
         stats_text.append(f"\n--- Ostatné ---")
         stats_text.append(f"Spracovaných feedov: {stats.get('feeds_processed', 0)}")
         stats_text.append(
             f"Kategórií transformovaných: {stats.get('categories_mapped', 0)}"
         )
-        
-        if stats.get('filtered_categories'):
-            stats_text.append(f"Filtrovaných kategórií: {stats.get('filtered_categories', 0)}")
+
+        if stats.get("filtered_categories"):
+            stats_text.append(
+                f"Filtrovaných kategórií: {stats.get('filtered_categories', 0)}"
+            )
 
         if "ai_processed" in stats:
             stats_text.append(f"\n--- AI vylepšenie ---")
@@ -464,25 +474,25 @@ class MainWindowNewFormat(QMainWindow):
         """Extract categories from DataFrame and display in list."""
         # Extract categories
         self.all_categories = self.category_filter.extract_categories(df)
-        
+
         if not self.all_categories:
             # No categories found
             self.category_filter_group.setVisible(False)
             return
-        
+
         # Populate category list
         self._populate_category_list(self.all_categories)
-        
+
         # Show category filter section
         self.category_filter_group.setVisible(True)
-        
+
         # Update info label
         self._update_category_info()
 
     def _populate_category_list(self, categories: list):
         """Populate category list with checkboxes."""
         self.category_list.clear()
-        
+
         for category in categories:
             item = QListWidgetItem(category)
             item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
@@ -492,7 +502,7 @@ class MainWindowNewFormat(QMainWindow):
     def _filter_category_list(self):
         """Filter category list based on search text."""
         search_text = self.category_search.text()
-        
+
         if not search_text:
             # Show all categories
             filtered_categories = self.all_categories
@@ -501,10 +511,10 @@ class MainWindowNewFormat(QMainWindow):
             filtered_categories = self.category_filter.search_categories(
                 self.all_categories, search_text
             )
-        
+
         # Repopulate list with filtered categories
         self._populate_category_list(filtered_categories)
-        
+
         # Update info
         self._update_category_info()
 
@@ -517,14 +527,14 @@ class MainWindowNewFormat(QMainWindow):
             if item.checkState() == Qt.Checked:
                 any_checked = True
                 break
-        
+
         # Toggle: if any checked, uncheck all; otherwise check all
         new_state = Qt.Unchecked if any_checked else Qt.Checked
-        
+
         for i in range(self.category_list.count()):
             item = self.category_list.item(i)
             item.setCheckState(new_state)
-        
+
         self._update_category_info()
 
     def _select_all_categories(self):
@@ -532,7 +542,7 @@ class MainWindowNewFormat(QMainWindow):
         for i in range(self.category_list.count()):
             item = self.category_list.item(i)
             item.setCheckState(Qt.Checked)
-        
+
         self._update_category_info()
 
     def _deselect_all_categories(self):
@@ -540,7 +550,7 @@ class MainWindowNewFormat(QMainWindow):
         for i in range(self.category_list.count()):
             item = self.category_list.item(i)
             item.setCheckState(Qt.Unchecked)
-        
+
         self._update_category_info()
 
     def _update_category_info(self):
@@ -548,7 +558,7 @@ class MainWindowNewFormat(QMainWindow):
         selected_count = self._get_selected_categories_count()
         total_count = len(self.all_categories)
         visible_count = self.category_list.count()
-        
+
         if visible_count < total_count:
             self.category_info_label.setText(
                 f"Zobrazené: {visible_count} z {total_count} kategórií | "
@@ -580,14 +590,14 @@ class MainWindowNewFormat(QMainWindow):
     def handle_category_mapping_request(self, original_category, product_name):
         """
         Handle interactive category mapping request from worker thread.
-        
+
         Args:
             original_category: The unmapped category
             product_name: Product name for context
         """
         # Collect existing categories for suggestions
         existing_categories = set()
-        
+
         # 1. Get categories from worker's category manager
         if (
             hasattr(self, "worker")
@@ -598,42 +608,45 @@ class MainWindowNewFormat(QMainWindow):
             category_manager = self.worker.pipeline.category_mapper.category_manager
             unique_cats = category_manager.get_unique_categories()
             existing_categories.update(unique_cats)
-        
+
         # 2. Get categories from loaded main data (filter out already-formatted ones)
-        if self.main_data_df is not None and "defaultCategory" in self.main_data_df.columns:
+        if (
+            self.main_data_df is not None
+            and "defaultCategory" in self.main_data_df.columns
+        ):
             main_categories = self.main_data_df["defaultCategory"].dropna().unique()
             # Only add categories WITHOUT the prefix (raw categories for mapping)
             # Categories with prefix are already in final format and shouldn't be used as suggestions
             for cat in main_categories:
                 if not str(cat).startswith("Tovary a kategórie >"):
                     existing_categories.add(cat)
-        
+
         # 3. Get categories from all_categories list (filter out already-formatted ones)
         if self.all_categories:
             for cat in self.all_categories:
                 if not str(cat).startswith("Tovary a kategórie >"):
                     existing_categories.add(cat)
-        
+
         # Get suggestions using similarity matching
         suggestions = []
         if existing_categories:
             suggestions = get_category_suggestions(
                 original_category, list(existing_categories), top_n=5
             )
-        
+
         # Show dialog with suggestions
         dialog = CategoryMappingDialog(
             original_category, suggestions, product_name, self
         )
         if dialog.exec_():
             new_category = dialog.get_new_category()
-            
+
             # Update progress bar with mapping info
             if new_category and new_category != original_category:
                 self.progress_bar.setFormat(
                     f"Mapovanie kategórie: {original_category[:40]}... -> {new_category[:40]}..."
                 )
-            
+
             # Send result back to worker
             self.worker.set_category_mapping_result(new_category)
         else:

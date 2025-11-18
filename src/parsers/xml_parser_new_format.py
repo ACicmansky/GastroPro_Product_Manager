@@ -43,14 +43,14 @@ class XMLParserNewFormat:
         namespace_url = feed_config.get("namespace")
 
         xml_root = ET.fromstring(xml_content)
-        
+
         # Register namespace if provided
         namespaces = {}
         if namespace_url:
             namespaces = {"g": namespace_url}
             # Register namespace for ElementTree
             ET.register_namespace("g", namespace_url)
-        
+
         root = xml_root.find(root_element)
 
         # Extract data
@@ -63,7 +63,7 @@ class XMLParserNewFormat:
                     element = item.find(f"g:{xml_field}", namespaces)
                 else:
                     element = item.find(xml_field)
-                
+
                 value = element.text if element is not None and element.text else ""
                 row[new_field] = value
 
@@ -225,30 +225,34 @@ class XMLParserNewFormat:
         """
         for idx, row in df.iterrows():
             html_content = row.get("description", "")
-            
+
             if not html_content or not isinstance(html_content, str):
                 continue
-            
+
             try:
                 decoded_html = html.unescape(html_content)
-                
+
                 # Check if content has tab structure
                 has_tabs = "{tab title=" in decoded_html
-                
+
                 if has_tabs:
                     # Extract content from tabs
                     popis_pattern = re.compile(
-                        r'\{tab title="popis"\}(.*?)(?:\{tab title|\{/tabs\}|$)', re.DOTALL
+                        r'\{tab title="popis"\}(.*?)(?:\{tab title|\{/tabs\}|$)',
+                        re.DOTALL,
                     )
                     parametre_pattern = re.compile(
-                        r'\{tab title="parametre"\}(.*?)(?:\{tab title|\{/tabs\}|$)', re.DOTALL
+                        r'\{tab title="parametre"\}(.*?)(?:\{tab title|\{/tabs\}|$)',
+                        re.DOTALL,
                     )
 
                     popis_match = popis_pattern.search(decoded_html)
                     parametre_match = parametre_pattern.search(decoded_html)
 
                     popis_content = popis_match.group(1) if popis_match else ""
-                    parametre_content = parametre_match.group(1) if parametre_match else ""
+                    parametre_content = (
+                        parametre_match.group(1) if parametre_match else ""
+                    )
 
                     popis_text = (
                         BeautifulSoup(popis_content, "html.parser").get_text(
@@ -270,32 +274,40 @@ class XMLParserNewFormat:
                                     param_name = cols[0].get_text(strip=True)
                                     param_value = cols[1].get_text(strip=True)
                                     if param_value:
-                                        param_lines.append(f"{param_name} {param_value}")
+                                        param_lines.append(
+                                            f"{param_name} {param_value}"
+                                        )
                             params_text = "\n".join(param_lines)
                         else:
-                            params_text = soup_params.get_text(separator=" ", strip=True)
+                            params_text = soup_params.get_text(
+                                separator=" ", strip=True
+                            )
                 else:
                     # No tabs - extract clean text from entire HTML content
                     popis_text = BeautifulSoup(decoded_html, "html.parser").get_text(
                         separator=" ", strip=True
                     )
                     params_text = ""
-                
+
                 # Update DataFrame - matching old version behavior:
                 # 1. popis_text goes to description (Dlhý popis)
                 if "description" in df.columns and popis_text:
                     df.at[idx, "description"] = popis_text
-                
+
                 # 2. params_text goes to shortDescription (Krátky popis), appended if exists
                 if "shortDescription" in df.columns and params_text:
                     current_short = str(row.get("shortDescription", "")).strip()
                     if current_short and current_short not in ["nan", "None", ""]:
-                        df.at[idx, "shortDescription"] = f"{current_short}\n{params_text}"
+                        df.at[idx, "shortDescription"] = (
+                            f"{current_short}\n{params_text}"
+                        )
                     else:
                         df.at[idx, "shortDescription"] = params_text
-                
+
             except Exception as e:
-                print(f"  Warning: Error processing HTML for product at index {idx}: {e}")
+                print(
+                    f"  Warning: Error processing HTML for product at index {idx}: {e}"
+                )
                 continue
-        
+
         return df

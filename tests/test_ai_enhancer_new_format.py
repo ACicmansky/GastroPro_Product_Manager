@@ -548,9 +548,7 @@ class TestBatchProcessing:
 
         # Mock API to fail multiple times
         with patch.object(enhancer, "client") as mock_client:
-            mock_client.models.generate_content.side_effect = Exception(
-                "API error"
-            )
+            mock_client.models.generate_content.side_effect = Exception("API error")
 
             with patch.object(enhancer, "_check_and_wait_for_quota"):
                 with patch("time.sleep") as mock_sleep:
@@ -620,9 +618,7 @@ class TestFuzzyMatching:
         )
 
         enhancer = AIEnhancerNewFormat(config)
-        match_idx = enhancer.find_best_match(
-            "Coffee Machine Professional", "name", df
-        )
+        match_idx = enhancer.find_best_match("Coffee Machine Professional", "name", df)
 
         # Should find match (word order independent)
         assert match_idx == 0
@@ -656,9 +652,7 @@ class TestFuzzyMatching:
         )
 
         enhancer = AIEnhancerNewFormat(config)
-        match_idx = enhancer.find_best_match(
-            "Completely Different Product", "name", df
-        )
+        match_idx = enhancer.find_best_match("Completely Different Product", "name", df)
 
         # Should return None if no good match
         assert match_idx is None

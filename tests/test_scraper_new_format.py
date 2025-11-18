@@ -351,9 +351,7 @@ class TestScraperOutput:
         scraper = ScraperNewFormat(config)
 
         # Mock data with None values
-        data = pd.DataFrame(
-            {"code": ["PROD001"], "name": ["Product"], "price": [None]}
-        )
+        data = pd.DataFrame({"code": ["PROD001"], "name": ["Product"], "price": [None]})
 
         result = scraper._clean_data(data)
 

@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class CategoryFilter:
     """
     Filter products by categories.
-    
+
     Extracts unique categories from DataFrame and filters products
     based on selected categories.
     """
@@ -74,9 +74,7 @@ class CategoryFilter:
             logger.warning("defaultCategory column not found, returning all products")
             return df
 
-    def search_categories(
-        self, categories: List[str], search_text: str
-    ) -> List[str]:
+    def search_categories(self, categories: List[str], search_text: str) -> List[str]:
         """
         Search/filter categories by text.
 

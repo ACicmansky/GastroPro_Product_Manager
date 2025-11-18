@@ -34,7 +34,7 @@ class AIEnhancerNewFormat:
 
         self.config = config
         self.ai_config = config.get("ai_enhancement", {})
-        
+
         # API configuration
         self.api_key = os.getenv("GOOGLE_API_KEY") or self.ai_config.get("api_key", "")
         self.model_name = self.ai_config.get("model", "gemini-2.5-flash-lite")
@@ -72,13 +72,15 @@ class AIEnhancerNewFormat:
         self.minute_start_time = time.time()
 
         # Ensure tmp directory exists
-        self.tmp_dir = self.ai_config.get("tmp_dir", os.path.join(os.path.dirname(__file__), "tmp"))
+        self.tmp_dir = self.ai_config.get(
+            "tmp_dir", os.path.join(os.path.dirname(__file__), "tmp")
+        )
         os.makedirs(self.tmp_dir, exist_ok=True)
 
     def _check_and_wait_for_quota(self, tokens_needed: int = 0):
         """
         Check quota and wait if necessary.
-        
+
         Thread-safe quota management for API calls and tokens.
         Limits: 15 calls/minute, 250,000 tokens/minute
         """
@@ -128,12 +130,12 @@ class AIEnhancerNewFormat:
     ) -> List[Dict[str, str]]:
         """
         Prepare batch data for AI processing.
-        
+
         Args:
             df: DataFrame containing products
             start_idx: Start index in DataFrame
             end_idx: End index in DataFrame
-            
+
         Returns:
             List of product dictionaries ready for API
         """
@@ -157,10 +159,10 @@ class AIEnhancerNewFormat:
     ) -> Optional[List[Dict[str, str]]]:
         """
         Process a batch of products with retry logic.
-        
+
         Args:
             products: List of product dictionaries
-            
+
         Returns:
             List of enhanced product dictionaries or None on failure
         """
@@ -198,8 +200,10 @@ class AIEnhancerNewFormat:
                     try:
                         # Clean response text
                         response_text = response.text.strip()
-                        response_text = response_text.replace('```json', '').replace('```', '')
-                        
+                        response_text = response_text.replace("```json", "").replace(
+                            "```", ""
+                        )
+
                         # Try direct JSON parse
                         enhanced_products = json.loads(response_text)
                         return enhanced_products
@@ -238,12 +242,12 @@ class AIEnhancerNewFormat:
     ) -> Optional[int]:
         """
         Find the best matching product in the dataframe using fuzzy matching.
-        
+
         Args:
             enhanced_product_name: Product name/code from API response
             column_name: Column to match against ('code' or 'name')
             df: DataFrame to search in
-            
+
         Returns:
             Index of best match or None if no good match found
         """
@@ -293,12 +297,12 @@ class AIEnhancerNewFormat:
     ) -> Tuple[pd.DataFrame, int]:
         """
         Update dataframe with enhanced descriptions.
-        
+
         Args:
             df: The full dataframe to update
             enhanced_products: List of enhanced product dicts from API
             valid_indices: Indices of products that were sent for processing
-            
+
         Returns:
             Tuple of (updated dataframe, count of updated products)
         """
@@ -379,11 +383,11 @@ class AIEnhancerNewFormat:
     ) -> Tuple[pd.DataFrame, Dict]:
         """
         Process entire dataframe with AI enhancement using parallel processing.
-        
+
         Args:
             df: DataFrame to process
             progress_callback: Optional callback for progress updates
-            
+
         Returns:
             Tuple of (processed dataframe, statistics dict)
         """
@@ -447,7 +451,9 @@ class AIEnhancerNewFormat:
                     if result:
                         enhanced_products, batch_indices = result
                         df, updated_count = self.update_dataframe(
-                            df, enhanced_products, valid_indices=needs_processing_indices
+                            df,
+                            enhanced_products,
+                            valid_indices=needs_processing_indices,
                         )
                         processed_count += updated_count
 
@@ -479,12 +485,12 @@ class AIEnhancerNewFormat:
     ):
         """
         Process a single batch of products.
-        
+
         Args:
             products: List of product dicts to process
             batch_indices: Original DataFrame indices for these products
             batch_num: Batch number for logging
-            
+
         Returns:
             Tuple of (enhanced products, batch indices) or None
         """
@@ -496,7 +502,7 @@ class AIEnhancerNewFormat:
     def _save_progress(self, df: pd.DataFrame, batch_identifier):
         """
         Save progress to tmp directory.
-        
+
         Args:
             df: DataFrame to save
             batch_identifier: Batch number or 'final'

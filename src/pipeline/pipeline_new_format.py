@@ -109,7 +109,9 @@ class PipelineNewFormat:
         """
         return self.merger.merge(main_df, feed_dfs)
 
-    def map_categories(self, df: pd.DataFrame, enable_interactive: bool = True) -> pd.DataFrame:
+    def map_categories(
+        self, df: pd.DataFrame, enable_interactive: bool = True
+    ) -> pd.DataFrame:
         """
         Map and transform categories.
 
@@ -120,7 +122,9 @@ class PipelineNewFormat:
         Returns:
             DataFrame with transformed categories
         """
-        return self.category_mapper.map_dataframe(df, enable_interactive=enable_interactive)
+        return self.category_mapper.map_dataframe(
+            df, enable_interactive=enable_interactive
+        )
 
     def apply_transformation(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -228,7 +232,7 @@ class PipelineNewFormat:
             df = self.parse_xml(feed_name, xml_content)
             feed_dfs[feed_name] = df
             print(f"  Parsed {feed_name}: {len(df)} products")
-        
+
         # Add scraped data if provided
         if scraped_data is not None and not scraped_data.empty:
             feed_dfs["web_scraping"] = scraped_data
@@ -238,8 +242,10 @@ class PipelineNewFormat:
         self._last_merge_stats = {}
         if selected_categories is not None:
             print("\nMerging data with category filtering...")
-            merged_df, self._last_merge_stats = self.merger.merge_with_category_filter_and_stats(
-                main_df, feed_dfs, selected_categories
+            merged_df, self._last_merge_stats = (
+                self.merger.merge_with_category_filter_and_stats(
+                    main_df, feed_dfs, selected_categories
+                )
             )
         else:
             print("\nMerging data with image priority...")
@@ -249,7 +255,9 @@ class PipelineNewFormat:
         # Step 4: Map categories (optional)
         if apply_categories:
             print("\nMapping categories...")
-            merged_df = self.map_categories(merged_df, enable_interactive=enable_interactive_mapping)
+            merged_df = self.map_categories(
+                merged_df, enable_interactive=enable_interactive_mapping
+            )
 
         # Step 5: Apply transformation (optional)
         if apply_transformation:
@@ -293,9 +301,12 @@ class PipelineNewFormat:
         """
         # Run pipeline
         result_df = self.run(
-            xml_feeds, output_file, main_data_file, scraped_data, 
+            xml_feeds,
+            output_file,
+            main_data_file,
+            scraped_data,
             selected_categories=selected_categories,
-            enable_interactive_mapping=enable_interactive_mapping
+            enable_interactive_mapping=enable_interactive_mapping,
         )
 
         # Calculate statistics
@@ -312,9 +323,9 @@ class PipelineNewFormat:
                 else 0
             ),
         }
-        
+
         # Add merge statistics if available
-        if hasattr(self, '_last_merge_stats') and self._last_merge_stats:
+        if hasattr(self, "_last_merge_stats") and self._last_merge_stats:
             stats.update(self._last_merge_stats)
 
         return result_df, stats
