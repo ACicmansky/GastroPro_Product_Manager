@@ -99,6 +99,11 @@ class CategoryMapperNewFormat:
             print(f"  [SKIP] Category already in correct format: '{original_category[:60]}...'")
             return original_category  # Return as-is, no mapping or transformation needed
         
+        # If category is a raw URL from scraper, keep it for mapping lookup
+        # The mapping file should have entries like "/e-shop/..." -> "Category > Subcategory"
+        # This allows proper mapping through categories.json
+        lookup_category = original_category
+        
         mapped_category = original_category
         
         # 1. Check CategoryMappingManager first

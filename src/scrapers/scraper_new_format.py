@@ -382,13 +382,10 @@ class ScraperNewFormat:
                     if category_url == "/e-shop/mystyle":
                         return None
                     
-                    # Extract category name from URL
-                    category_name = category_url.replace("/e-shop/", "").replace("-", " ").title()
-                    
-                    # Apply category transformation (add prefix)
-                    transformed_category = f"Tovary a kategórie > {category_name}"
-                    product_data["defaultCategory"] = transformed_category
-                    product_data["categoryText"] = transformed_category
+                    # Save raw category URL - let category mapper handle transformation
+                    # This ensures proper mapping through categories.json and correct format
+                    product_data["defaultCategory"] = category_url
+                    product_data["categoryText"] = category_url
                 else:
                     product_data["defaultCategory"] = ""
                     product_data["categoryText"] = ""

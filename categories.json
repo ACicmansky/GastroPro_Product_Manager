@@ -2734,5 +2734,69 @@
   {
     "oldCategory": "Chladiace vitríny - pultové",
     "newCategory": "Vitríny a výdaj/Chladiace vitríny"
+  },
+  {
+    "oldCategory": "Príprava potravín | Krájače na chleba",
+    "newCategory": "Príprava surovín/Strúhače a krájače"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Hrnce a rajnice | Pokrievky na hrnce",
+    "newCategory": "Kuchynský riad/Hrnce, kastróly a pokrievky"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby EKO | GN1/2 nádoby EKO",
+    "newCategory": "Kuchynský riad/Gastro nádoby (GN)"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby EKO | GN1/4 nádoby EKO",
+    "newCategory": "Kuchynský riad/Gastro nádoby (GN)"
+  },
+  {
+    "oldCategory": "Príprava potravín | Mlynčeky na mäso a príslušenstvo",
+    "newCategory": "Príprava surovín/Mlynčeky na mäso"
+  },
+  {
+    "oldCategory": "Pizza a kebab | Pizzapece XL",
+    "newCategory": "Pizza a cestoviny/Pece na pizzu"
+  },
+  {
+    "oldCategory": "Pizza a kebab | Pizzapece Cuppone",
+    "newCategory": "Pizza a cestoviny/Pece na pizzu"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén | STALGAST® | Pokrievky polypropylén | STALGAST®",
+    "newCategory": "Kuchynský riad/Hrnce, kastróly a pokrievky"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | Pokrievky s výrezom na úchyty | STALGAST®",
+    "newCategory": "Kuchynský riad/Hrnce, kastróly a pokrievky"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/1 nádoby s úchytmi | STALGAST®",
+    "newCategory": "Kuchynský riad/Gastro nádoby (GN)"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/2 nádoby s úchytmi | STALGAST®",
+    "newCategory": "Kuchynský riad/Gastro nádoby (GN)"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/3 nádoby s úchytmi | STALGAST®",
+    "newCategory": "Kuchynský riad/Gastro nádoby (GN)"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/4 nádoby s úchytmi | STALGAST®",
+    "newCategory": "Kuchynský riad/Gastro nádoby (GN)"
+  },
+  {
+    "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/6 nádoby s úchytmi | STALGAST®",
+    "newCategory": "Kuchynský riad/Gastro nádoby (GN)"
+  },
+  {
+    "oldCategory": "Umývací program | Umývacie batérie a sprchy | Senzorové batérie",
+    "newCategory": "Hygiena a sanitácia/Batérie a sprchy"
+  },
+  {
+    "oldCategory": "Chladiaci program | Výrobníky ľadu",
+    "newCategory": "Bar a kaviareň/Výrobníky a drviče ľadu"
   }
 ]
