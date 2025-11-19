@@ -80,7 +80,8 @@ class PipelineNewFormat:
             feed_dfs[feed_name] = df
 
         # Merge all feeds
-        return self.merger.merge(pd.DataFrame(), feed_dfs)
+        merged_df, _ = self.merger.merge(pd.DataFrame(), feed_dfs)
+        return merged_df
 
     def merge_feeds(self, feed_dfs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
         """
@@ -92,7 +93,8 @@ class PipelineNewFormat:
         Returns:
             Merged DataFrame
         """
-        return self.merger.merge(pd.DataFrame(), feed_dfs)
+        merged_df, _ = self.merger.merge(pd.DataFrame(), feed_dfs)
+        return merged_df
 
     def merge_with_main(
         self, main_df: pd.DataFrame, feed_dfs: Dict[str, pd.DataFrame]
@@ -107,7 +109,8 @@ class PipelineNewFormat:
         Returns:
             Merged DataFrame
         """
-        return self.merger.merge(main_df, feed_dfs)
+        merged_df, _ = self.merger.merge(main_df, feed_dfs)
+        return merged_df
 
     def map_categories(
         self, df: pd.DataFrame, enable_interactive: bool = True
@@ -240,16 +243,10 @@ class PipelineNewFormat:
 
         # Step 3: Merge data
         self._last_merge_stats = {}
-        if selected_categories is not None:
-            print("\nMerging data with category filtering...")
-            merged_df, self._last_merge_stats = (
-                self.merger.merge_with_category_filter_and_stats(
-                    main_df, feed_dfs, selected_categories
-                )
-            )
-        else:
-            print("\nMerging data with image priority...")
-            merged_df = self.merger.merge(main_df, feed_dfs)
+        print("\nMerging data...")
+        merged_df, self._last_merge_stats = self.merger.merge(
+            main_df, feed_dfs, selected_categories
+        )
         print(f"  Total products after merge: {len(merged_df)}")
 
         # Step 4: Map categories (optional)

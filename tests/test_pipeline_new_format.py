@@ -101,7 +101,11 @@ class TestPipelineSteps:
         pipeline = PipelineNewFormat(config)
 
         df = pd.DataFrame(
-            {"code": ["PROD001"], "defaultCategory": ["Vitríny/Chladiace"]}
+            {
+                "code": ["PROD001"],
+                "name": ["Product 1"],
+                "defaultCategory": ["Vitríny/Chladiace"],
+            }
         )
 
         result = pipeline.map_categories(df)
