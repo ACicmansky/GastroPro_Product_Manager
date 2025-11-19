@@ -21,6 +21,8 @@
 - ✅ CategoryMappingManager with centralized caching and single-source-of-truth architecture
 - ✅ Product name context display in category mapping dialog
 - ✅ Category filtering with text search and toggle selection
+## Known Issues
+- None currently identified.
 - ✅ Progress indicators for long-running operations
 - ✅ Topchladenie.sk web scraping with multi-threading
 - ✅ Alternative CSV loading for Topchladenie.sk products

@@ -370,7 +370,7 @@ class ScraperNewFormat:
             if gallery:
                 for img_link in gallery.find_all("a"):
                     href = img_link.get("href")
-                    if href and "/data/sharedfiles/obrazky/produkty/pFull/" in href:
+                    if href and ("/data/sharedfiles/obrazky/produkty/pFull/" in href or "/data/sharedfiles/obrazky/pFull/" in href):
                         image_urls.append(urljoin(self.base_url, href))
 
             # Split images into 8 columns
