@@ -50,67 +50,7 @@ class PipelineNewFormat:
         else:
             raise ValueError(f"Unknown feed: {feed_name}")
 
-    def process_xml_feed(self, feed_name: str, xml_content: str) -> pd.DataFrame:
-        """
-        Process single XML feed.
 
-        Args:
-            feed_name: Name of the feed
-            xml_content: XML content
-
-        Returns:
-            Processed DataFrame
-        """
-        return self.parse_xml(feed_name, xml_content)
-
-    def process_multiple_feeds(self, feeds: Dict[str, str]) -> pd.DataFrame:
-        """
-        Process multiple XML feeds and merge them.
-
-        Args:
-            feeds: Dictionary of feed_name -> xml_content
-
-        Returns:
-            Merged DataFrame
-        """
-        feed_dfs = {}
-
-        for feed_name, xml_content in feeds.items():
-            df = self.parse_xml(feed_name, xml_content)
-            feed_dfs[feed_name] = df
-
-        # Merge all feeds
-        merged_df, _ = self.merger.merge(pd.DataFrame(), feed_dfs)
-        return merged_df
-
-    def merge_feeds(self, feed_dfs: Dict[str, pd.DataFrame]) -> pd.DataFrame:
-        """
-        Merge multiple feed DataFrames.
-
-        Args:
-            feed_dfs: Dictionary of feed_name -> DataFrame
-
-        Returns:
-            Merged DataFrame
-        """
-        merged_df, _ = self.merger.merge(pd.DataFrame(), feed_dfs)
-        return merged_df
-
-    def merge_with_main(
-        self, main_df: pd.DataFrame, feed_dfs: Dict[str, pd.DataFrame]
-    ) -> pd.DataFrame:
-        """
-        Merge feeds with existing main data.
-
-        Args:
-            main_df: Main DataFrame
-            feed_dfs: Dictionary of feed DataFrames
-
-        Returns:
-            Merged DataFrame
-        """
-        merged_df, _ = self.merger.merge(main_df, feed_dfs)
-        return merged_df
 
     def map_categories(
         self, df: pd.DataFrame, enable_interactive: bool = True
@@ -155,17 +95,7 @@ class PipelineNewFormat:
 
         return result_df
 
-    def finalize_output(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Finalize output with all columns and defaults.
 
-        Args:
-            df: DataFrame to finalize
-
-        Returns:
-            Finalized DataFrame with all 138 columns
-        """
-        return self.apply_transformation(df)
 
     def load_main_data(self, file_path: str) -> pd.DataFrame:
         """

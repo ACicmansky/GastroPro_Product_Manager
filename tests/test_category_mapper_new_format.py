@@ -263,6 +263,7 @@ class TestCategoryMappingIntegration:
         df = pd.DataFrame(
             {
                 "code": ["PROD001"],
+                "name": ["Product 1"],
                 "defaultCategory": ["Vitríny"],
                 "source": ["gastromarket"],
             }

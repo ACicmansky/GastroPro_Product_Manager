@@ -27,7 +27,7 @@ class TestPipelineNewFormat:
         pipeline = PipelineNewFormat(config)
 
         # Process single feed
-        result = pipeline.process_xml_feed("gastromarket", sample_xml_gastromarket)
+        result = pipeline.parse_xml("gastromarket", sample_xml_gastromarket)
 
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
@@ -42,12 +42,12 @@ class TestPipelineNewFormat:
 
         pipeline = PipelineNewFormat(config)
 
-        feeds = {
-            "gastromarket": sample_xml_gastromarket,
-            "forgastro": sample_xml_forgastro,
+        feed_dfs = {
+            "gastromarket": pipeline.parse_xml("gastromarket", sample_xml_gastromarket),
+            "forgastro": pipeline.parse_xml("forgastro", sample_xml_forgastro),
         }
 
-        result = pipeline.process_multiple_feeds(feeds)
+        result, _ = pipeline.merger.merge(pd.DataFrame(), feed_dfs)
 
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
@@ -88,7 +88,7 @@ class TestPipelineSteps:
             }
         )
 
-        result = pipeline.merge_feeds({"feed1": feed1, "feed2": feed2})
+        result, _ = pipeline.merger.merge(pd.DataFrame(), {"feed1": feed1, "feed2": feed2})
 
         assert len(result) == 1
         # Should use feed2 (more images)
@@ -158,7 +158,7 @@ class TestPipelineWithMainData:
             }
         )
 
-        result = pipeline.merge_with_main(main_df, {"feed": feed_df})
+        result, _ = pipeline.merger.merge(main_df, {"feed": feed_df})
 
         # Should have both products
         assert len(result) == 2
@@ -216,7 +216,7 @@ class TestPipelineOutput:
 
         df = pd.DataFrame({"code": ["PROD001"], "name": ["Product 1"]})
 
-        result = pipeline.finalize_output(df)
+        result = pipeline.apply_transformation(df)
 
         # Should have all required columns
         new_columns = config.get("new_output_columns", [])
