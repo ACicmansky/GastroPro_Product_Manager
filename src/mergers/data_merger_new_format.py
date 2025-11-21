@@ -11,14 +11,15 @@ from datetime import datetime
 class DataMergerNewFormat:
     """Merger for new format data with image priority logic."""
 
-    def __init__(self, config: Dict):
+    def __init__(self, options: Dict):
         """
         Initialize data merger with configuration.
 
         Args:
-            config: Configuration dictionary from config.json
+            options: Options from GUI
         """
-        self.config = config
+
+        self.options = options
         self.image_columns = [
             "defaultImage",
             "image",
@@ -55,7 +56,9 @@ class DataMergerNewFormat:
         print("\n" + "=" * 60)
         print("MERGING DATA")
         if selected_categories:
-            print(f"Category filter active: {len(selected_categories)} categories selected")
+            print(
+                f"Category filter active: {len(selected_categories)} categories selected"
+            )
         print("=" * 60)
 
         current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -124,6 +127,15 @@ class DataMergerNewFormat:
                         for img_col in self.image_columns:
                             if img_col in row:
                                 merged_data[img_col] = str(row[img_col])
+
+                    # Update categories from feed if enabled in options
+                    if self.options.get("update_categories_from_feeds", False):
+                        if "defaultCategory" in row and pd.notna(
+                            row["defaultCategory"]
+                        ):
+                            merged_data["defaultCategory"] = str(row["defaultCategory"])
+                        if "categoryText" in row and pd.notna(row["categoryText"]):
+                            merged_data["categoryText"] = str(row["categoryText"])
 
                     merged_data["source"] = feed_name
                     merged_data["last_updated"] = current_time

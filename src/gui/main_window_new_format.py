@@ -217,8 +217,15 @@ class MainWindowNewFormat(QMainWindow):
         self.web_scraping_checkbox = QCheckBox("Web scraping (TopChladenie.sk)")
         self.web_scraping_checkbox.setChecked(False)
 
+        self.update_categories_checkbox = QCheckBox("Aktualizovať kategórie z feedov")
+        self.update_categories_checkbox.setChecked(False)
+        self.update_categories_checkbox.setToolTip(
+            "Ak je zaškrtnuté, kategórie produktov budú prepísané hodnotami z XML feedov/scrapingu."
+        )
+
         layout.addWidget(self.ai_enhancement_checkbox)
         layout.addWidget(self.web_scraping_checkbox)
+        layout.addWidget(self.update_categories_checkbox)
 
         self.layout.addWidget(group)
 
@@ -331,6 +338,7 @@ class MainWindowNewFormat(QMainWindow):
             "enable_forgastro": self.forgastro_checkbox.isChecked(),
             "enable_web_scraping": self.web_scraping_checkbox.isChecked(),
             "enable_ai_enhancement": self.ai_enhancement_checkbox.isChecked(),
+            "update_categories_from_feeds": self.update_categories_checkbox.isChecked(),
             "main_data_file": self.main_data_file,
             "selected_categories": (
                 self.get_selected_categories() if self.main_data_file else None

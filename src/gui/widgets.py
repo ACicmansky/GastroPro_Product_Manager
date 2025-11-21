@@ -101,7 +101,7 @@ class CategoryMappingDialog(QDialog):
     def init_ui(self):
         self.setWindowTitle("Mapovanie kategórie")
         self.setModal(True)
-        self.setMinimumWidth(500)
+        self.setMinimumWidth(700)
 
         layout = QVBoxLayout()
 

@@ -11,20 +11,11 @@ from pathlib import Path
 class TestPipelineNewFormat:
     """Test complete pipeline with new 138-column format."""
 
-    def test_pipeline_initialization(self, config):
-        """Test pipeline initializes with config."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
-
-        pipeline = PipelineNewFormat(config)
-
-        assert pipeline.config is not None
-        assert hasattr(pipeline, "run")
-
     def test_pipeline_processes_xml_feeds(self, config, sample_xml_gastromarket):
         """Test pipeline processes XML feeds."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         # Process single feed
         result = pipeline.parse_xml("gastromarket", sample_xml_gastromarket)
@@ -40,7 +31,7 @@ class TestPipelineNewFormat:
         """Test pipeline merges multiple XML feeds."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         feed_dfs = {
             "gastromarket": pipeline.parse_xml("gastromarket", sample_xml_gastromarket),
@@ -62,7 +53,7 @@ class TestPipelineSteps:
         """Test Step 1: Parse XML to new format."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         result = pipeline.parse_xml("gastromarket", sample_xml_gastromarket)
 
@@ -73,7 +64,7 @@ class TestPipelineSteps:
         """Test Step 2: Merge data with image priority."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         feed1 = pd.DataFrame(
             {"code": ["PROD001"], "price": ["100"], "defaultImage": ["img1.jpg"]}
@@ -88,7 +79,9 @@ class TestPipelineSteps:
             }
         )
 
-        result, _ = pipeline.merger.merge(pd.DataFrame(), {"feed1": feed1, "feed2": feed2})
+        result, _ = pipeline.merger.merge(
+            pd.DataFrame(), {"feed1": feed1, "feed2": feed2}
+        )
 
         assert len(result) == 1
         # Should use feed2 (more images)
@@ -98,25 +91,25 @@ class TestPipelineSteps:
         """Test Step 3: Map and transform categories."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         df = pd.DataFrame(
             {
                 "code": ["PROD001"],
                 "name": ["Product 1"],
-                "defaultCategory": ["Vitríny/Chladiace"],
+                "defaultCategory": ["Nerezový nábytok/Pracovné stoly, pevné"],
             }
         )
 
-        result = pipeline.map_categories(df)
+        result = pipeline.map_categories(df, False)
 
-        assert "Tovary a kategórie > " in result.loc[0, "defaultCategory"]
+        assert "Gastro prevádzky a profesionáli > " in result.loc[0, "defaultCategory"]
 
     def test_step_4_apply_transformation(self, config):
         """Test Step 4: Apply output transformation."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         df = pd.DataFrame(
             {"code": ["prod001"], "name": ["Product 1"], "price": ["100"]}
@@ -137,7 +130,7 @@ class TestPipelineWithMainData:
         """Test merging feeds with existing main data."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         # Existing main data
         main_df = pd.DataFrame(
@@ -172,7 +165,7 @@ class TestPipelineWithMainData:
         """Test loading main data from file."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         # Create test file
         test_file = test_data_dir / "main_data.xlsx"
@@ -192,7 +185,7 @@ class TestPipelineOutput:
         """Test saving pipeline output."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         df = pd.DataFrame(
             {"code": ["PROD001"], "name": ["Product 1"], "price": ["100"]}
@@ -212,7 +205,7 @@ class TestPipelineOutput:
         """Test that output has all 138 columns."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         df = pd.DataFrame({"code": ["PROD001"], "name": ["Product 1"]})
 
@@ -233,7 +226,7 @@ class TestPipelineEndToEnd:
         """Test complete pipeline from XML to output file."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         # Run complete pipeline
         output_file = test_data_dir / "complete_output.xlsx"
@@ -262,7 +255,7 @@ class TestPipelineEndToEnd:
         """Test pipeline executes all steps."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         output_file = test_data_dir / "all_steps_output.xlsx"
 
@@ -277,7 +270,7 @@ class TestPipelineEndToEnd:
         if "defaultCategory" in result.columns:
             for cat in result["defaultCategory"]:
                 if cat and cat != "":
-                    assert "Tovary a kategórie > " in cat or cat == ""
+                    assert "Gastro prevádzky a profesionáli > " in cat or cat == ""
 
         # Codes should be uppercase
         if "code" in result.columns:
@@ -293,7 +286,7 @@ class TestPipelineStatistics:
         """Test that pipeline returns statistics."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         result, stats = pipeline.run_with_stats(
             xml_feeds={"gastromarket": sample_xml_gastromarket}
@@ -308,7 +301,7 @@ class TestPipelineStatistics:
         """Test that statistics track all pipeline steps."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         result, stats = pipeline.run_with_stats(
             xml_feeds={"gastromarket": sample_xml_gastromarket}

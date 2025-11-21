@@ -310,14 +310,14 @@ class TestCategoryFilterIntegration:
             config = json.load(f)
 
         filter = CategoryFilter()
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         # Filter data
         selected = ["Tovary a kategórie > Chladenie > Chladničky"]
         filtered_data = filter.filter_by_categories(sample_data, selected)
 
         # Process through pipeline
-        result = pipeline.finalize_output(filtered_data)
+        result = pipeline.apply_transformation(filtered_data)
 
         # Should process successfully
         assert len(result) == 2

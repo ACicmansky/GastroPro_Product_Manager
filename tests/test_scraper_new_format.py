@@ -279,7 +279,7 @@ class TestScraperIntegration:
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
         scraper = ScraperNewFormat(config)
-        pipeline = PipelineNewFormat(config)
+        pipeline = PipelineNewFormat(config, {})
 
         # Create mock scraped data (already in new format)
         scraped_df = pd.DataFrame(
@@ -295,7 +295,7 @@ class TestScraperIntegration:
         )
 
         # Should be processable by pipeline
-        result = pipeline.finalize_output(scraped_df)
+        result = pipeline.apply_transformation(scraped_df)
 
         assert len(result) == 1
         assert result.loc[0, "code"] == "SCRAPED001"

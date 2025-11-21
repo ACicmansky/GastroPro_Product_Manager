@@ -22,103 +22,46 @@ class CategoryMapperNewFormat:
         """
         self.config = config
         self.custom_mappings = {}
-        self.prefix = "Tovary a kategórie > "
         self.category_manager = CategoryMappingManager(mappings_path)
         self.interactive_callback = None
 
-    def transform_category(self, category: str) -> str:
-        """
-        Transform category to new format.
-
-        Transformation:
-        1. Add prefix "Tovary a kategórie > "
-        2. Replace "/" with " > "
-
-        Args:
-            category: Original category string
-
-        Returns:
-            Transformed category string
-        """
-        if not category or category in ["", "nan", "None"]:
-            return ""
-
-        # Clean the category
-        category = str(category).strip()
-
-        if not category:
-            return ""
-
-        # Replace multiple slashes with single slash
-        category = re.sub(r"/+", "/", category)
-
-        # Remove leading/trailing slashes
-        category = category.strip("/")
-
-        if not category:
-            return ""
-
-        # Replace / with >
-        # Handle spaces around slashes
-        category = re.sub(r"\s*/\s*", " > ", category)
-
-        # Add prefix only if not already present
-        if not category.startswith(self.prefix):
-            result = self.prefix + category
-        else:
-            result = category
-
-        return result
-
     def map_category(self, category: str, product_name: Optional[str] = None) -> str:
         """
-        Map category using mappings, then apply transformation.
+        Map category using mappings.
 
         Mapping priority:
-        0. If category already has correct format (starts with prefix), return as-is
         1. Check CategoryMappingManager (loaded from categories.json)
         2. Check custom mappings
         3. If not found and interactive_callback is set, prompt user
-        4. Apply transformation
+        4. If not found, return original category
 
         Args:
             category: Original category
             product_name: Optional product name for context in interactive dialog
 
         Returns:
-            Mapped and transformed category
+            Mapped category string
         """
         if not category or category in ["", "nan", "None"]:
             return ""
 
         original_category = str(category).strip()
 
-        # 0. Check if category is already in correct format (from loaded XLSX)
-        # Categories from main data file already have "Tovary a kategórie >" prefix
-        if original_category.startswith(self.prefix):
-            print(
-                f"  [SKIP] Category already in correct format: '{original_category[:60]}...'"
-            )
-            return (
-                original_category  # Return as-is, no mapping or transformation needed
-            )
-
-        # If category is a raw URL from scraper, keep it for mapping lookup
-        # The mapping file should have entries like "/e-shop/..." -> "Category > Subcategory"
-        # This allows proper mapping through categories.json
-        lookup_category = original_category
-
-        mapped_category = original_category
-
         # 1. Check CategoryMappingManager first
         manager_mapping = self.category_manager.find_mapping(original_category)
         if manager_mapping:
-            mapped_category = manager_mapping
+            return manager_mapping
+
         # 2. Check custom mappings
-        elif original_category in self.custom_mappings:
-            mapped_category = self.custom_mappings[original_category]
-        # 3. Interactive callback for unmapped categories
-        elif self.interactive_callback:
+        if original_category in self.custom_mappings:
+            return self.custom_mappings[original_category]
+
+        # 3. Check if it is already a valid target category
+        if self.category_manager.is_target_category(original_category):
+            return original_category
+
+        # 4. Interactive callback for unmapped categories
+        if self.interactive_callback:
             print(f"\n  [INTERACTIVE] Unmapped category found: '{original_category}'")
             print(f"  [INTERACTIVE] Product: '{product_name}'")
             print(f"  [INTERACTIVE] Requesting user input...")
@@ -130,20 +73,20 @@ class CategoryMapperNewFormat:
             if new_category and new_category != original_category:
                 # User provided a new category
                 self.category_manager.add_mapping(original_category, new_category)
-                mapped_category = new_category
+                return new_category
             else:
                 # User cancelled or kept original - save original→original to avoid re-asking
                 self.category_manager.add_mapping(original_category, original_category)
-                mapped_category = original_category
-        else:
-            # No mapping found and no interactive callback
-            if original_category:
-                print(
-                    f"  [WARNING] No mapping for '{original_category}' and no interactive callback set"
-                )
+                return original_category
 
-        # Apply transformation
-        return self.transform_category(mapped_category)
+        # No mapping found and no interactive callback
+        if original_category:
+            print(
+                f"  [WARNING] No mapping for '{original_category}' and no interactive callback set"
+            )
+
+        # Return original category if no mapping found
+        return original_category
 
     def map_dataframe(
         self, df: pd.DataFrame, enable_interactive: bool = True
@@ -199,8 +142,10 @@ class CategoryMapperNewFormat:
                 )
         else:
             # Just transform (no interactive mapping)
+            # Since transform_category is removed, we just use map_category without interaction
+            # or if we want to support direct mapping without interaction:
             result_df["defaultCategory"] = result_df["defaultCategory"].apply(
-                lambda x: self.transform_category(str(x)) if pd.notna(x) else ""
+                lambda x: self.map_category(str(x)) if pd.notna(x) else ""
             )
 
         # Copy to categoryText (both should have same value)

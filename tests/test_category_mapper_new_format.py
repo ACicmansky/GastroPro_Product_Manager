@@ -19,50 +19,19 @@ class TestCategoryMapperNewFormat:
         assert mapper.config is not None
         assert hasattr(mapper, "map_category")
 
-    def test_apply_category_transformation(self, config):
-        """Test applying category transformation to new format."""
+    def test_map_category_returns_original_if_no_mapping(self, config):
+        """Test that map_category returns original category if no mapping found."""
         from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
 
         mapper = CategoryMapperNewFormat(config)
 
-        # Input: old format category
+        # Input: category with no mapping
         input_category = "Vitríny/Chladiace vitríny"
 
-        # Expected: new format with prefix and separator change
-        result = mapper.transform_category(input_category)
+        # Expected: original category (no transformation)
+        result = mapper.map_category(input_category)
 
-        assert result == "Tovary a kategórie > Vitríny > Chladiace vitríny"
-
-    def test_transform_adds_prefix(self, config):
-        """Test that transformation adds required prefix."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
-
-        mapper = CategoryMapperNewFormat(config)
-
-        result = mapper.transform_category("Kategória")
-
-        assert result.startswith("Tovary a kategórie > ")
-
-    def test_transform_replaces_separator(self, config):
-        """Test that transformation replaces / with >."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
-
-        mapper = CategoryMapperNewFormat(config)
-
-        result = mapper.transform_category("Cat1/Cat2/Cat3")
-
-        assert "/" not in result
-        assert "Cat1 > Cat2 > Cat3" in result
-
-    def test_transform_empty_category(self, config):
-        """Test transformation of empty category."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
-
-        mapper = CategoryMapperNewFormat(config)
-
-        result = mapper.transform_category("")
-
-        assert result == ""
+        assert result == input_category
 
 
 class TestCategoryMappingDataFrame:
@@ -83,9 +52,12 @@ class TestCategoryMappingDataFrame:
         mapper = CategoryMapperNewFormat(config)
         result = mapper.map_dataframe(df)
 
-        # Should have transformed categories
-        assert all(result["defaultCategory"].str.startswith("Tovary a kategórie > "))
-        assert all(~result["defaultCategory"].str.contains("/"))
+        # Should NOT have transformed categories (no prefix added automatically)
+        assert not any(
+            result["defaultCategory"].str.startswith("Tovary a kategórie > ")
+        )
+        # Should preserve original if no mapping
+        assert result.loc[0, "defaultCategory"] == "Vitríny/Chladiace"
 
     def test_map_updates_both_category_columns(self, config):
         """Test that both defaultCategory and categoryText are updated."""
@@ -105,7 +77,7 @@ class TestCategoryMappingDataFrame:
 
         # Both should be updated with same value
         assert result.loc[0, "defaultCategory"] == result.loc[0, "categoryText"]
-        assert "Tovary a kategórie > " in result.loc[0, "categoryText"]
+        assert result.loc[0, "categoryText"] == "Vitríny/Chladiace"
 
     def test_map_preserves_other_columns(self, config):
         """Test that mapping preserves other columns."""
@@ -166,9 +138,8 @@ class TestCategoryMappingWithMappingFile:
 
             result = mapper.map_category("Old Category")
 
-            # Should use custom mapping and apply transformation
-            assert "New Category" in result
-            assert "Tovary a kategórie > " in result
+            # Should use custom mapping directly (no transformation)
+            assert result == "New Category"
 
     def test_fallback_to_original_if_no_mapping(self, config):
         """Test fallback to original category if no mapping exists."""
@@ -179,59 +150,36 @@ class TestCategoryMappingWithMappingFile:
         # Category with no mapping
         result = mapper.map_category("Unknown Category")
 
-        # Should still apply transformation
-        assert "Tovary a kategórie > Unknown Category" == result
+        # Should return original
+        assert result == "Unknown Category"
 
-
-class TestCategoryTransformationEdgeCases:
-    """Test edge cases in category transformation."""
-
-    def test_transform_multiple_slashes(self, config):
-        """Test transformation with multiple consecutive slashes."""
+    def test_map_returns_existing_target_category(self, config):
+        """Test that map_category returns category as-is if it is already a target category."""
         from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from unittest.mock import MagicMock
 
         mapper = CategoryMapperNewFormat(config)
 
-        result = mapper.transform_category("Cat1//Cat2///Cat3")
+        # Mock the category manager
+        mapper.category_manager = MagicMock()
+        mapper.category_manager.find_mapping.return_value = None
+        mapper.category_manager.is_target_category.return_value = True
 
-        # Should handle multiple slashes
-        assert "//" not in result
-        assert "///" not in result
+        # Set interactive callback to ensure it's NOT called
+        mock_callback = MagicMock()
+        mapper.set_interactive_callback(mock_callback)
 
-    def test_transform_leading_trailing_slashes(self, config):
-        """Test transformation with leading/trailing slashes."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        # Input: category that is already a target category
+        input_category = "Gastro prevádzky a profesionáli > Nerezový nábytok"
 
-        mapper = CategoryMapperNewFormat(config)
+        # Expected: original category (because is_target_category returns True)
+        result = mapper.map_category(input_category)
 
-        result = mapper.transform_category("/Category/")
-
-        # Should handle cleanly
-        assert not result.endswith(" > ")
-        assert "Tovary a kategórie > " in result
-
-    def test_transform_special_characters(self, config):
-        """Test transformation with special characters."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
-
-        mapper = CategoryMapperNewFormat(config)
-
-        result = mapper.transform_category("Kategória/Špeciálne")
-
-        # Should preserve special characters
-        assert "Kategória" in result
-        assert "Špeciálne" in result
-
-    def test_transform_whitespace(self, config):
-        """Test transformation handles whitespace correctly."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
-
-        mapper = CategoryMapperNewFormat(config)
-
-        result = mapper.transform_category("Cat1 / Cat2 / Cat3")
-
-        # Should handle spaces around slashes
-        assert "Cat1 > Cat2 > Cat3" in result
+        assert result == input_category
+        # Verify is_target_category was called
+        mapper.category_manager.is_target_category.assert_called_with(input_category)
+        # Verify interactive callback was NOT called
+        mock_callback.assert_not_called()
 
 
 class TestCategoryMappingIntegration:
@@ -250,11 +198,11 @@ class TestCategoryMappingIntegration:
         mapper = CategoryMapperNewFormat(config)
         result = mapper.map_dataframe(parsed_df)
 
-        # Categories should be transformed
+        # Categories should NOT be transformed automatically
         if "defaultCategory" in result.columns:
             for cat in result["defaultCategory"]:
                 if cat and cat != "":
-                    assert "Tovary a kategórie > " in cat or cat == ""
+                    assert not cat.startswith("Tovary a kategórie > ")
 
     def test_map_preserves_feed_name(self, config):
         """Test that category mapping preserves source."""
@@ -292,8 +240,8 @@ class TestCategoryMappingIntegration:
         mapper = CategoryMapperNewFormat(config)
         result = mapper.map_dataframe(df)
 
-        # All categories should be transformed
+        # Categories should NOT be transformed automatically
         assert len(result) == 3
         for idx, row in result.iterrows():
             if row["defaultCategory"]:
-                assert "Tovary a kategórie > " in row["defaultCategory"]
+                assert not row["defaultCategory"].startswith("Tovary a kategórie > ")

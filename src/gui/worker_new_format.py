@@ -33,7 +33,7 @@ class WorkerNewFormat(QObject):
         super().__init__()
         self.config = config
         self.options = options
-        self.pipeline = PipelineNewFormat(config)
+        self.pipeline = PipelineNewFormat(self.config, self.options)
         self.category_mapping_result = None
         self.category_mapping_event_loop = None
 

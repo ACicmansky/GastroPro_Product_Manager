@@ -102,7 +102,7 @@ def sample_xml_gastromarket():
         <g:MENO>GastroMarket Product 1</g:MENO>
         <g:POPIS>Short description from GM</g:POPIS>
         <g:CENA_KATALOG>150.00</g:CENA_KATALOG>
-        <g:KATEGORIA_KOMPLET>GM Category | Subcategory</g:KATEGORIA_KOMPLET>
+        <g:KATEGORIA_KOMPLET>Nerezový nábytok/Pracovné stoly, pevné</g:KATEGORIA_KOMPLET>
         <g:OBRAZOK_1>http://example.com/gm1.jpg</g:OBRAZOK_1>
         <g:META_POPIS>Meta description</g:META_POPIS>
         <g:DOSTUPNOST>11.0</g:DOSTUPNOST>

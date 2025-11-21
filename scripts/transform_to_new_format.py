@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 
 # Hardcoded file path - change this to your input file
-INPUT_FILE = r"c:\Source\Python\GastroPro_Product_Manager\data\old_data_format.csv"
+INPUT_FILE = r"c:\Source\Python\GastroPro_Product_Manager\data\data_format.csv"
 
 
 def load_config():
@@ -133,7 +133,7 @@ def apply_category_transformation(df, output_df, config):
     special_mappings = config["output_mapping"].get("special_mappings", {})
     category_config = special_mappings.get("Hlavna kategória", {})
 
-    prefix = category_config.get("prefix", "Tovary a kategórie > ")
+    prefix = category_config.get("prefix", "Gastro prevádzky a profesionáli > ")
     replacements = category_config.get("replace", {"/": " > "})
     target_columns = category_config.get(
         "target_columns", ["defaultCategory", "categoryText"]

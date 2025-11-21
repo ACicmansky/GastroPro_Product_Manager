@@ -183,3 +183,21 @@ class CategoryMappingManager:
                 if new_cat:
                     categories.add(new_cat)
             return list(categories)
+
+    def is_target_category(self, category: str) -> bool:
+        """Check if the category already exists as a target (newCategory) in mappings.
+
+        Args:
+            category: The category to check
+
+        Returns:
+            True if the category is a valid target category, False otherwise
+        """
+        if not category:
+            return False
+
+        with self._lock:
+            for mapping in self._mappings:
+                if mapping.get("newCategory") == category:
+                    return True
+        return False

@@ -5,7 +5,6 @@ Integrates all components: XML parsing, merging, category mapping, transformatio
 
 import pandas as pd
 from typing import Dict, Tuple, Optional
-from pathlib import Path
 
 from src.parsers.xml_parser_new_format import XMLParserNewFormat
 from src.mergers.data_merger_new_format import DataMergerNewFormat
@@ -17,18 +16,17 @@ from src.loaders.data_loader_factory import DataLoaderFactory
 class PipelineNewFormat:
     """Complete pipeline for new format data processing."""
 
-    def __init__(self, config: Dict):
+    def __init__(self, config: Dict, options: Dict):
         """
         Initialize pipeline with configuration.
 
         Args:
             config: Configuration dictionary from config.json
+            options: Options from GUI
         """
-        self.config = config
-
         # Initialize components
         self.xml_parser = XMLParserNewFormat(config)
-        self.merger = DataMergerNewFormat(config)
+        self.merger = DataMergerNewFormat(options)
         self.category_mapper = CategoryMapperNewFormat(config)
         self.transformer = OutputTransformer(config)
 
@@ -49,8 +47,6 @@ class PipelineNewFormat:
             return self.xml_parser.parse_forgastro(xml_content)
         else:
             raise ValueError(f"Unknown feed: {feed_name}")
-
-
 
     def map_categories(
         self, df: pd.DataFrame, enable_interactive: bool = True
@@ -94,8 +90,6 @@ class PipelineNewFormat:
         result_df = self.transformer.apply_default_values(result_df)
 
         return result_df
-
-
 
     def load_main_data(self, file_path: str) -> pd.DataFrame:
         """

@@ -408,12 +408,10 @@ class TestMergeStatistics:
         )
 
         merger = DataMergerNewFormat(config)
-        
+
         # Filter for Cat A only
         result, stats = merger.merge(
-            main_df, 
-            {"feed": feed_df}, 
-            selected_categories=["Cat A"]
+            main_df, {"feed": feed_df}, selected_categories=["Cat A"]
         )
 
         # Should have PROD001 (Cat A) and PROD003 (Feed)
@@ -422,7 +420,79 @@ class TestMergeStatistics:
         assert "PROD001" in result["code"].values
         assert "PROD003" in result["code"].values
         assert "PROD002" not in result["code"].values
-        
+
         assert stats["removed"] == 1
 
+    def test_merge_updates_categories_when_enabled(self, config):
+        """Test that categories are updated from feed when enabled in config."""
+        from src.mergers.data_merger_new_format import DataMergerNewFormat
 
+        # Enable category updates
+        config["update_categories_from_feeds"] = True
+        merger = DataMergerNewFormat(config)
+
+        # Main data with old category
+        main_df = pd.DataFrame(
+            {
+                "code": ["PROD001"],
+                "name": ["Product 1"],
+                "defaultCategory": ["Old Category"],
+                "categoryText": ["Old Category"],
+                "price": ["100.0"],
+            }
+        )
+
+        # Feed data with new category
+        feed_data = [
+            {
+                "code": "PROD001",
+                "name": "Product 1",
+                "defaultCategory": "New Category",
+                "categoryText": "New Category",
+                "price": "100.0",
+            }
+        ]
+        feed_df = pd.DataFrame(feed_data)
+
+        result, stats = merger.merge(main_df, {"test_feed": feed_df})
+
+        # Should have new category
+        assert result.loc[0, "defaultCategory"] == "New Category"
+        assert result.loc[0, "categoryText"] == "New Category"
+
+    def test_merge_preserves_categories_when_disabled(self, config):
+        """Test that categories are preserved when updates are disabled."""
+        from src.mergers.data_merger_new_format import DataMergerNewFormat
+
+        # Disable category updates
+        config["update_categories_from_feeds"] = False
+        merger = DataMergerNewFormat(config)
+
+        # Main data with old category
+        main_df = pd.DataFrame(
+            {
+                "code": ["PROD001"],
+                "name": ["Product 1"],
+                "defaultCategory": ["Old Category"],
+                "categoryText": ["Old Category"],
+                "price": ["100.0"],
+            }
+        )
+
+        # Feed data with new category
+        feed_data = [
+            {
+                "code": "PROD001",
+                "name": "Product 1",
+                "defaultCategory": "New Category",
+                "categoryText": "New Category",
+                "price": "100.0",
+            }
+        ]
+        feed_df = pd.DataFrame(feed_data)
+
+        result, stats = merger.merge(main_df, {"test_feed": feed_df})
+
+        # Should keep old category
+        assert result.loc[0, "defaultCategory"] == "Old Category"
+        assert result.loc[0, "categoryText"] == "Old Category"
