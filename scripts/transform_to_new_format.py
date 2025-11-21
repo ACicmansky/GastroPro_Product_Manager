@@ -133,7 +133,7 @@ def apply_category_transformation(df, output_df, config):
     special_mappings = config["output_mapping"].get("special_mappings", {})
     category_config = special_mappings.get("Hlavna kategória", {})
 
-    prefix = category_config.get("prefix", "Gastro prevádzky a profesionáli > ")
+    prefix = category_config.get("prefix", "Gastro Prevádzky a Profesionáli > ")
     replacements = category_config.get("replace", {"/": " > "})
     target_columns = category_config.get(
         "target_columns", ["defaultCategory", "categoryText"]

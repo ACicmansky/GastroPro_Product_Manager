@@ -103,7 +103,7 @@ class TestPipelineSteps:
 
         result = pipeline.map_categories(df, False)
 
-        assert "Gastro prevádzky a profesionáli > " in result.loc[0, "defaultCategory"]
+        assert "Gastro Prevádzky a Profesionáli > " in result.loc[0, "defaultCategory"]
 
     def test_step_4_apply_transformation(self, config):
         """Test Step 4: Apply output transformation."""
@@ -270,7 +270,7 @@ class TestPipelineEndToEnd:
         if "defaultCategory" in result.columns:
             for cat in result["defaultCategory"]:
                 if cat and cat != "":
-                    assert "Gastro prevádzky a profesionáli > " in cat or cat == ""
+                    assert "Gastro Prevádzky a Profesionáli > " in cat or cat == ""
 
         # Codes should be uppercase
         if "code" in result.columns:

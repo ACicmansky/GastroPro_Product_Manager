@@ -170,7 +170,7 @@ class TestCategoryMappingWithMappingFile:
         mapper.set_interactive_callback(mock_callback)
 
         # Input: category that is already a target category
-        input_category = "Gastro prevádzky a profesionáli > Nerezový nábytok"
+        input_category = "Gastro Prevádzky a Profesionáli > Nerezový nábytok"
 
         # Expected: original category (because is_target_category returns True)
         result = mapper.map_category(input_category)

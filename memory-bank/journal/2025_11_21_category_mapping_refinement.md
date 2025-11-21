@@ -4,7 +4,7 @@
 **Focus:** Refine Category Mapping Logic
 
 ## Context
-The user identified an issue where the interactive category mapping dialog was prompting for categories that were already in the correct "newCategory" format (e.g., "Gastro prevádzky a profesionáli > ..."). This caused redundant work for the user.
+The user identified an issue where the interactive category mapping dialog was prompting for categories that were already in the correct "newCategory" format (e.g., "Gastro Prevádzky a Profesionáli > ..."). This caused redundant work for the user.
 
 ## Changes Implemented
 

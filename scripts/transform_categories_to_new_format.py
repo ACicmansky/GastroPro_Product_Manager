@@ -18,7 +18,7 @@ def transform_categories(categories_filePath: str):
     df = pd.DataFrame(categories)
 
     df["newCategory"] = df["newCategory"].apply(
-        lambda x: "Gastro prevádzky a profesionáli > " + x.replace("/", " > ")
+        lambda x: "Gastro Prevádzky a Profesionáli > " + x.replace("/", " > ")
     )
 
     json_str = df.to_json(orient="records", force_ascii=False, indent=2)
