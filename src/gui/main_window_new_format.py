@@ -217,6 +217,9 @@ class MainWindowNewFormat(QMainWindow):
         self.web_scraping_checkbox = QCheckBox("Web scraping (TopChladenie.sk)")
         self.web_scraping_checkbox.setChecked(False)
 
+        self.mebella_scraping_checkbox = QCheckBox("Web scraping (Mebella.pl)")
+        self.mebella_scraping_checkbox.setChecked(False)
+
         self.update_categories_checkbox = QCheckBox("Aktualizovať kategórie z feedov")
         self.update_categories_checkbox.setChecked(False)
         self.update_categories_checkbox.setToolTip(
@@ -225,6 +228,7 @@ class MainWindowNewFormat(QMainWindow):
 
         layout.addWidget(self.ai_enhancement_checkbox)
         layout.addWidget(self.web_scraping_checkbox)
+        layout.addWidget(self.mebella_scraping_checkbox)
         layout.addWidget(self.update_categories_checkbox)
 
         self.layout.addWidget(group)
@@ -324,6 +328,7 @@ class MainWindowNewFormat(QMainWindow):
             not self.gastromarket_checkbox.isChecked()
             and not self.forgastro_checkbox.isChecked()
             and not self.web_scraping_checkbox.isChecked()
+            and not self.mebella_scraping_checkbox.isChecked()
         ):
             QMessageBox.warning(
                 self,
@@ -337,6 +342,7 @@ class MainWindowNewFormat(QMainWindow):
             "enable_gastromarket": self.gastromarket_checkbox.isChecked(),
             "enable_forgastro": self.forgastro_checkbox.isChecked(),
             "enable_web_scraping": self.web_scraping_checkbox.isChecked(),
+            "enable_mebella_scraping": self.mebella_scraping_checkbox.isChecked(),
             "enable_ai_enhancement": self.ai_enhancement_checkbox.isChecked(),
             "update_categories_from_feeds": self.update_categories_checkbox.isChecked(),
             "main_data_file": self.main_data_file,

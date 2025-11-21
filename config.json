@@ -60,7 +60,7 @@
           "categoryText"
         ],
         "transform": "add_prefix_and_replace_separator",
-        "prefix": "Gastro prevádzky a profesionáli > ",
+        "prefix": "Gastro Prevádzky a Profesionáli > ",
         "replace": {
           "/": " > "
         }

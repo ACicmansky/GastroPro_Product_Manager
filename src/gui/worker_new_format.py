@@ -10,6 +10,7 @@ from typing import Dict, Optional
 from src.pipeline.pipeline_new_format import PipelineNewFormat
 from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
 from src.scrapers.scraper_new_format import EnhancedScraperNewFormat
+from src.scrapers.mebella_scraper import MebellaScraper
 
 
 class WorkerNewFormat(QObject):
@@ -154,20 +155,48 @@ class WorkerNewFormat(QObject):
         try:
             self.progress.emit("Web scraping: inicializácia...")
 
-            # Create scraper with progress callback
-            scraper = EnhancedScraperNewFormat(
-                config=self.config,
-                progress_callback=lambda msg: self.progress.emit(
-                    f"Web scraping: {msg}"
-                ),
-                max_threads=8,
-            )
+            all_scraped_dfs = []
 
-            self.progress.emit("Web scraping: spúšťam...")
-            scraped_df = scraper.scrape_products()
+            # 1. TopChladenie.sk
+            if self.options.get("enable_web_scraping", False):
+                self.progress.emit("Web scraping (TopChladenie.sk): spúšťam...")
+                scraper = EnhancedScraperNewFormat(
+                    config=self.config,
+                    progress_callback=lambda msg: self.progress.emit(
+                        f"TopChladenie: {msg}"
+                    ),
+                    max_threads=8,
+                )
+                df = scraper.scrape_products()
+                if df is not None and not df.empty:
+                    all_scraped_dfs.append(df)
+                    self.progress.emit(f"TopChladenie: hotovo ({len(df)} produktov)")
 
-            self.progress.emit(f"Web scraping: dokončené ({len(scraped_df)} produktov)")
-            return scraped_df
+            # 2. Mebella.pl
+            if self.options.get("enable_mebella_scraping", False):
+                self.progress.emit("Web scraping (Mebella.pl): spúšťam...")
+                # Use MebellaScraper (single threaded for now as it's not Enhanced yet, or we can make it Enhanced)
+                # MebellaScraper inherits from ScraperNewFormat.
+                # If we want multi-threading, we should have inherited from EnhancedScraperNewFormat or implemented it.
+                # For now, let's use it as is.
+                scraper_mebella = MebellaScraper(
+                    config=self.config,
+                    progress_callback=lambda msg: self.progress.emit(f"Mebella: {msg}"),
+                )
+                # Note: MebellaScraper.scrape_products is inherited from ScraperNewFormat
+                df_mebella = scraper_mebella.scrape_products()
+                if df_mebella is not None and not df_mebella.empty:
+                    all_scraped_dfs.append(df_mebella)
+                    self.progress.emit(f"Mebella: hotovo ({len(df_mebella)} produktov)")
+
+            if not all_scraped_dfs:
+                self.progress.emit("Web scraping: žiadne dáta nezískané")
+                return None
+
+            # Combine results
+            final_df = pd.concat(all_scraped_dfs, ignore_index=True)
+            self.progress.emit(f"Web scraping: celkom {len(final_df)} produktov")
+            return final_df
 
         except Exception as e:
             self.progress.emit(f"Web scraping: chyba - {str(e)}")
