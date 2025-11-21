@@ -21,6 +21,12 @@
 
 ## Recent Changes
 
+**Refine Category Mapping Logic (November 21, 2025)**:
+- **Optimization**: Prevented redundant interactive prompts for categories already in target format
+- **Implementation**: Added `is_target_category` check to `CategoryMappingManager`
+- **Logic**: `map_category` now checks if category is already a valid `newCategory` before prompting
+- **Tests**: Added new unit test `test_map_returns_existing_target_category`
+
 **XML Namespace Parsing Fix (November 16, 2025)**:
 - **Critical Bug Fix**: Fixed Gastromarket XML parser failing with production feed
 - **Root Cause**: Real feed uses prefixed namespace (`xmlns:g=`) not default namespace

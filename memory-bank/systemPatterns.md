@@ -105,6 +105,11 @@ src/
    - Centralized mapping functions for consistent application
    - User-controlled application at export time
    - Interactive on-the-fly mapping via CategoryMappingDialog
+   - **Smart Mapping Priority**:
+     1. Check explicit mappings (Manager & Custom)
+     2. Check if already a valid target category (prevents redundant prompts)
+     3. Interactive callback (if enabled)
+     4. Return original category
    - Optional callback mechanism for real-time unmapped category resolution
    - Detailed logging of mapping operations
 

@@ -21,6 +21,7 @@
 - ✅ CategoryMappingManager with centralized caching and single-source-of-truth architecture
 - ✅ Product name context display in category mapping dialog
 - ✅ Category filtering with text search and toggle selection
+- ✅ Refined category mapping logic: checks if category is already in target format before prompting
 ## Known Issues
 - None currently identified.
 - ✅ Progress indicators for long-running operations
