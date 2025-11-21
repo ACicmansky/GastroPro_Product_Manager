@@ -249,7 +249,7 @@
   },
   {
     "oldCategory": "Strúhač syra",
-    "newCategory": "Gastro prevádzky a profesionáli > Príprava surovín > Strúhače a krájače"
+    "newCategory": "Gastro prevádzky a profesionáli > Príprava surovín > Strúhače a krájače na syr"
   },
   {
     "oldCategory": "Výrobníky kališkového ľadu chladené vzduchom",
@@ -289,23 +289,23 @@
   },
   {
     "oldCategory": "Pultové chladiace vitríny so vstavaným kompresorom",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Pultové chladiace vitríny s externým kompresorom",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Pultové chladiace vitríny s dvojitým chladením",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Pultové vyhrievané vitríny",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Ohrevné vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Ohrevné vitríny"
   },
   {
     "oldCategory": "Pultové neutrálne vitríny",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Neutrálne vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Neutrálne vitríny"
   },
   {
     "oldCategory": "Fritézy s vodnou clonou",
@@ -393,7 +393,7 @@
   },
   {
     "oldCategory": "Termosy",
-    "newCategory": "Gastro prevádzky a profesionáli > Transport a logistika > Termosky a termonádoby"
+    "newCategory": "Gastro prevádzky a profesionáli > Transport a logistika > Termonádoby"
   },
   {
     "oldCategory": "Ohrievače vody",
@@ -405,7 +405,7 @@
   },
   {
     "oldCategory": "Grily a hriankovače",
-    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Kontaktné grily a hriankovače"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Kontaktné grily, Hriankovače a Salamandre"
   },
   {
     "oldCategory": "Varič vajíčok",
@@ -445,15 +445,15 @@
   },
   {
     "oldCategory": "Kontaktné grily",
-    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Kontaktné grily a hriankovače"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Kontaktné grily, Hriankovače a Salamandre"
   },
   {
     "oldCategory": "Elektrické salamandre",
-    "newCategory": "Gastro prevádzky a profesionáli > Varná technika > Salamandre a gratinovacie zariadenia"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Kontaktné grily, Hriankovače a Salamandre"
   },
   {
     "oldCategory": "Plynové salamandre",
-    "newCategory": "Gastro prevádzky a profesionáli > Varná technika > Salamandre a gratinovacie zariadenia"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Kontaktné grily, Hriankovače a Salamandre"
   },
   {
     "oldCategory": "Konvektické rúry",
@@ -497,7 +497,7 @@
   },
   {
     "oldCategory": "Mobilné šalátové bary",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Saladety a šalátové bary"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Saladety a šalátové bary"
   },
   {
     "oldCategory": "Sklo-keramické grily",
@@ -509,7 +509,7 @@
   },
   {
     "oldCategory": "Chladiace vitríny",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Sady diskov ku krájačom a robotom",
@@ -517,7 +517,7 @@
   },
   {
     "oldCategory": "Indukčné platne",
-    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Indukčné variče"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Stolné indukčné variče"
   },
   {
     "oldCategory": "Zmäkčovač vody",
@@ -657,7 +657,7 @@
   },
   {
     "oldCategory": "Chladiaci program | Presklené chladničky",
-    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Chladničky > Presklené chladničky"
+    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Presklené chladničky"
   },
   {
     "oldCategory": "Umývací program | Umývacie batérie a sprchy | Stolové batérie",
@@ -669,11 +669,11 @@
   },
   {
     "oldCategory": "Chladiaci program | Biele chladničky a mrazničky EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Chladničky"
+    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Skriňové chladničky"
   },
   {
     "oldCategory": "Vitríny | Stolové chladené vitríny - oblé",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Zmrzlina a pečenie | Šľahačka",
@@ -713,11 +713,11 @@
   },
   {
     "oldCategory": "Chladiaci program | Pizza a sushi vitríny",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Vitríny | Stolové chladené vitríny - hranaté",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Nerezový nábytok | Modulárny výdaj | Chladené výdajné vitríny",
@@ -741,15 +741,15 @@
   },
   {
     "oldCategory": "Vitríny | Predajné vitríny EVO",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Vitríny | Predajné vitríny EVOK",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Vitríny | Vysoké chladené vitríny - okrúhle",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Stolový inventár | Rolltop vitrínky",
@@ -825,11 +825,11 @@
   },
   {
     "oldCategory": "Chladiaci program | Nerezové chladničky a mrazničky PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Chladničky"
+    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Skriňové chladničky"
   },
   {
     "oldCategory": "Chladiaci program | Nerezové chladničky a mrazničky EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Chladničky"
+    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Skriňové chladničky"
   },
   {
     "oldCategory": "Bar a káva | Doplnky pre kaviareň",
@@ -865,15 +865,15 @@
   },
   {
     "oldCategory": "Chladiaci program | Chladiace saladety PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Saladety a šalátové bary"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Saladety a šalátové bary"
   },
   {
     "oldCategory": "Pizza a kebab | Nádoby na cesto",
-    "newCategory": "Gastro prevádzky a profesionáli > Pizza a cestoviny > Príslušenstvo na pizzu a cesto"
+    "newCategory": "Gastro prevádzky a profesionáli > Pizza a cestoviny > Lopaty a náradie na pizzu"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Deliace lišty PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynské náradie | Nože a nožnice | Ocieľky a brúsky",
@@ -921,7 +921,7 @@
   },
   {
     "oldCategory": "Stolové zariadenia | Salamandre a toastre",
-    "newCategory": "Gastro prevádzky a profesionáli > Varná technika > Salamandre a gratinovacie zariadenia"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Kontaktné grily, Hriankovače a Salamandre"
   },
   {
     "oldCategory": "Kuchynské náradie | Šumovačky | Drôtené šumovačky",
@@ -953,7 +953,7 @@
   },
   {
     "oldCategory": "Chladiaci program | Chladiace saladety EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Saladety a šalátové bary"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Saladety a šalátové bary"
   },
   {
     "oldCategory": "Nerezový nábytok | Výlevky",
@@ -1137,111 +1137,111 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | Pokrievky s výrezom na úchyty",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/1 nádoby EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/1 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby s úchytmi | GN1/1 nádoby s úchytmi",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | GN1/1 nádoby s úchytmi",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/12 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/2 nádoby EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/2 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | GN1/2 nádoby s úchytmi",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/3 nádoby EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/3 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | GN1/3 nádoby s úchytmi",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/4 nádoby EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/4 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/6 nádoby EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/6 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi STALGAST® PROFI | GN1/6 nádoby s úchytmi",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | GN1/9 nádoby EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN1/9 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN2/1 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN2/3 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | GN2/4 nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby EKO | Pokrievky pre GN nádoby EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | Pokrievky pre GN nádoby PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | Gastronádoby PROFI | Pokrievky s tesnenim PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby s úchytmi | GN1/3 nádoby s úchytmi",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby s úchytmi | GN1/6 nádoby s úchytmi",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Varná technológia | GASTROMARKET 600 EKO | Plynové grily",
@@ -1265,7 +1265,7 @@
   },
   {
     "oldCategory": "Stolové zariadenia | Elektrické grilovacie platne",
-    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Grilovacie platne"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Stolové grilovacie platne"
   },
   {
     "oldCategory": "Kuchynský riad | Panvice | Panvice liatinové",
@@ -1273,7 +1273,7 @@
   },
   {
     "oldCategory": "Stolové zariadenia | Plynové grilovacie platne GASTROMARKET",
-    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Grilovacie platne"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Stolové grilovacie platne"
   },
   {
     "oldCategory": "Catering | Cateringový nábytok | Cateringové stoly",
@@ -1313,7 +1313,7 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby hliníkové s teflónovým porvchom",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Panvice | Panvice hliníkové na indukciu",
@@ -1365,7 +1365,7 @@
   },
   {
     "oldCategory": "Stolové zariadenia | Indukčné platne EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Indukčné variče"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Stolné indukčné variče"
   },
   {
     "oldCategory": "Varná technológia | STALGAST 700 | Indukčné sporáky 700",
@@ -1381,7 +1381,7 @@
   },
   {
     "oldCategory": "Pizza a kebab | Príslušenstvo",
-    "newCategory": "Gastro prevádzky a profesionáli > Pizza a cestoviny > Príslušenstvo na pizzu a cesto"
+    "newCategory": "Gastro prevádzky a profesionáli > Pizza a cestoviny > Lopaty a náradie na pizzu"
   },
   {
     "oldCategory": "Stolový inventár | Džbániky a kanvice | Kanvice bez poklopu",
@@ -1417,7 +1417,7 @@
   },
   {
     "oldCategory": "Stolové zariadenia | Kontaktné grily",
-    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Kontaktné grily a hriankovače"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Kontaktné grily, Hriankovače a Salamandre"
   },
   {
     "oldCategory": "Konvektomaty a pece | Teplovzdušné rúry s parnou funkciou",
@@ -1549,7 +1549,7 @@
   },
   {
     "oldCategory": "Príprava potravín | Škrabky na zemiaky",
-    "newCategory": "Gastro prevádzky a profesionáli > Príprava surovín > Škrabky zemiakov a zeleniny"
+    "newCategory": "Gastro prevádzky a profesionáli > Príprava surovín > Škrabky zemiakov"
   },
   {
     "oldCategory": "Príprava potravín | Tyčové mixéry | Tyčové ručné mixéry FIMAR",
@@ -1721,7 +1721,7 @@
   },
   {
     "oldCategory": "Catering | Termosky",
-    "newCategory": "Gastro prevádzky a profesionáli > Transport a logistika > Termosky a termonádoby"
+    "newCategory": "Gastro prevádzky a profesionáli > Transport a logistika > Termonádoby"
   },
   {
     "oldCategory": "Catering | Variče na víno a perkolátory | Variče na víno",
@@ -1761,99 +1761,99 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/1 nádoby polykarbonátové - transparentné",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/1 nádoby polypropylén - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | GN1/1 nádoby polykarbonátové - čierne",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - biele | GN1/1 nádoby PC biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - čierne | GN1/1 nádoby PC čierne",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/2 nádoby polykarbonátové - transparentné",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/2 nádoby polypropylén - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - čierne | GN1/2 nádoby PC čierne",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - biele | GN1/2 nádoby PC biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - biele | GN1/3 nádoby polykarbonátové - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/3 nádoby polykarbonátové - transparentné",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/3 nádoby polypropylén - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | GN1/3 nádoby polykarbonátové - čierne",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polypropylén - biele | GN1/3 nádoby polypropylén - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - biele | GN1/4 nádoby polykarbonátové - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/4 nádoby polykarbonátové - transparentné",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/4 nádoby polypropylén - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | GN1/4 nádoby polykarbonátové - čierne",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - biele | GN1/6 nádoby PC biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/6 nádoby polykarbonátové - transparentné",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | GN1/6 nádoby polypropylén - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | GN1/6 nádoby polykarbonátové - čierne",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - biele | GN1/6 nádoby polykarbonátové - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | GN1/9 nádoby polykarbonátové - transparentné",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Catering | Chafingy | Palivo k chafingom",
@@ -1941,7 +1941,7 @@
   },
   {
     "oldCategory": "Umývací program | Odkvapávacie vozíky a regále",
-    "newCategory": "Gastro prevádzky a profesionáli > Umývacia technika > Manipulačné vozíky a regály"
+    "newCategory": "Gastro prevádzky a profesionáli > Umývacia technika > Odkvapkávacie vozíky a regály"
   },
   {
     "oldCategory": "Kuchynské náradie | Meranie",
@@ -1969,7 +1969,7 @@
   },
   {
     "oldCategory": "Vitríny | Stolové ohrevné vitríny",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Ohrevné vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Ohrevné vitríny"
   },
   {
     "oldCategory": "Nerezový nábytok | Bain-Marie - vodné kúpele",
@@ -1977,7 +1977,7 @@
   },
   {
     "oldCategory": "Vitríny | Stolové ohrevné vitríny - mini",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Ohrevné vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Ohrevné vitríny"
   },
   {
     "oldCategory": "Catering | Prepravné vozíky | Ohrevné prepravné vozíky",
@@ -1993,7 +1993,7 @@
   },
   {
     "oldCategory": "Zmrzlina a pečenie | Pečenie",
-    "newCategory": "Gastro prevádzky a profesionáli > Cukrárska a zmrzlinárska technika > Náradie a formy na pečenie"
+    "newCategory": "Gastro prevádzky a profesionáli > Cukrárska a zmrzlinárska technika > Pečenie"
   },
   {
     "oldCategory": "Stolový inventár | Podnosy a tácky | Okrúhle a oválne tácky",
@@ -2001,11 +2001,11 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | Pokrievky polykarbonátové so silikónovým tesnením",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - transparentné | GN pokrievky s tesnením PC transparentné",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Stolové zariadenia | Palacinkovače a waflovače",
@@ -2033,15 +2033,15 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Perforované gastronádoby STALGAST® PROFI | GN1/1 nádoby perforované",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Perforované gastronádoby STALGAST® PROFI | GN1/2 nádoby perforované",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Perforované gastronádoby STALGAST® PROFI | GN2/3 nádoby perforované",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynské náradie | Tĺčiky a perforátory",
@@ -2069,7 +2069,7 @@
   },
   {
     "oldCategory": "Chladiaci program | Príslušenstvo k chladiacej technike",
-    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Príslušenstvo a náhradné diely"
+    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Rošty a príslušenstvo pre chladničky a mrazničky"
   },
   {
     "oldCategory": "Konvektomaty a pece | Teplovzdušné rúry NERONE",
@@ -2141,31 +2141,31 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - biele | GN pokrievky PC biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | Pokrievky polykarbonátové",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polypropylén STALGAST® PROFI - biele | Pokrievky polypropylénové - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - čierne | Pokrievky polykarbonátové - čierne",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - biele | Pokrievky polykarbonátové - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - transparentné | GN pokrievky PC transparentné",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polypropylén - biele | GN pokrievky polypropylén - biele",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Stolový inventár | Košíky na pečivo | Čierne košíky",
@@ -2233,7 +2233,7 @@
   },
   {
     "oldCategory": "Stolové zariadenia | Indukčné platne PROFI",
-    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Indukčné variče"
+    "newCategory": "Gastro prevádzky a profesionáli > Stolné varné zariadenia > Stolné indukčné variče"
   },
   {
     "oldCategory": "Kuchynský riad | Hrnce a rajnice | Rajnice bez pokrievky",
@@ -2265,7 +2265,7 @@
   },
   {
     "oldCategory": "Vitríny | Vysoké chladené vitríny - hranaté",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Skladovanie a hygiena | Transportné vozíky",
@@ -2285,15 +2285,15 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Smaltované gastronádoby STALGAST® PROFI | GN1/1 nádoby smaltované",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Smaltované gastronádoby STALGAST® PROFI | GN2/1 nádoby smaltované",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Smaltované gastronádoby STALGAST® PROFI | GN2/3 nádoby smaltované",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Umývací program | Umývacie batérie a sprchy | Sprchy",
@@ -2345,7 +2345,7 @@
   },
   {
     "oldCategory": "Príprava potravín | Strúhač na syr",
-    "newCategory": "Gastro prevádzky a profesionáli > Príprava surovín > Strúhače a krájače"
+    "newCategory": "Gastro prevádzky a profesionáli > Príprava surovín > Strúhače a krájače na syr"
   },
   {
     "oldCategory": "Nerezový nábytok | Modulárny výdaj | Výdajné kasa stoly",
@@ -2373,7 +2373,7 @@
   },
   {
     "oldCategory": "Catering | Termoizolačné nádoby",
-    "newCategory": "Gastro prevádzky a profesionáli > Transport a logistika > Termosky a termonádoby"
+    "newCategory": "Gastro prevádzky a profesionáli > Transport a logistika > Termonádoby"
   },
   {
     "oldCategory": "Catering | Termoporty",
@@ -2381,7 +2381,7 @@
   },
   {
     "oldCategory": "Pizza a kebab | Termotašky na pizzu",
-    "newCategory": "Gastro prevádzky a profesionáli > Transport a logistika > Termotašky na jedlo"
+    "newCategory": "Gastro prevádzky a profesionáli > Transport a logistika > Termotašky na jedlo a pizzu"
   },
   {
     "oldCategory": "Stolový inventár | Podnosy a tácky | Obdĺžníkové tácky",
@@ -2421,11 +2421,11 @@
   },
   {
     "oldCategory": "Vitríny | Predajné vitríny M80",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Vitríny | Predajné vitríny SALINA",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "B2B | Stalgast® | Príbory bufet | Džbány | Oceľ | Bez veka",
@@ -2441,11 +2441,11 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | GN nádoby polycarbonát STALGAST® PROFI - transparentné | Odkvapkávacie vložky do nádob",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby polycarbonát - transparentné | GN odkvapkávacie vložky PC transparentné",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Nerezový nábytok | Modulárny výdaj | Stojany a vozíky na príbor a podnosy",
@@ -2521,27 +2521,27 @@
   },
   {
     "oldCategory": "/e-shop/samostatne-chladnicky/bez-mraznicky-vnutri",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Chladničky > Skriňové chladničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Skriňové chladničky"
   },
   {
     "oldCategory": "/e-shop/samostatne-chladnicky/s-mraznickou-vo-vnutri",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Kombinované chladničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Kombinované chladničky"
   },
   {
     "oldCategory": "/e-shop/chladnicky-s-mraznickou/s-mraznickou-hore",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Kombinované chladničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Kombinované chladničky"
   },
   {
     "oldCategory": "/e-shop/chladnicky-s-mraznickou/s-mraznickou-dole",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Kombinované chladničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Kombinované chladničky"
   },
   {
     "oldCategory": "/e-shop/americke-chladnicky",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Americké chladničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Americké chladničky"
   },
   {
     "oldCategory": "/e-shop/mraznicky/pultove",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Mrazničky > Truhlicové mrazničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Mrazničky > Truhlicové mrazničky"
   },
   {
     "oldCategory": "/e-shop/gastro-zariadenie/pultove-mraznicky",
@@ -2549,35 +2549,35 @@
   },
   {
     "oldCategory": "/e-shop/mraznicky/suplikove",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Mrazničky > Skriňové mrazničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Mrazničky > Skriňové mrazničky"
   },
   {
     "oldCategory": "/e-shop/vstavane-spotrebice/chladnicky-na-vino",
-    "newCategory": "Domácnosť a kulinári > Bar a kaviareň > Pre domácnosť > Vínotéky a humidory"
+    "newCategory": "Domácnosť a kulinári > Bar a kaviareň > Vínotéky a humidory"
   },
   {
     "oldCategory": "/e-shop/vstavane-spotrebice/mraznicky",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Mrazničky > Vstavané mrazničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Mrazničky > Vstavané mrazničky"
   },
   {
     "oldCategory": "/e-shop/vstavane-spotrebice/chladnicky",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Chladničky > Vstavané chladničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Vstavané chladničky"
   },
   {
     "oldCategory": "/e-shop/vstavane-spotrebice/kombinovane-chladnicky",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Pre domácnosť > Kombinované chladničky"
+    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Kombinované chladničky"
   },
   {
     "oldCategory": "/e-shop/domace-vinoteky/temperovane",
-    "newCategory": "Domácnosť a kulinári > Bar a kaviareň > Pre domácnosť > Vínotéky a humidory"
+    "newCategory": "Domácnosť a kulinári > Bar a kaviareň > Vínotéky a humidory"
   },
   {
     "oldCategory": "/e-shop/domace-vinoteky/klimatizovane",
-    "newCategory": "Domácnosť a kulinári > Bar a kaviareň > Pre domácnosť > Vínotéky a humidory"
+    "newCategory": "Domácnosť a kulinári > Bar a kaviareň > Vínotéky a humidory"
   },
   {
     "oldCategory": "/e-shop/humidory",
-    "newCategory": "Domácnosť a kulinári > Bar a kaviareň > Pre domácnosť > Vínotéky a humidory"
+    "newCategory": "Domácnosť a kulinári > Bar a kaviareň > Vínotéky a humidory"
   },
   {
     "oldCategory": "/e-shop/komercne-zariadenia/gastro-zariadenie",
@@ -2617,7 +2617,7 @@
   },
   {
     "oldCategory": "/e-shop/prislusenstvo",
-    "newCategory": "Domácnosť a kulinári > Chladenie a mrazenie > Príslušenstvo a náhradné diely"
+    "newCategory": "Gastro prevádzky a profesionáli > Chladenie a mrazenie > Rošty a príslušenstvo pre chladničky a mrazničky"
   },
   {
     "oldCategory": "Zariadenie interiéru/Stolové podnože/Mosadzné stolové nohy, brúsené",
@@ -2689,19 +2689,19 @@
   },
   {
     "oldCategory": "Bar a kaviareň/Vínotéky a humidory",
-    "newCategory": "Gastro prevádzky a profesionáli > Bar a kaviareň > Pre domácnosť > Vínotéky a humidory"
+    "newCategory": "Gastro prevádzky a profesionáli > Bar a kaviareň > Vínotéky a humidory"
   },
   {
     "oldCategory": "Chladiace vitríny - samostatne stojace",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Chladiace vitríny - pultové",
-    "newCategory": "Gastro prevádzky a profesionáli > Vitríny a výdaj > Chladiace vitríny"
+    "newCategory": "Gastro prevádzky a profesionáli > Vitríny > Chladiace vitríny"
   },
   {
     "oldCategory": "Príprava potravín | Krájače na chleba",
-    "newCategory": "Gastro prevádzky a profesionáli > Príprava surovín > Strúhače a krájače"
+    "newCategory": "Gastro prevádzky a profesionáli > Príprava surovín > Krájače na chlieb"
   },
   {
     "oldCategory": "Kuchynský riad | Hrnce a rajnice | Pokrievky na hrnce",
@@ -2709,11 +2709,11 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby EKO | GN1/2 nádoby EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby EKO | GN1/4 nádoby EKO",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Príprava potravín | Mlynčeky na mäso a príslušenstvo",
@@ -2737,23 +2737,23 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/1 nádoby s úchytmi | STALGAST®",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/2 nádoby s úchytmi | STALGAST®",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/3 nádoby s úchytmi | STALGAST®",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/4 nádoby s úchytmi | STALGAST®",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby STALGAST® | Gastronádoby s úchytmi | STALGAST® | GN1/6 nádoby s úchytmi | STALGAST®",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Umývací program | Umývacie batérie a sprchy | Senzorové batérie",
@@ -2789,11 +2789,11 @@
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby smaltované EKO | GN2/1 nádoby smaltované",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Kuchynský riad | Gastronádoby | GN nádoby s úchytmi | GN1/2 nádoby s úchytmi",
-    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastro nádoby (GN)"
+    "newCategory": "Gastro prevádzky a profesionáli > Kuchynský riad > Gastronádoby (GN)"
   },
   {
     "oldCategory": "Stolový inventár | Príbory | Príbor PROFI",
