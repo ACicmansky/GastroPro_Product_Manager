@@ -55,17 +55,33 @@
     "special_mappings": {
       "comment": "Special transformation rules for specific columns",
       "Hlavna kategória": {
-        "target_columns": ["defaultCategory", "categoryText"],
+        "target_columns": [
+          "defaultCategory",
+          "categoryText"
+        ],
         "transform": "add_prefix_and_replace_separator",
-        "prefix": "Tovary a kategórie > ",
-        "replace": {"/": " > "}
+        "prefix": "Gastro prevádzky a profesionáli > ",
+        "replace": {
+          "/": " > "
+        }
       },
       "Kat. číslo": {
-        "target_columns": ["code"],
+        "target_columns": [
+          "code"
+        ],
         "transform": "uppercase"
       },
       "Obrázky": {
-        "target_columns": ["defaultImage", "image", "image2", "image3", "image4", "image5", "image6", "image7"],
+        "target_columns": [
+          "defaultImage",
+          "image",
+          "image2",
+          "image3",
+          "image4",
+          "image5",
+          "image6",
+          "image7"
+        ],
         "transform": "split_by_comma",
         "comment": "Split comma-separated image URLs into multiple columns"
       }

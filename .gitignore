@@ -4,3 +4,4 @@ __pycache__
 data/
 tests/test_data/
 test_output.txt
+test_output_pipeline.txt
