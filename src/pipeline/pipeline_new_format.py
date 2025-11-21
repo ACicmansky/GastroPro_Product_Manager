@@ -80,14 +80,26 @@ class PipelineNewFormat:
         # Data from XML is already in new format, so we just:
         # 1. Ensure all columns exist
         # 2. Apply defaults
+        # 3. Change GastroMarket to Gastro in shortDescription, description, metaDescription, seoTitle
 
         result_df = df.copy()
 
-        # Ensure all columns exist
         result_df = self.transformer._ensure_all_columns(result_df)
 
-        # Apply defaults
         result_df = self.transformer.apply_default_values(result_df)
+
+        result_df["shortDescription"] = result_df["shortDescription"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        result_df["description"] = result_df["description"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        result_df["metaDescription"] = result_df["metaDescription"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        result_df["seoTitle"] = result_df["seoTitle"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
 
         return result_df
 
