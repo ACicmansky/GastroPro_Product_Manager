@@ -21,6 +21,12 @@
 
 ## Recent Changes
 
+**Scraper Refactoring & Testing (November 22, 2025)**:
+- **Architecture**: Refactored `MebellaScraper` and `TopchladenieScraper` to use `BaseScraper`.
+- **Playwright**: Integrated Playwright for Mebella pagination.
+- **Testing**: Achieved 100% mocked coverage for scraping logic (Playwright & requests).
+- **Feature**: Added `pairCode` variant grouping logic (removes last word from code).
+
 **Refine Category Mapping Logic (November 21, 2025)**:
 - **Optimization**: Prevented redundant interactive prompts for categories already in target format
 - **Implementation**: Added `is_target_category` check to `CategoryMappingManager`

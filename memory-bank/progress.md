@@ -73,6 +73,14 @@
   - Statistics display
   - Ready for production deployment
 
+## Recently Completed (November 22, 2025)
+- ✅ **Scraper Refactoring & Testing**
+  - Refactored `MebellaScraper` and `TopchladenieScraper` to inherit from `BaseScraper`
+  - Integrated `playwright` for Mebella pagination
+  - Implemented `pairCode` variant grouping logic
+  - Comprehensive unit tests with mocking (Playwright & requests)
+  - Fixed encoding and determinism issues in scrapers
+
 ## Recently Completed (January 2025)
 - ✅ **Phase 11: Web Scraping for New Format ✅ COMPLETE
 

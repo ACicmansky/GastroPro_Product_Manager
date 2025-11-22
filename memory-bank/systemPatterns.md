@@ -62,29 +62,6 @@ src/
 
 4. **Strategy Pattern**:
    - Used in variant detection with different similarity comparison strategies
-   - Configurable extraction rules for different product categories
-   - Flexible prompt engineering for different product types
-
-2. **Configuration Management Pattern**:
-   - External JSON configuration file
-   - Runtime config updates
-   - Default configuration fallback
-
-3. **Data Processing Pipeline**:
-   - Input stage: CSV loading and preparation
-   - Processing stage: Category filtering, mapping, and XML feed integration
-   - Web scraping stage: Multi-threaded acquisition of additional products and attributes (optional)
-   - Variant Detection: Product grouping and difference extraction
-   - Output stage: CSV generation and report export
-
-4. **Variant Detection System**:
-   - Product similarity analysis using name patterns
-   - Configurable extraction of differences (dimensions, power, etc.)
-   - Category-specific extraction rules
-   - Human-readable reporting of variant groups
-
-5. **AI Enhancement System**:
-   - Parallel batch processing with configurable batch sizes
    - Token-based quota management (250k tokens/minute)
    - Automatic retry with exponential backoff
    - Progress tracking and incremental saving

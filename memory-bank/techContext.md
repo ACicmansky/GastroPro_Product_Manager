@@ -48,6 +48,7 @@
 - python-dotenv>=1.0.0
 - pytest (testing framework)
 - rapidfuzz (category matching)
+- playwright (dynamic web scraping)
 
 ## Data Structures
 1. **Configuration (JSON)**:
