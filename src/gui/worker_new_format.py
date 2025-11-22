@@ -191,6 +191,13 @@ class WorkerNewFormat(QObject):
                         if not match.empty:
                             df_mebella.at[index, "price"] = match["price"].values[0]
 
+                    # Add pairCode for variants (remove last word from code)
+                    # Example: "BEA BIG BAR" -> "BEA BIG"
+                    if "code" in df_mebella.columns:
+                        df_mebella["pairCode"] = df_mebella["code"].apply(
+                            lambda x: " ".join(str(x).split()[:-1]) if x else ""
+                        )
+
                     all_scraped_dfs.append(df_mebella)
                     self.progress.emit(f"Mebella: hotovo ({len(df_mebella)} produktov)")
 

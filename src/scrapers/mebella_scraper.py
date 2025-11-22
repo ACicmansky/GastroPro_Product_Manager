@@ -285,6 +285,7 @@ class MebellaScraper(BaseScraper):
             # Construct the result dictionary mapped to new_output_columns
             result = {
                 "code": name,
+                "pairCode": "",
                 "name": name,
                 "price": "0",
                 "shortDescription": description,
