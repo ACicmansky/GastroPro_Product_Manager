@@ -166,9 +166,7 @@ class MebellaScraper(BaseScraper):
 
         return product_urls
 
-    def scrape_product_detail(
-        self, url: str, category_name: str = "Table Bases"
-    ) -> Optional[Dict]:
+    def scrape_product_detail(self, url: str) -> Optional[Dict]:
         """
         Scrapes detailed information from a product page.
         """
@@ -177,6 +175,7 @@ class MebellaScraper(BaseScraper):
             response = self.session.get(url)
             response.raise_for_status()
             soup = BeautifulSoup(response.content, "html.parser")
+            category_name = "Table Bases"
 
             # 1. Product Name
             # Try SKU span first as it seems most complete: <span class="sku">BEA BIG DINING</span>
@@ -199,21 +198,7 @@ class MebellaScraper(BaseScraper):
                 logger.warning(f"Could not find product name for {url}")
                 return None
 
-            # 2. Price
-            # Prices seem to be hidden or "On Request". Default to 0.
-            price = 0.0
-            # Attempt to find price if it exists
-            price_elem = soup.select_one(".woocommerce-Price-amount")
-            if price_elem:
-                price_text = price_elem.get_text(strip=True)
-                # Clean price text (remove currency, replace comma with dot)
-                price_text = re.sub(r"[^\d.,]", "", price_text).replace(",", ".")
-                try:
-                    price = float(price_text)
-                except ValueError:
-                    pass
-
-            # 3. Description
+            # 2. Description
             description = ""
             desc_div = soup.select_one(
                 "div.elementor-widget-woocommerce-product-content"
@@ -221,7 +206,7 @@ class MebellaScraper(BaseScraper):
             if desc_div:
                 description = desc_div.get_text(separator="\n", strip=True)
 
-            # 4. Images
+            # 3. Images
             images = []
             # Main image
             main_img = soup.select_one("div.woocommerce-product-gallery__image a")
@@ -238,7 +223,7 @@ class MebellaScraper(BaseScraper):
                     if img_url not in images:
                         images.append(img_url)
 
-            # 5. Attributes
+            # 4. Attributes
             # The page uses Elementor with 50/50 columns for attributes.
             # Structure: section.elementor-inner-section -> div.elementor-container -> 2x div.elementor-col-50
             attributes = {}
@@ -260,7 +245,7 @@ class MebellaScraper(BaseScraper):
                         key = key_col.rstrip(":")
                         attributes[key] = val_col
 
-            # 6. Parse "Size" section (h, a, b)
+            # 5. Parse "Size" section (h, a, b)
             # Look for text widgets containing "h:", "a:", "b:"
             # Pattern: <p>h: <strong>720 mm</strong></p>
             text_widgets = soup.select("div.elementor-widget-text-editor")
@@ -282,7 +267,7 @@ class MebellaScraper(BaseScraper):
                 if b_match:
                     attributes["Depth"] = b_match.group(1)
 
-            # Fallback to CSS classes if Elementor parsing fails
+            # 6. Fallback to CSS classes if Elementor parsing fails
             if not attributes:
                 product_div = soup.select_one("div.type-product")
                 if product_div and product_div.get("class"):
@@ -301,13 +286,11 @@ class MebellaScraper(BaseScraper):
             result = {
                 "code": name,
                 "name": name,
-                "price": price,
+                "price": "0",
                 "shortDescription": description,
                 "manufacturer": "Mebella",
                 "defaultCategory": category_name,
-                "currency": "EUR",
-                "vat": "23",  # Default VAT
-                "unit": "ks",
+                "categoryText": category_name,
                 "availabilityInStock": "1",  # Assume in stock if scraped
             }
 
@@ -326,8 +309,14 @@ class MebellaScraper(BaseScraper):
                     if i <= 7:
                         result[f"image{i}"] = img
 
-            # Combine all attributes into description
             if attributes:
+                # Look in attributes for Base material to update category_name
+                if "Base material" in attributes:
+                    category_name = f"{category_name} > {attributes['Base material']}"
+                    result["defaultCategory"] = category_name
+                    result["categoryText"] = category_name
+
+                # Combine all attributes into description
                 attr_lines = []
                 for k, v in attributes.items():
                     attr_lines.append(f"{k}: {v}")

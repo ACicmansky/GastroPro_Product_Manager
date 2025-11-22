@@ -6,6 +6,7 @@ Handles background processing with progress updates.
 from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop
 import pandas as pd
 from typing import Dict, Optional
+from pathlib import Path
 
 from src.pipeline.pipeline_new_format import PipelineNewFormat
 from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
@@ -154,7 +155,6 @@ class WorkerNewFormat(QObject):
         """
         try:
             self.progress.emit("Web scraping: inicializácia...")
-
             all_scraped_dfs = []
 
             # 1. TopChladenie.sk
@@ -175,16 +175,22 @@ class WorkerNewFormat(QObject):
             # 2. Mebella.pl
             if self.options.get("enable_mebella_scraping", False):
                 self.progress.emit("Web scraping (Mebella.pl): spúšťam...")
-                # Use MebellaScraper (single threaded for now as it's not Enhanced yet, or we can make it Enhanced)
-                # MebellaScraper inherits from ScraperNewFormat.
-                # If we want multi-threading, we should have inherited from EnhancedScraperNewFormat or implemented it.
-                # For now, let's use it as is.
                 scraper_mebella = MebellaScraper(
                     progress_callback=lambda msg: self.progress.emit(f"Mebella: {msg}"),
                 )
-                # Note: MebellaScraper.scrape_products is inherited from ScraperNewFormat
                 df_mebella = scraper_mebella.scrape_products()
                 if df_mebella is not None and not df_mebella.empty:
+                    # Load table_bases.json that is in root directory
+                    prices = pd.read_json(
+                        Path(__file__).parent.parent.parent / "table_bases_prices.json"
+                    )
+
+                    # Update prices
+                    for index, row in df_mebella.iterrows():
+                        match = prices[prices["name"] == row["name"]]
+                        if not match.empty:
+                            df_mebella.at[index, "price"] = match["price"].values[0]
+
                     all_scraped_dfs.append(df_mebella)
                     self.progress.emit(f"Mebella: hotovo ({len(df_mebella)} produktov)")
 
