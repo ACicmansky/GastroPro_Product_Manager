@@ -17,7 +17,7 @@ class MebellaScraper(BaseScraper):
         self,
         base_url: str = "https://mebella.pl",
         progress_callback=None,
-        max_threads: int = 1,
+        max_threads: int = 8,
     ):
         super().__init__(base_url, progress_callback, max_threads)
         # Mebella requires browser-like headers to bypass 403

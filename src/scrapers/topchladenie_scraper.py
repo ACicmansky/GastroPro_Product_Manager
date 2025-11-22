@@ -24,7 +24,7 @@ class TopchladenieScraper(BaseScraper):
         config: Dict,
         base_url: str = "https://www.topchladenie.sk",
         progress_callback=None,
-        max_threads: int = 1,
+        max_threads: int = 8,
     ):
         self.config = config
         super().__init__(base_url, progress_callback, max_threads)
