@@ -15,7 +15,7 @@ class MebellaScraper(BaseScraper):
 
     def __init__(
         self,
-        base_url: str = "https://mebella.pl/en/product-category/table-bases",
+        base_url: str = "https://mebella.pl",
         progress_callback=None,
         max_threads: int = 1,
     ):
@@ -46,18 +46,18 @@ class MebellaScraper(BaseScraper):
         print("\nGetting category links...")
         category_links = []
         direct_categories = [
-            "/gerro-en/",
-            "/bow-en/",
-            "/conti-new-en/",
-            "/bea-en/",
-            "/unique-en/",
-            "/pod-en/",
-            "/plus-en/",
-            "/flat-en/",  # This category contains show more button and uses ajax to load more products
-            "/oval-en/",
-            "/yeti-en/",
-            "/inox-en/",  # This category contains show more button and uses ajax to load more products
-            "/brass-en/",
+            "/en/product-category/table-bases/gerro-en/",
+            "/en/product-category/table-bases/bow-en/",
+            "/en/product-category/table-bases/conti-new-en/",
+            "/en/product-category/table-bases/bea-en/",
+            "/en/product-category/table-bases/unique-en/",
+            "/en/product-category/table-bases/pod-en/",
+            "/en/product-category/table-bases/plus-en/",
+            "/en/product-category/table-bases/flat-en/",
+            "/en/product-category/table-bases/oval-en/",
+            "/en/product-category/table-bases/yeti-en/",
+            "/en/product-category/table-bases/inox-en/",
+            "/en/product-category/table-bases/brass-en/",
         ]
 
         for category in direct_categories:

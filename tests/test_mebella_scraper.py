@@ -11,33 +11,61 @@ class TestMebellaScraper(unittest.TestCase):
 
     def test_get_category_links(self):
         links = self.scraper.get_category_links()
-        self.assertEqual(links, ["https://mebella.pl/en/product-category/table-bases/"])
+        self.assertEqual(
+            links,
+            [
+                "https://mebella.pl/en/product-category/table-bases/gerro-en/",
+                "https://mebella.pl/en/product-category/table-bases/bow-en/",
+                "https://mebella.pl/en/product-category/table-bases/conti-new-en/",
+                "https://mebella.pl/en/product-category/table-bases/bea-en/",
+                "https://mebella.pl/en/product-category/table-bases/unique-en/",
+                "https://mebella.pl/en/product-category/table-bases/pod-en/",
+                "https://mebella.pl/en/product-category/table-bases/plus-en/",
+                "https://mebella.pl/en/product-category/table-bases/flat-en/",
+                "https://mebella.pl/en/product-category/table-bases/oval-en/",
+                "https://mebella.pl/en/product-category/table-bases/yeti-en/",
+                "https://mebella.pl/en/product-category/table-bases/inox-en/",
+                "https://mebella.pl/en/product-category/table-bases/brass-en/",
+            ],
+        )
 
-    def test_get_product_urls(self):
-        # Mock response for category page
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        # Minimal HTML with one product link
-        mock_response.content = b"""
-        <html>
-            <body>
-                <div class="product_title">
-                    <a href="https://mebella.pl/en/produkt/test-product/">Test Product</a>
-                </div>
-            </body>
-        </html>
-        """
+    @unittest.mock.patch("playwright.sync_api.sync_playwright")
+    def test_get_product_urls(self, mock_sync_playwright):
+        # Setup mock playwright
+        mock_playwright = mock_sync_playwright.return_value.__enter__.return_value
+        mock_browser = mock_playwright.chromium.launch.return_value
+        mock_page = mock_browser.new_page.return_value
 
-        # Mock the session.get to return the page first, then 404 to stop the loop
-        self.scraper.session.get.side_effect = [
-            mock_response,
-            MagicMock(status_code=404),
-        ]
+        # Mock "Show more" button visibility (False = no button, loop breaks immediately)
+        mock_page.is_visible.return_value = False
+
+        # Mock product links found on the page
+        mock_link1 = MagicMock()
+        mock_link1.get_attribute.return_value = (
+            "https://mebella.pl/en/produkt/test-product-1/"
+        )
+
+        mock_link2 = MagicMock()
+        mock_link2.get_attribute.return_value = (
+            "https://mebella.pl/en/produkt/test-product-2/"
+        )
+
+        mock_page.query_selector_all.return_value = [mock_link1, mock_link2]
 
         urls = self.scraper.get_product_urls(
-            "https://mebella.pl/en/product-category/table-bases/"
+            "https://mebella.pl/en/product-category/table-bases/gerro-en/"
         )
-        self.assertIn("https://mebella.pl/en/produkt/test-product/", urls)
+
+        # Verify Playwright was used
+        mock_sync_playwright.assert_called_once()
+        mock_page.goto.assert_called_with(
+            "https://mebella.pl/en/product-category/table-bases/gerro-en/",
+            timeout=60000,
+        )
+
+        # Verify results
+        self.assertIn("https://mebella.pl/en/produkt/test-product-1/", urls)
+        self.assertIn("https://mebella.pl/en/produkt/test-product-2/", urls)
 
     def test_scrape_product_detail(self):
         # Mock response for product page

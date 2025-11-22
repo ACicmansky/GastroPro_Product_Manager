@@ -10,8 +10,8 @@ from pathlib import Path
 
 from src.pipeline.pipeline_new_format import PipelineNewFormat
 from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
-from src.scrapers.scraper_new_format import EnhancedScraperNewFormat
 from src.scrapers.mebella_scraper import MebellaScraper
+from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
 
 class WorkerNewFormat(QObject):
@@ -160,7 +160,7 @@ class WorkerNewFormat(QObject):
             # 1. TopChladenie.sk
             if self.options.get("enable_web_scraping", False):
                 self.progress.emit("Web scraping (TopChladenie.sk): spúšťam...")
-                scraper = EnhancedScraperNewFormat(
+                scraper = TopchladenieScraper(
                     config=self.config,
                     progress_callback=lambda msg: self.progress.emit(
                         f"TopChladenie: {msg}"
@@ -187,7 +187,7 @@ class WorkerNewFormat(QObject):
 
                     # Update prices
                     for index, row in df_mebella.iterrows():
-                        match = prices[prices["name"] == row["name"]]
+                        match = prices[prices["code"] == row["code"]]
                         if not match.empty:
                             df_mebella.at[index, "price"] = match["price"].values[0]
 
