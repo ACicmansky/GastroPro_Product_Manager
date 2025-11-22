@@ -13,8 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def test_scraper():
-    config = {}  # No specific config needed for now
-    scraper = MebellaScraper(config)
+    scraper = MebellaScraper()
 
     logger.info("Testing get_category_links...")
     cat_links = scraper.get_category_links()

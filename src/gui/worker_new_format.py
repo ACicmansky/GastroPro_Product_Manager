@@ -180,7 +180,6 @@ class WorkerNewFormat(QObject):
                 # If we want multi-threading, we should have inherited from EnhancedScraperNewFormat or implemented it.
                 # For now, let's use it as is.
                 scraper_mebella = MebellaScraper(
-                    config=self.config,
                     progress_callback=lambda msg: self.progress.emit(f"Mebella: {msg}"),
                 )
                 # Note: MebellaScraper.scrape_products is inherited from ScraperNewFormat

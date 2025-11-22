@@ -1,27 +1,25 @@
 import logging
 import re
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 
-from src.scrapers.scraper_new_format import ScraperNewFormat, ScraperConfig
+from src.scrapers.base_scraper import BaseScraper
 
 logger = logging.getLogger(__name__)
 
 
-class MebellaScraper(ScraperNewFormat):
-    """
-    Scraper for Mebella.pl (Table Bases).
-    """
+class MebellaScraper(BaseScraper):
+    """Scraper for Mebella.pl (Table Bases)."""
 
     def __init__(
         self,
-        config: Dict,
-        base_url: str = "https://mebella.pl/en/product-category/table-bases/",
+        base_url: str = "https://mebella.pl/en/product-category/table-bases",
         progress_callback=None,
+        max_threads: int = 1,
     ):
-        super().__init__(config, base_url, progress_callback)
+        super().__init__(base_url, progress_callback, max_threads)
         # Mebella requires browser-like headers to bypass 403
         self.session.headers.update(
             {
@@ -45,62 +43,126 @@ class MebellaScraper(ScraperNewFormat):
         Returns the main category link.
         Since we are targeting a specific category, we just return the base URL.
         """
-        return [self.base_url]
+        print("\nGetting category links...")
+        category_links = []
+        direct_categories = [
+            "/gerro-en/",
+            "/bow-en/",
+            "/conti-new-en/",
+            "/bea-en/",
+            "/unique-en/",
+            "/pod-en/",
+            "/plus-en/",
+            "/flat-en/",  # This category contains show more button and uses ajax to load more products
+            "/oval-en/",
+            "/yeti-en/",
+            "/inox-en/",  # This category contains show more button and uses ajax to load more products
+            "/brass-en/",
+        ]
+
+        for category in direct_categories:
+            category_links.append(urljoin(self.base_url, category))
+        return category_links
 
     def get_product_urls(self, category_url: str) -> List[str]:
         """
-        Extracts product URLs from the category page, handling pagination.
+        Extracts product URLs from the category page using Playwright to handle AJAX pagination.
         """
+        from playwright.sync_api import sync_playwright
+
         product_urls = []
-        page = 1
+        logger.info(f"Scraping category page with Playwright: {category_url}")
 
-        while True:
-            # Construct URL for the current page
-            if page == 1:
-                url = category_url
-            else:
-                url = f"{category_url}page/{page}/"
+        try:
+            with sync_playwright() as p:
+                # Launch browser (headless)
+                browser = p.chromium.launch(headless=True)
+                page = browser.new_page()
 
-            logger.info(f"Scraping category page: {url}")
-
-            try:
-                response = self.session.get(url)
-                if response.status_code == 404:
-                    logger.info("Reached end of pagination (404).")
-                    break
-
-                response.raise_for_status()
-                soup = BeautifulSoup(response.content, "html.parser")
-
-                # Find product links
-                # Based on analysis: div.product_title a
-                links = soup.select("div.product_title a")
-                if not links:
-                    # Fallback: try finding any link with /produkt/ in href
-                    links = soup.select("a[href*='/produkt/']")
-
-                new_urls = []
-                for link in links:
-                    href = link.get("href")
-                    if href and "/produkt/" in href:
-                        full_url = urljoin(self.base_url, href)
-                        if full_url not in product_urls and full_url not in new_urls:
-                            new_urls.append(full_url)
-
-                if not new_urls:
-                    logger.info("No more products found on this page.")
-                    break
-
-                product_urls.extend(new_urls)
-                logger.info(
-                    f"Found {len(new_urls)} products on page {page}. Total: {len(product_urls)}"
+                # Set headers to mimic real browser
+                page.set_extra_http_headers(
+                    {
+                        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+                    }
                 )
 
-                page += 1
+                # Navigate to category page
+                page.goto(category_url, timeout=60000)
 
-            except Exception as e:
-                logger.error(f"Error scraping category page {url}: {e}")
-                break
+                # Handle cookie consent if it appears (optional but good practice)
+                try:
+                    page.click("button#cookie_action_close_header", timeout=2000)
+                except:
+                    pass
+
+                while True:
+                    # Scroll to bottom to trigger any lazy loading or make button visible
+                    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+
+                    # Check for "Show more" button
+                    # Selector based on analysis: a.post-load-more
+                    load_more_selector = "a.post-load-more"
+
+                    if page.is_visible(load_more_selector):
+                        logger.info("Found 'Show more' button. Clicking...")
+                        try:
+                            # Click and wait for network idle or a short delay
+                            page.click(load_more_selector)
+                            page.wait_for_timeout(3000)  # Wait for AJAX load
+                        except Exception as e:
+                            logger.warning(f"Error clicking 'Show more': {e}")
+                            break
+                    else:
+                        logger.info("No more 'Show more' buttons found.")
+                        break
+
+                # Extract all product links after full load
+                # Selector: div.product_title a
+                links = page.query_selector_all("div.product_title a")
+                if not links:
+                    # Fallback selector
+                    links = page.query_selector_all("a[href*='/produkt/']")
+
+                for link in links:
+                    href = link.get_attribute("href")
+                    if href and "/produkt/" in href:
+                        full_url = urljoin(self.base_url, href)
+                        if full_url not in product_urls:
+                            product_urls.append(full_url)
+
+                browser.close()
+
+            logger.info(f"Found {len(product_urls)} products in total.")
+
+        except Exception as e:
+            logger.error(f"Error scraping category page with Playwright: {e}")
+            # Fallback to requests if Playwright fails completely
+            return self._get_product_urls_fallback(category_url)
+
+        return product_urls
+
+    def _get_product_urls_fallback(self, category_url: str) -> List[str]:
+        """
+        Fallback method using requests (only gets first page).
+        """
+        product_urls = []
+        try:
+            response = self.session.get(category_url)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.content, "html.parser")
+
+            links = soup.select("div.product_title a")
+            if not links:
+                links = soup.select("a[href*='/produkt/']")
+
+            for link in links:
+                href = link.get("href")
+                if href and "/produkt/" in href:
+                    full_url = urljoin(self.base_url, href)
+                    if full_url not in product_urls:
+                        product_urls.append(full_url)
+        except Exception as e:
+            logger.error(f"Fallback scraping failed: {e}")
 
         return product_urls
 
@@ -220,7 +282,7 @@ class MebellaScraper(ScraperNewFormat):
                 if b_match:
                     attributes["Depth"] = b_match.group(1)
 
-            # Fallback to CSS classes if Elementor parsing fails (though Elementor seems to be the primary source now)
+            # Fallback to CSS classes if Elementor parsing fails
             if not attributes:
                 product_div = soup.select_one("div.type-product")
                 if product_div and product_div.get("class"):

@@ -5,8 +5,7 @@ from src.scrapers.mebella_scraper import MebellaScraper
 
 class TestMebellaScraper(unittest.TestCase):
     def setUp(self):
-        self.config = {}
-        self.scraper = MebellaScraper(self.config)
+        self.scraper = MebellaScraper()
         # Mock the session directly on the instance
         self.scraper.session = MagicMock()
 
@@ -70,9 +69,10 @@ class TestMebellaScraper(unittest.TestCase):
 
         self.assertIsNotNone(data)
         self.assertEqual(data["name"], "Test Product SKU")
-        self.assertEqual(data["description"], "Test description.")
+        self.assertTrue(data["description"].startswith("Test description."))
+        self.assertIn("Material: Steel", data["description"])
+        self.assertIn("Wysokosc mm: 720", data["description"])
         self.assertEqual(data["defaultImage"], "https://mebella.pl/img/test.jpg")
-        self.assertEqual(data["variant:Material"], "Steel")
 
 
 if __name__ == "__main__":

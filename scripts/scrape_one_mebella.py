@@ -25,7 +25,7 @@ def scrape_single_product():
     url = "https://mebella.pl/en/produkt/bea-big-dining/"
 
     logger.info(f"Initializing MebellaScraper...")
-    scraper = MebellaScraper(config={})
+    scraper = MebellaScraper()
 
     logger.info(f"Scraping product: {url}")
 
