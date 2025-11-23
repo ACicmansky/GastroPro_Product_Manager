@@ -2814,5 +2814,17 @@
   {
     "oldCategory": "Table Bases",
     "newCategory": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože"
+  },
+  {
+    "oldCategory": "Table Bases > inox",
+    "newCategory": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Nerezové podnože"
+  },
+  {
+    "oldCategory": "Table Bases > steel",
+    "newCategory": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Oceľové podnože"
+  },
+  {
+    "oldCategory": "Table Bases > brass",
+    "newCategory": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Mosadzné podnože"
   }
 ]

@@ -178,21 +178,24 @@ class MebellaScraper(BaseScraper):
             category_name = "Table Bases"
 
             # 1. Product Name
-            # Try SKU span first as it seems most complete: <span class="sku">BEA BIG DINING</span>
             name = None
-            sku_span = soup.select_one("span.sku")
-            if sku_span:
-                name = sku_span.get_text(strip=True)
+            # Try title tag
+            title_tag = soup.find("title")
+            if title_tag:
+                name = (
+                    title_tag.get_text(strip=True)
+                    .replace(" – Mebella", "")
+                    .replace(" &#8211; Mebella", "")
+                    .replace("(POL)", "")
+                    .replace("(STD)", "")
+                    .strip()
+                )
 
+            # Try SKU span if title tag fails: <span class="sku">BEA BIG DINING</span>
             if not name:
-                # Fallback to title tag
-                title_tag = soup.find("title")
-                if title_tag:
-                    name = (
-                        title_tag.get_text(strip=True)
-                        .replace(" – Mebella", "")
-                        .replace(" &#8211; Mebella", "")
-                    )
+                sku_span = soup.select_one("span.sku")
+                if sku_span:
+                    name = sku_span.get_text(strip=True)
 
             if not name:
                 logger.warning(f"Could not find product name for {url}")
@@ -287,7 +290,6 @@ class MebellaScraper(BaseScraper):
                 "code": name,
                 "pairCode": "",
                 "name": name,
-                "price": "0",
                 "shortDescription": description,
                 "manufacturer": "Mebella",
                 "defaultCategory": category_name,
@@ -297,11 +299,11 @@ class MebellaScraper(BaseScraper):
 
             # Map dimensions
             if "Height" in attributes:
-                result["height"] = attributes["Height"]
+                result["variant:Dĺžka (mm)"] = attributes["Height"]
             if "Width" in attributes:
-                result["width"] = attributes["Width"]
+                result["variant:Šírka (mm)"] = attributes["Width"]
             if "Depth" in attributes:
-                result["depth"] = attributes["Depth"]
+                result["variant:Hĺbka (mm)"] = attributes["Depth"]
 
             # Map images
             if images:
@@ -321,14 +323,7 @@ class MebellaScraper(BaseScraper):
                 attr_lines = []
                 for k, v in attributes.items():
                     attr_lines.append(f"{k}: {v}")
-
-                # Combine original description with attributes
-                if result["shortDescription"]:
-                    result["description"] = (
-                        result["shortDescription"] + "\n\n" + "\n".join(attr_lines)
-                    )
-                else:
-                    result["description"] = "\n".join(attr_lines)
+                result["description"] = "\n".join(attr_lines)
 
             return result
 

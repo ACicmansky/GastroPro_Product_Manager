@@ -24,7 +24,7 @@
         "price": "75,00"
     },
     {
-        "code": "YETI CAFFEE",
+        "code": "YETI COFFEE",
         "price": "50,59"
     },
     {
@@ -36,7 +36,7 @@
         "price": "51,13"
     },
     {
-        "code": "YETI BIG CAFFEE",
+        "code": "YETI BIG COFFEE",
         "price": "55,87"
     },
     {
@@ -48,7 +48,7 @@
         "price": "58,22"
     },
     {
-        "code": "YETI PIPE CAFFEE",
+        "code": "YETI PIPE COFFEE",
         "price": "78,98"
     },
     {
@@ -64,19 +64,19 @@
         "price": "74,74"
     },
     {
-        "code": "YETI RECT CAFFEE",
+        "code": "YETI RECTANGLE COFFEE",
         "price": "67,13"
     },
     {
-        "code": "YETI RECT DINING",
+        "code": "YETI RECTANGLE DINING",
         "price": "76,28"
     },
     {
-        "code": "YETI RECT BAR",
+        "code": "YETI RECTANGLE BAR",
         "price": "79,69"
     },
     {
-        "code": "PLUS CAFFEE",
+        "code": "PLUS COFFEE",
         "price": "44,32"
     },
     {
@@ -88,7 +88,7 @@
         "price": "47,53"
     },
     {
-        "code": "PLUS BIG CAFFEE",
+        "code": "PLUS BIG COFFEE",
         "price": "46,34"
     },
     {
@@ -100,19 +100,19 @@
         "price": "49,54"
     },
     {
-        "code": "PLUS RECT CAFFEE",
+        "code": "PLUS RECTANGLE COFFEE",
         "price": "70,11"
     },
     {
-        "code": "PLUS RECT DINING",
+        "code": "PLUS RECTANGLE DINING",
         "price": "71,69"
     },
     {
-        "code": "PLUS RECT BAR",
+        "code": "PLUS RECTANGLE BAR",
         "price": "76,33"
     },
     {
-        "code": "PLUS PIPE CAFFEE",
+        "code": "PLUS PIPE COFFEE",
         "price": "65,86"
     },
     {
@@ -172,15 +172,15 @@
         "price": "111"
     },
     {
-        "code": "GERRO RECT COFFEE",
+        "code": "GERRO RECTANGLE COFFEE",
         "price": "148"
     },
     {
-        "code": "GERRO RECT DINING",
+        "code": "GERRO RECTANGLE DINING",
         "price": "151"
     },
     {
-        "code": "GERRO RECT BAR",
+        "code": "GERRO RECTANGLE BAR",
         "price": "162"
     },
     {
@@ -188,7 +188,7 @@
         "price": "134"
     },
     {
-        "code": "BOW DINING (STD)",
+        "code": "BOW DINING",
         "price": "105"
     },
     {
@@ -228,7 +228,7 @@
         "price": "105"
     },
     {
-        "code": "CONTI NEW 3R CAFFEE",
+        "code": "CONTI NEW 3R COFFEE",
         "price": "78"
     },
     {
@@ -240,7 +240,7 @@
         "price": "111"
     },
     {
-        "code": "CONTI NEW 4R CAFFEE",
+        "code": "CONTI NEW 4R COFFEE",
         "price": "97"
     },
     {
@@ -252,15 +252,15 @@
         "price": "141"
     },
     {
-        "code": "CONTI NEW RECT BAR",
+        "code": "CONTI NEW RECTANGLE BAR",
         "price": "173"
     },
     {
-        "code": "CONTI NEW RECT DINING",
+        "code": "CONTI NEW RECTANGLE DINING",
         "price": "139"
     },
     {
-        "code": "OVAL SMALL CAFFEE",
+        "code": "OVAL SMALL COFFEE",
         "price": "59"
     },
     {
@@ -284,43 +284,43 @@
         "price": "77"
     },
     {
-        "code": "OVAL RECT SMALL CAFFEE",
+        "code": "OVAL RECTANGLE SMALL COFFEE",
         "price": "74"
     },
     {
-        "code": "OVAL RECT SMALL DINING",
+        "code": "OVAL RECTANGLE SMALL DINING",
         "price": "75"
     },
     {
-        "code": "OVAL RECT SMALL BAR",
+        "code": "OVAL RECTANGLE SMALL BAR",
         "price": "78"
     },
     {
-        "code": "OVAL RECT DUET SMALL CAFFEE",
+        "code": "OVAL RECTANGLE DUET SMALL COFFEE",
         "price": "98"
     },
     {
-        "code": "OVAL RECT DUET SMALL DINING",
+        "code": "OVAL RECTANGLE DUET SMALL DINING",
         "price": "100"
     },
     {
-        "code": "OVAL RECT DUET SMALL BAR",
+        "code": "OVAL RECTANGLE DUET SMALL BAR",
         "price": "106"
     },
     {
-        "code": "OVAL RECT DUET BIG CAFFEE",
+        "code": "OVAL RECTANGLE DUET BIG COFFEE",
         "price": "119"
     },
     {
-        "code": "OVAL RECT DUET BIG DINING",
+        "code": "OVAL RECTANGLE DUET BIG DINING",
         "price": "121"
     },
     {
-        "code": "OVAL RECT DUET BIG BAR",
+        "code": "OVAL RECTANGLE DUET BIG BAR",
         "price": "127"
     },
     {
-        "code": "TRIPOD CAFFEE",
+        "code": "TRIPOD COFFEE",
         "price": "55"
     },
     {
@@ -332,7 +332,7 @@
         "price": "66"
     },
     {
-        "code": "QUADPOD CAFFEE",
+        "code": "QUADPOD COFFEE",
         "price": "71"
     },
     {
@@ -368,15 +368,15 @@
         "price": "71"
     },
     {
-        "code": "BEA RECT COFFEE",
+        "code": "BEA RECTANGLE COFFEE",
         "price": "87"
     },
     {
-        "code": "BEA RECT DINING",
+        "code": "BEA RECTANGLE DINING",
         "price": "82"
     },
     {
-        "code": "BEA RECT BAR",
+        "code": "BEA RECTANGLE BAR",
         "price": "84"
     },
     {
@@ -396,7 +396,7 @@
         "price": "81"
     },
     {
-        "code": "PYRAMID ROUND 09 CAFFEE",
+        "code": "PYRAMID ROUND 09 COFFEE",
         "price": "74"
     },
     {
@@ -408,7 +408,7 @@
         "price": "80"
     },
     {
-        "code": "PYRAMID SQUARE 10 CAFFEE",
+        "code": "PYRAMID SQUARE 10 COFFEE",
         "price": "79"
     },
     {
@@ -420,19 +420,19 @@
         "price": "87"
     },
     {
-        "code": "PYRAMID RECTANGULAR 10 CAFFEE",
+        "code": "PYRAMID RECTANGLEANGULAR 10 COFFEE",
         "price": "107"
     },
     {
-        "code": "PYRAMID RECTANGULAR 10 DINING",
+        "code": "PYRAMID RECTANGLEANGULAR 10 DINING",
         "price": "108"
     },
     {
-        "code": "PYRAMID RECTANGULAR 10 BAR",
+        "code": "PYRAMID RECTANGLEANGULAR 10 BAR",
         "price": "114"
     },
     {
-        "code": "CORAL CROSS 09 CAFFEE",
+        "code": "CORAL CROSS 09 COFFEE",
         "price": "93"
     },
     {
@@ -444,7 +444,7 @@
         "price": "99"
     },
     {
-        "code": "CORAL CROSS 10 CAFFEE",
+        "code": "CORAL CROSS 10 COFFEE",
         "price": "94"
     },
     {
@@ -472,7 +472,7 @@
         "price": "121"
     },
     {
-        "code": "PYRAMID ROUND 01 CAFFEE",
+        "code": "PYRAMID ROUND 01 COFFEE",
         "price": "101"
     },
     {
@@ -492,7 +492,7 @@
         "price": "151"
     },
     {
-        "code": "PYRAMID ROUND 21 CAFFEE",
+        "code": "PYRAMID ROUND 21 COFFEE",
         "price": "111"
     },
     {
@@ -504,7 +504,7 @@
         "price": "165"
     },
     {
-        "code": "PYRAMID SQUARE 02 CAFFEE",
+        "code": "PYRAMID SQUARE 02 COFFEE",
         "price": "107"
     },
     {
@@ -524,27 +524,27 @@
         "price": "161"
     },
     {
-        "code": "PYRAMID RECTANGULAR 02 CAFFEE",
+        "code": "PYRAMID RECTANGLEANGULAR 02 COFFEE",
         "price": "123"
     },
     {
-        "code": "PYRAMID RECTANGULAR 02 DINING",
+        "code": "PYRAMID RECTANGLEANGULAR 02 DINING",
         "price": "128"
     },
     {
-        "code": "PYRAMID RECTANGULAR 02 BAR",
+        "code": "PYRAMID RECTANGLEANGULAR 02 BAR",
         "price": "150"
     },
     {
-        "code": "PYRAMID RECTANGULAR 06 DINING",
+        "code": "PYRAMID RECTANGLEANGULAR 06 DINING",
         "price": "145"
     },
     {
-        "code": "PYRAMID RECTANGULAR 06 BAR",
+        "code": "PYRAMID RECTANGLEANGULAR 06 BAR",
         "price": "176"
     },
     {
-        "code": "CORAL CROSS 01 CAFFEE",
+        "code": "CORAL CROSS 01 COFFEE",
         "price": "111"
     },
     {
@@ -556,7 +556,7 @@
         "price": "144"
     },
     {
-        "code": "CORAL CROSS 02 CAFFEE",
+        "code": "CORAL CROSS 02 COFFEE",
         "price": "111"
     },
     {
@@ -584,7 +584,7 @@
         "price": "164"
     },
     {
-        "code": "CORAL CROSS 21 CAFFEE",
+        "code": "CORAL CROSS 21 COFFEE",
         "price": "135"
     },
     {
@@ -612,7 +612,7 @@
         "price": "157"
     },
     {
-        "code": "FLAT ROUND MINI 09 CAFFEE",
+        "code": "FLAT ROUND MINI 09 COFFEE",
         "price": "49"
     },
     {
@@ -624,7 +624,7 @@
         "price": "53"
     },
     {
-        "code": "FLAT ROUND SMALL 09 CAFFEE",
+        "code": "FLAT ROUND SMALL 09 COFFEE",
         "price": "61"
     },
     {
@@ -636,7 +636,7 @@
         "price": "67"
     },
     {
-        "code": "FLAT ROUND MEDIUM 09 CAFFEE",
+        "code": "FLAT ROUND MEDIUM 09 COFFEE",
         "price": "77"
     },
     {
@@ -648,7 +648,7 @@
         "price": "83"
     },
     {
-        "code": "FLAT ROUND BIG 09 CAFFEE",
+        "code": "FLAT ROUND BIG 09 COFFEE",
         "price": "97"
     },
     {
@@ -664,7 +664,7 @@
         "price": "230"
     },
     {
-        "code": "FLAT ROUND GRAND 09 CAFFEE",
+        "code": "FLAT ROUND GRAND 09 COFFEE",
         "price": "211"
     },
     {
@@ -676,7 +676,7 @@
         "price": "216"
     },
     {
-        "code": "FLAT ROUND GRAND 09 KSO CAFFEE",
+        "code": "FLAT ROUND GRAND 09 KSO COFFEE",
         "price": "184"
     },
     {
@@ -688,7 +688,7 @@
         "price": "189"
     },
     {
-        "code": "FLAT SQUARE SMALL 09 CAFFEE",
+        "code": "FLAT SQUARE SMALL 09 COFFEE",
         "price": "62"
     },
     {
@@ -700,7 +700,7 @@
         "price": "67"
     },
     {
-        "code": "FLAT SQUARE SMALL 10 CAFFEE",
+        "code": "FLAT SQUARE SMALL 10 COFFEE",
         "price": "62"
     },
     {
@@ -712,7 +712,7 @@
         "price": "67"
     },
     {
-        "code": "FLAT SQUARE MEDIUM 09 CAFFEE",
+        "code": "FLAT SQUARE MEDIUM 09 COFFEE",
         "price": "79"
     },
     {
@@ -724,7 +724,7 @@
         "price": "84"
     },
     {
-        "code": "FLAT SQUARE MEDIUM 10 CAFFEE",
+        "code": "FLAT SQUARE MEDIUM 10 COFFEE",
         "price": "78"
     },
     {
@@ -736,7 +736,7 @@
         "price": "84"
     },
     {
-        "code": "FLAT SQUARE BIG 09 CAFFEE",
+        "code": "FLAT SQUARE BIG 09 COFFEE",
         "price": "98"
     },
     {
@@ -748,7 +748,7 @@
         "price": "103"
     },
     {
-        "code": "FLAT SQUARE BIG 10 CAFFEE",
+        "code": "FLAT SQUARE BIG 10 COFFEE",
         "price": "98"
     },
     {
@@ -768,79 +768,79 @@
         "price": "263"
     },
     {
-        "code": "FLAT RECT SMALL 09 CAFFEE",
+        "code": "FLAT RECTANGLE SMALL 09 COFFEE",
         "price": "80"
     },
     {
-        "code": "FLAT RECT SMALL 09 DINING",
+        "code": "FLAT RECTANGLE SMALL 09 DINING",
         "price": "81"
     },
     {
-        "code": "FLAT RECT SMALL 09 BAR",
+        "code": "FLAT RECTANGLE SMALL 09 BAR",
         "price": "85"
     },
     {
-        "code": "FLAT RECT SMALL 10 CAFFEE",
+        "code": "FLAT RECTANGLE SMALL 10 COFFEE",
         "price": "79"
     },
     {
-        "code": "FLAT RECT SMALL 10 DINING",
+        "code": "FLAT RECTANGLE SMALL 10 DINING",
         "price": "81"
     },
     {
-        "code": "FLAT RECT SMALL 10 BAR",
+        "code": "FLAT RECTANGLE SMALL 10 BAR",
         "price": "85"
     },
     {
-        "code": "FLAT RECT DUET SMALL 09 CAFFEE",
+        "code": "FLAT RECTANGLE DUET SMALL 09 COFFEE",
         "price": "102"
     },
     {
-        "code": "FLAT RECT DUET SMALL 09 DINING",
+        "code": "FLAT RECTANGLE DUET SMALL 09 DINING",
         "price": "104"
     },
     {
-        "code": "FLAT RECT DUET SMALL 09 BAR",
+        "code": "FLAT RECTANGLE DUET SMALL 09 BAR",
         "price": "112"
     },
     {
-        "code": "FLAT RECT DUET SMALL 10 CAFFEE",
+        "code": "FLAT RECTANGLE DUET SMALL 10 COFFEE",
         "price": "101"
     },
     {
-        "code": "FLAT RECT DUET SMALL 10 DINING",
+        "code": "FLAT RECTANGLE DUET SMALL 10 DINING",
         "price": "104"
     },
     {
-        "code": "FLAT RECT DUET SMALL 10 BAR",
+        "code": "FLAT RECTANGLE DUET SMALL 10 BAR",
         "price": "112"
     },
     {
-        "code": "FLAT RECT DUET BIG 09 CAFFEE",
+        "code": "FLAT RECTANGLE DUET BIG 09 COFFEE",
         "price": "130"
     },
     {
-        "code": "FLAT RECT DUET BIG 09 DINING",
+        "code": "FLAT RECTANGLE DUET BIG 09 DINING",
         "price": "133"
     },
     {
-        "code": "FLAT RECT DUET BIG 09 BAR",
+        "code": "FLAT RECTANGLE DUET BIG 09 BAR",
         "price": "141"
     },
     {
-        "code": "FLAT RECT DUET BIG 10 CAFFEE",
+        "code": "FLAT RECTANGLE DUET BIG 10 COFFEE",
         "price": "130"
     },
     {
-        "code": "FLAT RECT DUET BIG 10 DINING",
+        "code": "FLAT RECTANGLE DUET BIG 10 DINING",
         "price": "132"
     },
     {
-        "code": "FLAT RECT DUET BIG 10 BAR",
+        "code": "FLAT RECTANGLE DUET BIG 10 BAR",
         "price": "140"
     },
     {
-        "code": "FLAT CROSS SMALL 09 CAFFEE",
+        "code": "FLAT CROSS SMALL 09 COFFEE",
         "price": "98"
     },
     {
@@ -852,7 +852,7 @@
         "price": "104"
     },
     {
-        "code": "FLAT CROSS BIG 09 CAFFEE",
+        "code": "FLAT CROSS BIG 09 COFFEE",
         "price": "112"
     },
     {
@@ -864,7 +864,7 @@
         "price": "117"
     },
     {
-        "code": "FLAT CROSS SMALL 10 CAFFEE",
+        "code": "FLAT CROSS SMALL 10 COFFEE",
         "price": "98"
     },
     {
@@ -876,7 +876,7 @@
         "price": "103"
     },
     {
-        "code": "FLAT CROSS BIG 10 CAFFEE",
+        "code": "FLAT CROSS BIG 10 COFFEE",
         "price": "112"
     },
     {
@@ -904,7 +904,7 @@
         "price": "177"
     },
     {
-        "code": "FLAT ROUND SMALL 01 CAFFEE",
+        "code": "FLAT ROUND SMALL 01 COFFEE",
         "price": "65"
     },
     {
@@ -924,7 +924,7 @@
         "price": "80"
     },
     {
-        "code": "FLAT ROUND SMALL 21 CAFFEE",
+        "code": "FLAT ROUND SMALL 21 COFFEE",
         "price": "95"
     },
     {
@@ -936,7 +936,7 @@
         "price": "106"
     },
     {
-        "code": "FLAT ROUND SMALL 13 CAFFEE",
+        "code": "FLAT ROUND SMALL 13 COFFEE",
         "price": "86"
     },
     {
@@ -948,7 +948,7 @@
         "price": "109"
     },
     {
-        "code": "FLAT ROUND MEDIUM 01 CAFFEE",
+        "code": "FLAT ROUND MEDIUM 01 COFFEE",
         "price": "81"
     },
     {
@@ -960,7 +960,7 @@
         "price": "96"
     },
     {
-        "code": "FLAT ROUND MEDIUM 21MF CAFFEE",
+        "code": "FLAT ROUND MEDIUM 21MF COFFEE",
         "price": "127"
     },
     {
@@ -972,7 +972,7 @@
         "price": "138"
     },
     {
-        "code": "FLAT ROUND MEDIUM 13 CAFFEE",
+        "code": "FLAT ROUND MEDIUM 13 COFFEE",
         "price": "100"
     },
     {
@@ -984,7 +984,7 @@
         "price": "123"
     },
     {
-        "code": "FLAT ROUND BIG 01 CAFFEE",
+        "code": "FLAT ROUND BIG 01 COFFEE",
         "price": "101"
     },
     {
@@ -996,7 +996,7 @@
         "price": "116"
     },
     {
-        "code": "FLAT ROUND BIG 21F CAFFEE",
+        "code": "FLAT ROUND BIG 21F COFFEE",
         "price": "165"
     },
     {
@@ -1008,7 +1008,7 @@
         "price": "175"
     },
     {
-        "code": "FLAT ROUND BIG 13 CAFFEE",
+        "code": "FLAT ROUND BIG 13 COFFEE",
         "price": "117"
     },
     {
@@ -1024,7 +1024,7 @@
         "price": "265"
     },
     {
-        "code": "FLAT SQUARE SMALL 01 CAFFEE",
+        "code": "FLAT SQUARE SMALL 01 COFFEE",
         "price": "65"
     },
     {
@@ -1036,7 +1036,7 @@
         "price": "81"
     },
     {
-        "code": "FLAT SQUARE SMALL 02 CAFFEE",
+        "code": "FLAT SQUARE SMALL 02 COFFEE",
         "price": "65"
     },
     {
@@ -1048,7 +1048,7 @@
         "price": "81"
     },
     {
-        "code": "FLAT SQUARE MEDIUM 01 CAFFEE",
+        "code": "FLAT SQUARE MEDIUM 01 COFFEE",
         "price": "82"
     },
     {
@@ -1060,7 +1060,7 @@
         "price": "97"
     },
     {
-        "code": "FLAT SQUARE MEDIUM 02 CAFFEE",
+        "code": "FLAT SQUARE MEDIUM 02 COFFEE",
         "price": "82"
     },
     {
@@ -1072,7 +1072,7 @@
         "price": "97"
     },
     {
-        "code": "FLAT SQUARE BIG 01 CAFFEE",
+        "code": "FLAT SQUARE BIG 01 COFFEE",
         "price": "102"
     },
     {
@@ -1084,7 +1084,7 @@
         "price": "117"
     },
     {
-        "code": "FLAT SQUARE BIG 02 CAFFEE",
+        "code": "FLAT SQUARE BIG 02 COFFEE",
         "price": "102"
     },
     {
@@ -1104,79 +1104,79 @@
         "price": "309"
     },
     {
-        "code": "FLAT RECT SMALL 01 CAFFEE",
+        "code": "FLAT RECTANGLE SMALL 01 COFFEE",
         "price": "83"
     },
     {
-        "code": "FLAT RECT SMALL 01 DINING",
+        "code": "FLAT RECTANGLE SMALL 01 DINING",
         "price": "93"
     },
     {
-        "code": "FLAT RECT SMALL 01 BAR",
+        "code": "FLAT RECTANGLE SMALL 01 BAR",
         "price": "98"
     },
     {
-        "code": "FLAT RECT SMALL 02 CAFFEE",
+        "code": "FLAT RECTANGLE SMALL 02 COFFEE",
         "price": "83"
     },
     {
-        "code": "FLAT RECT SMALL 02 DINING",
+        "code": "FLAT RECTANGLE SMALL 02 DINING",
         "price": "92"
     },
     {
-        "code": "FLAT RECT SMALL 02 BAR",
+        "code": "FLAT RECTANGLE SMALL 02 BAR",
         "price": "98"
     },
     {
-        "code": "FLAT RECT DUET SMALL 01 CAFFEE",
+        "code": "FLAT RECTANGLE DUET SMALL 01 COFFEE",
         "price": "108"
     },
     {
-        "code": "FLAT RECT DUET SMALL 01 DINING",
+        "code": "FLAT RECTANGLE DUET SMALL 01 DINING",
         "price": "127"
     },
     {
-        "code": "FLAT RECT DUET SMALL 01 BAR",
+        "code": "FLAT RECTANGLE DUET SMALL 01 BAR",
         "price": "139"
     },
     {
-        "code": "FLAT RECT DUET SMALL 02 CAFFEE",
+        "code": "FLAT RECTANGLE DUET SMALL 02 COFFEE",
         "price": "108"
     },
     {
-        "code": "FLAT RECT DUET SMALL 02 DINING",
+        "code": "FLAT RECTANGLE DUET SMALL 02 DINING",
         "price": "127"
     },
     {
-        "code": "FLAT RECT DUET SMALL 02 BAR",
+        "code": "FLAT RECTANGLE DUET SMALL 02 BAR",
         "price": "139"
     },
     {
-        "code": "FLAT RECT DUET BIG 01 CAFFEE",
+        "code": "FLAT RECTANGLE DUET BIG 01 COFFEE",
         "price": "137"
     },
     {
-        "code": "FLAT RECT DUET BIG 01 DINING",
+        "code": "FLAT RECTANGLE DUET BIG 01 DINING",
         "price": "156"
     },
     {
-        "code": "FLAT RECT DUET BIG 01 BAR",
+        "code": "FLAT RECTANGLE DUET BIG 01 BAR",
         "price": "168"
     },
     {
-        "code": "FLAT RECT DUET BIG 02 CAFFEE",
+        "code": "FLAT RECTANGLE DUET BIG 02 COFFEE",
         "price": "137"
     },
     {
-        "code": "FLAT RECT DUET BIG 02 DINING",
+        "code": "FLAT RECTANGLE DUET BIG 02 DINING",
         "price": "155"
     },
     {
-        "code": "FLAT RECT DUET BIG 02 BAR",
+        "code": "FLAT RECTANGLE DUET BIG 02 BAR",
         "price": "168"
     },
     {
-        "code": "FLAT CROSS SMALL 01 CAFFEE",
+        "code": "FLAT CROSS SMALL 01 COFFEE",
         "price": "102"
     },
     {
@@ -1188,7 +1188,7 @@
         "price": "117"
     },
     {
-        "code": "FLAT CROSS BIG 01 CAFFEE",
+        "code": "FLAT CROSS BIG 01 COFFEE",
         "price": "115"
     },
     {
@@ -1200,7 +1200,7 @@
         "price": "131"
     },
     {
-        "code": "FLAT CROSS SMALL 02 CAFFEE",
+        "code": "FLAT CROSS SMALL 02 COFFEE",
         "price": "102"
     },
     {
@@ -1212,7 +1212,7 @@
         "price": "117"
     },
     {
-        "code": "FLAT CROSS BIG 02 CAFFEE",
+        "code": "FLAT CROSS BIG 02 COFFEE",
         "price": "115"
     },
     {
@@ -1240,7 +1240,7 @@
         "price": "218"
     },
     {
-        "code": "INOX ROUND SMALL 09 CAFFEE",
+        "code": "INOX ROUND SMALL 09 COFFEE",
         "price": "96"
     },
     {
@@ -1252,7 +1252,7 @@
         "price": "113"
     },
     {
-        "code": "INOX ROUND MEDIUM 09 CAFFEE",
+        "code": "INOX ROUND MEDIUM 09 COFFEE",
         "price": "122"
     },
     {
@@ -1264,7 +1264,7 @@
         "price": "140"
     },
     {
-        "code": "INOX ROUND BIG 09 CAFFEE",
+        "code": "INOX ROUND BIG 09 COFFEE",
         "price": "142"
     },
     {
@@ -1280,7 +1280,7 @@
         "price": "324"
     },
     {
-        "code": "INOX SQUARE SMALL 09 CAFFEE",
+        "code": "INOX SQUARE SMALL 09 COFFEE",
         "price": "92"
     },
     {
@@ -1292,7 +1292,7 @@
         "price": "109"
     },
     {
-        "code": "INOX SQUARE SMALL 10 CAFFEE",
+        "code": "INOX SQUARE SMALL 10 COFFEE",
         "price": "97"
     },
     {
@@ -1304,7 +1304,7 @@
         "price": "119"
     },
     {
-        "code": "INOX SQUARE MEDIUM 09 CAFFEE",
+        "code": "INOX SQUARE MEDIUM 09 COFFEE",
         "price": "116"
     },
     {
@@ -1316,7 +1316,7 @@
         "price": "133"
     },
     {
-        "code": "INOX SQUARE MEDIUM 10 CAFFEE",
+        "code": "INOX SQUARE MEDIUM 10 COFFEE",
         "price": "121"
     },
     {
@@ -1328,7 +1328,7 @@
         "price": "143"
     },
     {
-        "code": "INOX SQUARE BIG 09 CAFFEE",
+        "code": "INOX SQUARE BIG 09 COFFEE",
         "price": "136"
     },
     {
@@ -1340,7 +1340,7 @@
         "price": "154"
     },
     {
-        "code": "INOX SQUARE BIG 10 CAFFEE",
+        "code": "INOX SQUARE BIG 10 COFFEE",
         "price": "141"
     },
     {
@@ -1360,75 +1360,75 @@
         "price": "394"
     },
     {
-        "code": "INOX RECT SMALL 09 CAFFEE",
+        "code": "INOX RECTANGLE SMALL 09 COFFEE",
         "price": "115"
     },
     {
-        "code": "INOX RECT SMALL 09 DINING",
+        "code": "INOX RECTANGLE SMALL 09 DINING",
         "price": "120"
     },
     {
-        "code": "INOX RECT SMALL 09 BAR",
+        "code": "INOX RECTANGLE SMALL 09 BAR",
         "price": "132"
     },
     {
-        "code": "INOX RECT SMALL 10 CAFFEE",
+        "code": "INOX RECTANGLE SMALL 10 COFFEE",
         "price": "120"
     },
     {
-        "code": "INOX RECT SMALL 10 DINING",
+        "code": "INOX RECTANGLE SMALL 10 DINING",
         "price": "126"
     },
     {
-        "code": "INOX RECT SMALL 10 BAR",
+        "code": "INOX RECTANGLE SMALL 10 BAR",
         "price": "142"
     },
     {
-        "code": "INOX RECT DUET SMALL 09 CAFFEE",
+        "code": "INOX RECTANGLE DUET SMALL 09 COFFEE",
         "price": "151"
     },
     {
-        "code": "INOX RECT DUET SMALL 09 DINING",
+        "code": "INOX RECTANGLE DUET SMALL 09 DINING",
         "price": "160"
     },
     {
-        "code": "INOX RECT DUET SMALL 09 BAR",
+        "code": "INOX RECTANGLE DUET SMALL 09 BAR",
         "price": "186"
     },
     {
-        "code": "INOX RECT DUET SMALL 10 CAFFEE",
+        "code": "INOX RECTANGLE DUET SMALL 10 COFFEE",
         "price": "162"
     },
     {
-        "code": "INOX RECT DUET SMALL 10 DINING",
+        "code": "INOX RECTANGLE DUET SMALL 10 DINING",
         "price": "173"
     },
     {
-        "code": "INOX RECT DUET SMALL 10 BAR",
+        "code": "INOX RECTANGLE DUET SMALL 10 BAR",
         "price": "205"
     },
     {
-        "code": "INOX RECT DUET BIG 09 CAFFEE",
+        "code": "INOX RECTANGLE DUET BIG 09 COFFEE",
         "price": "190"
     },
     {
-        "code": "INOX RECT DUET BIG 09 DINING",
+        "code": "INOX RECTANGLE DUET BIG 09 DINING",
         "price": "199"
     },
     {
-        "code": "INOX RECT DUET BIG 09 BAR",
+        "code": "INOX RECTANGLE DUET BIG 09 BAR",
         "price": "224"
     },
     {
-        "code": "INOX RECT DUET BIG 10 CAFFEE",
+        "code": "INOX RECTANGLE DUET BIG 10 COFFEE",
         "price": "200"
     },
     {
-        "code": "INOX RECT DUET BIG 10 DINING",
+        "code": "INOX RECTANGLE DUET BIG 10 DINING",
         "price": "211"
     },
     {
-        "code": "INOX RECT DUET BIG 10 BAR",
+        "code": "INOX RECTANGLE DUET BIG 10 BAR",
         "price": "243"
     },
     {
@@ -1448,7 +1448,7 @@
         "price": "322"
     },
     {
-        "code": "INOX ROUND SMALL 01 CAFFEE",
+        "code": "INOX ROUND SMALL 01 COFFEE",
         "price": "85"
     },
     {
@@ -1460,7 +1460,7 @@
         "price": "101"
     },
     {
-        "code": "INOX ROUND SMALL 21 CAFFEE",
+        "code": "INOX ROUND SMALL 21 COFFEE",
         "price": "115"
     },
     {
@@ -1472,7 +1472,7 @@
         "price": "126"
     },
     {
-        "code": "INOX ROUND SMALL 13 CAFFEE",
+        "code": "INOX ROUND SMALL 13 COFFEE",
         "price": "106"
     },
     {
@@ -1484,7 +1484,7 @@
         "price": "129"
     },
     {
-        "code": "INOX ROUND MEDIUM 01 CAFFEE",
+        "code": "INOX ROUND MEDIUM 01 COFFEE",
         "price": "112"
     },
     {
@@ -1496,7 +1496,7 @@
         "price": "127"
     },
     {
-        "code": "INOX ROUND MEDIUM 21 CAFFEE",
+        "code": "INOX ROUND MEDIUM 21 COFFEE",
         "price": "158"
     },
     {
@@ -1508,7 +1508,7 @@
         "price": "169"
     },
     {
-        "code": "INOX ROUND MEDIUM 13 CAFFEE",
+        "code": "INOX ROUND MEDIUM 13 COFFEE",
         "price": "130"
     },
     {
@@ -1520,7 +1520,7 @@
         "price": "153"
     },
     {
-        "code": "INOX ROUND BIG 01 CAFFEE",
+        "code": "INOX ROUND BIG 01 COFFEE",
         "price": "131"
     },
     {
@@ -1532,7 +1532,7 @@
         "price": "147"
     },
     {
-        "code": "INOX ROUND BIG 21F CAFFEE",
+        "code": "INOX ROUND BIG 21F COFFEE",
         "price": "196"
     },
     {
@@ -1544,7 +1544,7 @@
         "price": "206"
     },
     {
-        "code": "INOX ROUND BIG 13 CAFFEE",
+        "code": "INOX ROUND BIG 13 COFFEE",
         "price": "146"
     },
     {
@@ -1560,7 +1560,7 @@
         "price": "307"
     },
     {
-        "code": "INOX SQUARE SMALL 01 CAFFEE",
+        "code": "INOX SQUARE SMALL 01 COFFEE",
         "price": "81"
     },
     {
@@ -1572,7 +1572,7 @@
         "price": "97"
     },
     {
-        "code": "INOX SQUARE SMALL 02 CAFFEE",
+        "code": "INOX SQUARE SMALL 02 COFFEE",
         "price": "81"
     },
     {
@@ -1584,7 +1584,7 @@
         "price": "97"
     },
     {
-        "code": "INOX SQUARE MEDIUM 01 CAFFEE",
+        "code": "INOX SQUARE MEDIUM 01 COFFEE",
         "price": "105"
     },
     {
@@ -1596,7 +1596,7 @@
         "price": "121"
     },
     {
-        "code": "INOX SQUARE MEDIUM 02 CAFFEE",
+        "code": "INOX SQUARE MEDIUM 02 COFFEE",
         "price": "105"
     },
     {
@@ -1608,7 +1608,7 @@
         "price": "121"
     },
     {
-        "code": "INOX SQUARE BIG 01 CAFFEE",
+        "code": "INOX SQUARE BIG 01 COFFEE",
         "price": "125"
     },
     {
@@ -1620,7 +1620,7 @@
         "price": "141"
     },
     {
-        "code": "INOX SQUARE BIG 02 CAFFEE",
+        "code": "INOX SQUARE BIG 02 COFFEE",
         "price": "125"
     },
     {
@@ -1640,75 +1640,75 @@
         "price": "344"
     },
     {
-        "code": "INOX RECT SMALL 01 CAFFEE",
+        "code": "INOX RECTANGLE SMALL 01 COFFEE",
         "price": "104"
     },
     {
-        "code": "INOX RECT SMALL 01 DINING",
+        "code": "INOX RECTANGLE SMALL 01 DINING",
         "price": "114"
     },
     {
-        "code": "INOX RECT SMALL 01 BAR",
+        "code": "INOX RECTANGLE SMALL 01 BAR",
         "price": "120"
     },
     {
-        "code": "INOX RECT SMALL 02 CAFFEE",
+        "code": "INOX RECTANGLE SMALL 02 COFFEE",
         "price": "104"
     },
     {
-        "code": "INOX RECT SMALL 02 DINING",
+        "code": "INOX RECTANGLE SMALL 02 DINING",
         "price": "114"
     },
     {
-        "code": "INOX RECT SMALL 02 BAR",
+        "code": "INOX RECTANGLE SMALL 02 BAR",
         "price": "120"
     },
     {
-        "code": "INOX RECT DUET SMALL 01 CAFFEE",
+        "code": "INOX RECTANGLE DUET SMALL 01 COFFEE",
         "price": "130"
     },
     {
-        "code": "INOX RECT DUET SMALL 01 DINING",
+        "code": "INOX RECTANGLE DUET SMALL 01 DINING",
         "price": "149"
     },
     {
-        "code": "INOX RECT DUET SMALL 01 BAR",
+        "code": "INOX RECTANGLE DUET SMALL 01 BAR",
         "price": "161"
     },
     {
-        "code": "INOX RECT DUET SMALL 02 CAFFEE",
+        "code": "INOX RECTANGLE DUET SMALL 02 COFFEE",
         "price": "130"
     },
     {
-        "code": "INOX RECT DUET SMALL 02 DINING",
+        "code": "INOX RECTANGLE DUET SMALL 02 DINING",
         "price": "148"
     },
     {
-        "code": "INOX RECT DUET SMALL 02 BAR",
+        "code": "INOX RECTANGLE DUET SMALL 02 BAR",
         "price": "161"
     },
     {
-        "code": "INOX RECT DUET BIG 01 CAFFEE",
+        "code": "INOX RECTANGLE DUET BIG 01 COFFEE",
         "price": "168"
     },
     {
-        "code": "INOX RECT DUET BIG 01 DINING",
+        "code": "INOX RECTANGLE DUET BIG 01 DINING",
         "price": "187"
     },
     {
-        "code": "INOX RECT DUET BIG 01 BAR",
+        "code": "INOX RECTANGLE DUET BIG 01 BAR",
         "price": "199"
     },
     {
-        "code": "INOX RECT DUET BIG 02 CAFFEE",
+        "code": "INOX RECTANGLE DUET BIG 02 COFFEE",
         "price": "168"
     },
     {
-        "code": "INOX RECT DUET BIG 02 DINING",
+        "code": "INOX RECTANGLE DUET BIG 02 DINING",
         "price": "186"
     },
     {
-        "code": "INOX RECT DUET BIG 02 BAR",
+        "code": "INOX RECTANGLE DUET BIG 02 BAR",
         "price": "199"
     },
     {
@@ -1728,7 +1728,7 @@
         "price": "256"
     },
     {
-        "code": "INOX ROUND SMALL 09 CAFFEE",
+        "code": "INOX ROUND SMALL 09 COFFEE",
         "price": "93"
     },
     {
@@ -1740,7 +1740,7 @@
         "price": "107"
     },
     {
-        "code": "INOX ROUND MEDIUM 09 CAFFEE",
+        "code": "INOX ROUND MEDIUM 09 COFFEE",
         "price": "118"
     },
     {
@@ -1752,7 +1752,7 @@
         "price": "133"
     },
     {
-        "code": "INOX ROUND BIG 09 CAFFEE",
+        "code": "INOX ROUND BIG 09 COFFEE",
         "price": "139"
     },
     {
@@ -1768,7 +1768,7 @@
         "price": "312"
     },
     {
-        "code": "INOX SQUARE SMALL 09 CAFFEE",
+        "code": "INOX SQUARE SMALL 09 COFFEE",
         "price": "89"
     },
     {
@@ -1780,7 +1780,7 @@
         "price": "103"
     },
     {
-        "code": "INOX SQUARE SMALL 10 CAFFEE",
+        "code": "INOX SQUARE SMALL 10 COFFEE",
         "price": "91"
     },
     {
@@ -1792,7 +1792,7 @@
         "price": "106"
     },
     {
-        "code": "INOX SQUARE MEDIUM 09 CAFFEE",
+        "code": "INOX SQUARE MEDIUM 09 COFFEE",
         "price": "113"
     },
     {
@@ -1804,7 +1804,7 @@
         "price": "128"
     },
     {
-        "code": "INOX SQUARE MEDIUM 10 CAFFEE",
+        "code": "INOX SQUARE MEDIUM 10 COFFEE",
         "price": "115"
     },
     {
@@ -1816,7 +1816,7 @@
         "price": "130"
     },
     {
-        "code": "INOX SQUARE BIG 09 CAFFEE",
+        "code": "INOX SQUARE BIG 09 COFFEE",
         "price": "133"
     },
     {
@@ -1828,7 +1828,7 @@
         "price": "148"
     },
     {
-        "code": "INOX SQUARE BIG 10 CAFFEE",
+        "code": "INOX SQUARE BIG 10 COFFEE",
         "price": "135"
     },
     {
@@ -1848,75 +1848,75 @@
         "price": "361"
     },
     {
-        "code": "INOX RECT SMALL 09 CAFFEE",
+        "code": "INOX RECTANGLE SMALL 09 COFFEE",
         "price": "112"
     },
     {
-        "code": "INOX RECT SMALL 09 DINING",
+        "code": "INOX RECTANGLE SMALL 09 DINING",
         "price": "116"
     },
     {
-        "code": "INOX RECT SMALL 09 BAR",
+        "code": "INOX RECTANGLE SMALL 09 BAR",
         "price": "127"
     },
     {
-        "code": "INOX RECT SMALL 10 CAFFEE",
+        "code": "INOX RECTANGLE SMALL 10 COFFEE",
         "price": "114"
     },
     {
-        "code": "INOX RECT SMALL 10 DINING",
+        "code": "INOX RECTANGLE SMALL 10 DINING",
         "price": "118"
     },
     {
-        "code": "INOX RECT SMALL 10 BAR",
+        "code": "INOX RECTANGLE SMALL 10 BAR",
         "price": "129"
     },
     {
-        "code": "INOX RECT DUET SMALL 09 CAFFEE",
+        "code": "INOX RECTANGLE DUET SMALL 09 COFFEE",
         "price": "145"
     },
     {
-        "code": "INOX RECT DUET SMALL 09 DINING",
+        "code": "INOX RECTANGLE DUET SMALL 09 DINING",
         "price": "153"
     },
     {
-        "code": "INOX RECT DUET SMALL 09 BAR",
+        "code": "INOX RECTANGLE DUET SMALL 09 BAR",
         "price": "174"
     },
     {
-        "code": "INOX RECT DUET SMALL 10 CAFFEE",
+        "code": "INOX RECTANGLE DUET SMALL 10 COFFEE",
         "price": "148"
     },
     {
-        "code": "INOX RECT DUET SMALL 10 DINING",
+        "code": "INOX RECTANGLE DUET SMALL 10 DINING",
         "price": "157"
     },
     {
-        "code": "INOX RECT DUET SMALL 10 BAR",
+        "code": "INOX RECTANGLE DUET SMALL 10 BAR",
         "price": "180"
     },
     {
-        "code": "INOX RECT DUET BIG 09 CAFFEE",
+        "code": "INOX RECTANGLE DUET BIG 09 COFFEE",
         "price": "183"
     },
     {
-        "code": "INOX RECT DUET BIG 09 DINING",
+        "code": "INOX RECTANGLE DUET BIG 09 DINING",
         "price": "191"
     },
     {
-        "code": "INOX RECT DUET BIG 09 BAR",
+        "code": "INOX RECTANGLE DUET BIG 09 BAR",
         "price": "212"
     },
     {
-        "code": "INOX RECT DUET BIG 10 CAFFEE",
+        "code": "INOX RECTANGLE DUET BIG 10 COFFEE",
         "price": "186"
     },
     {
-        "code": "INOX RECT DUET BIG 10 DINING",
+        "code": "INOX RECTANGLE DUET BIG 10 DINING",
         "price": "195"
     },
     {
-        "code": "INOX RECT DUET BIG 10 BAR",
+        "code": "INOX RECTANGLE DUET BIG 10 BAR",
         "price": "218"
     },
     {
@@ -1936,7 +1936,7 @@
         "price": "284"
     },
     {
-        "code": "INOX ROUND SMALL 01 CAFFEE",
+        "code": "INOX ROUND SMALL 01 COFFEE",
         "price": "85"
     },
     {
@@ -1948,7 +1948,7 @@
         "price": "100"
     },
     {
-        "code": "INOX ROUND SMALL 21 CAFFEE",
+        "code": "INOX ROUND SMALL 21 COFFEE",
         "price": "115"
     },
     {
@@ -1960,7 +1960,7 @@
         "price": "126"
     },
     {
-        "code": "INOX ROUND SMALL 13 CAFFEE",
+        "code": "INOX ROUND SMALL 13 COFFEE",
         "price": "105"
     },
     {
@@ -1972,7 +1972,7 @@
         "price": "129"
     },
     {
-        "code": "INOX ROUND MEDIUM 01 CAFFEE",
+        "code": "INOX ROUND MEDIUM 01 COFFEE",
         "price": "111"
     },
     {
@@ -1984,7 +1984,7 @@
         "price": "126"
     },
     {
-        "code": "INOX ROUND MEDIUM 21 CAFFEE",
+        "code": "INOX ROUND MEDIUM 21 COFFEE",
         "price": "157"
     },
     {
@@ -1996,7 +1996,7 @@
         "price": "168"
     },
     {
-        "code": "INOX ROUND MEDIUM 13 CAFFEE",
+        "code": "INOX ROUND MEDIUM 13 COFFEE",
         "price": "129"
     },
     {
@@ -2008,7 +2008,7 @@
         "price": "152"
     },
     {
-        "code": "INOX ROUND BIG 01 CAFFEE",
+        "code": "INOX ROUND BIG 01 COFFEE",
         "price": "131"
     },
     {
@@ -2020,7 +2020,7 @@
         "price": "146"
     },
     {
-        "code": "INOX ROUND BIG 21F CAFFEE",
+        "code": "INOX ROUND BIG 21F COFFEE",
         "price": "196"
     },
     {
@@ -2032,7 +2032,7 @@
         "price": "206"
     },
     {
-        "code": "INOX ROUND BIG 13 CAFFEE",
+        "code": "INOX ROUND BIG 13 COFFEE",
         "price": "146"
     },
     {
@@ -2048,7 +2048,7 @@
         "price": "306"
     },
     {
-        "code": "INOX SQUARE SMALL 01 CAFFEE",
+        "code": "INOX SQUARE SMALL 01 COFFEE",
         "price": "81"
     },
     {
@@ -2060,7 +2060,7 @@
         "price": "97"
     },
     {
-        "code": "INOX SQUARE SMALL 02 CAFFEE",
+        "code": "INOX SQUARE SMALL 02 COFFEE",
         "price": "81"
     },
     {
@@ -2072,7 +2072,7 @@
         "price": "97"
     },
     {
-        "code": "INOX SQUARE MEDIUM 01 CAFFEE",
+        "code": "INOX SQUARE MEDIUM 01 COFFEE",
         "price": "105"
     },
     {
@@ -2084,7 +2084,7 @@
         "price": "121"
     },
     {
-        "code": "INOX SQUARE MEDIUM 02 CAFFEE",
+        "code": "INOX SQUARE MEDIUM 02 COFFEE",
         "price": "105"
     },
     {
@@ -2096,7 +2096,7 @@
         "price": "121"
     },
     {
-        "code": "INOX SQUARE BIG 01 CAFFEE",
+        "code": "INOX SQUARE BIG 01 COFFEE",
         "price": "125"
     },
     {
@@ -2108,7 +2108,7 @@
         "price": "141"
     },
     {
-        "code": "INOX SQUARE BIG 02 CAFFEE",
+        "code": "INOX SQUARE BIG 02 COFFEE",
         "price": "125"
     },
     {
@@ -2128,75 +2128,75 @@
         "price": "344"
     },
     {
-        "code": "INOX RECT SMALL 01 CAFFEE",
+        "code": "INOX RECTANGLE SMALL 01 COFFEE",
         "price": "104"
     },
     {
-        "code": "INOX RECT SMALL 01 DINING",
+        "code": "INOX RECTANGLE SMALL 01 DINING",
         "price": "114"
     },
     {
-        "code": "INOX RECT SMALL 01 BAR",
+        "code": "INOX RECTANGLE SMALL 01 BAR",
         "price": "120"
     },
     {
-        "code": "INOX RECT SMALL 02 CAFFEE",
+        "code": "INOX RECTANGLE SMALL 02 COFFEE",
         "price": "104"
     },
     {
-        "code": "INOX RECT SMALL 02 DINING",
+        "code": "INOX RECTANGLE SMALL 02 DINING",
         "price": "114"
     },
     {
-        "code": "INOX RECT SMALL 02 BAR",
+        "code": "INOX RECTANGLE SMALL 02 BAR",
         "price": "120"
     },
     {
-        "code": "INOX RECT DUET SMALL 01 CAFFEE",
+        "code": "INOX RECTANGLE DUET SMALL 01 COFFEE",
         "price": "130"
     },
     {
-        "code": "INOX RECT DUET SMALL 01 DINING",
+        "code": "INOX RECTANGLE DUET SMALL 01 DINING",
         "price": "149"
     },
     {
-        "code": "INOX RECT DUET SMALL 01 BAR",
+        "code": "INOX RECTANGLE DUET SMALL 01 BAR",
         "price": "161"
     },
     {
-        "code": "INOX RECT DUET SMALL 02 CAFFEE",
+        "code": "INOX RECTANGLE DUET SMALL 02 COFFEE",
         "price": "130"
     },
     {
-        "code": "INOX RECT DUET SMALL 02 DINING",
+        "code": "INOX RECTANGLE DUET SMALL 02 DINING",
         "price": "148"
     },
     {
-        "code": "INOX RECT DUET SMALL 02 BAR",
+        "code": "INOX RECTANGLE DUET SMALL 02 BAR",
         "price": "161"
     },
     {
-        "code": "INOX RECT DUET BIG 01 CAFFEE",
+        "code": "INOX RECTANGLE DUET BIG 01 COFFEE",
         "price": "168"
     },
     {
-        "code": "INOX RECT DUET BIG 01 DINING",
+        "code": "INOX RECTANGLE DUET BIG 01 DINING",
         "price": "187"
     },
     {
-        "code": "INOX RECT DUET BIG 01 BAR",
+        "code": "INOX RECTANGLE DUET BIG 01 BAR",
         "price": "199"
     },
     {
-        "code": "INOX RECT DUET BIG 02 CAFFEE",
+        "code": "INOX RECTANGLE DUET BIG 02 COFFEE",
         "price": "168"
     },
     {
-        "code": "INOX RECT DUET BIG 02 DINING",
+        "code": "INOX RECTANGLE DUET BIG 02 DINING",
         "price": "186"
     },
     {
-        "code": "INOX RECT DUET BIG 02 BAR",
+        "code": "INOX RECTANGLE DUET BIG 02 BAR",
         "price": "199"
     },
     {
@@ -2456,27 +2456,27 @@
         "price": "423"
     },
     {
-        "code": "BRASS RECT SMALL OSCILATED COFFEE",
+        "code": "BRASS RECTANGLE SMALL OSCILATED COFFEE",
         "price": "227"
     },
     {
-        "code": "BRASS RECT SMALL OSCILATED STANDARD",
+        "code": "BRASS RECTANGLE SMALL OSCILATED STANDARD",
         "price": "236"
     },
     {
-        "code": "BRASS RECT SMALL OSCILATED BAR",
+        "code": "BRASS RECTANGLE SMALL OSCILATED BAR",
         "price": "259"
     },
     {
-        "code": "BRASS RECT DUET BIG OSCILATED COFFEE",
+        "code": "BRASS RECTANGLE DUET BIG OSCILATED COFFEE",
         "price": "469"
     },
     {
-        "code": "BRASS RECT DUET BIG OSCILATED STANDARD",
+        "code": "BRASS RECTANGLE DUET BIG OSCILATED STANDARD",
         "price": "502"
     },
     {
-        "code": "BRASS RECT DUET BIG OSCILATED BAR",
+        "code": "BRASS RECTANGLE DUET BIG OSCILATED BAR",
         "price": "590"
     },
     {
@@ -2696,27 +2696,27 @@
         "price": "303"
     },
     {
-        "code": "BRASS RECT SMALL OSCILATED STD COFFEE",
+        "code": "BRASS RECTANGLE SMALL OSCILATED STD COFFEE",
         "price": "195"
     },
     {
-        "code": "BRASS RECT SMALL OSCILATED STD STANDARD",
+        "code": "BRASS RECTANGLE SMALL OSCILATED STD STANDARD",
         "price": "197"
     },
     {
-        "code": "BRASS RECT SMALL OSCILATED STD BAR",
+        "code": "BRASS RECTANGLE SMALL OSCILATED STD BAR",
         "price": "200"
     },
     {
-        "code": "BRASS RECT DUET BIG OSCILATED STD COFFEE",
+        "code": "BRASS RECTANGLE DUET BIG OSCILATED STD COFFEE",
         "price": "338"
     },
     {
-        "code": "BRASS RECT DUET BIG OSCILATED STD STANDARD",
+        "code": "BRASS RECTANGLE DUET BIG OSCILATED STD STANDARD",
         "price": "342"
     },
     {
-        "code": "BRASS RECT DUET BIG OSCILATED STD BAR",
+        "code": "BRASS RECTANGLE DUET BIG OSCILATED STD BAR",
         "price": "352"
     },
     {
