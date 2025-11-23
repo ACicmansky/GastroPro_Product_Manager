@@ -29,14 +29,6 @@ class XLSXLoader:
 
         print(f"\nLoading XLSX file: {file_path}")
 
-        # Check if file is actually CSV (fallback)
-        if file_path.suffix.lower() == ".csv":
-            print("  Detected CSV file, using CSV loader...")
-            from src.loaders.csv_loader import CSVLoader
-
-            csv_loader = CSVLoader()
-            return csv_loader.load(file_path)
-
         try:
             # Load XLSX file
             df = pd.read_excel(file_path, engine=self.engine)
