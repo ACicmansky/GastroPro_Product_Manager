@@ -21,6 +21,13 @@
 
 ## Recent Changes
 
+**Mebella Scraper & GUI Fixes (November 24, 2025)**:
+- **Scraper Fix**: Implemented infinite scroll handling in `MebellaScraper` (Playwright) to retrieve all products (previously capped at ~12).
+- **Caching**: Added JSON-based URL caching (7-day validity) to `MebellaScraper` to speed up subsequent runs.
+- **GUI Fix**: Resolved `RuntimeError` in `PriceMappingDialog` by properly parenting `input_group` to the layout.
+- **UI Improvement**: Refined `PriceMappingDialog` manual input layout (fixed height, spacing) and added product image display.
+- **Feature**: Added "remaining count" indicator to price mapping dialog.
+
 **Scraper Refactoring & Testing (November 22, 2025)**:
 - **Architecture**: Refactored `MebellaScraper` and `TopchladenieScraper` to use `BaseScraper`.
 - **Playwright**: Integrated Playwright for Mebella pagination.

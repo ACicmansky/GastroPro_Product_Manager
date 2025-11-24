@@ -25,11 +25,12 @@ The system also includes advanced product variant detection and difference extra
 3. System automatically loads and processes configured XML feeds
 4. Optionally performs multi-threaded web scraping to augment the catalog and fill missing fields
 5. System merges the selected local data with the feed and scraped data
-6. System enhances data with AI: generates/improves B2B short and long descriptions and SEO meta (title, description, keywords) using a web-search-enabled LLM
-7. System identifies product variants and extracts differences based on configuration
-8. User reviews the detected variants and extracted differences
-9. System generates detailed reports of variant groups and differences
-10. User saves the final CSV output with variant relationships, differences, and enhanced content
+6. **Interactive Price Mapping**: For products with missing prices, the user is prompted to manually select or enter a price via a smart dialog with suggestions.
+7. System enhances data with AI: generates/improves B2B short and long descriptions and SEO meta (title, description, keywords) using a web-search-enabled LLM
+8. System identifies product variants and extracts differences based on configuration
+9. User reviews the detected variants and extracted differences
+10. System generates detailed reports of variant groups and differences
+11. User saves the final CSV output with variant relationships, differences, and enhanced content
 
 ## Target Users
 - E-commerce store administrators

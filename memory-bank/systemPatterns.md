@@ -132,3 +132,9 @@ src/
 - Potential for plugin architecture to support additional data formats
 - Database integration for persistent storage
 - Caching mechanism for XML feeds to reduce network requests
+
+10. **Scraper Caching Strategy**:
+    - **JSON-based Caching**: Stores scraped URLs/data in `cache/` directory
+    - **Validity Period**: Configurable expiration (e.g., 7 days) to prevent stale data
+    - **Hash-based Keys**: Uses MD5 hash of URLs for unique filenames
+    - **Performance**: Skips expensive scraping steps (Playwright/scrolling) if cache is valid

@@ -73,6 +73,17 @@
   - Statistics display
   - Ready for production deployment
 
+## Recently Completed (November 24, 2025)
+- ✅ **Mebella Scraper Optimization**
+  - Fixed pagination logic to handle infinite scroll (retrieves 190+ products vs 12)
+  - Implemented JSON-based URL caching with 7-day validity
+  - Optimized scroll/click behavior for "Load More" buttons
+- ✅ **GUI Stability & Improvements**
+  - Fixed `RuntimeError` in `PriceMappingDialog` (garbage collection issue)
+  - Improved `PriceMappingDialog` UI (layout, fixed height, image display)
+  - Added "remaining count" indicator for batch price mapping
+  - Updated `main_window_new_format.py` data source validation
+
 ## Recently Completed (November 22, 2025)
 - ✅ **Scraper Refactoring & Testing**
   - Refactored `MebellaScraper` and `TopchladenieScraper` to inherit from `BaseScraper`
