@@ -282,6 +282,24 @@ element = item.find(f"g:{xml_field}", namespaces)
 }
 ```
 
+## Recently Completed (November 24, 2025)
+- ✅ **AI Enhancement Grouping Logic for Product Variants**
+  - **Dual Prompt System**: Implemented differentiated AI processing for product variants
+  - **Group 1 (Variants)**: Products with `pairCode` use `create_system_prompt_no_dimensions()`
+    - Excludes dimension keywords: "výška", "šírka", "dĺžka", "hĺbka", "rozmery", "mm", "cm", "m"
+    - Prevents dimensionally-similar variants from having identical AI descriptions
+  - **Group 2 (Standard)**: All other products use standard `create_system_prompt()`
+  - **Implementation**:
+    - Modified `AIEnhancerNewFormat` to support dual `GenerateContentConfig` objects
+    - Updated `process_dataframe` to identify and batch products by group
+    - Updated `DataMergerNewFormat` to preserve `pairCode` during merging
+  - **Verification**: Created `verify_ai_grouping.py` to confirm correct prompt assignment
+  - **Files Modified**:
+    - `src/ai/ai_prompts_new_format.py` - Added `create_system_prompt_no_dimensions()`
+    - `src/ai/ai_enhancer_new_format.py` - Implemented grouping and dual-config logic
+    - `src/mergers/data_merger_new_format.py` - Added `pairCode` preservation
+    - `tests/test_ai_enhancer_new_format.py` - Fixed failing tests with proper mocking
+
 ## Pending
 - ⏳ **Phase 14**: Continue with remaining features
 - ⏳ Manual testing with real Gemini API key

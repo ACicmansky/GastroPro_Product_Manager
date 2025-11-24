@@ -2,16 +2,11 @@
 
 ## Current Focus
 
-**Debugging Scraper Image Issue** ✅ COMPLETE (November 19, 2025)
-- Fixed missing images for products with different gallery URL structure
-- Verified with `https://www.topchladenie.sk/e-shop/liebherr-cbnd-5223-plus`
-
-**Phase 13: Real AI Enhancement Implementation** ✅ COMPLETE (November 16, 2025)
-- Full Gemini API integration with quota management
-- Parallel batch processing with retry logic
-- Fuzzy matching for product identification
-- English column names and prompts
-- All 217 tests passing (38 AI tests)
+**AI Enhancement Grouping Logic** ✅ COMPLETE (November 24, 2025)
+- Implemented dual-prompt system for variants vs standard products
+- Group 1 (variants with `pairCode`) use dimension-free prompt
+- Group 2 (standard products) use full-featured prompt
+- Verified with `verify_ai_grouping.py` script
 
 **Phase 14: Next Phase** (Upcoming)
 - Continue with remaining features
@@ -20,6 +15,14 @@
 - Production deployment preparation
 
 ## Recent Changes
+
+**AI Enhancement Grouping Logic (November 24, 2025)**:
+- **Dual-Prompt System**: Implemented differentiated AI processing for product variants
+- **Group 1 (Variants)**: Products with `pairCode` use `create_system_prompt_no_dimensions()` - excludes dimension keywords
+- **Group 2 (Standard)**: All other products use standard `create_system_prompt()`
+- **Implementation**: Modified `AIEnhancerNewFormat` to support dual `GenerateContentConfig` objects
+- **Data Preservation**: Updated `DataMergerNewFormat` to preserve `pairCode` during merging
+- **Verification**: Created `verify_ai_grouping.py` script to confirm correct prompt assignment
 
 **Mebella Scraper & GUI Fixes (November 24, 2025)**:
 - **Scraper Fix**: Implemented infinite scroll handling in `MebellaScraper` (Playwright) to retrieve all products (previously capped at ~12).

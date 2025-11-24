@@ -114,6 +114,17 @@ src/
    - **Enhanced Fields**: shortDescription, description, seoTitle, seoDescription, seoKeywords
    - **Processing Tracking**: aiProcessed flag, aiProcessedDate timestamp
 
+10. **AI Enhancement Grouping Logic (November 2025)**:
+    - **Product Variants (Group 1)**: Products with `pairCode` OR whose `code` is used as a `pairCode` by another product
+    - **Standard Products (Group 2)**: All other products without variant relationships
+    - **Dual Prompt System**:
+      - Group 1 uses `create_system_prompt_no_dimensions()` - excludes dimension keywords
+      - Group 2 uses `create_system_prompt()` - standard prompt with all features
+    - **Negative Constraints for Variants**: Prevents AI from generating "výška", "šírka", "dĺžka", "hĺbka", "rozmery", "mm", "cm", "m" in text fields
+    - **Batch Processing**: Separate batches created for each group with appropriate config
+    - **Data Preservation**: `pairCode` preserved through merger via `DataMergerNewFormat`
+    - **Verification**: `verify_ai_grouping.py` script confirms correct prompt selection
+
 ## Component Relationships
 - **main.py**: The main entry point of the application; initializes and runs the GUI.
 - **src/gui/main_window.py**: Contains the `MainWindow` class, which manages the entire UI, its state, and user interactions. It delegates data processing to the `worker`.
