@@ -29,7 +29,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QThread, QStandardPaths
 
 from .worker_new_format import WorkerNewFormat
-from .widgets import CategoryMappingDialog
+from .widgets import CategoryMappingDialog, PriceMappingDialog
 from ..utils.config_loader import load_config
 from ..utils.category_mapper import get_category_suggestions
 from src.loaders.data_loader_factory import DataLoaderFactory
@@ -121,7 +121,7 @@ class MainWindowNewFormat(QMainWindow):
         self.main_data_label.setStyleSheet("color: gray;")
 
         button_layout = QHBoxLayout()
-        self.select_main_button = QPushButton("Vybrať XLSX/CSV súbor")
+        self.select_main_button = QPushButton("Vybrať XLSX súbor")
         self.select_main_button.clicked.connect(self.select_main_data_file)
         self.clear_main_button = QPushButton("Vymazať")
         self.clear_main_button.clicked.connect(self.clear_main_data)
@@ -269,7 +269,7 @@ class MainWindowNewFormat(QMainWindow):
             self,
             "Vyberte hlavný dátový súbor",
             QStandardPaths.writableLocation(QStandardPaths.DownloadLocation),
-            "Data files (*.xlsx *.csv);;XLSX files (*.xlsx);;CSV files (*.csv)",
+            "Data files (*.xlsx);;XLSX files (*.xlsx)",
         )
 
         if file_path:
@@ -325,7 +325,8 @@ class MainWindowNewFormat(QMainWindow):
         """Process data and export results."""
         # Validate: at least one data source must be selected
         if (
-            not self.gastromarket_checkbox.isChecked()
+            self.main_data_file is None
+            and not self.gastromarket_checkbox.isChecked()
             and not self.forgastro_checkbox.isChecked()
             and not self.web_scraping_checkbox.isChecked()
             and not self.mebella_scraping_checkbox.isChecked()
@@ -372,6 +373,7 @@ class MainWindowNewFormat(QMainWindow):
         self.worker.category_mapping_request.connect(
             self.handle_category_mapping_request
         )
+        self.worker.price_mapping_request.connect(self.handle_price_mapping_request)
         self.worker.error.connect(self.show_error_message)
         self.worker.progress.connect(self.update_progress)
 
@@ -671,3 +673,221 @@ class MainWindowNewFormat(QMainWindow):
         """Show error message."""
         title, message = error_info
         QMessageBox.critical(self, title, message)
+
+    def handle_price_mapping_request(self, product_data, prices_df):
+        """
+        Handle interactive price mapping request.
+
+        Args:
+            product_data: Dictionary with product info
+            prices_df: DataFrame with prices
+        """
+        dialog = PriceMappingDialog(product_data, prices_df, self)
+        if dialog.exec_():
+            price = dialog.get_selected_price()
+            self.worker.set_price_mapping_result(price)
+        else:
+            self.worker.set_price_mapping_result(None)
+
+    def _extract_and_display_categories(self, df: pd.DataFrame):
+        """Extract categories from DataFrame and display in list."""
+        # Extract categories
+        self.all_categories = self.category_filter.extract_categories(df)
+
+        if not self.all_categories:
+            # No categories found
+            self.category_filter_group.setVisible(False)
+            return
+
+        # Populate category list
+        self._populate_category_list(self.all_categories)
+
+        # Show category filter section
+        self.category_filter_group.setVisible(True)
+
+        # Update info label
+        self._update_category_info()
+
+    def _populate_category_list(self, categories: list):
+        """Populate category list with checkboxes."""
+        self.category_list.clear()
+
+        for category in categories:
+            item = QListWidgetItem(category)
+            item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
+            item.setCheckState(Qt.Checked)  # Check all by default
+            self.category_list.addItem(item)
+
+    def _filter_category_list(self):
+        """Filter category list based on search text."""
+        search_text = self.category_search.text()
+
+        if not search_text:
+            # Show all categories
+            filtered_categories = self.all_categories
+        else:
+            # Filter categories
+            filtered_categories = self.category_filter.search_categories(
+                self.all_categories, search_text
+            )
+
+        # Repopulate list with filtered categories
+        self._populate_category_list(filtered_categories)
+
+        # Update info
+        self._update_category_info()
+
+    def _toggle_filtered_categories(self):
+        """Toggle check state of all visible categories."""
+        # Check if any visible items are checked
+        any_checked = False
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            if item.checkState() == Qt.Checked:
+                any_checked = True
+                break
+
+        # Toggle: if any checked, uncheck all; otherwise check all
+        new_state = Qt.Unchecked if any_checked else Qt.Checked
+
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            item.setCheckState(new_state)
+
+        self._update_category_info()
+
+    def _select_all_categories(self):
+        """Select all visible categories."""
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            item.setCheckState(Qt.Checked)
+
+        self._update_category_info()
+
+    def _deselect_all_categories(self):
+        """Deselect all visible categories."""
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            item.setCheckState(Qt.Unchecked)
+
+        self._update_category_info()
+
+    def _update_category_info(self):
+        """Update category info label."""
+        selected_count = self._get_selected_categories_count()
+        total_count = len(self.all_categories)
+        visible_count = self.category_list.count()
+
+        if visible_count < total_count:
+            self.category_info_label.setText(
+                f"Zobrazené: {visible_count} z {total_count} kategórií | "
+                f"Vybrané: {selected_count}"
+            )
+        else:
+            self.category_info_label.setText(
+                f"Celkom: {total_count} kategórií | Vybrané: {selected_count}"
+            )
+
+    def _get_selected_categories_count(self) -> int:
+        """Get count of selected categories."""
+        count = 0
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            if item.checkState() == Qt.Checked:
+                count += 1
+        return count
+
+    def get_selected_categories(self) -> list:
+        """Get list of selected category names."""
+        selected = []
+        for i in range(self.category_list.count()):
+            item = self.category_list.item(i)
+            if item.checkState() == Qt.Checked:
+                selected.append(item.text())
+        return selected
+
+    def handle_category_mapping_request(self, original_category, product_name):
+        """
+        Handle interactive category mapping request from worker thread.
+
+        Args:
+            original_category: The unmapped category
+            product_name: Product name for context
+        """
+        # Collect existing categories for suggestions
+        existing_categories = set()
+
+        # 1. Get categories from worker's category manager
+        if (
+            hasattr(self, "worker")
+            and hasattr(self.worker, "pipeline")
+            and hasattr(self.worker.pipeline, "category_mapper")
+            and hasattr(self.worker.pipeline.category_mapper, "category_manager")
+        ):
+            category_manager = self.worker.pipeline.category_mapper.category_manager
+            unique_cats = category_manager.get_unique_categories()
+            existing_categories.update(unique_cats)
+
+        # 2. Get categories from loaded main data (filter out already-formatted ones)
+        if (
+            self.main_data_df is not None
+            and "defaultCategory" in self.main_data_df.columns
+        ):
+            main_categories = self.main_data_df["defaultCategory"].dropna().unique()
+            # Only add categories WITHOUT the prefix (raw categories for mapping)
+            # Categories with prefix are already in final format and shouldn't be used as suggestions
+            for cat in main_categories:
+                if not str(cat).startswith("Tovary a kategórie >"):
+                    existing_categories.add(cat)
+
+        # 3. Get categories from all_categories list (filter out already-formatted ones)
+        if self.all_categories:
+            for cat in self.all_categories:
+                if not str(cat).startswith("Tovary a kategórie >"):
+                    existing_categories.add(cat)
+
+        # Get suggestions using similarity matching
+        suggestions = []
+        if existing_categories:
+            suggestions = get_category_suggestions(
+                original_category, list(existing_categories), top_n=5
+            )
+
+        # Show dialog with suggestions
+        dialog = CategoryMappingDialog(
+            original_category, suggestions, product_name, self
+        )
+        if dialog.exec_():
+            new_category = dialog.get_new_category()
+
+            # Update progress bar with mapping info
+            if new_category and new_category != original_category:
+                self.progress_bar.setFormat(
+                    f"Mapovanie kategórie: {original_category[:40]}... -> {new_category[:40]}..."
+                )
+
+            # Send result back to worker
+            self.worker.set_category_mapping_result(new_category)
+        else:
+            # User cancelled - return original category
+            self.worker.set_category_mapping_result(original_category)
+
+    def show_error_message(self, error_info):
+        """Show error message."""
+        title, message = error_info
+        QMessageBox.critical(self, title, message)
+
+    def handle_price_mapping_request(self, product_data, prices_df):
+        """
+        Handle interactive price mapping request.
+
+        Args:
+            product_data: Dictionary with product info
+            prices_df: DataFrame with prices
+        """
+        dialog = PriceMappingDialog(product_data, prices_df, self)
+        if dialog.exec_():
+            price = dialog.get_selected_price()
+            self.worker.set_price_mapping_result(price)
+        else:
+            self.worker.set_price_mapping_result(None)

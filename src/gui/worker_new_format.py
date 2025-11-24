@@ -23,6 +23,7 @@ class WorkerNewFormat(QObject):
     result = pyqtSignal(object)  # result DataFrame
     statistics = pyqtSignal(dict)  # statistics dict
     category_mapping_request = pyqtSignal(str, str)  # (original_category, product_name)
+    price_mapping_request = pyqtSignal(dict, object)  # (product_data, prices_df)
 
     def __init__(self, config: Dict, options: Dict):
         """
@@ -38,6 +39,8 @@ class WorkerNewFormat(QObject):
         self.pipeline = PipelineNewFormat(self.config, self.options)
         self.category_mapping_result = None
         self.category_mapping_event_loop = None
+        self.price_mapping_result = None
+        self.price_mapping_event_loop = None
 
     def run(self):
         """Run the complete pipeline."""
@@ -54,7 +57,9 @@ class WorkerNewFormat(QObject):
 
             # Prepare scraped data if requested
             scraped_data = None
-            if self.options.get("enable_web_scraping", False):
+            if self.options.get("enable_web_scraping", False) or self.options.get(
+                "enable_mebella_scraping", False
+            ):
                 scraped_data = self._scrape_products()
 
             # Get main data file if provided
@@ -186,10 +191,72 @@ class WorkerNewFormat(QObject):
                     )
 
                     # Update prices
+                    # Update prices
+                    prices_path = (
+                        Path(__file__).parent.parent.parent / "table_bases_prices.json"
+                    )
+
+                    # Identify products needing mapping upfront
+                    codes_needing_mapping = []
+                    for _, row in df_mebella.iterrows():
+                        if prices[prices["code"] == row["code"]].empty:
+                            codes_needing_mapping.append(row["code"])
+
+                    mapped_count = 0
+                    total_to_map = len(codes_needing_mapping)
+
                     for index, row in df_mebella.iterrows():
-                        match = prices[prices["code"] == row["code"]]
+                        product_code = row["code"]
+                        match = prices[prices["code"] == product_code]
+
                         if not match.empty:
                             df_mebella.at[index, "price"] = match["price"].values[0]
+                        else:
+                            # No match found - request user input
+                            remaining_count = total_to_map - mapped_count
+                            self.progress.emit(
+                                f"Cena nenájdená pre: {product_code}, vyžaduje sa vstup (ostáva {remaining_count})..."
+                            )
+                            # Prepare product data
+                            product_data = {
+                                "code": product_code,
+                                "width": row.get("width"),
+                                "depth": row.get("depth"),
+                                "height": row.get("height"),
+                                "image_url": row.get("defaultImage"),
+                                "remaining_count": remaining_count,
+                            }
+                            new_price = self._request_price_mapping(
+                                product_data, prices
+                            )
+
+                            if new_price:
+                                mapped_count += 1
+                                # Update DataFrame
+                                df_mebella.at[index, "price"] = new_price
+
+                                # Add to prices DataFrame and save to JSON
+                                dimension = f"{row.get('width')}x{row.get('depth')}x{row.get('height')}"
+                                new_row = pd.DataFrame(
+                                    [
+                                        {
+                                            "code": product_code,
+                                            "price": new_price,
+                                            "dimension": dimension,
+                                        }
+                                    ]
+                                )
+                                prices = pd.concat([prices, new_row], ignore_index=True)
+
+                                try:
+                                    prices.to_json(
+                                        prices_path, orient="records", indent=4
+                                    )
+                                    self.progress.emit(
+                                        f"Nová cena uložená pre: {product_code}"
+                                    )
+                                except Exception as e:
+                                    self.progress.emit(f"Chyba pri ukladaní ceny: {e}")
 
                     # Add pairCode for variants (remove last word from code if it is a variant suffix)
                     # Example: "BEA BIG BAR" -> "BEA BIG"
@@ -301,5 +368,42 @@ class WorkerNewFormat(QObject):
         self.category_mapping_result = new_category
 
         # Quit the event loop to unblock worker thread
+        # Quit the event loop to unblock worker thread
         if self.category_mapping_event_loop:
             self.category_mapping_event_loop.quit()
+
+    def _request_price_mapping(
+        self, product_data: Dict, prices_df: pd.DataFrame
+    ) -> Optional[str]:
+        """
+        Request interactive price mapping from GUI.
+
+        Args:
+            product_data: Dictionary with product info (code, dimensions)
+            prices_df: DataFrame containing existing prices
+
+        Returns:
+            New price string or None
+        """
+        self.price_mapping_result = None
+
+        # Emit signal to GUI
+        self.price_mapping_request.emit(product_data, prices_df)
+
+        # Create event loop
+        self.price_mapping_event_loop = QEventLoop()
+        self.price_mapping_event_loop.exec_()
+
+        return self.price_mapping_result
+
+    def set_price_mapping_result(self, price: str):
+        """
+        Set the price mapping result from GUI.
+
+        Args:
+            price: The selected price
+        """
+        self.price_mapping_result = price
+
+        if self.price_mapping_event_loop:
+            self.price_mapping_event_loop.quit()

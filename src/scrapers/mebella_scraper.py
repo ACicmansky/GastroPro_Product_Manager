@@ -18,8 +18,10 @@ class MebellaScraper(BaseScraper):
         base_url: str = "https://mebella.pl",
         progress_callback=None,
         max_threads: int = 8,
+        cache_dir: str = "cache/mebella_urls",
     ):
         super().__init__(base_url, progress_callback, max_threads)
+        self.cache_dir = cache_dir
         # Mebella requires browser-like headers to bypass 403
         self.session.headers.update(
             {
@@ -37,6 +39,50 @@ class MebellaScraper(BaseScraper):
                 "Cookie": "pll_language=en; wp-wpml_current_language=en",
             }
         )
+
+    def _get_cache_path(self, category_url: str) -> str:
+        """Generates a cache file path for a given category URL."""
+        import hashlib
+        import os
+
+        if not os.path.exists(self.cache_dir):
+            os.makedirs(self.cache_dir)
+
+        url_hash = hashlib.md5(category_url.encode("utf-8")).hexdigest()
+        return os.path.join(self.cache_dir, f"{url_hash}.json")
+
+    def _load_cached_urls(self, category_url: str) -> Optional[List[str]]:
+        """Loads cached URLs if they exist and are fresh (less than 24h old)."""
+        import json
+        import os
+        import time
+
+        cache_path = self._get_cache_path(category_url)
+        if os.path.exists(cache_path):
+            try:
+                # Check file age (24 hours = 86400 seconds)
+                if time.time() - os.path.getmtime(cache_path) < 604800:
+                    with open(cache_path, "r", encoding="utf-8") as f:
+                        data = json.load(f)
+                        logger.info(
+                            f"Loaded {len(data)} URLs from cache for {category_url}"
+                        )
+                        return data
+            except Exception as e:
+                logger.warning(f"Failed to load cache for {category_url}: {e}")
+        return None
+
+    def _save_cached_urls(self, category_url: str, urls: List[str]):
+        """Saves URLs to cache."""
+        import json
+
+        try:
+            cache_path = self._get_cache_path(category_url)
+            with open(cache_path, "w", encoding="utf-8") as f:
+                json.dump(urls, f)
+            logger.info(f"Saved {len(urls)} URLs to cache for {category_url}")
+        except Exception as e:
+            logger.warning(f"Failed to save cache for {category_url}: {e}")
 
     def get_category_links(self) -> List[str]:
         """
@@ -68,6 +114,11 @@ class MebellaScraper(BaseScraper):
         """
         Extracts product URLs from the category page using Playwright to handle AJAX pagination.
         """
+        # Check cache first
+        cached_urls = self._load_cached_urls(category_url)
+        if cached_urls:
+            return cached_urls
+
         from playwright.sync_api import sync_playwright
 
         product_urls = []
@@ -95,29 +146,68 @@ class MebellaScraper(BaseScraper):
                 except:
                     pass
 
+                last_product_count = 0
+                no_change_count = 0
+                max_no_change = 3  # Stop after 3 attempts with no new products
+
                 while True:
-                    # Scroll to bottom to trigger any lazy loading or make button visible
+                    # Scroll to bottom to trigger any lazy loading
                     page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
+                    page.wait_for_timeout(2000)  # Wait for scroll event
 
-                    # Check for "Show more" button
-                    # Selector based on analysis: a.post-load-more
-                    load_more_selector = "a.post-load-more"
+                    # Try to click "Load More" button if it exists (some themes have it)
+                    load_more_selectors = [
+                        "a.post-load-more",
+                        ".woocommerce-pagination a.next",
+                        ".load-more",
+                    ]
+                    clicked = False
+                    for selector in load_more_selectors:
+                        if page.is_visible(selector):
+                            try:
+                                page.click(selector)
+                                page.wait_for_timeout(3000)
+                                clicked = True
+                                break
+                            except:
+                                pass
 
-                    if page.is_visible(load_more_selector):
-                        logger.info("Found 'Show more' button. Clicking...")
-                        try:
-                            # Click and wait for network idle or a short delay
-                            page.click(load_more_selector)
-                            page.wait_for_timeout(3000)  # Wait for AJAX load
-                        except Exception as e:
-                            logger.warning(f"Error clicking 'Show more': {e}")
-                            break
+                    if not clicked:
+                        # If no button, just wait a bit more for infinite scroll
+                        page.wait_for_timeout(2000)
+
+                    # Count products
+                    # Selector: div.product_title a
+                    links = page.query_selector_all("div.product_title a")
+                    if not links:
+                        links = page.query_selector_all("a[href*='/produkt/']")
+
+                    current_count = len(links)
+                    logger.info(f"Current product count: {current_count}")
+
+                    if current_count > last_product_count:
+                        last_product_count = current_count
+                        no_change_count = 0
                     else:
-                        logger.info("No more 'Show more' buttons found.")
+                        no_change_count += 1
+                        logger.info(
+                            f"No new products found. Attempt {no_change_count}/{max_no_change}"
+                        )
+
+                        # Try scrolling up a bit and back down to trigger scroll events
+                        if no_change_count < max_no_change:
+                            page.evaluate("window.scrollBy(0, -500)")
+                            page.wait_for_timeout(500)
+                            page.evaluate(
+                                "window.scrollTo(0, document.body.scrollHeight)"
+                            )
+                            page.wait_for_timeout(2000)
+
+                    if no_change_count >= max_no_change:
+                        logger.info("Reached end of product list.")
                         break
 
                 # Extract all product links after full load
-                # Selector: div.product_title a
                 links = page.query_selector_all("div.product_title a")
                 if not links:
                     # Fallback selector
@@ -133,6 +223,10 @@ class MebellaScraper(BaseScraper):
                 browser.close()
 
             logger.info(f"Found {len(product_urls)} products in total.")
+
+            # Save to cache
+            if product_urls:
+                self._save_cached_urls(category_url, product_urls)
 
         except Exception as e:
             logger.error(f"Error scraping category page with Playwright: {e}")
@@ -186,8 +280,6 @@ class MebellaScraper(BaseScraper):
                     title_tag.get_text(strip=True)
                     .replace(" – Mebella", "")
                     .replace(" &#8211; Mebella", "")
-                    .replace("(POL)", "")
-                    .replace("(STD)", "")
                     .strip()
                 )
 
@@ -300,10 +392,13 @@ class MebellaScraper(BaseScraper):
             # Map dimensions
             if "Height" in attributes:
                 result["variant:Dĺžka (mm)"] = attributes["Height"]
+                result["height"] = attributes["Height"]
             if "Width" in attributes:
                 result["variant:Šírka (mm)"] = attributes["Width"]
+                result["width"] = attributes["Width"]
             if "Depth" in attributes:
                 result["variant:Hĺbka (mm)"] = attributes["Depth"]
+                result["depth"] = attributes["Depth"]
 
             # Map images
             if images:
