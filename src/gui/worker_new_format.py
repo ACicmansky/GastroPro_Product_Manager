@@ -313,7 +313,7 @@ class WorkerNewFormat(QObject):
 
         if to_process > 0:
             self.progress.emit(f"AI vylepšenie: {to_process} produktov...")
-            result_df, ai_stats = enhancer.enhance_dataframe_with_stats(df)
+            result_df, ai_stats = enhancer.enhance_dataframe_with_stats(df, True)
 
             # Update statistics
             stats["ai_processed"] = ai_stats.get("newly_processed", 0)

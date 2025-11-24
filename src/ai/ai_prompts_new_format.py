@@ -121,3 +121,38 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 * [ ] metaDescription má 120-160 znakov
 * [ ] Výstup je čistý JSON bez akýchkoľvek iných prvkov
 """
+
+
+def create_system_prompt_no_dimensions() -> str:
+    """
+    Create system prompt for AI enhancement with negative constraints for dimensions.
+    Used for Group 1 products (variants).
+    """
+    base_prompt = create_system_prompt()
+
+    # Add negative constraints
+    negative_constraints = """
+
+---
+
+### ⛔ **ZAKÁZANÉ (NEGATIVE CONSTRAINTS)**
+
+* **NEGENERUJ** žiadne rozmery v textových poliach!
+* **VYNECHAJ** slová: "výška", "šírka", "dĺžka", "hĺbka", "rozmery", "objem" "mm", "cm", "m" (ak sa týkajú rozmerov).
+* **NEUVÁDZAJ** konkrétne číselné rozmery produktu (napr. 1000x500x800 mm).
+* Ostatné technické parametre (napríklad výkon, napätie) **MÔŽEŠ** uvádzať.
+* Toto platí pre všetky polia: `shortDescription`, `description`, `seoTitle`, `metaDescription`.
+
+---
+"""
+
+    # Insert before OUTPUT section
+    insert_point = base_prompt.find("### 📤 **VÝSTUP**")
+    if insert_point != -1:
+        return (
+            base_prompt[:insert_point]
+            + negative_constraints
+            + base_prompt[insert_point:]
+        )
+    else:
+        return base_prompt + negative_constraints

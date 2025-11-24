@@ -790,6 +790,8 @@ class TestParallelProcessing:
         )
 
         enhancer = AIEnhancerNewFormat(config)
+        enhancer.client = Mock()
+        enhancer.api_key = "test_key"
 
         # Mock batch processing
         with patch.object(enhancer, "process_batch_with_retry") as mock_batch:

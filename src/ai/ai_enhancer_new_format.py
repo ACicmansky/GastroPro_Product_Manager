@@ -52,16 +52,29 @@ class AIEnhancerNewFormat:
                 grounding_tool = types.Tool(google_search=types.GoogleSearch())
 
                 # Import prompts
-                from .ai_prompts_new_format import create_system_prompt
+                from .ai_prompts_new_format import (
+                    create_system_prompt,
+                    create_system_prompt_no_dimensions,
+                )
 
-                self.api_config = types.GenerateContentConfig(
+                # Standard config (Group 2)
+                self.api_config_standard = types.GenerateContentConfig(
                     tools=[grounding_tool],
                     system_instruction=create_system_prompt(),
+                    temperature=self.temperature,
+                )
+
+                # No dimensions config (Group 1 - Variants)
+                self.api_config_no_dimensions = types.GenerateContentConfig(
+                    tools=[grounding_tool],
+                    system_instruction=create_system_prompt_no_dimensions(),
                     temperature=self.temperature,
                 )
             except Exception as e:
                 logger.warning(f"Failed to initialize Gemini API client: {e}")
                 self.client = None
+                self.api_config_standard = None
+                self.api_config_no_dimensions = None
         else:
             self.client = None
 
@@ -155,19 +168,25 @@ class AIEnhancerNewFormat:
         return products
 
     def process_batch_with_retry(
-        self, products: List[Dict[str, str]]
+        self,
+        products: List[Dict[str, str]],
+        config: Optional[types.GenerateContentConfig] = None,
     ) -> Optional[List[Dict[str, str]]]:
         """
         Process a batch of products with retry logic.
 
         Args:
             products: List of product dictionaries
+            config: Optional API config to use (defaults to standard)
 
         Returns:
             List of enhanced product dictionaries or None on failure
         """
         if not products or not self.client:
             return []
+
+        # Use provided config or standard config
+        api_config = config or self.api_config_standard
 
         # Estimate tokens needed (rough estimation)
         estimated_tokens = len(json.dumps(products)) * 1.5
@@ -180,7 +199,7 @@ class AIEnhancerNewFormat:
 
                 # Send to Gemini API
                 response = self.client.models.generate_content(
-                    model=self.model_name, config=self.api_config, contents=user_prompt
+                    model=self.model_name, config=api_config, contents=user_prompt
                 )
 
                 # Track actual tokens used
@@ -420,27 +439,80 @@ class AIEnhancerNewFormat:
 
         logger.info(f"Processing {total_products} products with AI enhancement")
 
+        # Identify Group 1 and Group 2 products
+        # Group 1: Products with a pairCode OR whose code is used as a pairCode
+        group1_indices = []
+        group2_indices = []
+
+        if "pairCode" in df.columns:
+            # Get all pairCodes that are present in the dataframe
+            all_pair_codes = set(df["pairCode"].dropna().unique())
+            # Remove empty strings if any
+            all_pair_codes.discard("")
+
+            for idx, row in needs_processing.iterrows():
+                code = str(row.get("code", "")).strip()
+                pair_code = str(row.get("pairCode", "")).strip()
+
+                is_group1 = False
+                # Condition 1: Has a pairCode
+                if pair_code:
+                    is_group1 = True
+                # Condition 2: Its code is used as a pairCode by another product
+                elif code and code in all_pair_codes:
+                    is_group1 = True
+
+                if is_group1:
+                    group1_indices.append(idx)
+                else:
+                    group2_indices.append(idx)
+        else:
+            # If no pairCode column, all go to Group 2 (standard)
+            group2_indices = needs_processing.index.tolist()
+
+        logger.info(f"Group 1 (Variants/No Dimensions): {len(group1_indices)} products")
+        logger.info(f"Group 2 (Standard): {len(group2_indices)} products")
+
         # Store the indices of products that need processing
         needs_processing_indices = needs_processing.index
         processed_count = 0
 
-        # Process in batches with parallel execution
+        # Prepare batches
         batches = []
-        for i in range(0, total_products, self.batch_size):
-            batch_end = min(i + self.batch_size, total_products)
-            batch_indices = needs_processing.index[i:batch_end]
-            products = self.prepare_batch_data(needs_processing, i, batch_end)
-            if products:
-                batches.append((products, batch_indices, len(batches) + 1))
+
+        # Helper to create batches for a group
+        def create_batches_for_group(indices, config):
+            if not indices:
+                return
+            group_df = needs_processing.loc[indices]
+            for i in range(0, len(group_df), self.batch_size):
+                batch_end = min(i + self.batch_size, len(group_df))
+                batch_indices = group_df.index[i:batch_end]
+                products = self.prepare_batch_data(group_df, i, batch_end)
+                if products:
+                    batches.append((products, batch_indices, len(batches) + 1, config))
+
+        # Create batches for Group 1
+        create_batches_for_group(group1_indices, self.api_config_no_dimensions)
+
+        # Create batches for Group 2
+        create_batches_for_group(group2_indices, self.api_config_standard)
+
+        # Re-number batches for logging consistency
+        batches = [(b[0], b[1], i + 1, b[3]) for i, b in enumerate(batches)]
 
         # Process batches in parallel
         with ThreadPoolExecutor(max_workers=self.max_parallel_calls) as executor:
             # Submit all batches
             future_to_batch = {
                 executor.submit(
-                    self._process_single_batch, batch_data, batch_indices, batch_num
+                    self._process_single_batch,
+                    batch_data,
+                    batch_indices,
+                    batch_num,
+                    config,
                 ): batch_num
-                for batch_data, batch_indices, batch_num in batches
+                for batch_data, batch_indices, batch_num, config in batches
             }
 
             # Process completed batches
@@ -481,7 +553,11 @@ class AIEnhancerNewFormat:
         return df, statistics
 
     def _process_single_batch(
-        self, products: List[Dict[str, str]], batch_indices: pd.Index, batch_num: int
+        self,
+        products: List[Dict[str, str]],
+        batch_indices: pd.Index,
+        batch_num: int,
+        config: Optional[types.GenerateContentConfig] = None,
     ):
         """
         Process a single batch of products.
@@ -490,11 +566,12 @@ class AIEnhancerNewFormat:
             products: List of product dicts to process
             batch_indices: Original DataFrame indices for these products
             batch_num: Batch number for logging
+            config: Optional API config to use
 
         Returns:
             Tuple of (enhanced products, batch indices) or None
         """
-        enhanced_products = self.process_batch_with_retry(products)
+        enhanced_products = self.process_batch_with_retry(products, config)
         if enhanced_products:
             return enhanced_products, batch_indices
         return None

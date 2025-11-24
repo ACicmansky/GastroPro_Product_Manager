@@ -137,6 +137,10 @@ class DataMergerNewFormat:
                         if "categoryText" in row and pd.notna(row["categoryText"]):
                             merged_data["categoryText"] = str(row["categoryText"])
 
+                    # Update pairCode from feed if present
+                    if "pairCode" in row and pd.notna(row["pairCode"]):
+                        merged_data["pairCode"] = str(row["pairCode"])
+
                     merged_data["source"] = feed_name
                     merged_data["last_updated"] = current_time
                     products_by_code[code] = merged_data
@@ -175,7 +179,9 @@ class DataMergerNewFormat:
 
                 # Include product from main data
                 product_data = row.to_dict()
-                product_data["source"] = "core"
+                # if source column has empty value then set to core
+                if "source" in product_data and product_data["source"] == "":
+                    product_data["source"] = "core"
                 product_data["last_updated"] = current_time
                 products_by_code[code] = product_data
                 processed_codes.add(code)

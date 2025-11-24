@@ -190,9 +190,8 @@ class MainWindowNewFormat(QMainWindow):
         self.gastromarket_checkbox = QCheckBox("Načítať z GastroMarket XML")
         self.forgastro_checkbox = QCheckBox("Načítať z ForGastro XML")
 
-        # Check by default
-        self.gastromarket_checkbox.setChecked(True)
-        self.forgastro_checkbox.setChecked(True)
+        self.gastromarket_checkbox.setChecked(False)
+        self.forgastro_checkbox.setChecked(False)
 
         layout.addWidget(self.gastromarket_checkbox)
         layout.addWidget(self.forgastro_checkbox)
@@ -212,7 +211,7 @@ class MainWindowNewFormat(QMainWindow):
         layout = QVBoxLayout(group)
 
         self.ai_enhancement_checkbox = QCheckBox("Použiť AI vylepšenie")
-        self.ai_enhancement_checkbox.setChecked(False)
+        self.ai_enhancement_checkbox.setChecked(True)
 
         self.web_scraping_checkbox = QCheckBox("Web scraping (TopChladenie.sk)")
         self.web_scraping_checkbox.setChecked(False)

@@ -129,7 +129,7 @@
   "ai_enhancement": {
     "enabled": true,
     "model": "gemini-2.5-flash-lite",
-    "batch_size": 30,
+    "batch_size": 20,
     "temperature": 0.1,
     "retry_attempts": 3,
     "retry_delay": 60,
