@@ -270,7 +270,6 @@ class MebellaScraper(BaseScraper):
             response = self.session.get(url)
             response.raise_for_status()
             soup = BeautifulSoup(response.content, "html.parser")
-            category_name = "Table Bases"
 
             # 1. Product Name
             name = None
@@ -294,7 +293,10 @@ class MebellaScraper(BaseScraper):
                 logger.warning(f"Could not find product name for {url}")
                 return None
 
-            # 2. Description
+            # 2. Category
+            category_name = f"Table Bases > {name.split()[0].capitalize}"
+
+            # 3. Description
             description = ""
             desc_div = soup.select_one(
                 "div.elementor-widget-woocommerce-product-content"
@@ -302,7 +304,7 @@ class MebellaScraper(BaseScraper):
             if desc_div:
                 description = desc_div.get_text(separator="\n", strip=True)
 
-            # 3. Images
+            # 4. Images
             images = []
             # Main image
             main_img = soup.select_one("div.woocommerce-product-gallery__image a")
@@ -319,7 +321,7 @@ class MebellaScraper(BaseScraper):
                     if img_url not in images:
                         images.append(img_url)
 
-            # 4. Attributes
+            # 5. Attributes
             # The page uses Elementor with 50/50 columns for attributes.
             # Structure: section.elementor-inner-section -> div.elementor-container -> 2x div.elementor-col-50
             attributes = {}
@@ -341,7 +343,7 @@ class MebellaScraper(BaseScraper):
                         key = key_col.rstrip(":")
                         attributes[key] = val_col
 
-            # 5. Parse "Size" section (h, a, b)
+            # 6. Parse "Size" section (h, a, b)
             # Look for text widgets containing "h:", "a:", "b:"
             # Pattern: <p>h: <strong>720 mm</strong></p>
             text_widgets = soup.select("div.elementor-widget-text-editor")
@@ -363,7 +365,7 @@ class MebellaScraper(BaseScraper):
                 if b_match:
                     attributes["Depth"] = b_match.group(1)
 
-            # 6. Fallback to CSS classes if Elementor parsing fails
+            # 7. Fallback to CSS classes if Elementor parsing fails
             if not attributes:
                 product_div = soup.select_one("div.type-product")
                 if product_div and product_div.get("class"):
@@ -414,12 +416,6 @@ class MebellaScraper(BaseScraper):
                         result[f"image{i}"] = img
 
             if attributes:
-                # Look in attributes for Base material to update category_name
-                if "Base material" in attributes:
-                    category_name = f"{category_name} > {attributes['Base material']}"
-                    result["defaultCategory"] = category_name
-                    result["categoryText"] = category_name
-
                 # Combine all attributes into description
                 attr_lines = []
                 for k, v in attributes.items():
