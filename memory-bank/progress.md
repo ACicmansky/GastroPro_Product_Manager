@@ -73,6 +73,13 @@
   - Statistics display
   - Ready for production deployment
 
+## Recently Completed (November 25, 2025)
+- ✅ **AI Enhancement Optimization**
+  - **Throughput**: Increased batch size (45) and parallel calls (10) to fully utilize 15 calls/min limit.
+  - **Efficiency**: Refactored rate limiter to be non-blocking during sleep.
+  - **Visibility**: Added progress prints to the terminal.
+  - **Stability**: Restored missing logic in `process_dataframe`.
+
 ## Recently Completed (November 24, 2025)
 - ✅ **Mebella Scraper Optimization**
   - Fixed pagination logic to handle infinite scroll (retrieves 190+ products vs 12)

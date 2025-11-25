@@ -16,6 +16,12 @@
 
 ## Recent Changes
 
+**AI Enhancement Fix & Optimization (November 25, 2025)**:
+- **Critical Fix**: Restored missing logic in `process_dataframe` (grouping, batching) that was accidentally removed.
+- **Optimization**: Increased batch size to 45 and parallel calls to 10 to maximize throughput (15 calls/min limit).
+- **Rate Limiting**: Refactored `_check_and_wait_for_quota` to be non-blocking during sleep, allowing other threads to proceed.
+- **UX**: Added progress prints to the terminal for better visibility.
+
 **AI Enhancement Grouping Logic (November 24, 2025)**:
 - **Dual-Prompt System**: Implemented differentiated AI processing for product variants
 - **Group 1 (Variants)**: Products with `pairCode` use `create_system_prompt_no_dimensions()` - excludes dimension keywords
