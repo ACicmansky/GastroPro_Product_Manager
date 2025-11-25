@@ -392,13 +392,18 @@ class MebellaScraper(BaseScraper):
 
             # Map dimensions
             if "Height" in attributes:
-                result["variant:Dĺžka (mm)"] = attributes["Height"]
+                suffix = ""
+                if attributes["Height"] == "600":
+                    suffix = " COFFEE"
+                elif attributes["Height"] == "720":
+                    suffix = " DINING"
+                elif attributes["Height"] == "1060":
+                    suffix = " BAR"
+                result["variant:Výška (mm)"] = f"{attributes['Height']}{suffix}"
                 result["height"] = attributes["Height"]
             if "Width" in attributes:
-                result["variant:Šírka (mm)"] = attributes["Width"]
                 result["width"] = attributes["Width"]
             if "Depth" in attributes:
-                result["variant:Hĺbka (mm)"] = attributes["Depth"]
                 result["depth"] = attributes["Depth"]
 
             # Map images
