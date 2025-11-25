@@ -34,6 +34,8 @@ from ..utils.config_loader import load_config
 from ..utils.category_mapper import get_category_suggestions
 from src.loaders.data_loader_factory import DataLoaderFactory
 from src.filters.category_filter import CategoryFilter
+from .column_config_dialog import ColumnConfigDialog
+from ..utils.config_loader import save_config
 
 
 class MainWindowNewFormat(QMainWindow):
@@ -302,10 +304,84 @@ class MainWindowNewFormat(QMainWindow):
             # Extract and display categories
             self._extract_and_display_categories(df)
 
+            # Check for column differences
+            self._check_column_configuration(df)
+
         except Exception as e:
             QMessageBox.critical(
                 self, "Chyba načítania", f"Nepodarilo sa načítať súbor.\nChyba: {e}"
             )
+
+    def _check_column_configuration(self, df: pd.DataFrame):
+        """
+        Check if input columns match configuration and offer updates.
+
+        Args:
+            df: Loaded DataFrame
+        """
+        try:
+            input_columns = set(df.columns)
+
+            # Get configured output columns
+            output_mapping = self.config.get("output_mapping", {})
+            current_output_columns = set(self.config.get("new_output_columns", []))
+
+            # Identify differences
+            # Columns in input but not in config (candidates to add)
+            columns_to_add = sorted(list(input_columns - current_output_columns))
+
+            # Columns in config but not in input (candidates to remove)
+            # Note: We should filter out columns that are generated/mapped from other sources
+            # For simplicity, we just show all missing ones, user decides
+            columns_to_remove = sorted(list(current_output_columns - input_columns))
+
+            # Filter out some internal/generated columns from removal suggestions to avoid clutter
+            # e.g. aiProcessed, variant columns that might be generated
+            ignored_prefixes = ["variant:", "image", "relatedProduct"]
+            columns_to_remove = [
+                c
+                for c in columns_to_remove
+                if not any(c.startswith(p) for p in ignored_prefixes)
+                and c
+                not in ["aiProcessed", "aiProcessedDate", "source", "last_updated"]
+            ]
+
+            if columns_to_add or columns_to_remove:
+                dialog = ColumnConfigDialog(columns_to_add, columns_to_remove, self)
+                if dialog.exec_():
+                    to_add, to_remove = dialog.get_changes()
+
+                    if to_add or to_remove:
+                        # Update config
+                        current_list = self.config.get("new_output_columns", [])
+
+                        # Add new columns
+                        for col in to_add:
+                            if col not in current_list:
+                                current_list.append(col)
+
+                        # Remove columns
+                        for col in to_remove:
+                            if col in current_list:
+                                current_list.remove(col)
+
+                        # Save config
+                        self.config["new_output_columns"] = current_list
+                        if save_config(self.config):
+                            QMessageBox.information(
+                                self,
+                                "Konfigurácia aktualizovaná",
+                                f"Konfigurácia bola úspešne aktualizovaná.\n"
+                                f"Pridané: {len(to_add)}, Odstránené: {len(to_remove)}",
+                            )
+                        else:
+                            QMessageBox.warning(
+                                self,
+                                "Chyba ukladania",
+                                "Nepodarilo sa uložiť konfiguračný súbor.",
+                            )
+        except Exception as e:
+            print(f"Error checking column configuration: {e}")
 
     def clear_main_data(self):
         """Clear main data file selection."""

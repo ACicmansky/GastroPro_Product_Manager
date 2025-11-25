@@ -74,6 +74,13 @@
   - Ready for production deployment
 
 ## Recently Completed (November 25, 2025)
+- ✅ **Dynamic Column Configuration**
+  - **Feature**: Automatic detection of column differences between input and config
+  - **Dialog**: `ColumnConfigDialog` with checkboxes for add/remove columns
+  - **Config Update**: `save_config` utility in `config_loader.py`
+  - **Integration**: Triggers on file load in `MainWindowNewFormat`
+  - **Verified**: Unit tests confirm correct behavior
+
 - ✅ **AI Enhancement Optimization**
   - **Throughput**: Increased batch size (45) and parallel calls (10) to fully utilize 15 calls/min limit.
   - **Efficiency**: Refactored rate limiter to be non-blocking during sleep.

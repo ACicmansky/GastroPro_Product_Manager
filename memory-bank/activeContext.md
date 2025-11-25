@@ -2,11 +2,11 @@
 
 ## Current Focus
 
-**AI Enhancement Grouping Logic** ✅ COMPLETE (November 24, 2025)
-- Implemented dual-prompt system for variants vs standard products
-- Group 1 (variants with `pairCode`) use dimension-free prompt
-- Group 2 (standard products) use full-featured prompt
-- Verified with `verify_ai_grouping.py` script
+**Dynamic Column Configuration** ✅ COMPLETE (November 25, 2025)
+- Implemented automatic column detection and configuration update
+- GUI dialog for user to review and approve changes
+- Config.json auto-update on user confirmation
+- Verified with unit tests
 
 **Phase 14: Next Phase** (Upcoming)
 - Continue with remaining features
@@ -15,6 +15,13 @@
 - Production deployment preparation
 
 ## Recent Changes
+
+**Dynamic Column Configuration (November 25, 2025)**:
+- **New Feature**: Automatic detection of column differences between input XLSX and config.json
+- **GUI Dialog**: `ColumnConfigDialog` presents users with columns to add/remove with checkboxes
+- **Config Update**: `save_config` utility function to persist changes to config.json
+- **Smart Filtering**: Ignores generated columns (variants, images, AI tracking) from removal suggestions
+- **Integration**: Triggered automatically when loading main data file in `MainWindowNewFormat`
 
 **AI Enhancement Fix & Optimization (November 25, 2025)**:
 - **Critical Fix**: Restored missing logic in `process_dataframe` (grouping, batching) that was accidentally removed.

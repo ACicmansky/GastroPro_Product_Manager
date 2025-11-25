@@ -201,3 +201,23 @@ class CategoryMappingManager:
                 if mapping.get("newCategory") == category:
                     return True
         return False
+
+
+def save_config(config: Dict, config_path: str = "config.json") -> bool:
+    """Saves configuration to a JSON file.
+
+    Args:
+        config: Configuration dictionary to save
+        config_path: Path to the configuration file
+
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    try:
+        with open(config_path, "w", encoding="utf-8") as f:
+            json.dump(config, f, ensure_ascii=False, indent=2)
+        print(f"Configuration saved to {config_path}")
+        return True
+    except Exception as e:
+        print(f"Error saving configuration: {e}")
+        return False
