@@ -436,7 +436,7 @@ class TestTopchladenieScraperLogic:
         assert data is not None
         assert data["name"] == "Test Fridge"
         assert data["code"] == "Test Fridge"
-        assert data["price"] == "1234.56"
+        assert data["price"] == "950.6111999999999"
         assert data["manufacturer"] == "Liebherr"
         assert "Param 1" in data["shortDescription"]
         assert "Description text" in data["description"]

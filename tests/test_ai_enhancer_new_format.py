@@ -96,81 +96,7 @@
 #             mock_api.assert_not_called()
 
 #             # Should return original data
-#             assert result["aiProcessed"] == "1"
-
-
-# class TestAIEnhancementBatch:
-#     """Test batch AI enhancement."""
-
-#     def test_enhance_dataframe(self, config):
-#         """Test enhancing entire DataFrame."""
-#         from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
-
-#         df = pd.DataFrame(
-#             {
-#                 "code": ["PROD001", "PROD002"],
-#                 "name": ["Product 1", "Product 2"],
-#                 "shortDescription": ["", ""],
-#                 "aiProcessed": ["", ""],
-#             }
-#         )
-
-#         enhancer = AIEnhancerNewFormat(config)
-
-#         with patch.object(enhancer, "_call_ai_api") as mock_api:
-#             mock_api.return_value = {"shortDescription": "Enhanced"}
-
-#             result = enhancer.enhance_dataframe(df)
-
-#             # Both products should be processed
-#             assert all(result["aiProcessed"] == "1")
-#             assert mock_api.call_count == 2
-
-#     def test_batch_skips_processed_products(self, config):
-#         """Test batch processing skips already processed products."""
-#         from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
-
-#         df = pd.DataFrame(
-#             {
-#                 "code": ["PROD001", "PROD002", "PROD003"],
-#                 "name": ["P1", "P2", "P3"],
-#                 "aiProcessed": ["1", "", "1"],
-#                 "aiProcessedDate": ["2024-01-01", "", "2024-01-01"],
-#             }
-#         )
-
-#         enhancer = AIEnhancerNewFormat(config)
-
-#         with patch.object(enhancer, "_call_ai_api") as mock_api:
-#             mock_api.return_value = {"shortDescription": "Enhanced"}
-
-#             result = enhancer.enhance_dataframe(df)
-
-#             # Only PROD002 should be processed
-#             assert mock_api.call_count == 1
-
-#     def test_batch_with_force_reprocess(self, config):
-#         """Test batch processing with force reprocess flag."""
-#         from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
-
-#         df = pd.DataFrame(
-#             {
-#                 "code": ["PROD001", "PROD002"],
-#                 "name": ["P1", "P2"],
-#                 "aiProcessed": ["1", "1"],
-#             }
-#         )
-
-#         enhancer = AIEnhancerNewFormat(config)
-
-#         with patch.object(enhancer, "_call_ai_api") as mock_api:
-#             mock_api.return_value = {"shortDescription": "Enhanced"}
-
-#             result = enhancer.enhance_dataframe(df, force_reprocess=True)
-
-#             # Both should be processed despite being marked
-#             assert mock_api.call_count == 2
-
+#             assert result["aiProcessed"] == "1
 
 # class TestAIEnhancementFields:
 #     """Test AI enhancement of specific fields."""
@@ -285,58 +211,6 @@
 
 #         # Should not crash
 #         assert result is not None
-
-
-# class TestAIEnhancementTracking:
-#     """Test AI enhancement tracking and statistics."""
-
-#     def test_tracks_enhancement_statistics(self, config):
-#         """Test that enhancement tracks statistics."""
-#         from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
-
-#         df = pd.DataFrame(
-#             {
-#                 "code": ["PROD001", "PROD002", "PROD003"],
-#                 "name": ["P1", "P2", "P3"],
-#                 "aiProcessed": ["", "", "1"],
-#             }
-#         )
-
-#         enhancer = AIEnhancerNewFormat(config)
-
-#         with patch.object(enhancer, "_call_ai_api") as mock_api:
-#             mock_api.return_value = {"shortDescription": "Enhanced"}
-
-#             result, stats = enhancer.enhance_dataframe_with_stats(df)
-
-#             assert "total_processed" in stats
-#             assert "already_processed" in stats
-#             assert "newly_processed" in stats
-#             assert stats["newly_processed"] == 2
-#             assert stats["already_processed"] == 1
-
-#     def test_tracks_api_calls(self, config):
-#         """Test tracking of API calls."""
-#         from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
-
-#         df = pd.DataFrame(
-#             {
-#                 "code": ["PROD001", "PROD002"],
-#                 "name": ["P1", "P2"],
-#                 "aiProcessed": ["", ""],
-#             }
-#         )
-
-#         enhancer = AIEnhancerNewFormat(config)
-
-#         with patch.object(enhancer, "_call_ai_api") as mock_api:
-#             mock_api.return_value = {"shortDescription": "Enhanced"}
-
-#             result, stats = enhancer.enhance_dataframe_with_stats(df)
-
-#             assert "api_calls" in stats
-#             assert stats["api_calls"] == 2
-
 
 # class TestQuotaManagement:
 #     """Test quota management for API calls and tokens."""

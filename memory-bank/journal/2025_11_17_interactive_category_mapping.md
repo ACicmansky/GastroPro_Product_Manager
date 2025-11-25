@@ -68,7 +68,6 @@ During Phase 7 (Category Mapper with Transformation), we skipped an important fe
   2. Custom mappings
   3. Interactive callback (prompts user)
 - Added `set_interactive_callback()` method
-- Added `reload_mappings()` method
 - Enhanced `map_dataframe()` with `enable_interactive` parameter
 
 **Key Methods**:

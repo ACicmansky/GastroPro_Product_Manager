@@ -44,36 +44,6 @@ class CategoryFilter:
         logger.info(f"Extracted {len(categories)} unique categories")
         return categories
 
-    def filter_by_categories(
-        self, df: pd.DataFrame, selected_categories: Optional[List[str]]
-    ) -> pd.DataFrame:
-        """
-        Filter DataFrame to include only products in selected categories.
-
-        Args:
-            df: DataFrame with product data
-            selected_categories: List of category names to include (None or empty = all)
-
-        Returns:
-            Filtered DataFrame
-        """
-        # If no categories selected, return all data
-        if not selected_categories:
-            logger.info("No categories selected, returning all products")
-            return df
-
-        # Filter by selected categories
-        if "defaultCategory" in df.columns:
-            filtered_df = df[df["defaultCategory"].isin(selected_categories)]
-            logger.info(
-                f"Filtered {len(df)} products to {len(filtered_df)} "
-                f"products in {len(selected_categories)} categories"
-            )
-            return filtered_df
-        else:
-            logger.warning("defaultCategory column not found, returning all products")
-            return df
-
     def search_categories(self, categories: List[str], search_text: str) -> List[str]:
         """
         Search/filter categories by text.

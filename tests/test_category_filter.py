@@ -133,100 +133,6 @@ class TestCategoryExtraction:
         assert "" not in categories
 
 
-class TestCategoryFiltering:
-    """Test filtering products by categories."""
-
-    def test_filter_by_single_category(self, sample_data):
-        """Test filtering by single category."""
-        from src.filters.category_filter import CategoryFilter
-
-        filter = CategoryFilter()
-        selected = ["Tovary a kategórie > Chladenie > Chladničky"]
-
-        result = filter.filter_by_categories(sample_data, selected)
-
-        # Should return only products in selected category
-        assert len(result) == 2
-        assert all(result["defaultCategory"] == selected[0])
-
-    def test_filter_by_multiple_categories(self, sample_data):
-        """Test filtering by multiple categories."""
-        from src.filters.category_filter import CategoryFilter
-
-        filter = CategoryFilter()
-        selected = [
-            "Tovary a kategórie > Chladenie > Chladničky",
-            "Tovary a kategórie > Gastro > Sporáky",
-        ]
-
-        result = filter.filter_by_categories(sample_data, selected)
-
-        # Should return products in any of selected categories
-        assert len(result) == 3
-        assert all(result["defaultCategory"].isin(selected))
-
-    def test_filter_by_empty_list_returns_all(self, sample_data):
-        """Test filtering with empty selection returns all products."""
-        from src.filters.category_filter import CategoryFilter
-
-        filter = CategoryFilter()
-        result = filter.filter_by_categories(sample_data, [])
-
-        # Should return all products
-        assert len(result) == len(sample_data)
-
-    def test_filter_by_none_returns_all(self, sample_data):
-        """Test filtering with None returns all products."""
-        from src.filters.category_filter import CategoryFilter
-
-        filter = CategoryFilter()
-        result = filter.filter_by_categories(sample_data, None)
-
-        # Should return all products
-        assert len(result) == len(sample_data)
-
-    def test_filter_preserves_data_integrity(self, sample_data):
-        """Test filtering preserves all columns and data."""
-        from src.filters.category_filter import CategoryFilter
-
-        filter = CategoryFilter()
-        selected = ["Tovary a kategórie > Chladenie > Chladničky"]
-
-        result = filter.filter_by_categories(sample_data, selected)
-
-        # Should preserve all columns
-        assert list(result.columns) == list(sample_data.columns)
-
-        # Should preserve data in other columns
-        assert result.iloc[0]["code"] == "PROD001"
-        assert result.iloc[0]["name"] == "Product 1"
-
-    def test_filter_nonexistent_category(self, sample_data):
-        """Test filtering by category that doesn't exist."""
-        from src.filters.category_filter import CategoryFilter
-
-        filter = CategoryFilter()
-        selected = ["Tovary a kategórie > Nonexistent > Category"]
-
-        result = filter.filter_by_categories(sample_data, selected)
-
-        # Should return empty DataFrame
-        assert len(result) == 0
-
-    def test_filter_maintains_index(self, sample_data):
-        """Test filtering maintains original DataFrame index."""
-        from src.filters.category_filter import CategoryFilter
-
-        filter = CategoryFilter()
-        selected = ["Tovary a kategórie > Chladenie > Chladničky"]
-
-        result = filter.filter_by_categories(sample_data, selected)
-
-        # Should maintain original indices (0 and 2)
-        assert 0 in result.index
-        assert 2 in result.index
-
-
 class TestCategorySearch:
     """Test category search/filter functionality."""
 
@@ -293,35 +199,6 @@ class TestCategorySearch:
 
         # Should return empty list
         assert result == []
-
-
-class TestCategoryFilterIntegration:
-    """Test integration with pipeline."""
-
-    def test_filter_integrates_with_pipeline(self, sample_data):
-        """Test category filter works with pipeline."""
-        from src.filters.category_filter import CategoryFilter
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
-        import json
-
-        # Load config
-        config_path = Path("config.json")
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = json.load(f)
-
-        filter = CategoryFilter()
-        pipeline = PipelineNewFormat(config, {})
-
-        # Filter data
-        selected = ["Tovary a kategórie > Chladenie > Chladničky"]
-        filtered_data = filter.filter_by_categories(sample_data, selected)
-
-        # Process through pipeline
-        result = pipeline.apply_transformation(filtered_data)
-
-        # Should process successfully
-        assert len(result) == 2
-        assert all(result["defaultCategory"] == selected[0])
 
 
 # Integration test marker

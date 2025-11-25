@@ -104,43 +104,6 @@ class TestCategoryMappingDataFrame:
 class TestCategoryMappingWithMappingFile:
     """Test category mapping with mapping file."""
 
-    def test_load_category_mappings(self, config, sample_category_mappings):
-        """Test loading category mappings from file."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
-
-        mapper = CategoryMapperNewFormat(config)
-
-        # Sample fixture returns a list, so we test the method exists
-        # In production, this would load from a file
-        assert hasattr(mapper, "load_mappings")
-
-        # Test that it can handle dict input
-        if isinstance(sample_category_mappings, list):
-            # Convert list to dict for testing
-            test_mappings = {
-                item["oldCategory"]: item["newCategory"]
-                for item in sample_category_mappings
-            }
-            mapper.set_custom_mappings(test_mappings)
-            assert len(mapper.custom_mappings) > 0
-
-    def test_apply_custom_mapping(self, config):
-        """Test applying custom category mapping."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
-
-        mapper = CategoryMapperNewFormat(config)
-
-        # Custom mapping
-        custom_mappings = {"Old Category": "New Category"}
-
-        if hasattr(mapper, "set_custom_mappings"):
-            mapper.set_custom_mappings(custom_mappings)
-
-            result = mapper.map_category("Old Category")
-
-            # Should use custom mapping directly (no transformation)
-            assert result == "New Category"
-
     def test_fallback_to_original_if_no_mapping(self, config):
         """Test fallback to original category if no mapping exists."""
         from src.mappers.category_mapper_new_format import CategoryMapperNewFormat

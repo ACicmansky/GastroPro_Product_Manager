@@ -379,14 +379,6 @@ def get_scraped_products(
         return pd.DataFrame()
 
 
-def save_to_csv(df, filename="topchladenie_products.csv"):
-    try:
-        df.to_csv(filename, index=False, encoding=ScrapingConfig.CSV_ENCODING, sep=";")
-        logger.info(f"Data saved to {filename}")
-    except Exception as e:
-        logger.error(f"Error saving data to CSV: {e}")
-
-
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     for col in df.columns:
         if df[col].dtype == "object":
