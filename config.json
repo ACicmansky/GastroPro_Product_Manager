@@ -91,7 +91,7 @@
     "default_values": {
       "comment": "Default values applied only if column is empty or missing",
       "currency": "EUR",
-      "includingVat": "1",
+      "includingVat": "0",
       "percentVat": "23",
       "unit": "ks",
       "itemType": "product",

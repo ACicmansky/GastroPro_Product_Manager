@@ -168,6 +168,7 @@ class TopchladenieScraper(BaseScraper):
                 if price_elem and price_elem.get("content")
                 else 0.0
             )
+            price = price * 0.77
             product_data["price"] = str(price)
 
             # Manufacturer

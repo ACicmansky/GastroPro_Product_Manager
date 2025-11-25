@@ -41,7 +41,7 @@ Added complete `output_mapping` configuration with four subsections:
 **c) Default Values (32 values)**
 Applied only when column is empty or missing:
 - `currency`: "EUR"
-- `includingVat`: "1"
+- `includingVat`: "0"
 - `percentVat`: "23"
 - `itemType`: "product"
 - `productVisibility`: "visible"

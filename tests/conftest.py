@@ -72,7 +72,7 @@ def sample_new_format_df():
         "aiProcessed": ["False", "False", "False"],
         "aiProcessedDate": ["", "", ""],
         "currency": ["EUR", "EUR", "EUR"],
-        "includingVat": ["1", "1", "1"],
+        "includingVat": ["0", "0", "0"],
     }
     return pd.DataFrame(data)
 
