@@ -97,46 +97,41 @@ class AIEnhancerNewFormat:
         Thread-safe quota management for API calls and tokens.
         Limits: 15 calls/minute, 250,000 tokens/minute
         """
-        with self.calls_lock:
-            current_time = time.time()
-
-            # Reset counters if a minute has passed
-            if current_time - self.minute_start_time >= 60:
-                self.calls_in_current_minute = 0
-                self.tokens_in_current_minute = 0
-                self.minute_start_time = current_time
-
-            # Check if we need to wait
-            need_to_wait = False
+        while True:
+            wait_time = 0
             wait_reason = ""
 
-            # Check call limit (15 calls per minute)
-            if self.calls_in_current_minute >= 15:
-                need_to_wait = True
-                wait_reason = "call limit"
+            with self.calls_lock:
+                current_time = time.time()
 
-            # Check token limit (250,000 tokens per minute)
-            if self.tokens_in_current_minute + tokens_needed > 250000:
-                need_to_wait = True
-                wait_reason = "token limit"
+                # Reset counters if a minute has passed
+                if current_time - self.minute_start_time >= 60:
+                    self.calls_in_current_minute = 0
+                    self.tokens_in_current_minute = 0
+                    self.minute_start_time = current_time
 
-            if need_to_wait:
-                # Calculate wait time until next minute
-                time_to_wait = 60 - (current_time - self.minute_start_time)
-                if time_to_wait > 0:
-                    logger.info(
-                        f"Quota limit reached ({wait_reason}), waiting {time_to_wait:.1f} seconds..."
-                    )
-                    time.sleep(time_to_wait)
+                # Check call limit (15 calls per minute)
+                if self.calls_in_current_minute >= 15:
+                    wait_time = 60 - (current_time - self.minute_start_time)
+                    wait_reason = "call limit"
+                # Check token limit (250,000 tokens per minute)
+                elif self.tokens_in_current_minute + tokens_needed > 250000:
+                    wait_time = 60 - (current_time - self.minute_start_time)
+                    wait_reason = "token limit"
 
-                # Reset counters
-                self.calls_in_current_minute = 0
-                self.tokens_in_current_minute = 0
-                self.minute_start_time = time.time()
+                if wait_time <= 0:
+                    # No wait needed, reserve quota
+                    self.calls_in_current_minute += 1
+                    self.tokens_in_current_minute += tokens_needed
+                    return
 
-            # Increment counters
-            self.calls_in_current_minute += 1
-            self.tokens_in_current_minute += tokens_needed
+            # Wait outside the lock
+            if wait_time > 0:
+                logger.info(
+                    f"Quota limit reached ({wait_reason}), waiting {wait_time:.1f} seconds..."
+                )
+                # Sleep a bit extra to ensure we are in the next minute
+                time.sleep(wait_time + 0.1)
 
     def prepare_batch_data(
         self, df: pd.DataFrame, start_idx: int, end_idx: int
@@ -398,7 +393,10 @@ class AIEnhancerNewFormat:
         return df, updated_count
 
     def process_dataframe(
-        self, df: pd.DataFrame, progress_callback=None
+        self,
+        df: pd.DataFrame,
+        progress_callback=None,
+        force_reprocess: bool = False,
     ) -> Tuple[pd.DataFrame, Dict]:
         """
         Process entire dataframe with AI enhancement using parallel processing.
@@ -430,19 +428,23 @@ class AIEnhancerNewFormat:
         )
 
         # Filter products needing processing
-        needs_processing = df[df["aiProcessed"].isin(["", "0", "False"])]
+        if force_reprocess:
+            needs_processing = df
+        else:
+            needs_processing = df[df["aiProcessed"].isin(["", "0", "False"])]
         total_products = len(needs_processing)
 
         if total_products == 0:
             logger.info("No products need AI enhancement")
+            print("No products need AI enhancement")
             return df, {"ai_should_process": 0, "ai_processed": 0}
 
         logger.info(f"Processing {total_products} products with AI enhancement")
+        print(f"Starting AI enhancement for {total_products} products...")
 
-        # Identify Group 1 and Group 2 products
+        # Identify Group 1 and Group 2 products for correct config selection
         # Group 1: Products with a pairCode OR whose code is used as a pairCode
-        group1_indices = []
-        group2_indices = []
+        group1_indices = set()
 
         if "pairCode" in df.columns:
             # Get all pairCodes that are present in the dataframe
@@ -454,24 +456,12 @@ class AIEnhancerNewFormat:
                 code = str(row.get("code", "")).strip()
                 pair_code = str(row.get("pairCode", "")).strip()
 
-                is_group1 = False
                 # Condition 1: Has a pairCode
                 if pair_code:
-                    is_group1 = True
+                    group1_indices.add(idx)
                 # Condition 2: Its code is used as a pairCode by another product
                 elif code and code in all_pair_codes:
-                    is_group1 = True
-
-                if is_group1:
-                    group1_indices.append(idx)
-                else:
-                    group2_indices.append(idx)
-        else:
-            # If no pairCode column, all go to Group 2 (standard)
-            group2_indices = needs_processing.index.tolist()
-
-        logger.info(f"Group 1 (Variants/No Dimensions): {len(group1_indices)} products")
-        logger.info(f"Group 2 (Standard): {len(group2_indices)} products")
+                    group1_indices.add(idx)
 
         # Store the indices of products that need processing
         needs_processing_indices = needs_processing.index
@@ -493,13 +483,20 @@ class AIEnhancerNewFormat:
                     batches.append((products, batch_indices, len(batches) + 1, config))
 
         # Create batches for Group 1
-        create_batches_for_group(group1_indices, self.api_config_no_dimensions)
+        create_batches_for_group(list(group1_indices), self.api_config_no_dimensions)
 
-        # Create batches for Group 2
+        # Create batches for Group 2 (indices in needs_processing but not in group1_indices)
+        group2_indices = [
+            idx for idx in needs_processing.index if idx not in group1_indices
+        ]
         create_batches_for_group(group2_indices, self.api_config_standard)
 
         # Re-number batches for logging consistency
         batches = [(b[0], b[1], i + 1, b[3]) for i, b in enumerate(batches)]
+
+        print(
+            f"Created {len(batches)} batches for processing (Group 1: {len(group1_indices)}, Group 2: {len(group2_indices)})"
+        )
 
         # Process batches in parallel
         with ThreadPoolExecutor(max_workers=self.max_parallel_calls) as executor:
@@ -533,8 +530,12 @@ class AIEnhancerNewFormat:
                         self._save_progress(df, batch_num)
 
                         logger.info(f"Processed batch {batch_num}/{len(batches)}")
+                        print(
+                            f"Processed batch {batch_num}/{len(batches)} - Total processed: {processed_count}/{total_products}"
+                        )
                 except Exception as e:
                     logger.error(f"Error processing batch {batch_num}: {e}")
+                    print(f"Error processing batch {batch_num}: {e}")
 
                 # Update progress
                 if progress_callback:
@@ -608,6 +609,7 @@ class AIEnhancerNewFormat:
         product: pd.Series,
         preserve_existing: bool = True,
         force_reprocess: bool = False,
+        config: Optional[types.GenerateContentConfig] = None,
     ) -> pd.Series:
         """
         Enhance a single product with AI-generated content.
@@ -638,7 +640,7 @@ class AIEnhancerNewFormat:
                 return result
 
         # Call AI API to enhance
-        enhancements = self._call_ai_api(result)
+        enhancements = self._call_ai_api(result, config)
 
         # Apply enhancements
         for field, value in enhancements.items():
@@ -678,17 +680,44 @@ class AIEnhancerNewFormat:
         processed_count = 0
         skipped_count = 0
 
+        # Identify Group 1 and Group 2 products for correct config selection
+        # Group 1: Products with a pairCode OR whose code is used as a pairCode
+        group1_indices = set()
+
+        if "pairCode" in df.columns:
+            # Get all pairCodes that are present in the dataframe
+            all_pair_codes = set(df["pairCode"].dropna().unique())
+            # Remove empty strings if any
+            all_pair_codes.discard("")
+
+            for idx, row in result_df.iterrows():
+                code = str(row.get("code", "")).strip()
+                pair_code = str(row.get("pairCode", "")).strip()
+
+                # Condition 1: Has a pairCode
+                if pair_code:
+                    group1_indices.add(idx)
+                # Condition 2: Its code is used as a pairCode by another product
+                elif code and code in all_pair_codes:
+                    group1_indices.add(idx)
+
         for idx, row in result_df.iterrows():
             # Skip if already processed (unless force_reprocess)
             if not force_reprocess and str(row.get("aiProcessed", "")) == "1":
                 skipped_count += 1
                 continue
 
+            # Determine config based on group
+            config = self.api_config_standard
+            if idx in group1_indices:
+                config = self.api_config_no_dimensions
+
             # Enhance product
             enhanced = self.enhance_product(
                 row,
                 preserve_existing=not force_reprocess,
                 force_reprocess=force_reprocess,
+                config=config,
             )
 
             # Update DataFrame
@@ -720,38 +749,19 @@ class AIEnhancerNewFormat:
         Returns:
             Tuple of (enhanced DataFrame, statistics dict)
         """
-        # Count already processed
-        already_processed = 0
-        if "aiProcessed" in df.columns:
-            already_processed = (df["aiProcessed"] == "1").sum()
+        # Use the parallel batch processing method which is much more efficient
+        # and handles grouping correctly
+        return self.process_dataframe(df, force_reprocess=force_reprocess)
 
-        # Enhance
-        result_df = self.enhance_dataframe(df, force_reprocess)
-
-        # Calculate statistics
-        total_processed = (result_df["aiProcessed"] == "1").sum()
-        newly_processed = total_processed - (
-            0 if force_reprocess else already_processed
-        )
-
-        stats = {
-            "total_processed": int(total_processed),
-            "already_processed": int(already_processed),
-            "newly_processed": int(newly_processed),
-            "api_calls": int(newly_processed),
-        }
-
-        return result_df, stats
-
-    def _call_ai_api(self, product: pd.Series) -> Dict:
+    def _call_ai_api(
+        self, product: pd.Series, config: Optional[types.GenerateContentConfig] = None
+    ) -> Dict:
         """
         Call AI API to generate enhancements.
 
-        This is a placeholder for actual API integration.
-        In production, this would call OpenAI, Anthropic, or similar.
-
         Args:
             product: Product data
+            config: Optional API config to use
 
         Returns:
             Dictionary of field -> enhanced value
@@ -761,27 +771,20 @@ class AIEnhancerNewFormat:
             print("  Warning: No API key configured, skipping AI enhancement")
             return {}
 
-        # Placeholder implementation
-        # In production, this would make actual API calls
-        enhancements = {}
+        # Prepare single product for batch API
+        product_dict = {
+            "code": str(product.get("code", "")),
+            "name": str(product.get("name", "")),
+            "defaultCategory": str(product.get("defaultCategory", "")),
+            "shortDescription": str(product.get("shortDescription", "")),
+            "description": str(product.get("description", "")),
+        }
 
-        # Generate short description if missing
-        if str(product.get("shortDescription", "")) in ["", "nan", "None"]:
-            name = str(product.get("name", ""))
-            manufacturer = str(product.get("manufacturer", ""))
-            if name:
-                enhancements["shortDescription"] = (
-                    f"{name} - Professional quality product"
-                )
-                if manufacturer and manufacturer not in ["", "nan", "None"]:
-                    enhancements["shortDescription"] += f" by {manufacturer}"
+        # Call API using the batch method (list of 1)
+        # This handles retry logic, quota management, and JSON parsing
+        enhanced_list = self.process_batch_with_retry([product_dict], config)
 
-        # Generate full description if missing
-        if str(product.get("description", "")) in ["", "nan", "None"]:
-            name = str(product.get("name", ""))
-            if name:
-                enhancements["description"] = (
-                    f"Detailed description for {name}. High-quality professional equipment suitable for commercial use."
-                )
+        if enhanced_list and len(enhanced_list) > 0:
+            return enhanced_list[0]
 
-        return enhancements
+        return {}
