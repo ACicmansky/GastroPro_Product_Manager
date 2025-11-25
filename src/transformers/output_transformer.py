@@ -255,6 +255,25 @@ class OutputTransformer:
         print(f"  Applied {applied_count} default values")
         return df
 
+    def _change_GastroMarket_string(self, df: pd.DataFrame) -> pd.DataFrame:
+        df["shortDescription"] = df["shortDescription"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        df["description"] = df["description"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        df["metaDescription"] = df["metaDescription"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        df["seoTitle"] = df["seoTitle"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        return df
+
+    def _update_variantVisibility(self, df: pd.DataFrame) -> pd.DataFrame:
+        df.loc[df["pairCode"] != "", "variantVisibility"] = "1"
+        return df
+
     def _ensure_all_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         """
         Ensure all 138 columns exist in the output DataFrame.

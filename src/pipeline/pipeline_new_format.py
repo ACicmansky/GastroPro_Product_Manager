@@ -88,18 +88,9 @@ class PipelineNewFormat:
 
         result_df = self.transformer.apply_default_values(result_df)
 
-        result_df["shortDescription"] = result_df["shortDescription"].str.replace(
-            "GastroMarket", "Gastro", case=False, regex=False
-        )
-        result_df["description"] = result_df["description"].str.replace(
-            "GastroMarket", "Gastro", case=False, regex=False
-        )
-        result_df["metaDescription"] = result_df["metaDescription"].str.replace(
-            "GastroMarket", "Gastro", case=False, regex=False
-        )
-        result_df["seoTitle"] = result_df["seoTitle"].str.replace(
-            "GastroMarket", "Gastro", case=False, regex=False
-        )
+        result_df = self.transformer._change_GastroMarket_string(result_df)
+
+        result_df = self.transformer._update_variantVisibility(result_df)
 
         return result_df
 
