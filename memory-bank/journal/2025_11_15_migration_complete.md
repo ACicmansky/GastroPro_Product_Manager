@@ -394,7 +394,7 @@ src/
 
 ### 2. Image Splitting
 **Input**: Single column with `"img1.jpg,img2.jpg,img3.jpg"`  
-**Output**: 8 columns (`defaultImage`, `image`, `image2-7`)  
+**Output**: 8 columns (`image`, `image2-7`)  
 **Max**: 8 images per product
 
 ### 3. Code Uppercase

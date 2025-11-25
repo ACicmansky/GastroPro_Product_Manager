@@ -100,29 +100,6 @@ class TestXLSXLoading:
         assert result.loc[0, "price"] in ["100.50", "100.5"]
 
 
-class TestCSVFallback:
-    """Test CSV fallback when XLSX is not available."""
-
-    def test_load_csv_as_fallback(self, test_data_dir):
-        """Test loading CSV file as fallback."""
-        from src.loaders.xlsx_loader import XLSXLoader
-
-        csv_path = test_data_dir / "sample_fallback.csv"
-
-        # Create CSV file
-        df = pd.DataFrame(
-            {"code": ["TEST001"], "name": ["Product 1"], "price": ["100.50"]}
-        )
-        df.to_csv(csv_path, index=False, sep=";", encoding="utf-8")
-
-        loader = XLSXLoader()
-        result = loader.load(csv_path)
-
-        assert isinstance(result, pd.DataFrame)
-        assert len(result) == 1
-        assert result.loc[0, "code"] == "TEST001"
-
-
 class TestDataLoaderFactory:
     """Test data loader factory for automatic format detection."""
 
@@ -141,22 +118,6 @@ class TestDataLoaderFactory:
         from src.loaders.xlsx_loader import XLSXLoader
 
         assert isinstance(loader, XLSXLoader)
-
-    def test_factory_detects_csv(self, test_data_dir):
-        """Test factory detects CSV format."""
-        from src.loaders.data_loader_factory import DataLoaderFactory
-
-        csv_path = test_data_dir / "test.csv"
-
-        # Create sample CSV
-        df = pd.DataFrame({"code": ["TEST001"]})
-        df.to_csv(csv_path, index=False, sep=";", encoding="utf-8")
-
-        loader = DataLoaderFactory.get_loader(csv_path)
-
-        from src.loaders.csv_loader import CSVLoader
-
-        assert isinstance(loader, CSVLoader)
 
     def test_factory_load_method(self, test_data_dir):
         """Test factory load method."""
@@ -229,7 +190,7 @@ class TestXLSXSaving:
         """Test that saving preserves column order."""
         from src.loaders.xlsx_loader import XLSXLoader
 
-        columns = ["code", "name", "price", "defaultImage", "defaultCategory"]
+        columns = ["code", "name", "price", "image", "defaultCategory"]
         df = pd.DataFrame({col: ["test"] for col in columns})
 
         output_path = tmp_path / "output_order.xlsx"

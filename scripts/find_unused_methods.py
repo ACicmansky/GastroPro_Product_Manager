@@ -8,8 +8,10 @@ PROJECT_ROOT = Path(__file__).parent.parent
 SRC_DIR = PROJECT_ROOT / "src"
 TESTS_DIR = PROJECT_ROOT / "tests"
 
+
 def get_python_files(directory):
     return list(directory.rglob("*.py"))
+
 
 def get_definitions(files):
     """
@@ -20,9 +22,9 @@ def get_definitions(files):
         try:
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
-            
+
             tree = ast.parse(content)
-            
+
             for node in ast.walk(tree):
                 if isinstance(node, ast.ClassDef):
                     class_name = node.name
@@ -31,14 +33,16 @@ def get_definitions(files):
                             # Skip magic methods
                             if item.name.startswith("__") and item.name.endswith("__"):
                                 continue
-                                
-                            definitions.append({
-                                'name': item.name,
-                                'file': file_path,
-                                'type': 'method',
-                                'class': class_name,
-                                'lineno': item.lineno
-                            })
+
+                            definitions.append(
+                                {
+                                    "name": item.name,
+                                    "file": file_path,
+                                    "type": "method",
+                                    "class": class_name,
+                                    "lineno": item.lineno,
+                                }
+                            )
                 elif isinstance(node, ast.FunctionDef):
                     # Check if it's a standalone function (not inside a class)
                     # ast.walk doesn't track parent, so we might get methods here if we are not careful.
@@ -51,22 +55,26 @@ def get_definitions(files):
                 if isinstance(node, ast.FunctionDef):
                     if node.name.startswith("__") and node.name.endswith("__"):
                         continue
-                    definitions.append({
-                        'name': node.name,
-                        'file': file_path,
-                        'type': 'function',
-                        'class': None,
-                        'lineno': node.lineno
-                    })
-                    
+                    definitions.append(
+                        {
+                            "name": node.name,
+                            "file": file_path,
+                            "type": "function",
+                            "class": None,
+                            "lineno": node.lineno,
+                        }
+                    )
+
         except Exception as e:
             print(f"Error parsing {file_path}: {e}")
-            
+
     return definitions
 
+
 def check_usage(definitions, src_files, test_files):
-    results = []
-    
+    only_in_tests = []
+    completely_unused = []
+
     # Cache file contents to avoid re-reading
     src_contents = {}
     for f in src_files:
@@ -75,7 +83,7 @@ def check_usage(definitions, src_files, test_files):
                 src_contents[f] = file.read()
         except:
             pass
-            
+
     test_contents = {}
     for f in test_files:
         try:
@@ -85,9 +93,9 @@ def check_usage(definitions, src_files, test_files):
             pass
 
     for definition in definitions:
-        name = definition['name']
-        def_file = definition['file']
-        
+        name = definition["name"]
+        def_file = definition["file"]
+
         # Check usage in SRC
         used_in_src = False
         for f, content in src_contents.items():
@@ -95,9 +103,9 @@ def check_usage(definitions, src_files, test_files):
             # We want to find 'name' but not as a definition
             # If f is the definition file, we expect at least 1 occurrence (the definition)
             # So we count occurrences.
-            
-            matches = len(re.findall(r'\b' + re.escape(name) + r'\b', content))
-            
+
+            matches = len(re.findall(r"\b" + re.escape(name) + r"\b", content))
+
             if f == def_file:
                 # In the defining file, we expect 1 definition.
                 # If matches > 1, it's used internally.
@@ -108,49 +116,67 @@ def check_usage(definitions, src_files, test_files):
                 if matches > 0:
                     used_in_src = True
                     break
-        
+
         if used_in_src:
             continue
-            
+
         # Check usage in TESTS
         used_in_tests = False
         for f, content in test_contents.items():
-            matches = len(re.findall(r'\b' + re.escape(name) + r'\b', content))
+            matches = len(re.findall(r"\b" + re.escape(name) + r"\b", content))
             if matches > 0:
                 used_in_tests = True
                 break
-        
+
         if used_in_tests:
-            results.append(definition)
-            
-    return results
+            only_in_tests.append(definition)
+        else:
+            completely_unused.append(definition)
+
+    return only_in_tests, completely_unused
+
 
 def main():
-    print("Scanning for methods used ONLY in tests...")
+    print("Scanning for unused methods...")
     src_files = get_python_files(SRC_DIR)
     test_files = get_python_files(TESTS_DIR)
-    
+
     print(f"Found {len(src_files)} source files and {len(test_files)} test files.")
-    
+
     definitions = get_definitions(src_files)
     print(f"Found {len(definitions)} definitions (functions/methods).")
-    
-    candidates = check_usage(definitions, src_files, test_files)
-    
-    print(f"\nFound {len(candidates)} methods used ONLY in tests:\n")
-    
+
+    only_in_tests, completely_unused = check_usage(definitions, src_files, test_files)
+
+    print(f"\nFound {len(only_in_tests)} methods used ONLY in tests:\n")
+
     # Group by file
-    by_file = defaultdict(list)
-    for c in candidates:
-        by_file[c['file']].append(c)
-        
-    for file_path, items in by_file.items():
+    by_file_tests = defaultdict(list)
+    for c in only_in_tests:
+        by_file_tests[c["file"]].append(c)
+
+    for file_path, items in by_file_tests.items():
         rel_path = file_path.relative_to(PROJECT_ROOT)
         print(f"File: {rel_path}")
         for item in items:
-            context = f"Class: {item['class']}" if item['class'] else "Function"
+            context = f"Class: {item['class']}" if item["class"] else "Function"
             print(f"  - {item['name']} ({context}, line {item['lineno']})")
         print("")
+
+    print(f"\nFound {len(completely_unused)} methods used NOWHERE (0 references):\n")
+
+    by_file_unused = defaultdict(list)
+    for c in completely_unused:
+        by_file_unused[c["file"]].append(c)
+
+    for file_path, items in by_file_unused.items():
+        rel_path = file_path.relative_to(PROJECT_ROOT)
+        print(f"File: {rel_path}")
+        for item in items:
+            context = f"Class: {item['class']}" if item["class"] else "Function"
+            print(f"  - {item['name']} ({context}, line {item['lineno']})")
+        print("")
+
 
 if __name__ == "__main__":
     main()

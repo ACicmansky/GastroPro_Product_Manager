@@ -227,7 +227,6 @@ class TopchladenieScraper(BaseScraper):
                 :8
             ]  # Max 8 images, preserve order
             image_columns = [
-                "defaultImage",
                 "image",
                 "image2",
                 "image3",
@@ -235,6 +234,7 @@ class TopchladenieScraper(BaseScraper):
                 "image5",
                 "image6",
                 "image7",
+                "image8",
             ]
             for i, col_name in enumerate(image_columns):
                 product_data[col_name] = (

@@ -21,7 +21,6 @@ class DataMergerNewFormat:
 
         self.options = options
         self.image_columns = [
-            "defaultImage",
             "image",
             "image2",
             "image3",
@@ -29,6 +28,7 @@ class DataMergerNewFormat:
             "image5",
             "image6",
             "image7",
+            "image8",
         ]
 
     def merge(

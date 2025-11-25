@@ -154,7 +154,6 @@ class XMLParserNewFormat:
         """
         # Define image column names
         image_columns = [
-            "defaultImage",
             "image",
             "image2",
             "image3",
@@ -162,6 +161,7 @@ class XMLParserNewFormat:
             "image5",
             "image6",
             "image7",
+            "image8",
         ]
 
         # Initialize all image columns as empty

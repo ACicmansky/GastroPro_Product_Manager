@@ -76,7 +76,7 @@
    - E-shop compatible format
    - Includes all product data, variants, pricing, flags, marketplace settings
    - AI tracking columns: `aiProcessed`, `aiProcessedDate`
-   - Multiple image columns: `defaultImage`, `image`, `image2-7`
+   - Multiple image columns: `image`, `image2-7`
    - Category fields with prefix: "Tovary a kategórie > ..."
    - Uppercase catalog codes
    - Raw data (no formatting) - e-shop handles display

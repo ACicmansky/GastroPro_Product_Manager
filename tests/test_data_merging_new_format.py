@@ -20,7 +20,7 @@ class TestNewFormatMerging:
                 "code": ["PROD001", "PROD002"],
                 "name": ["Product 1", "Product 2"],
                 "price": ["100.00", "200.00"],
-                "defaultImage": ["http://main.com/img1.jpg", ""],
+                "image": ["http://main.com/img1.jpg", ""],
                 "source": ["", ""],
             }
         )
@@ -31,7 +31,7 @@ class TestNewFormatMerging:
                 "code": ["PROD002", "PROD003"],
                 "name": ["Product 2 Updated", "Product 3"],
                 "price": ["250.00", "300.00"],
-                "defaultImage": [
+                "image": [
                     "http://feed.com/img2.jpg",
                     "http://feed.com/img3.jpg",
                 ],
@@ -57,7 +57,7 @@ class TestNewFormatMerging:
                 "code": ["PROD001"],
                 "name": ["Product 1"],
                 "price": ["100.00"],
-                "defaultImage": [""],
+                "image": [""],
             }
         )
 
@@ -66,7 +66,7 @@ class TestNewFormatMerging:
                 "code": ["PROD001"],
                 "name": ["Product 1"],
                 "price": ["150.00"],
-                "defaultImage": ["http://feed.com/img1.jpg"],
+                "image": ["http://feed.com/img1.jpg"],
             }
         )
 
@@ -86,7 +86,7 @@ class TestNewFormatMerging:
                 "name": ["Original Name"],
                 "price": ["100.00"],
                 "shortDescription": ["Original description"],
-                "defaultImage": [""],
+                "image": [""],
             }
         )
 
@@ -96,7 +96,7 @@ class TestNewFormatMerging:
                 "name": ["Feed Name"],
                 "price": ["150.00"],
                 "shortDescription": ["Feed description"],
-                "defaultImage": ["http://feed.com/img1.jpg"],
+                "image": ["http://feed.com/img1.jpg"],
             }
         )
 
@@ -124,9 +124,8 @@ class TestImagePriorityMerging:
                 "code": ["PROD001"],
                 "name": ["Product 1"],
                 "price": ["100.00"],
-                "defaultImage": ["http://feed1.com/img1.jpg"],
-                "image": ["http://feed1.com/img2.jpg"],
-                "image2": [""],
+                "image": ["http://feed1.com/img1.jpg"],
+                "image2": ["http://feed1.com/img2.jpg"],
                 "source": ["feed1"],
             }
         )
@@ -137,10 +136,10 @@ class TestImagePriorityMerging:
                 "code": ["PROD001"],
                 "name": ["Product 1"],
                 "price": ["100.00"],
-                "defaultImage": ["http://feed2.com/img1.jpg"],
-                "image": ["http://feed2.com/img2.jpg"],
-                "image2": ["http://feed2.com/img3.jpg"],
-                "image3": ["http://feed2.com/img4.jpg"],
+                "image": ["http://feed2.com/img1.jpg"],
+                "image2": ["http://feed2.com/img2.jpg"],
+                "image3": ["http://feed2.com/img3.jpg"],
+                "image4": ["http://feed2.com/img4.jpg"],
                 "source": ["feed2"],
             }
         )
@@ -150,7 +149,7 @@ class TestImagePriorityMerging:
 
         # Should use images from feed2 (more images)
         prod = result[result["code"] == "PROD001"].iloc[0]
-        assert "feed2.com" in prod["defaultImage"]
+        assert "feed2.com" in prod["image"]
         assert prod["image2"] != ""  # Should have 3rd image
 
     def test_count_non_empty_images(self, config):
@@ -161,11 +160,10 @@ class TestImagePriorityMerging:
 
         row = pd.Series(
             {
-                "defaultImage": "http://img1.jpg",
-                "image": "http://img2.jpg",
-                "image2": "",
-                "image3": "http://img3.jpg",
-                "image4": "",
+                "image": "http://img1.jpg",
+                "image2": "http://img2.jpg",
+                "image3": "",
+                "image4": "http://img3.jpg",
                 "image5": "",
                 "image6": "",
                 "image7": "",
@@ -184,7 +182,6 @@ class TestImagePriorityMerging:
                 "code": ["PROD001"],
                 "name": ["Product 1"],
                 "price": ["100.00"],
-                "defaultImage": [""],
                 "image": [""],
             }
         )
@@ -194,7 +191,6 @@ class TestImagePriorityMerging:
                 "code": ["PROD001"],
                 "name": ["Product 1"],
                 "price": ["100.00"],
-                "defaultImage": [""],
                 "image": [""],
             }
         )
@@ -216,9 +212,9 @@ class TestImagePriorityMerging:
                 "code": ["PROD001"],
                 "name": ["Product 1"],
                 "price": ["100.00"],
-                "defaultImage": ["http://main.com/img1.jpg"],
-                "image": ["http://main.com/img2.jpg"],
-                "image2": ["http://main.com/img3.jpg"],
+                "image": ["http://main.com/img1.jpg"],
+                "image2": ["http://main.com/img2.jpg"],
+                "image3": ["http://main.com/img3.jpg"],
                 "source": [""],
             }
         )
@@ -229,8 +225,7 @@ class TestImagePriorityMerging:
                 "code": ["PROD001"],
                 "name": ["Product 1"],
                 "price": ["150.00"],
-                "defaultImage": ["http://feed.com/img1.jpg"],
-                "image": [""],
+                "image": ["http://feed.com/img1.jpg"],
                 "source": ["feed"],
             }
         )
@@ -240,7 +235,7 @@ class TestImagePriorityMerging:
 
         # Should keep main images (more images)
         prod = result[result["code"] == "PROD001"].iloc[0]
-        assert "main.com" in prod["defaultImage"]
+        assert "main.com" in prod["image"]
         assert prod["image2"] != ""  # Should have 3rd image
 
 
@@ -256,7 +251,7 @@ class TestMultipleFeedMerging:
                 "code": ["PROD001", "PROD002"],
                 "name": ["P1", "P2"],
                 "price": ["100", "200"],
-                "defaultImage": ["", ""],
+                "image": ["", ""],
             }
         )
 
@@ -265,7 +260,7 @@ class TestMultipleFeedMerging:
                 "code": ["PROD002", "PROD003"],
                 "name": ["P2", "P3"],
                 "price": ["250", "300"],
-                "defaultImage": ["", ""],
+                "image": ["", ""],
             }
         )
 
@@ -274,7 +269,7 @@ class TestMultipleFeedMerging:
                 "code": ["PROD003", "PROD004"],
                 "name": ["P3", "P4"],
                 "price": ["350", "400"],
-                "defaultImage": ["", ""],
+                "image": ["", ""],
             }
         )
 
@@ -366,7 +361,7 @@ class TestMergeStatistics:
                 "code": ["PROD001"],
                 "name": ["P1"],
                 "price": ["100"],
-                "defaultImage": [""],
+                "image": [""],
             }
         )
 
@@ -375,8 +370,7 @@ class TestMergeStatistics:
                 "code": ["PROD001"],
                 "name": ["P1"],
                 "price": ["100"],
-                "defaultImage": ["http://img.jpg"],
-                "image": ["http://img2.jpg"],
+                "image": ["http://img.jpg"],
             }
         )
 
@@ -393,7 +387,7 @@ class TestMergeStatistics:
                 "code": ["PROD001", "PROD002"],
                 "name": ["Product 1", "Product 2"],
                 "price": ["100.00", "200.00"],
-                "defaultCategory": ["Cat A", "Cat B"],
+                "category": ["Cat A", "Cat B"],
             }
         )
 

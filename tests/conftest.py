@@ -67,7 +67,6 @@ def sample_new_format_df():
         "shortDescription": ["Short desc 1", "Short desc 2", "Short desc 3"],
         "description": ["Long desc 1", "Long desc 2", "Long desc 3"],
         "weight": ["1.5", "2.0", "0.5"],
-        "defaultImage": ["img1.jpg", "img3.jpg", "img4.jpg"],
         "image": ["img2.jpg", "", "img5.jpg"],
         "image2": ["", "", "img6.jpg"],
         "aiProcessed": ["False", "False", "False"],

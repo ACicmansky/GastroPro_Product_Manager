@@ -48,8 +48,8 @@ class TestTopchladenieScraper:
                 "description": ["Long description"],
                 "defaultCategory": ["Tovary a kategórie > Category > Subcategory"],
                 "categoryText": ["Tovary a kategórie > Category > Subcategory"],
-                "defaultImage": ["img1.jpg"],
-                "image": ["img2.jpg"],
+                "image": ["img1.jpg"],
+                "image2": ["img2.jpg"],
             }
         )
 
@@ -86,8 +86,8 @@ class TestScraperColumnMapping:
                 "defaultCategory": ["Tovary a kategórie > Category"],
                 "categoryText": ["Tovary a kategórie > Category"],
                 "active": ["1"],
-                "defaultImage": [""],
                 "image": [""],
+                "image2": [""],
             }
         )
 
@@ -147,10 +147,9 @@ class TestScraperImageHandling:
             {
                 "code": ["PROD001"],
                 "name": ["Product"],
-                "defaultImage": ["img1.jpg"],
-                "image": ["img2.jpg"],
-                "image2": ["img3.jpg"],
-                "image3": [""],
+                "image": ["img1.jpg"],
+                "image2": ["img2.jpg"],
+                "image3": ["img3.jpg"],
                 "image4": [""],
                 "image5": [""],
                 "image6": [""],
@@ -159,14 +158,13 @@ class TestScraperImageHandling:
         )
 
         # Verify all image columns exist
-        assert "defaultImage" in data.columns
         assert "image" in data.columns
         assert "image2" in data.columns
         assert "image7" in data.columns
 
-        assert data.loc[0, "defaultImage"] == "img1.jpg"
-        assert data.loc[0, "image"] == "img2.jpg"
-        assert data.loc[0, "image2"] == "img3.jpg"
+        assert data.loc[0, "image"] == "img1.jpg"
+        assert data.loc[0, "image2"] == "img2.jpg"
+        assert data.loc[0, "image3"] == "img3.jpg"
 
     def test_handles_single_image(self, config):
         """Test handling of single image URL."""
@@ -177,14 +175,13 @@ class TestScraperImageHandling:
             {
                 "code": ["PROD001"],
                 "name": ["Product"],
-                "defaultImage": ["single.jpg"],
-                "image": [""],
+                "image": ["single.jpg"],
                 "image2": [""],
             }
         )
 
-        assert data.loc[0, "defaultImage"] == "single.jpg"
-        assert data.loc[0, "image"] == ""
+        assert data.loc[0, "image"] == "single.jpg"
+        assert data.loc[0, "image2"] == ""
 
     def test_handles_max_8_images(self, config):
         """Test that maximum 8 images are supported."""
@@ -195,19 +192,18 @@ class TestScraperImageHandling:
             {
                 "code": ["PROD001"],
                 "name": ["Product"],
-                "defaultImage": ["img1.jpg"],
-                "image": ["img2.jpg"],
-                "image2": ["img3.jpg"],
-                "image3": ["img4.jpg"],
-                "image4": ["img5.jpg"],
-                "image5": ["img6.jpg"],
+                "image": ["img1.jpg"],
+                "image2": ["img2.jpg"],
+                "image3": ["img3.jpg"],
+                "image4": ["img4.jpg"],
+                "image5": ["img5.jpg"],
                 "image6": ["img7.jpg"],
                 "image7": ["img8.jpg"],
             }
         )
 
         # Should have exactly 8 image columns
-        assert data.loc[0, "defaultImage"] == "img1.jpg"
+        assert data.loc[0, "image"] == "img1.jpg"
         assert data.loc[0, "image7"] == "img8.jpg"
 
 
@@ -444,8 +440,8 @@ class TestTopchladenieScraperLogic:
         assert data["manufacturer"] == "Liebherr"
         assert "Param 1" in data["shortDescription"]
         assert "Description text" in data["description"]
-        assert "img1.jpg" in data["defaultImage"]
-        assert "img2.jpg" in data["image"]
+        assert "img1.jpg" in data["image"]
+        assert "img2.jpg" in data["image2"]
         assert data["defaultCategory"] == "/e-shop/category"
 
 

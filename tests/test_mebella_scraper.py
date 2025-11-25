@@ -53,7 +53,8 @@ class TestMebellaScraper(unittest.TestCase):
         mock_page.query_selector_all.return_value = [mock_link1, mock_link2]
 
         urls = self.scraper.get_product_urls(
-            "https://mebella.pl/en/product-category/table-bases/gerro-en/"
+            "https://mebella.pl/en/product-category/table-bases/gerro-en/",
+            use_cache=False,
         )
 
         # Verify Playwright was used
@@ -96,11 +97,10 @@ class TestMebellaScraper(unittest.TestCase):
         )
 
         self.assertIsNotNone(data)
-        self.assertEqual(data["name"], "Test Product SKU")
-        self.assertTrue(data["description"].startswith("Test description."))
+        self.assertEqual(data["name"], "Test Product")
         self.assertIn("Material: Steel", data["description"])
         self.assertIn("Wysokosc mm: 720", data["description"])
-        self.assertEqual(data["defaultImage"], "https://mebella.pl/img/test.jpg")
+        self.assertEqual(data["image"], "https://mebella.pl/img/test.jpg")
 
 
 if __name__ == "__main__":

@@ -110,14 +110,15 @@ class MebellaScraper(BaseScraper):
             category_links.append(urljoin(self.base_url, category))
         return category_links
 
-    def get_product_urls(self, category_url: str) -> List[str]:
+    def get_product_urls(self, category_url: str, use_cache: bool = True) -> List[str]:
         """
         Extracts product URLs from the category page using Playwright to handle AJAX pagination.
         """
         # Check cache first
-        cached_urls = self._load_cached_urls(category_url)
-        if cached_urls:
-            return cached_urls
+        if use_cache:
+            cached_urls = self._load_cached_urls(category_url)
+            if cached_urls:
+                return cached_urls
 
         from playwright.sync_api import sync_playwright
 
@@ -402,9 +403,9 @@ class MebellaScraper(BaseScraper):
 
             # Map images
             if images:
-                result["defaultImage"] = images[0]
+                result["image"] = images[0]
                 for i, img in enumerate(images[1:], start=2):
-                    if i <= 7:
+                    if i <= 8:
                         result[f"image{i}"] = img
 
             if attributes:

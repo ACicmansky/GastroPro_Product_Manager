@@ -11,14 +11,14 @@ from unittest.mock import Mock, patch, MagicMock
 from bs4 import BeautifulSoup
 
 
-class TestScraperNewFormat:
+class TestTopchladenieScraper:
     """Test scraper initialization and basic functionality."""
 
     def test_scraper_initializes_with_config(self, config):
         """Test scraper initializes with configuration."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         assert scraper is not None
         assert scraper.config is not None
@@ -26,9 +26,9 @@ class TestScraperNewFormat:
 
     def test_scraper_produces_new_format(self, config):
         """Test scraper produces new format output directly."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Scraper should produce data directly in new format
         # No column mapping needed since scrape_product_detail() returns new format
@@ -37,9 +37,9 @@ class TestScraperNewFormat:
 
     def test_scraper_outputs_new_format_columns(self, config):
         """Test scraper outputs DataFrame with new format column names."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Create mock scraped data (already in new format)
         new_format_data = pd.DataFrame(
@@ -51,8 +51,8 @@ class TestScraperNewFormat:
                 "description": ["Long description"],
                 "defaultCategory": ["Tovary a kategórie > Category > Subcategory"],
                 "categoryText": ["Tovary a kategórie > Category > Subcategory"],
-                "defaultImage": ["img1.jpg"],
-                "image": ["img2.jpg"],
+                "image": ["img1.jpg"],
+                "image2": ["img2.jpg"],
             }
         )
 
@@ -75,9 +75,9 @@ class TestScraperColumnMapping:
 
     def test_maps_all_standard_columns(self, config):
         """Test scraper produces new format column names directly."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Create mock data that simulates scraping output
         mock_data = pd.DataFrame(
@@ -91,8 +91,8 @@ class TestScraperColumnMapping:
                 "defaultCategory": ["Tovary a kategórie > Category"],
                 "categoryText": ["Tovary a kategórie > Category"],
                 "active": ["1"],
-                "defaultImage": [""],
                 "image": [""],
+                "image2": [""],
             }
         )
 
@@ -107,9 +107,9 @@ class TestScraperColumnMapping:
 
     def test_handles_missing_columns(self, config):
         """Test scraper handles missing data gracefully."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Minimal scraped data
         minimal_data = pd.DataFrame(
@@ -123,9 +123,9 @@ class TestScraperColumnMapping:
 
     def test_preserves_data_values(self, config):
         """Test scraper preserves special characters and formatting."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Test data with special characters
         test_data = pd.DataFrame(
@@ -149,19 +149,18 @@ class TestScraperImageHandling:
 
     def test_splits_images_into_8_columns(self, config):
         """Test that scraper produces 8 separate image columns."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Mock data with images already split (as scraper produces)
         data = pd.DataFrame(
             {
                 "code": ["PROD001"],
                 "name": ["Product"],
-                "defaultImage": ["img1.jpg"],
-                "image": ["img2.jpg"],
-                "image2": ["img3.jpg"],
-                "image3": [""],
+                "image": ["img1.jpg"],
+                "image2": ["img2.jpg"],
+                "image3": ["img3.jpg"],
                 "image4": [""],
                 "image5": [""],
                 "image6": [""],
@@ -170,59 +169,55 @@ class TestScraperImageHandling:
         )
 
         # Verify all image columns exist
-        assert "defaultImage" in data.columns
         assert "image" in data.columns
         assert "image2" in data.columns
         assert "image7" in data.columns
 
-        assert data.loc[0, "defaultImage"] == "img1.jpg"
-        assert data.loc[0, "image"] == "img2.jpg"
-        assert data.loc[0, "image2"] == "img3.jpg"
+        assert data.loc[0, "image"] == "img1.jpg"
+        assert data.loc[0, "image2"] == "img2.jpg"
 
     def test_handles_single_image(self, config):
         """Test handling of single image URL."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Mock data with single image
         data = pd.DataFrame(
             {
                 "code": ["PROD001"],
                 "name": ["Product"],
-                "defaultImage": ["single.jpg"],
-                "image": [""],
+                "image": ["single.jpg"],
                 "image2": [""],
             }
         )
 
-        assert data.loc[0, "defaultImage"] == "single.jpg"
-        assert data.loc[0, "image"] == ""
+        assert data.loc[0, "image"] == "single.jpg"
+        assert data.loc[0, "image2"] == ""
 
     def test_handles_max_8_images(self, config):
         """Test that maximum 8 images are supported."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Mock data with 8 images (max supported)
         data = pd.DataFrame(
             {
                 "code": ["PROD001"],
                 "name": ["Product"],
-                "defaultImage": ["img1.jpg"],
-                "image": ["img2.jpg"],
-                "image2": ["img3.jpg"],
-                "image3": ["img4.jpg"],
-                "image4": ["img5.jpg"],
-                "image5": ["img6.jpg"],
+                "image": ["img1.jpg"],
+                "image2": ["img2.jpg"],
+                "image3": ["img3.jpg"],
+                "image4": ["img4.jpg"],
+                "image5": ["img5.jpg"],
                 "image6": ["img7.jpg"],
                 "image7": ["img8.jpg"],
             }
         )
 
         # Should have exactly 8 image columns
-        assert data.loc[0, "defaultImage"] == "img1.jpg"
+        assert data.loc[0, "image"] == "img1.jpg"
         assert data.loc[0, "image7"] == "img8.jpg"
 
 
@@ -231,9 +226,9 @@ class TestScraperCategoryTransformation:
 
     def test_transforms_category_format(self, config):
         """Test scraper produces transformed category directly."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Mock data with transformed category (as scraper produces)
         data = pd.DataFrame(
@@ -251,9 +246,9 @@ class TestScraperCategoryTransformation:
 
     def test_category_applied_to_both_columns(self, config):
         """Test category is in both defaultCategory and categoryText."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Mock data (as scraper produces)
         data = pd.DataFrame(
@@ -275,10 +270,10 @@ class TestScraperIntegration:
 
     def test_scraper_integrates_with_pipeline(self, config):
         """Test scraped data can be processed by pipeline."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
         from src.pipeline.pipeline_new_format import PipelineNewFormat
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
         pipeline = PipelineNewFormat(config, {})
 
         # Create mock scraped data (already in new format)
@@ -289,8 +284,8 @@ class TestScraperIntegration:
                 "price": ["200.00"],
                 "defaultCategory": ["Tovary a kategórie > Test > Category"],
                 "categoryText": ["Tovary a kategórie > Test > Category"],
-                "defaultImage": ["img1.jpg"],
-                "image": ["img2.jpg"],
+                "image": ["img1.jpg"],
+                "image2": ["img2.jpg"],
             }
         )
 
@@ -303,9 +298,9 @@ class TestScraperIntegration:
 
     def test_scraped_data_ready_for_merge(self, config):
         """Test scraped data has correct structure for merging."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Mock scraped data (already in new format)
         data = pd.DataFrame(
@@ -331,9 +326,9 @@ class TestScraperOutput:
 
     def test_output_is_valid_dataframe(self, config):
         """Test output is a valid pandas DataFrame."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Mock scraped data
         data = pd.DataFrame(
@@ -346,9 +341,9 @@ class TestScraperOutput:
 
     def test_output_has_no_nan_strings(self, config):
         """Test _clean_data removes NaN properly."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Mock data with None values
         data = pd.DataFrame({"code": ["PROD001"], "name": ["Product"], "price": [None]})
@@ -362,9 +357,9 @@ class TestScraperOutput:
 
     def test_all_values_are_strings(self, config):
         """Test scraper produces string values."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
-        scraper = ScraperNewFormat(config)
+        scraper = TopchladenieScraper(config)
 
         # Mock scraped data (scraper always produces strings)
         data = pd.DataFrame(
@@ -386,28 +381,28 @@ class TestScraperProgressTracking:
 
     def test_scraper_accepts_progress_callback(self, config):
         """Test scraper accepts progress callback."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
         progress_messages = []
 
         def progress_callback(message):
             progress_messages.append(message)
 
-        scraper = ScraperNewFormat(config, progress_callback=progress_callback)
+        scraper = TopchladenieScraper(config, progress_callback=progress_callback)
 
         assert scraper.progress_callback is not None
 
-    @patch("src.scrapers.scraper_new_format.requests.Session")
+    @patch("src.scrapers.topchladenie_scraper.requests.Session")
     def test_scraper_reports_progress(self, mock_session, config):
         """Test scraper reports progress during scraping."""
-        from src.scrapers.scraper_new_format import ScraperNewFormat
+        from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
         progress_messages = []
 
         def progress_callback(message):
             progress_messages.append(message)
 
-        scraper = ScraperNewFormat(config, progress_callback=progress_callback)
+        scraper = TopchladenieScraper(config, progress_callback=progress_callback)
 
         # Test that _log_progress calls the callback
         scraper._log_progress("Test message 1")

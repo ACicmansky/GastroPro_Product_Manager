@@ -114,7 +114,6 @@ class OutputTransformer:
             print("  Warning: 'Obrázky' column not found")
             # Initialize empty image columns
             image_columns = [
-                "defaultImage",
                 "image",
                 "image2",
                 "image3",
@@ -122,6 +121,7 @@ class OutputTransformer:
                 "image5",
                 "image6",
                 "image7",
+                "image8",
             ]
             for col in image_columns:
                 output_df[col] = ""
@@ -129,7 +129,6 @@ class OutputTransformer:
 
         # Define image column names in order
         image_columns = [
-            "defaultImage",
             "image",
             "image2",
             "image3",
@@ -137,6 +136,7 @@ class OutputTransformer:
             "image5",
             "image6",
             "image7",
+            "image8",
         ]
 
         # Initialize all image columns as empty

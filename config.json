@@ -73,7 +73,6 @@
       },
       "Obrázky": {
         "target_columns": [
-          "defaultImage",
           "image",
           "image2",
           "image3",
@@ -199,6 +198,8 @@
     "imageDesc6",
     "image7",
     "imageDesc7",
+    "image8",
+    "imageDesc8",
     "defaultCategory",
     "categoryText",
     "priceRatio",

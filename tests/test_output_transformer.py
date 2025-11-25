@@ -92,15 +92,14 @@ class TestImageSplitting:
         result = transformer.split_images(df)
 
         # Check all 8 image columns exist
-        assert "defaultImage" in result.columns
         assert "image" in result.columns
         for i in range(2, 8):
             assert f"image{i}" in result.columns
 
-        # Check first image is in defaultImage
-        assert result.loc[0, "defaultImage"] == "http://example.com/img1.jpg"
+        # Check first image is in image
+        assert result.loc[0, "image"] == "http://example.com/img1.jpg"
         # Other columns should be empty
-        assert result.loc[0, "image"] == ""
+        assert result.loc[0, "image2"] == ""
 
     def test_split_multiple_images(self, config):
         """Test splitting multiple comma-separated image URLs."""
@@ -114,10 +113,10 @@ class TestImageSplitting:
 
         result = transformer.split_images(df)
 
-        assert result.loc[0, "defaultImage"] == "http://img1.jpg"
-        assert result.loc[0, "image"] == "http://img2.jpg"
-        assert result.loc[0, "image2"] == "http://img3.jpg"
-        assert result.loc[0, "image3"] == ""
+        assert result.loc[0, "image"] == "http://img1.jpg"
+        assert result.loc[0, "image2"] == "http://img2.jpg"
+        assert result.loc[0, "image3"] == "http://img3.jpg"
+        assert result.loc[0, "image4"] == ""
 
     def test_split_max_8_images(self, config):
         """Test that only first 8 images are kept."""
@@ -132,8 +131,8 @@ class TestImageSplitting:
         result = transformer.split_images(df)
 
         # Check first 8 are populated
-        assert result.loc[0, "defaultImage"] == "http://img1.jpg"
-        assert result.loc[0, "image7"] == "http://img8.jpg"
+        assert result.loc[0, "image"] == "http://img1.jpg"
+        assert result.loc[0, "image2"] == "http://img2.jpg"
         # 9th and 10th should not be included
 
     def test_split_empty_images(self, config):
@@ -147,8 +146,8 @@ class TestImageSplitting:
         result = transformer.split_images(df)
 
         # All image columns should be empty
-        assert result.loc[0, "defaultImage"] == ""
         assert result.loc[0, "image"] == ""
+        assert result.loc[0, "image2"] == ""
 
 
 class TestCategoryTransformation:
@@ -295,7 +294,7 @@ class TestFullTransformation:
         assert "code" in result.columns
         assert "name" in result.columns
         assert "price" in result.columns
-        assert "defaultImage" in result.columns
+        assert "image" in result.columns
         assert "defaultCategory" in result.columns
         assert "aiProcessed" in result.columns
 

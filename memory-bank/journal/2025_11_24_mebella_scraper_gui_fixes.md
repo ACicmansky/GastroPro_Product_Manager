@@ -121,7 +121,7 @@ This ensures the widget is properly parented and managed by the dialog's layout 
 1. **Image Display**: Added product image to dialog header
 2. **Remaining Count Indicator**: Shows "ostáva X" for batch progress
 3. **Dialog Size**: Increased minimum height from 600 to 800px
-4. **Image URL Support**: Added `row.get("defaultImage")` to product_data
+4. **Image URL Support**: Added `row.get("image")` to product_data
 
 ---
 

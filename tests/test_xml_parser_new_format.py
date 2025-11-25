@@ -25,7 +25,7 @@ class TestXMLParserNewFormat:
         assert "code" in result.columns
         assert "name" in result.columns
         assert "price" in result.columns
-        assert "defaultImage" in result.columns
+        assert "image" in result.columns
         assert "source" in result.columns
 
     def test_parse_forgastro_to_new_format(self, sample_xml_forgastro, config):
@@ -81,13 +81,11 @@ class TestXMLParserNewFormat:
         result = parser.parse_gastromarket(sample_xml_gastromarket)
 
         # Should have image columns
-        assert "defaultImage" in result.columns
         assert "image" in result.columns
+        assert "image2" in result.columns
 
         # At least one product should have an image
-        has_images = (
-            result["defaultImage"].notna().any() or (result["defaultImage"] != "").any()
-        )
+        has_images = result["image"].notna().any() or (result["image"] != "").any()
         # This might be false if sample has no images, which is ok
 
 
@@ -172,8 +170,8 @@ class TestXMLToNewFormatMapping:
 class TestXMLParserImageHandling:
     """Test XML parser image handling for new format."""
 
-    def test_single_image_to_defaultImage(self, config):
-        """Test single image goes to defaultImage."""
+    def test_single_image_to_image(self, config):
+        """Test single image goes to image."""
         from src.parsers.xml_parser_new_format import XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
@@ -183,8 +181,8 @@ class TestXMLParserImageHandling:
 
         result = parser._split_images(test_data, "IMAGE")
 
-        assert "defaultImage" in result.columns
-        assert result.loc[0, "defaultImage"] == "http://example.com/img1.jpg"
+        assert "image" in result.columns
+        assert result.loc[0, "image"] == "http://example.com/img1.jpg"
 
     def test_multiple_images_split(self, config):
         """Test multiple images are split correctly."""
@@ -199,9 +197,9 @@ class TestXMLParserImageHandling:
 
         result = parser._split_images(test_data, "IMAGE")
 
-        assert result.loc[0, "defaultImage"] == "http://img1.jpg"
-        assert result.loc[0, "image"] == "http://img2.jpg"
-        assert result.loc[0, "image2"] == "http://img3.jpg"
+        assert result.loc[0, "image"] == "http://img1.jpg"
+        assert result.loc[0, "image2"] == "http://img2.jpg"
+        assert result.loc[0, "image3"] == "http://img3.jpg"
 
 
 class TestXMLParserDataCleaning:

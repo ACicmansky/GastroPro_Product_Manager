@@ -223,7 +223,7 @@ class WorkerNewFormat(QObject):
                                 "width": row.get("width"),
                                 "depth": row.get("depth"),
                                 "height": row.get("height"),
-                                "image_url": row.get("defaultImage"),
+                                "image_url": row.get("image"),
                                 "remaining_count": remaining_count,
                             }
                             new_price = self._request_price_mapping(

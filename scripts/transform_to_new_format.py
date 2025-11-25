@@ -59,7 +59,7 @@ def split_images(image_string):
     # Split by comma and strip whitespace
     images = [img.strip() for img in str(image_string).split(",") if img.strip()]
 
-    # Limit to 8 images (defaultImage + image + image2-7)
+    # Limit to 8 images (image + image2-8)
     return images[:8]
 
 
@@ -78,7 +78,7 @@ def apply_direct_mappings(df, mappings):
 
 def apply_image_splitting(df, output_df):
     """
-    Split Obrázky column into defaultImage, image, image2-7.
+    Split Obrázky column into image, image2-8.
 
     Args:
         df: Input DataFrame with 'Obrázky' column
@@ -92,7 +92,6 @@ def apply_image_splitting(df, output_df):
 
     # Define image column names in order
     image_columns = [
-        "defaultImage",
         "image",
         "image2",
         "image3",
@@ -100,6 +99,7 @@ def apply_image_splitting(df, output_df):
         "image5",
         "image6",
         "image7",
+        "image8",
     ]
 
     # Initialize all image columns as empty

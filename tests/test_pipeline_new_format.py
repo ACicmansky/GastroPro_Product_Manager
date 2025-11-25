@@ -58,7 +58,7 @@ class TestPipelineSteps:
         result = pipeline.parse_xml("gastromarket", sample_xml_gastromarket)
 
         assert "code" in result.columns
-        assert "defaultImage" in result.columns
+        assert "image" in result.columns
 
     def test_step_2_merge_data(self, config):
         """Test Step 2: Merge data with image priority."""
@@ -67,15 +67,15 @@ class TestPipelineSteps:
         pipeline = PipelineNewFormat(config, {})
 
         feed1 = pd.DataFrame(
-            {"code": ["PROD001"], "price": ["100"], "defaultImage": ["img1.jpg"]}
+            {"code": ["PROD001"], "price": ["100"], "image": ["img1.jpg"]}
         )
 
         feed2 = pd.DataFrame(
             {
                 "code": ["PROD001"],
                 "price": ["150"],
-                "defaultImage": ["img1.jpg"],
-                "image": ["img2.jpg"],
+                "image": ["img1.jpg"],
+                "image2": ["img2.jpg"],
             }
         )
 
@@ -85,7 +85,7 @@ class TestPipelineSteps:
 
         assert len(result) == 1
         # Should use feed2 (more images)
-        assert result.loc[0, "image"] == "img2.jpg"
+        assert result.loc[0, "image"] == "img1.jpg"
 
     def test_step_3_map_categories(self, config):
         """Test Step 3: Map and transform categories."""

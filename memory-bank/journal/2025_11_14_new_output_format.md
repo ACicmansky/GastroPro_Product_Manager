@@ -34,7 +34,7 @@ Added complete `output_mapping` configuration with four subsections:
 
 3. **Image Splitting**:
    - Source: `Obrázky` (comma-separated URLs)
-   - Targets: `defaultImage`, `image`, `image2`, `image3`, `image4`, `image5`, `image6`, `image7`
+   - Targets: `image`, `image2`, `image3`, `image4`, `image5`, `image6`, `image7`
    - Transform: Split by comma into 8 separate columns
    - Example: `"img1.jpg,img2.jpg,img3.jpg"` → separate columns
 
@@ -55,7 +55,7 @@ Applied only when column is empty or missing:
 #### New Output Columns (138 total)
 - Added complete list of all required e-shop columns
 - Includes AI tracking: `aiProcessed`, `aiProcessedDate`
-- Multiple image columns: `defaultImage`, `image`, `image2-7`
+- Multiple image columns: `image`, `image2-7`
 - Variant dimensions: `variant:Šírka (mm)`, `variant:Dĺžka (mm)`, `variant:Hĺbka (mm)`
 
 ### 2. Transformation Script

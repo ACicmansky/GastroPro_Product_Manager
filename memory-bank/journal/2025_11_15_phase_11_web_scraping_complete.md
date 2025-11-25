@@ -73,7 +73,7 @@ Successfully migrated web scraping functionality from old format to new 138-colu
 "Výrobca" → "manufacturer"
 "Krátky popis" → "shortDescription"
 "Dlhý popis" → "description"
-"Obrázky" → split to defaultImage, image, image2-7
+"Obrázky" → split to image, image2-7
 "Hlavna kategória" → "defaultCategory" + "categoryText"
 "Viditeľný" → "active"
 ```
