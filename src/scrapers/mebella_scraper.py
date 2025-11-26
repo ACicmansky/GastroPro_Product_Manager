@@ -294,7 +294,7 @@ class MebellaScraper(BaseScraper):
                 return None
 
             # 2. Category
-            category_name = f"Table Bases > {name.split()[0]}"
+            category_name = f"Table Bases > {name.split()[0].upper()}"
 
             # 3. Description
             description = ""
