@@ -2878,5 +2878,9 @@
   {
     "oldCategory": "Tovary a kategórie > Nerezový nábytok > Umývacie stoly a drezy",
     "newCategory": "Gastro Prevádzky a Profesionáli > Nerezový nábytok > Umývacie stoly a drezy"
+  },
+  {
+    "oldCategory": "Gastro Prevádzky a Profesionáli > Neznáma kategória",
+    "newCategory": "Gastro Prevádzky a Profesionáli > Neznáma kategória"
   }
 ]

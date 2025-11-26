@@ -88,9 +88,7 @@ class MainWindowNewFormat(QMainWindow):
         self.layout = QVBoxLayout(self.central_widget)
 
         # Title
-        title = QLabel(
-            "<h2>GASTROPRO Product Manager</h2><p>Nový 138-stĺpcový formát</p>"
-        )
+        title = QLabel("<h2>GASTROPRO Product Manager</h2>")
         title.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(title)
 
@@ -551,7 +549,6 @@ class MainWindowNewFormat(QMainWindow):
                     f"<b>Súbor:</b> {save_path}<br>"
                     f"<b>Produktov:</b> {len(self.result_df)}<br>"
                     f"<b>Stĺpcov:</b> {len(self.result_df.columns)}<br><br>"
-                    f"<b>Formát:</b> Nový 138-stĺpcový formát<br>"
                     f"<b>Typ súboru:</b> {'XLSX' if save_path.endswith('.xlsx') else 'CSV'}"
                 )
 

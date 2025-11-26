@@ -21,7 +21,6 @@ class CategoryMapperNewFormat:
             mappings_path: Path to category mappings JSON file
         """
         self.config = config
-        self.custom_mappings = {}
         self.category_manager = CategoryMappingManager(mappings_path)
         self.interactive_callback = None
 
@@ -31,9 +30,8 @@ class CategoryMapperNewFormat:
 
         Mapping priority:
         1. Check CategoryMappingManager (loaded from categories.json)
-        2. Check custom mappings
-        3. If not found and interactive_callback is set, prompt user
-        4. If not found, return original category
+        2. If not found and interactive_callback is set, prompt user
+        3. If not found, return original category
 
         Args:
             category: Original category
@@ -43,7 +41,7 @@ class CategoryMapperNewFormat:
             Mapped category string
         """
         if not category or category in ["", "nan", "None"]:
-            return ""
+            return "Gastro Prevádzky a Profesionáli > Neznáma kategória"
 
         original_category = str(category).strip()
 
@@ -52,15 +50,11 @@ class CategoryMapperNewFormat:
         if manager_mapping:
             return manager_mapping
 
-        # 2. Check custom mappings
-        if original_category in self.custom_mappings:
-            return self.custom_mappings[original_category]
-
-        # 3. Check if it is already a valid target category
+        # 2. Check if it is already a valid target category
         if self.category_manager.is_target_category(original_category):
             return original_category
 
-        # 4. Interactive callback for unmapped categories
+        # 3. Interactive callback for unmapped categories
         if self.interactive_callback:
             print(f"\n  [INTERACTIVE] Unmapped category found: '{original_category}'")
             print(f"  [INTERACTIVE] Product: '{product_name}'")

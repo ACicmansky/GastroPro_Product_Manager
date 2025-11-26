@@ -526,9 +526,6 @@ class AIEnhancerNewFormat:
                         )
                         processed_count += updated_count
 
-                        # Save incremental progress
-                        self._save_progress(df, batch_num)
-
                         logger.info(f"Processed batch {batch_num}/{len(batches)}")
                         print(
                             f"Processed batch {batch_num}/{len(batches)} - Total processed: {processed_count}/{total_products}"
@@ -540,9 +537,6 @@ class AIEnhancerNewFormat:
                 # Update progress
                 if progress_callback:
                     progress_callback(processed_count, total_products)
-
-        # Final save
-        self._save_progress(df, "final")
 
         logger.info(
             f"AI enhancement completed. Processed {processed_count} products out of {total_products}"
@@ -576,33 +570,6 @@ class AIEnhancerNewFormat:
         if enhanced_products:
             return enhanced_products, batch_indices
         return None
-
-    def _save_progress(self, df: pd.DataFrame, batch_identifier):
-        """
-        Save progress to tmp directory.
-
-        Args:
-            df: DataFrame to save
-            batch_identifier: Batch number or 'final'
-        """
-        tmp_file = os.path.join(self.tmp_dir, "processed_tmp.csv")
-        try:
-            df_copy = df.copy()
-
-            # Try UTF-8 first (preferred)
-            try:
-                df_copy.to_csv(tmp_file, index=False, encoding="utf-8", sep=";")
-            except Exception:
-                # Fallback to cp1250 if needed
-                try:
-                    df_copy.to_csv(tmp_file, index=False, encoding="cp1250", sep=";")
-                except Exception as e:
-                    logger.error(f"Failed to save progress: {e}")
-                    return
-
-            logger.info(f"Saved progress (batch {batch_identifier}) to {tmp_file}")
-        except Exception as e:
-            logger.error(f"Failed to save progress: {e}")
 
     def enhance_product(
         self,

@@ -84,21 +84,6 @@ class TestCurrentAIEnhancement:
         matched_row = df[mask].iloc[0]
         assert matched_row["Názov tovaru"] == "Product 1"
 
-    def test_incremental_saving_structure(self, sample_old_format_df, tmp_path):
-        """Test structure for incremental saving."""
-        df = sample_old_format_df.copy()
-
-        # Simulate incremental save
-        temp_file = tmp_path / "processed_tmp.csv"
-        df.to_csv(temp_file, index=False, sep=";", encoding="cp1250", errors="replace")
-
-        # Verify file was created
-        assert temp_file.exists()
-
-        # Load it back
-        loaded_df = pd.read_csv(temp_file, sep=";", encoding="cp1250")
-        assert len(loaded_df) == len(df)
-
 
 class TestAIEnhancementConfiguration:
     """Test AI enhancement configuration."""
