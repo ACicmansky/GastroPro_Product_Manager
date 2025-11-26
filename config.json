@@ -301,6 +301,7 @@
     "glamiCategoryId",
     "aiProcessed",
     "aiProcessedDate",
-    "last_updated"
+    "last_updated",
+    "variant:Výška (mm)"
   ]
 }

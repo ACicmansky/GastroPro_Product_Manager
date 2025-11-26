@@ -6,6 +6,7 @@ Simplified interface focused on XML feed processing and AI enhancement.
 import sys
 import pandas as pd
 from pathlib import Path
+from datetime import datetime
 from PyQt5.QtWidgets import (
     QMainWindow,
     QWidget,
@@ -212,8 +213,14 @@ class MainWindowNewFormat(QMainWindow):
         group = QGroupBox("Možnosti spracovania")
         layout = QVBoxLayout(group)
 
+        is_ai_enhancement_enabled = True
         self.ai_enhancement_checkbox = QCheckBox("Použiť AI vylepšenie")
-        self.ai_enhancement_checkbox.setChecked(True)
+        self.ai_enhancement_checkbox.setChecked(is_ai_enhancement_enabled)
+        self.ai_enhancement_checkbox.stateChanged.connect(self._update_force_reprocess)
+
+        self.force_reprocess_checkbox = QCheckBox("Vynútiť AI vylepšenie")
+        self.force_reprocess_checkbox.setChecked(False)
+        self.force_reprocess_checkbox.setEnabled(is_ai_enhancement_enabled)
 
         self.web_scraping_checkbox = QCheckBox("Web scraping (TopChladenie.sk)")
         self.web_scraping_checkbox.setChecked(False)
@@ -228,6 +235,7 @@ class MainWindowNewFormat(QMainWindow):
         )
 
         layout.addWidget(self.ai_enhancement_checkbox)
+        layout.addWidget(self.force_reprocess_checkbox)
         layout.addWidget(self.web_scraping_checkbox)
         layout.addWidget(self.mebella_scraping_checkbox)
         layout.addWidget(self.update_categories_checkbox)
@@ -527,8 +535,8 @@ class MainWindowNewFormat(QMainWindow):
             self,
             "Uložiť výsledný súbor",
             QStandardPaths.writableLocation(QStandardPaths.DownloadLocation)
-            + "/GastroPro_Export.xlsx",
-            "XLSX files (*.xlsx);;CSV files (*.csv)",
+            + f"/{datetime.now().strftime('%Y_%m_%d')}_GastroPro.xlsx",
+            "XLSX files (*.xlsx);",
         )
 
         if save_path:
@@ -966,3 +974,9 @@ class MainWindowNewFormat(QMainWindow):
             self.worker.set_price_mapping_result(price)
         else:
             self.worker.set_price_mapping_result(None)
+
+    def _update_force_reprocess(self, state):
+        """Update force reprocess checkbox state."""
+        self.force_reprocess_checkbox.setEnabled(state == Qt.Checked)
+        if state != Qt.Checked:
+            self.force_reprocess_checkbox.setChecked(False)

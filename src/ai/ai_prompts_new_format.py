@@ -137,9 +137,10 @@ def create_system_prompt_no_dimensions() -> str:
 
 ### ⛔ **ZAKÁZANÉ (NEGATIVE CONSTRAINTS)**
 
-* **NEGENERUJ** žiadne rozmery alebo objem v textových poliach!
-* **VYNECHAJ** slová: "výška", "šírka", "dĺžka", "hĺbka", "rozmery", "objem" "mm", "cm", "m" (ak sa týkajú rozmerov alebo objemu).
-* **NEUVÁDZAJ** konkrétne číselné rozmery alebo objem produktu (napr. 1000x500x800 mm).
+* **NEGENERUJ** žiadne rozmery v textových poliach!
+* **VYNECHAJ** slová: "výška", "šírka", "dĺžka", "hĺbka", "rozmery", "mm", "cm", "m" (ak sa týkajú rozmerov).
+* **NEUVÁDZAJ** konkrétne číselné rozmery produktu (napr. 1000x500x800 mm).
+* Ak by si chcel uviesť objem, **NEUVÁDZAJ** konkrétnu hodnotu. Namiesto toho použi vetu: "Objem sa mení v závislosti na zvolenej variante tovaru".
 * Ostatné technické parametre (napríklad výkon, napätie) **MÔŽEŠ** uvádzať.
 * Toto platí pre všetky polia: `shortDescription`, `description`, `seoTitle`, `metaDescription`.
 

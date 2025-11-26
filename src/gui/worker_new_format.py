@@ -85,7 +85,9 @@ class WorkerNewFormat(QObject):
             # Apply AI enhancement if requested
             if self.options.get("enable_ai_enhancement", False):
                 self.progress.emit("Aplikácia AI vylepšenia...")
-                result_df = self._apply_ai_enhancement(result_df, stats)
+                result_df = self._apply_ai_enhancement(
+                    result_df, stats, self.options.get("force_reprocess", False)
+                )
 
             # Emit results
             self.progress.emit("Dokončené!")
@@ -291,7 +293,9 @@ class WorkerNewFormat(QObject):
             self.progress.emit(f"Web scraping: chyba - {str(e)}")
             return None
 
-    def _apply_ai_enhancement(self, df: pd.DataFrame, stats: Dict) -> pd.DataFrame:
+    def _apply_ai_enhancement(
+        self, df: pd.DataFrame, stats: Dict, force_reprocess: bool = False
+    ) -> pd.DataFrame:
         """
         Apply AI enhancement to products.
 
@@ -313,7 +317,9 @@ class WorkerNewFormat(QObject):
 
         if to_process > 0:
             self.progress.emit(f"AI vylepšenie: {to_process} produktov...")
-            result_df, ai_stats = enhancer.enhance_dataframe_with_stats(df)
+            result_df, ai_stats = enhancer.enhance_dataframe_with_stats(
+                df, force_reprocess
+            )
 
             # Update statistics
             stats["ai_processed"] = ai_stats.get("newly_processed", 0)
