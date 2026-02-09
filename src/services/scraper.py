@@ -171,6 +171,11 @@ class TopchladenieScraper:
             )
             if not product_name:
                 return None
+
+            # Sanitize product name to prevent CSV injection
+            if product_name and product_name.startswith(("=", "+", "-", "@")):
+                product_name = "'" + product_name
+
             product_data["Kat. číslo"] = product_data["Názov tovaru"] = product_name
             self.current_product_name = product_name  # Store for callback context
 
