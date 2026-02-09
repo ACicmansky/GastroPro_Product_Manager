@@ -1,18 +1,68 @@
 # src/utils/category_mapper.py
 import pandas as pd
 import html
-from typing import List, Tuple
+from typing import List, Tuple, Dict, Union, Optional
 from rapidfuzz import fuzz
 
 
+def normalize_category_string(category: str) -> str:
+    """Normalize a category string by replacing non-breaking spaces and unescaping HTML.
+
+    Args:
+        category: The category string to normalize
+
+    Returns:
+        The normalized category string
+    """
+    if not category:
+        return ""
+
+    normalized = category.replace("\xa0", " ")
+    try:
+        normalized = html.unescape(normalized)
+    except (ImportError, AttributeError):
+        normalized = normalized.replace("&nbsp;", " ")
+    return normalized
+
+
+def build_category_lookup(category_mappings: List[Dict]) -> Dict[str, Tuple[str, int]]:
+    """Build a lookup dictionary from a list of category mappings.
+
+    Args:
+        category_mappings: List of category mapping dictionaries
+
+    Returns:
+        A dictionary mapping category strings (raw and normalized) to (newCategory, index)
+        The index is used to resolve conflicts (lower index = higher priority)
+    """
+    lookup = {}
+    for idx, mapping in enumerate(category_mappings):
+        old_cat = mapping.get("oldCategory")
+        new_cat = mapping.get("newCategory")
+
+        if old_cat:
+            # Map exact match
+            if old_cat not in lookup:
+                lookup[old_cat] = (new_cat, idx)
+
+            # Map normalized match
+            normalized_old = normalize_category_string(old_cat)
+            if normalized_old not in lookup:
+                lookup[normalized_old] = (new_cat, idx)
+    return lookup
+
+
 def map_category(
-    category, category_mappings, interactive_callback=None, product_name=None
-):
+    category: str,
+    category_mappings: Union[List[Dict], Dict[str, Tuple[str, int]]],
+    interactive_callback=None,
+    product_name: Optional[str] = None
+) -> Optional[str]:
     """Map a category using the provided mappings.
 
     Args:
         category: The category to map
-        category_mappings: List of category mapping dictionaries
+        category_mappings: List of category mapping dictionaries or a pre-built lookup dictionary
         interactive_callback: Optional callback function(category, product_name) -> new_category
                             Called when no mapping is found
         product_name: Optional product name for context in interactive callback
@@ -23,27 +73,41 @@ def map_category(
     if not category or not isinstance(category, str) or not category_mappings:
         return category
 
-    normalized_category = category.replace("\xa0", " ")
-    try:
-        normalized_category = html.unescape(normalized_category)
-    except (ImportError, AttributeError):
-        normalized_category = normalized_category.replace("&nbsp;", " ")
+    # Optimized path using lookup dictionary
+    if isinstance(category_mappings, dict):
+        normalized_category = normalize_category_string(category)
 
-    for mapping in category_mappings:
-        if (
-            mapping.get("oldCategory") == category
-            or mapping.get("oldCategory") == normalized_category
-        ):
-            return mapping["newCategory"]
+        # Check for matches
+        res1 = category_mappings.get(category)
+        res2 = category_mappings.get(normalized_category) if category != normalized_category else None
 
-        old_cat_norm = mapping.get("oldCategory", "").replace("\xa0", " ")
-        try:
-            old_cat_norm = html.unescape(old_cat_norm)
-        except (ImportError, AttributeError):
-            old_cat_norm = old_cat_norm.replace("&nbsp;", " ")
+        result = None
+        if res1 and res2:
+            # If both match, prefer the one with lower index (earlier in original list)
+            result = res1[0] if res1[1] <= res2[1] else res2[0]
+        elif res1:
+            result = res1[0]
+        elif res2:
+            result = res2[0]
 
-        if old_cat_norm == category or old_cat_norm == normalized_category:
-            return mapping["newCategory"]
+        if result is not None:
+            return result
+
+    # Legacy path using list iteration
+    elif isinstance(category_mappings, list):
+        normalized_category = normalize_category_string(category)
+
+        for mapping in category_mappings:
+            if (
+                mapping.get("oldCategory") == category
+                or mapping.get("oldCategory") == normalized_category
+            ):
+                return mapping["newCategory"]
+
+            old_cat_norm = normalize_category_string(mapping.get("oldCategory", ""))
+
+            if old_cat_norm == category or old_cat_norm == normalized_category:
+                return mapping["newCategory"]
 
     # No mapping found - use interactive callback if provided
     if interactive_callback:
@@ -67,10 +131,13 @@ def map_dataframe_categories(df, category_mappings):
     mapped_df = df.copy()
     mapped_count = 0
 
+    # Build optimized lookup dictionary once
+    lookup = build_category_lookup(category_mappings) if isinstance(category_mappings, list) else category_mappings
+
     def apply_map(cat):
         nonlocal mapped_count
         original = cat
-        mapped = map_category(original, category_mappings)
+        mapped = map_category(original, lookup)
         if mapped != original:
             mapped_count += 1
         return mapped
