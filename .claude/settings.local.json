@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C \"C:\\\\Source\\\\Python\\\\GastroPro_Product_Manager\" log --oneline)",
+      "Bash(python:*)",
+      "Bash(pytest:*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Read|Grep",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node ./hooks/read_hook.js"
+          }
+        ]
+      }
+    ]
+  }
+}
