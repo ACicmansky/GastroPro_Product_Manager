@@ -196,6 +196,11 @@ class CategoryMappingManager:
         if not category:
             return False
 
+        if category.startswith(
+            "Gastro Prevádzky a Profesionáli >"
+        ) or category.startswith("Domácnosť a Kulinári >"):
+            return True
+
         with self._lock:
             for mapping in self._mappings:
                 if mapping.get("newCategory") == category:
