@@ -53,6 +53,14 @@
 - ✅ Standalone transformation script (`scripts/transform_to_new_format.py`)
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
+## Recently Completed (March 09, 2026)
+- ✅ **Gastromarket Stalgast Feed Integration**
+  - Configured secondary feed URL (`B2B_Product_Feed_Stalgast.xml`)
+  - Updated GUI with new "Načítať z GastroMarket STALGAST XML" checkbox
+  - Added XML parser logic tailored to Stalgast feed, sharing standard Gastromarket mapping
+  - Improved UX: AI enhancement disabled by default (`is_ai_enhancement_enabled = False`)
+  - Configuration accommodates new target output column `Unnamed: 386`
+
 ## Recently Completed (November 2025)
 - ✅ **Complete Migration to New 138-Column Format (TDD Approach - Phases 0-8)**
   - Phase 0-1: Test infrastructure and current implementation tests (110 tests)

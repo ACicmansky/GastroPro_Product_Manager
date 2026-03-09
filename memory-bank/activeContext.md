@@ -11,10 +11,13 @@
 **Phase 14: Next Phase** (Upcoming)
 - Continue with remaining features
 - Manual testing with real API
-- Integration testing
-- Production deployment preparation
-
 ## Recent Changes
+
+**Gastromarket Stalgast Feed Integration & Tweaks (March 09, 2026)**:
+- **New Feature**: Added integration for a secondary Gastromarket feed specifically for Stalgast products (`B2B_Product_Feed_Stalgast.xml`).
+- **GUI Update**: Added a new checkbox to enable the Stalgast feed directly from the UI.
+- **Config Changes**: Added Stalgast mapping to `config.json` and a placeholder for column `Unnamed: 386`.
+- **Default Change**: AI enhancement is now disabled by default in the UI to save costs and time when not explicitly needed.
 
 **Dynamic Column Configuration (November 25, 2025)**:
 - **New Feature**: Automatic detection of column differences between input XLSX and config.json

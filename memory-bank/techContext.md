@@ -87,6 +87,7 @@
      - RSS structure elements (`<rss>`, `<channel>`, `<item>`) are NOT namespaced
      - Data elements use `g:` prefix: `<g:KATALOG_CISLO>`, `<g:MENO>`, etc.
      - Parsed using ElementTree with namespace dictionary
+   - **Gastromarket Stalgast Feed**: Same structure as the primary Gastromarket feed, providing additional Stalgast-specific products.
    - **ForGastro Feed**: Standard XML without namespace
    - Product entries with identifiers, details, and category information
 
