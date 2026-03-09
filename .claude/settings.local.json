@@ -3,7 +3,17 @@
     "allow": [
       "Bash(git -C \"C:\\\\Source\\\\Python\\\\GastroPro_Product_Manager\" log --oneline)",
       "Bash(python:*)",
-      "Bash(pytest:*)"
+      "Bash(pytest:*)",
+      "mcp__github__list_issues",
+      "mcp__github__issue_write",
+      "Bash(python3:*)",
+      "Bash(tail:*)",
+      "mcp__github__get_me",
+      "Bash(git worktree:*)",
+      "Bash(cd:*)",
+      "mcp__github__list_pull_requests",
+      "Bash(gh pr:*)",
+      "mcp__github__pull_request_read"
     ]
   },
   "hooks": {
