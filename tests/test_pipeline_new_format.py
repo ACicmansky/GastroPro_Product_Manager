@@ -161,6 +161,46 @@ class TestPipelineWithMainData:
         # But update price
         assert prod1["price"] == "150"
 
+    def test_pipeline_preserves_ai_processed_flags(self, config):
+        """Test that pipeline maintains aiProcessed flags correctly (main=1, new=0)."""
+        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        
+        pipeline = PipelineNewFormat(config, {})
+        
+        # Existing main data (already processed)
+        main_df = pd.DataFrame(
+            {
+                "code": ["PROD001"],
+                "name": ["Existing Product"],
+                "price": ["100"],
+                "aiProcessed": ["1"]
+            }
+        )
+        
+        # Feed data (new product)
+        feed_df = pd.DataFrame(
+            {
+                "code": ["PROD001", "PROD002"],
+                "name": ["Feed Product 1", "New Feed Product"],
+                "price": ["150", "200"],
+            }
+        )
+        
+        result, _ = pipeline.merger.merge(main_df, {"feed": feed_df})
+        
+        # Apply transformation (simulating worker flow)
+        result = pipeline.apply_transformation(result)
+        
+        assert "aiProcessed" in result.columns
+        
+        # Existing product should still be "1"
+        prod1 = result[result["code"] == "PROD001"].iloc[0]
+        assert prod1["aiProcessed"] == "1"
+        
+        # New product should be initialized to "0"
+        prod2 = result[result["code"] == "PROD002"].iloc[0]
+        assert prod2["aiProcessed"] == "0"
+
     def test_load_main_data(self, config, test_data_dir):
         """Test loading main data from file."""
         from src.pipeline.pipeline_new_format import PipelineNewFormat

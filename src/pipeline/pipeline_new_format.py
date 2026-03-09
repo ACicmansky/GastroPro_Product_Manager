@@ -152,6 +152,8 @@ class PipelineNewFormat:
         if main_data_file:
             print(f"\nLoading main data from: {main_data_file}")
             main_df = self.load_main_data(main_data_file)
+            if "aiProcessed" not in main_df.columns:
+                main_df["aiProcessed"] = "1"
         else:
             main_df = pd.DataFrame()
 

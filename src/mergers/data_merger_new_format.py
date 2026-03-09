@@ -68,6 +68,7 @@ class DataMergerNewFormat:
             "created": {},  # By source
             "updated": {},  # By source
             "removed": 0,
+            "discontinued": 0,
             "total_created": 0,
             "total_updated": 0,
             "total_kept": 0,
@@ -90,6 +91,9 @@ class DataMergerNewFormat:
         # Track products by code
         products_by_code = {}
         processed_codes = set()
+        feed_matched_codes = (
+            set()
+        )  # codes matched by a feed (for discontinuation pruning)
 
         # Step 1: Process feed/scraped products (always included)
         print("\nStep 1: Processing feed/scraped products (always included)...")
@@ -114,32 +118,52 @@ class DataMergerNewFormat:
                 if main_product:
                     # Update existing product
                     merged_data = main_product.copy()
+                    feed_matched_codes.add(code)  # track for discontinuation pruning
 
-                    # Update price from feed
-                    if "price" in row and pd.notna(row["price"]):
-                        merged_data["price"] = str(row["price"])
-
-                    # Update images from feed (if feed has more images)
-                    feed_image_count = self._count_images(row)
-                    main_image_count = self._count_images(pd.Series(main_product))
-
-                    if feed_image_count > main_image_count:
-                        for img_col in self.image_columns:
-                            if img_col in row:
-                                merged_data[img_col] = str(row[img_col])
-
-                    # Update categories from feed if enabled in options
-                    if self.options.get("update_categories_from_feeds", False):
-                        if "defaultCategory" in row and pd.notna(
-                            row["defaultCategory"]
+                    if self.options.get("preserve_client_edits", False):
+                        # PRESERVE MODE: only update standardPrice and stock from feed;
+                        # price, images, categories, pairCode, descriptions kept from base
+                        if (
+                            "price" in row
+                            and pd.notna(row["price"])
+                            and str(row["price"]) not in ("", "nan")
                         ):
-                            merged_data["defaultCategory"] = str(row["defaultCategory"])
-                        if "categoryText" in row and pd.notna(row["categoryText"]):
-                            merged_data["categoryText"] = str(row["categoryText"])
+                            merged_data["standardPrice"] = str(row["price"])
+                        if (
+                            "stock" in row
+                            and pd.notna(row["stock"])
+                            and str(row["stock"]) not in ("", "nan")
+                        ):
+                            merged_data["stock"] = str(row["stock"])
+                    else:
+                        # NORMAL MODE: update price and also populate standardPrice
+                        if "price" in row and pd.notna(row["price"]):
+                            merged_data["price"] = str(row["price"])
+                            merged_data["standardPrice"] = str(row["price"])
 
-                    # Update pairCode from feed if present
-                    if "pairCode" in row and pd.notna(row["pairCode"]):
-                        merged_data["pairCode"] = str(row["pairCode"])
+                        # Update images from feed (if feed has more images)
+                        feed_image_count = self._count_images(row)
+                        main_image_count = self._count_images(pd.Series(main_product))
+
+                        if feed_image_count > main_image_count:
+                            for img_col in self.image_columns:
+                                if img_col in row:
+                                    merged_data[img_col] = str(row[img_col])
+
+                        # Update categories from feed if enabled in options
+                        if self.options.get("update_categories_from_feeds", False):
+                            if "defaultCategory" in row and pd.notna(
+                                row["defaultCategory"]
+                            ):
+                                merged_data["defaultCategory"] = str(
+                                    row["defaultCategory"]
+                                )
+                            if "categoryText" in row and pd.notna(row["categoryText"]):
+                                merged_data["categoryText"] = str(row["categoryText"])
+
+                        # Update pairCode from feed if present
+                        if "pairCode" in row and pd.notna(row["pairCode"]):
+                            merged_data["pairCode"] = str(row["pairCode"])
 
                     merged_data["source"] = feed_name
                     merged_data["last_updated"] = current_time
@@ -150,10 +174,19 @@ class DataMergerNewFormat:
                 else:
                     # New product from feed
                     product_data = row.to_dict()
+                    # Populate standardPrice for new products
+                    if (
+                        "price" in row
+                        and pd.notna(row["price"])
+                        and str(row["price"]) not in ("", "nan")
+                    ):
+                        product_data["standardPrice"] = str(row["price"])
                     product_data["source"] = feed_name
                     product_data["last_updated"] = current_time
+                    product_data["aiProcessed"] = "0"
                     products_by_code[code] = product_data
                     processed_codes.add(code)
+                    feed_matched_codes.add(code)  # Track for discontinuation pruning
                     stats["created"][feed_name] += 1
                     stats["total_created"] += 1
 
@@ -187,6 +220,26 @@ class DataMergerNewFormat:
                 processed_codes.add(code)
                 stats["total_kept"] += 1
 
+        # Step 3: Remove discontinued products (preserve_client_edits mode only)
+        if self.options.get("preserve_client_edits", False):
+            active_feed_sources = set(feed_dfs.keys())
+            codes_to_remove = [
+                code
+                for code, product in products_by_code.items()
+                if (
+                    product.get("source", "") in active_feed_sources
+                    and code not in feed_matched_codes
+                )
+            ]
+            for code in codes_to_remove:
+                del products_by_code[code]
+                stats["discontinued"] += 1
+                stats["removed"] += 1
+            if codes_to_remove:
+                print(
+                    f"  Discontinued (removed from supplier feed): {len(codes_to_remove)}"
+                )
+
         # Build result DataFrame
         if products_by_code:
             result_df = pd.DataFrame(list(products_by_code.values()))
@@ -198,8 +251,11 @@ class DataMergerNewFormat:
 
         # Print summary
         print(f"\nMerge complete: {len(result_df)} total products")
+        discontinued_str = (
+            f", Discontinued: {stats['discontinued']}" if stats["discontinued"] else ""
+        )
         print(
-            f"  Created: {stats['total_created']}, Updated: {stats['total_updated']}, Kept: {stats['total_kept']}, Removed: {stats['removed']}"
+            f"  Created: {stats['total_created']}, Updated: {stats['total_updated']}, Kept: {stats['total_kept']}, Removed: {stats['removed']}{discontinued_str}"
         )
         print("=" * 60)
 

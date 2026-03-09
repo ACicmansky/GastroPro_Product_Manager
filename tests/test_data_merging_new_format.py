@@ -387,7 +387,7 @@ class TestMergeStatistics:
                 "code": ["PROD001", "PROD002"],
                 "name": ["Product 1", "Product 2"],
                 "price": ["100.00", "200.00"],
-                "category": ["Cat A", "Cat B"],
+                "defaultCategory": ["Cat A", "Cat B"],
             }
         )
 
@@ -490,3 +490,71 @@ class TestMergeStatistics:
         # Should keep old category
         assert result.loc[0, "defaultCategory"] == "Old Category"
         assert result.loc[0, "categoryText"] == "Old Category"
+
+
+class TestDiscontinuationLogic:
+    """Test discontinuation logic when preserve_client_edits is enabled."""
+
+    def test_new_products_not_discontinued(self, config):
+        """Test that NEW products from feed are NOT discontinued when preserve_client_edits is True."""
+        from src.mergers.data_merger_new_format import DataMergerNewFormat
+
+        config["preserve_client_edits"] = True
+        merger = DataMergerNewFormat(config)
+
+        # Main data has one product
+        main_df = pd.DataFrame(
+            {
+                "code": ["PROD_OLD"],
+                "name": ["Old Product"],
+                "source": ["feed1"],
+            }
+        )
+
+        # Feed data has the old product AND a new product
+        feed_df = pd.DataFrame(
+            {
+                "code": ["PROD_OLD", "PROD_NEW"],
+                "name": ["Old Product", "New Product"],
+            }
+        )
+
+        result, stats = merger.merge(main_df, {"feed1": feed_df})
+
+        # Both products should be present. The bug was doing this:
+        # PROD_NEW was created but not tracked in feed_matched_codes, so it got deleted as discontinued
+        
+        assert len(result) == 2, f"Expected 2 products, got {len(result)}"
+        assert "PROD_NEW" in result["code"].values, "New product was improperly discontinued"
+        assert result[result["code"] == "PROD_NEW"]["aiProcessed"].values[0] == "0", "New product aiProcessed should be 0"
+
+    def test_missing_feed_products_are_discontinued(self, config):
+        """Test that products missing from the feed ARE discontinued when preserve_client_edits is True."""
+        from src.mergers.data_merger_new_format import DataMergerNewFormat
+
+        config["preserve_client_edits"] = True
+        merger = DataMergerNewFormat(config)
+
+        # Main data has two products from feed1
+        main_df = pd.DataFrame(
+            {
+                "code": ["PROD_KEEP", "PROD_DROP"],
+                "name": ["Keep Me", "Drop Me"],
+                "source": ["feed1", "feed1"],
+            }
+        )
+
+        # Feed data only has one of them
+        feed_df = pd.DataFrame(
+            {
+                "code": ["PROD_KEEP"],
+                "name": ["Keep Me Updated"],
+            }
+        )
+
+        result, stats = merger.merge(main_df, {"feed1": feed_df})
+
+        # Only PROD_KEEP should remain, PROD_DROP should be discontinued
+        assert len(result) == 1
+        assert "PROD_KEEP" in result["code"].values
+        assert "PROD_DROP" not in result["code"].values

@@ -297,7 +297,11 @@ class OutputTransformer:
         else:
             print("  All columns already present")
 
-        # Reorder columns to match configuration
-        df = df[self.new_output_columns]
+        # Keep important tracking columns that might not be in the config output list
+        internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
+        extra_cols = [col for col in internal_tracking if col in df.columns and col not in self.new_output_columns]
+
+        # Reorder columns to match configuration, followed by any internal tracking columns
+        df = df[self.new_output_columns + extra_cols]
 
         return df

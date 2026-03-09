@@ -419,11 +419,15 @@ class AIEnhancerNewFormat:
             df["aiProcessedDate"] = ""
 
         # Normalize 'aiProcessed' column
+        # "1", "TRUE", "YES", "1.0" → "1" (already processed)
+        # "0", "FALSE", "NO", "" → "0" (needs processing)
         df["aiProcessed"] = df["aiProcessed"].apply(
             lambda x: (
                 "1"
-                if str(x).strip().upper() in ["TRUE", "1", "YES"]
-                else "" if str(x).strip().upper() in ["FALSE", "0", "NO", ""] else x
+                if str(x).strip().upper() in ["TRUE", "1", "YES", "1.0"]
+                else "0"
+                if str(x).strip().upper() in ["FALSE", "0", "NO", "", "0.0"]
+                else x
             )
         )
 
@@ -431,7 +435,7 @@ class AIEnhancerNewFormat:
         if force_reprocess:
             needs_processing = df
         else:
-            needs_processing = df[df["aiProcessed"].isin(["", "0", "False"])]
+            needs_processing = df[df["aiProcessed"] != "1"]
         total_products = len(needs_processing)
 
         if total_products == 0:

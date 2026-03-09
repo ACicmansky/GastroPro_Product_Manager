@@ -232,11 +232,21 @@ class MainWindowNewFormat(QMainWindow):
             "Ak je zaškrtnuté, kategórie produktov budú prepísané hodnotami z XML feedov/scrapingu."
         )
 
+        self.preserve_edits_checkbox = QCheckBox("Zachovať úpravy e-shopu (iba ceny a sklad z feedu)")
+        self.preserve_edits_checkbox.setChecked(False)
+        self.preserve_edits_checkbox.setEnabled(False)  # enabled only when main data is loaded
+        self.preserve_edits_checkbox.setToolTip(
+            "Zachová opisy, obrázky, kategórie a ceny z e-shopu. "
+            "Z feedu sa aktualizuje len standardPrice a sklad. "
+            "Produkty, ktoré vypadli z feedu dodávateľa, budú odstránené."
+        )
+
         layout.addWidget(self.ai_enhancement_checkbox)
         layout.addWidget(self.force_reprocess_checkbox)
         layout.addWidget(self.web_scraping_checkbox)
         layout.addWidget(self.mebella_scraping_checkbox)
         layout.addWidget(self.update_categories_checkbox)
+        layout.addWidget(self.preserve_edits_checkbox)
 
         self.layout.addWidget(group)
 
@@ -306,6 +316,7 @@ class MainWindowNewFormat(QMainWindow):
             )
             self.main_data_label.setStyleSheet("color: green;")
             self.clear_main_button.setEnabled(True)
+            self.preserve_edits_checkbox.setEnabled(True)
 
             # Extract and display categories
             self._extract_and_display_categories(df)
@@ -401,6 +412,8 @@ class MainWindowNewFormat(QMainWindow):
         self.category_filter_group.setVisible(False)
         self.all_categories = []
         self.category_list.clear()
+        self.preserve_edits_checkbox.setEnabled(False)
+        self.preserve_edits_checkbox.setChecked(False)
 
     def process_and_export(self):
         """Process data and export results."""
@@ -427,6 +440,8 @@ class MainWindowNewFormat(QMainWindow):
             "enable_mebella_scraping": self.mebella_scraping_checkbox.isChecked(),
             "enable_ai_enhancement": self.ai_enhancement_checkbox.isChecked(),
             "update_categories_from_feeds": self.update_categories_checkbox.isChecked(),
+            "force_reprocess": self.force_reprocess_checkbox.isChecked(),
+            "preserve_client_edits": self.preserve_edits_checkbox.isChecked(),
             "main_data_file": self.main_data_file,
             "selected_categories": (
                 self.get_selected_categories() if self.main_data_file else None
@@ -485,6 +500,8 @@ class MainWindowNewFormat(QMainWindow):
             stats_text.append(f"Aktualizovaných: {stats.get('total_updated', 0)}")
             stats_text.append(f"Zachovaných: {stats.get('total_kept', 0)}")
             stats_text.append(f"Odstránených: {stats.get('removed', 0)}")
+            if stats.get("discontinued", 0) > 0:
+                stats_text.append(f"Vyradených z feedu: {stats.get('discontinued', 0)}")
 
             # Show breakdown by source
             if "created" in stats and stats["created"]:
