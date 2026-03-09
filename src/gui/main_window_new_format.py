@@ -189,12 +189,17 @@ class MainWindowNewFormat(QMainWindow):
         layout = QVBoxLayout(group)
 
         self.gastromarket_checkbox = QCheckBox("Načítať z GastroMarket XML")
+        self.gastromarket_stalgast_checkbox = QCheckBox(
+            "Načítať z GastroMarket STALGAST XML"
+        )
         self.forgastro_checkbox = QCheckBox("Načítať z ForGastro XML")
 
         self.gastromarket_checkbox.setChecked(False)
+        self.gastromarket_stalgast_checkbox.setChecked(False)
         self.forgastro_checkbox.setChecked(False)
 
         layout.addWidget(self.gastromarket_checkbox)
+        layout.addWidget(self.gastromarket_stalgast_checkbox)
         layout.addWidget(self.forgastro_checkbox)
 
         info_label = QLabel(
@@ -211,7 +216,7 @@ class MainWindowNewFormat(QMainWindow):
         group = QGroupBox("Možnosti spracovania")
         layout = QVBoxLayout(group)
 
-        is_ai_enhancement_enabled = True
+        is_ai_enhancement_enabled = False
         self.ai_enhancement_checkbox = QCheckBox("Použiť AI vylepšenie")
         self.ai_enhancement_checkbox.setChecked(is_ai_enhancement_enabled)
         self.ai_enhancement_checkbox.stateChanged.connect(self._update_force_reprocess)
@@ -232,9 +237,13 @@ class MainWindowNewFormat(QMainWindow):
             "Ak je zaškrtnuté, kategórie produktov budú prepísané hodnotami z XML feedov/scrapingu."
         )
 
-        self.preserve_edits_checkbox = QCheckBox("Zachovať úpravy e-shopu (iba ceny a sklad z feedu)")
+        self.preserve_edits_checkbox = QCheckBox(
+            "Zachovať úpravy e-shopu (iba ceny a sklad z feedu)"
+        )
         self.preserve_edits_checkbox.setChecked(False)
-        self.preserve_edits_checkbox.setEnabled(False)  # enabled only when main data is loaded
+        self.preserve_edits_checkbox.setEnabled(
+            False
+        )  # enabled only when main data is loaded
         self.preserve_edits_checkbox.setToolTip(
             "Zachová opisy, obrázky, kategórie a ceny z e-shopu. "
             "Z feedu sa aktualizuje len standardPrice a sklad. "
@@ -421,6 +430,7 @@ class MainWindowNewFormat(QMainWindow):
         if (
             self.main_data_file is None
             and not self.gastromarket_checkbox.isChecked()
+            and not self.gastromarket_stalgast_checkbox.isChecked()
             and not self.forgastro_checkbox.isChecked()
             and not self.web_scraping_checkbox.isChecked()
             and not self.mebella_scraping_checkbox.isChecked()
@@ -435,6 +445,7 @@ class MainWindowNewFormat(QMainWindow):
         # Prepare options
         options = {
             "enable_gastromarket": self.gastromarket_checkbox.isChecked(),
+            "enable_gastromarket_stalgast": self.gastromarket_stalgast_checkbox.isChecked(),
             "enable_forgastro": self.forgastro_checkbox.isChecked(),
             "enable_web_scraping": self.web_scraping_checkbox.isChecked(),
             "enable_mebella_scraping": self.mebella_scraping_checkbox.isChecked(),

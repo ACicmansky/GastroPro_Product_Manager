@@ -43,6 +43,8 @@ class PipelineNewFormat:
         """
         if feed_name.lower() == "gastromarket":
             return self.xml_parser.parse_gastromarket(xml_content)
+        elif feed_name.lower() == "gastromarket_stalgast":
+            return self.xml_parser.parse_gastromarket_stalgast(xml_content)
         elif feed_name.lower() == "forgastro":
             return self.xml_parser.parse_forgastro(xml_content)
         else:

@@ -44,6 +44,8 @@ class XMLParserFactory:
         # Route to appropriate parsing method
         if feed_name.lower() == "gastromarket":
             return parser.parse_gastromarket(xml_content)
+        elif feed_name.lower() == "gastromarket_stalgast":
+            return parser.parse_gastromarket_stalgast(xml_content)
         elif feed_name.lower() == "forgastro":
             return parser.parse_forgastro(xml_content)
         else:

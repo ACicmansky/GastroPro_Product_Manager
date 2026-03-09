@@ -122,6 +122,17 @@ class WorkerNewFormat(QObject):
                 if xml_content:
                     xml_feeds["gastromarket"] = xml_content
 
+        # Gastromarket Stalgast
+        if self.options.get("enable_gastromarket_stalgast", False):
+            xml_url = (
+                self.config.get("xml_feeds", {}).get("gastromarket_stalgast", {}).get("url")
+            )
+            if xml_url:
+                self.progress.emit("Sťahovanie Gastromarket Stalgast XML...")
+                xml_content = self._download_xml(xml_url)
+                if xml_content:
+                    xml_feeds["gastromarket_stalgast"] = xml_content
+
         # ForGastro
         if self.options.get("enable_forgastro", False):
             xml_url = self.config.get("xml_feeds", {}).get("forgastro", {}).get("url")

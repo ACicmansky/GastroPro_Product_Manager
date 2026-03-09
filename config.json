@@ -14,6 +14,20 @@
         "OBRAZOK_1": "IMAGE"
       }
     },
+    "gastromarket_stalgast": {
+      "url": "https://www.gastromarket.sk/product_data/B2B_Product_Feed_Stalgast.xml",
+      "root_element": "channel",
+      "item_element": "item",
+      "namespace": "http://base.google.com/ns/1.0",
+      "mapping": {
+        "KATALOG_CISLO": "code",
+        "MENO": "name",
+        "POPIS": "shortDescription",
+        "CENA_KATALOG": "price",
+        "KATEGORIA_KOMPLET": "defaultCategory",
+        "OBRAZOK_1": "IMAGE"
+      }
+    },
     "forgastro": {
       "url": "https://www.forgastro.sk/xml",
       "root_element": "products",
@@ -656,6 +670,7 @@
     "imageDesc99",
     "variant:Agregát pre objem boxu (m3)",
     "variant:Hĺbka zariadenia / Varnej Línie",
-    "xmlFeedName"
+    "xmlFeedName",
+    "Unnamed: 386"
   ]
 }

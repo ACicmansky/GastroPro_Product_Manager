@@ -88,6 +88,70 @@ class XMLParserNewFormat:
         print(f"  Parsed {len(df)} products from Gastromarket")
         return df
 
+    def parse_gastromarket_stalgast(self, xml_content: str) -> pd.DataFrame:
+        """
+        Parse Gastromarket Stalgast XML feed to new format.
+
+        Args:
+            xml_content: XML content as string
+
+        Returns:
+            DataFrame with new format columns
+        """
+        print("\nParsing Gastromarket Stalgast XML feed...")
+
+        feed_config = self.xml_feeds.get("gastromarket_stalgast", {})
+        root_element = feed_config.get("root_element", "channel")
+        item_element = feed_config.get("item_element", "item")
+        mapping = feed_config.get("mapping", {})
+        namespace_url = feed_config.get("namespace")
+
+        xml_root = ET.fromstring(xml_content)
+
+        # Register namespace if provided
+        namespaces = {}
+        if namespace_url:
+            namespaces = {"g": namespace_url}
+            # Register namespace for ElementTree
+            ET.register_namespace("g", namespace_url)
+
+        root = xml_root.find(root_element)
+
+        # Extract data
+        data = []
+        for item in root.findall(f".//{item_element}"):
+            row = {}
+            for xml_field, new_field in mapping.items():
+                # Use namespace prefix if configured
+                if namespace_url:
+                    element = item.find(f"g:{xml_field}", namespaces)
+                else:
+                    element = item.find(xml_field)
+
+                value = element.text if element is not None and element.text else ""
+                row[new_field] = value
+
+            # Add feed name
+            row["source"] = "gastromarket_stalgast"
+            data.append(row)
+
+        df = pd.DataFrame(data)
+
+        # Process images - check if IMAGE column exists in result
+        if "IMAGE" in df.columns:
+            df = self._split_images(df, "IMAGE")
+
+        # Clean prices
+        if "price" in df.columns:
+            df = self._clean_prices(df)
+
+        # Ensure all values are strings and replace NaN
+        for col in df.columns:
+            df[col] = df[col].astype(str).replace("nan", "").replace("None", "")
+
+        print(f"  Parsed {len(df)} products from Gastromarket Stalgast")
+        return df
+
     def parse_forgastro(self, xml_content: str) -> pd.DataFrame:
         """
         Parse ForGastro XML feed to new format.
