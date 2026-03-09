@@ -322,6 +322,16 @@ element = item.find(f"g:{xml_field}", namespaces)
     - `src/mergers/data_merger_new_format.py` - Added `pairCode` preservation
     - `tests/test_ai_enhancer_new_format.py` - Fixed failing tests with proper mocking
 
+## Recently Completed (March 2026)
+- ✅ **Phase 11: SQLite Database Integration**
+  - Implemented `ProductDatabase` for local SQLite storage as the primary source of truth.
+  - Created robust upsert mechanisms to merge client XLSX data while preserving internal columns (`aiProcessed`, `aiProcessedDate`, `source`, `last_updated`).
+  - Added database backup functionality to save timestamped copies before writing new states.
+  - Integrated DB into `PipelineNewFormat` data loading and saving stages.
+  - Added `db_path` config to `config.json`.
+- ✅ **Gastromarket Stalgast Feed Integration**
+  - Added dynamic config parsing for Stalgast XML feed.
+
 ## Pending
 - ⏳ **Phase 14**: Continue with remaining features
 - ⏳ Manual testing with real Gemini API key

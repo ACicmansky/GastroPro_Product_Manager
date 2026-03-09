@@ -20,7 +20,8 @@ The system also includes advanced product variant detection and difference extra
 - **Efficiency**: Reduce the time required to update product listings across platforms
 
 ## Workflow
-1. User loads a primary CSV file containing product data
+0. System initializes and loads existing product data from the local SQLite database (the source of truth).
+1. User loads a primary CSV/XLSX file; system merges (upserts) the incoming data into the database, explicitly preserving existing internal fields (e.g., AI flags).
 2. User selects product categories to include in the final output
 3. System automatically loads and processes configured XML feeds
 4. Optionally performs multi-threaded web scraping to augment the catalog and fill missing fields

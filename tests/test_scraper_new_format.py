@@ -392,8 +392,7 @@ class TestScraperProgressTracking:
 
         assert scraper.progress_callback is not None
 
-    @patch("src.scrapers.topchladenie_scraper.requests.Session")
-    def test_scraper_reports_progress(self, mock_session, config):
+    def test_scraper_reports_progress(self, config):
         """Test scraper reports progress during scraping."""
         from src.scrapers.topchladenie_scraper import TopchladenieScraper
 

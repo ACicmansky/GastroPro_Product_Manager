@@ -1,28 +1,26 @@
 # GastroPro Product Manager - Active Context
 
 ## Current Focus
+The current focus is on **monitoring and refining the application**. Recently completed major features include the new dynamic column configuration (Phase 10), integration of the Gastromarket Stalgast feed, and most significantly, the **SQLite Database Integration (Phase 11)**.
 
-**Dynamic Column Configuration** ✅ COMPLETE (November 25, 2025)
-- Implemented automatic column detection and configuration update
-- GUI dialog for user to review and approve changes
-- Config.json auto-update on user confirmation
-- Verified with unit tests
+The SQLite DB is now the source of truth, ensuring that internal metadata (like `aiProcessed`, `aiProcessedDate`) is preserved across client data uploads and application restarts.
 
-**Phase 14: Next Phase** (Upcoming)
-- Continue with remaining features
-- Manual testing with real API
 ## Recent Changes
-
-**Gastromarket Stalgast Feed Integration & Tweaks (March 09, 2026)**:
-- **New Feature**: Added integration for a secondary Gastromarket feed specifically for Stalgast products (`B2B_Product_Feed_Stalgast.xml`).
-- **GUI Update**: Added a new checkbox to enable the Stalgast feed directly from the UI.
-- **Config Changes**: Added Stalgast mapping to `config.json` and a placeholder for column `Unnamed: 386`.
+- **SQLite Database Integration:**
+  - Added `ProductDatabase` class (`src/core/database.py`) to manage a local SQLite database (`data/products.db`).
+  - Adapted `PipelineNewFormat` to use the DB as the source of truth instead of starting empty.
+  - Implemented robust upsert logic to merge client-uploaded changes while preserving internal application columns.
+  - Automated backups of `products.db` file to a `backups/` folder before saving the final processed state.
+  - Added `db_path` to `config.json`.
+  - Fixed tests in `test_output_transformer.py` to correctly preserve the internal variables missing from the final configuration map.
+- **Gastromarket Stalgast Integration:**
+  - Added `enable_gastromarket_stalgast` to `config.json`.
 - **Default Change**: AI enhancement is now disabled by default in the UI to save costs and time when not explicitly needed.
 
 **Dynamic Column Configuration (November 25, 2025)**:
 - **New Feature**: Automatic detection of column differences between input XLSX and config.json
 - **GUI Dialog**: `ColumnConfigDialog` presents users with columns to add/remove with checkboxes
-- **Config Update**: `save_config` utility function to persist changes to config.json
+- **Config    Update**: `save_config` utility function to persist changes to config.json
 - **Smart Filtering**: Ignores generated columns (variants, images, AI tracking) from removal suggestions
 - **Integration**: Triggered automatically when loading main data file in `MainWindowNewFormat`
 

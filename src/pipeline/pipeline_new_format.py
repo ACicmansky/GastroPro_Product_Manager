@@ -11,6 +11,7 @@ from src.mergers.data_merger_new_format import DataMergerNewFormat
 from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
 from src.transformers.output_transformer import OutputTransformer
 from src.loaders.data_loader_factory import DataLoaderFactory
+from src.core.database import ProductDatabase
 
 
 class PipelineNewFormat:
@@ -29,6 +30,9 @@ class PipelineNewFormat:
         self.merger = DataMergerNewFormat(options)
         self.category_mapper = CategoryMapperNewFormat(config)
         self.transformer = OutputTransformer(config)
+        
+        # Initialize Database Manager
+        self.db = ProductDatabase(config)
 
     def parse_xml(self, feed_name: str, xml_content: str) -> pd.DataFrame:
         """
@@ -150,14 +154,30 @@ class PipelineNewFormat:
         print("PIPELINE EXECUTION - NEW FORMAT")
         print("=" * 60)
 
-        # Step 1: Load main data if provided
+        # Step 1: Load main data if provided and sync with DB
         if main_data_file:
             print(f"\nLoading main data from: {main_data_file}")
-            main_df = self.load_main_data(main_data_file)
-            if "aiProcessed" not in main_df.columns:
-                main_df["aiProcessed"] = "1"
+            client_df = self.load_main_data(main_data_file)
+            
+            # Upsert client data to database, this merges client updates 
+            # while preserving internal DB fields that client file lacks
+            print("Syncing client data with database...")
+            self.db.upsert_from_client(client_df)
+            
+            # The working dataset is now everything known to the DB
+            main_df = self.db.get_all_products_df()
+            print(f"Loaded {len(main_df)} products from database source of truth.")
         else:
-            main_df = pd.DataFrame()
+            # If no client file given, base it entirely on DB
+            main_df = self.db.get_all_products_df()
+            if not main_df.empty:
+                print(f"Loaded {len(main_df)} products from database source of truth.")
+            else:
+                print("Database is empty. Starting fresh.")
+                
+        # Ensure aiProcessed flag exists if working from a completely empty state
+        if not main_df.empty and "aiProcessed" not in main_df.columns:
+            main_df["aiProcessed"] = "1"
 
         # Step 2: Parse XML feeds
         print(f"\nParsing {len(xml_feeds)} XML feed(s)...")
@@ -193,6 +213,12 @@ class PipelineNewFormat:
             result_df = self.apply_transformation(merged_df)
         else:
             result_df = merged_df
+
+        # Step 5.5: Update Source of Truth DB with the complete new state
+        print("\nBacking up database...")
+        self.db.backup_db()
+        print("Upserting final output state back to database...")
+        self.db.upsert_final(result_df)
 
         # Step 6: Save output if path provided
         if output_file:

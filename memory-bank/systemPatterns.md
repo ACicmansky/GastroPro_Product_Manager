@@ -125,6 +125,12 @@ src/
     - **Data Preservation**: `pairCode` preserved through merger via `DataMergerNewFormat`
     - **Verification**: `verify_ai_grouping.py` script confirms correct prompt selection
 
+11. **Database as Single Source of Truth**:
+    - **Persistence**: Replaces transient DataFrame loading with a persistent SQLite database (`products.db`).
+    - **Robust Upsert**: Client uploads (CSV/XLSX) are upserted into the database. Internal columns (`aiProcessed`, `aiProcessedDate`, `source`, `last_updated`) are preserved from the database if missing or empty in the client data.
+    - **Automated Backup**: Before any final overwrite, the system creates a timestamped copy of the database and maintains a rotating retention policy (last 10 backups).
+    - **Pipeline Integration**: The pipeline reads fully from the DB at instantiation and pushes the finalized dataset back to the DB at conclusion.
+
 ## Component Relationships
 - **main.py**: The main entry point of the application; initializes and runs the GUI.
 - **src/gui/main_window.py**: Contains the `MainWindow` class, which manages the entire UI, its state, and user interactions. It delegates data processing to the `worker`.

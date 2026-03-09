@@ -2,6 +2,7 @@
 
 ## Technology Stack
 - **Python 3.13**: Core programming language
+- **SQLite3**: Lightweight relational database mapped to dynamic schema for data persistence
 - **PyQt5**: GUI framework for desktop application
 - **Pandas**: Data manipulation library for CSV and data processing
 - **openpyxl**: Excel file (XLSX) reading and writing
@@ -37,6 +38,7 @@
 
 ## Dependencies
 - Python 3.13
+- sqlite3 (Standard Library)
 - PyQt5
 - pandas
 - openpyxl (XLSX support)
@@ -56,13 +58,18 @@
    - Data source configurations
    - Output settings
    - Variant extraction rules (variant_extractions.json)
+   - Dataset paths including `db_path`
    - **Output mapping configuration** (output_mapping section):
      - Direct column mappings (internal → new format)
      - Special transformations (category, uppercase, image splitting)
      - Default values (applied only when empty)
      - Drop columns list
 
-2. **Local CSV Structure**:
+2. **SQLite Database (`data/products.db`)**:
+   - Single source of truth containing a dynamic flexible `products` table schema generated from `config.json`.
+   - Stores all products across sessions, enabling safety via automated backups.
+
+3. **Local CSV Structure**:
    - Product ID
    - Product name
    - Price

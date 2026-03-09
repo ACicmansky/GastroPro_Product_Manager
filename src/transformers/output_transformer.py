@@ -82,12 +82,18 @@ class OutputTransformer:
         """
         print("\nApplying direct mappings...")
 
-        output_df = pd.DataFrame()
+        output_df = pd.DataFrame(index=df.index)
 
         for old_col, new_col in self.mappings.items():
             if old_col in df.columns and new_col != "Obrázky":
                 output_df[new_col] = df[old_col].astype(str).fillna("")
                 print(f"  Mapped: {old_col} -> {new_col}")
+                
+        # Forward internal columns that shouldn't be lost
+        internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
+        for col in internal_tracking:
+            if col in df.columns:
+                output_df[col] = df[col]
 
         print(f"  Mapped {len(output_df.columns)} columns")
         return output_df
@@ -302,6 +308,10 @@ class OutputTransformer:
         extra_cols = [col for col in internal_tracking if col in df.columns and col not in self.new_output_columns]
 
         # Reorder columns to match configuration, followed by any internal tracking columns
-        df = df[self.new_output_columns + extra_cols]
+        ordered_cols = self.new_output_columns + extra_cols
+        # Ensure we only select columns that actually exist in the dataframe 
+        # (in case self.new_output_columns has extra config values or non-column names)
+        final_cols = [c for c in ordered_cols if c in df.columns]
+        df = df[final_cols]
 
         return df

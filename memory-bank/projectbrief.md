@@ -10,6 +10,7 @@ GastroPro Product Manager is a Python desktop application designed to manipulate
 4. Web Scraping: Multi-threaded scraping to download additional products and fill missing attributes (optional)
 5. AI Enhancement: Improve or generate B2B short/long descriptions and SEO metadata (title/description/keywords) using an LLM with web search grounding
 6. Output Generation: Create and save a final CSV file that maintains the structure of the local CSV but incorporates data from feeds/scraping/AI
+7. Data Persistence: Maintain a local SQLite database acting as the single source of truth to preserve vital internal metadata between data loads.
 
 ## Project Goals
 - Streamline product data management for e-shop operators
@@ -28,6 +29,7 @@ GastroPro Product Manager is a Python desktop application designed to manipulate
 ## Technical Requirements
 - Python desktop application with PyQt5 GUI
 - Support for CSV, XML, and web scraping data sources
+- SQLite database for robust data persistence and source-of-truth management
 - Configuration management
 - Error handling and validation
 - Parallel processing with ThreadPoolExecutor and API quota management (calls/tokens)
