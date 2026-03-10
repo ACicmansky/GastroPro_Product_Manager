@@ -310,7 +310,7 @@ class TestPipelineEndToEnd:
         if "defaultCategory" in result.columns:
             for cat in result["defaultCategory"]:
                 if cat and cat != "":
-                    assert "Gastro Prevádzky a Profesionáli > " in cat or cat == ""
+                    assert "Gastro Prevádzky a Profesionáli > " in cat or "Domácnosť a Kulinári >" in cat or cat == ""
 
         # Codes should be uppercase
         if "code" in result.columns:

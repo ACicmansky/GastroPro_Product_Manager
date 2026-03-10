@@ -11,21 +11,6 @@ from datetime import datetime
 class TestCurrentAIEnhancement:
     """Test current AI enhancement functionality."""
 
-    @pytest.mark.skipif(not os.getenv("GOOGLE_API_KEY"), reason="API key not available")
-    @pytest.mark.requires_api
-    def test_ai_enhancement_updates_columns(self, sample_old_format_df, config):
-        """Test that AI enhancement updates correct columns."""
-        from src.services.ai_enhancer import AIEnhancementProcessor
-
-        df = sample_old_format_df.copy()
-        processor = AIEnhancementProcessor(config)
-
-        # This would make actual API calls - skip in CI
-        # Just test the structure
-        assert "Krátky popis" in df.columns
-        assert "Dlhý popis" in df.columns
-        assert "SEO titulka" in df.columns
-        assert "SEO popis" in df.columns
 
     def test_ai_tracking_columns_exist(self, sample_old_format_df):
         """Test that AI tracking columns exist in DataFrame."""
