@@ -87,6 +87,7 @@ src/
      2. Check if already a valid target category (prevents redundant prompts)
      3. Interactive callback (if enabled)
      4. Return original category
+   - **Root Category Enforcement**: Mappings must aggressively roll up under primary root labels (e.g., `Gastro Prevádzky a Profesionáli >` or `Domácnosť a Kulinári >`) to handle inconsistent external XML category hierarchies.
    - Optional callback mechanism for real-time unmapped category resolution
    - Detailed logging of mapping operations
 
@@ -144,6 +145,11 @@ src/
 2. **Pandas for Data Manipulation**: Efficient handling of tabular data
 3. **JSON for Configuration**: Human-readable and easily modifiable
 4. **ElementTree for XML Parsing**: Standard library solution for XML processing
+5. **Database as Single Source of Truth**: Replaces transient memory states with robust upsert workflows.
+6. **Strict Legacy Deprecation**: Do not mix legacy implementations with the modern pipeline (`PipelineNewFormat`, 138-column format). Legacy code is actively deprecated.
+7. **TDD (Test-Driven Development)**: Always write or maintain existing tests before/after implementing features.
+8. **KISS Principle**: Do not proactively propose unrequested features or complexity; adhere to the simplest robust implementation.
+9. **Windows OS First**: Ensure Windows-compatible paths (`\\` or raw strings) and `CRLF` line endings.
 
 ## Future Considerations
 - Potential for plugin architecture to support additional data formats

@@ -19,6 +19,9 @@
 
 ## Development Setup
 - **Environment**: Windows operating system
+- **Line Endings**: Requires Windows standard CRLF.
+- **Path Standard**: Windows-compatible paths (`\\` or raw paths) must be used.
+- **Methodology**: TDD (Test-Driven Development) is enforced.
 - **IDE**: Compatible with standard Python IDEs
 - **Version Control**: Git repository
 - **Environment Variables**:
@@ -145,11 +148,8 @@
 The application is organized into a `src` package to ensure clear separation of concerns:
 
 ### Legacy Structure (Old Format)
-- **main.py**: Original application entry point
-- **src/core/**: Core business logic with old `DataPipeline`
-- **src/gui/**: Original PyQt5 UI (`MainWindow`, `Worker`)
-- **src/services/**: External services (scraper, old ai_enhancer, variant_matcher)
-- **src/utils/**: Helper modules (data_loader, config_loader, category_mapper)
+- **Status**: Completely deprecated and removed (March 2026).
+- The repository now relies purely on the 138-Column `new format`. Old entry points (`main.py`), obsolete GUI dialogs, and legacy pipelines have been purged.
 
 ### New Format Structure (138-Column)
 - **main_new_format.py**: New application entry point

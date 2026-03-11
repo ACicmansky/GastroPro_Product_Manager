@@ -6,6 +6,10 @@ The current focus is on **monitoring and refining the application**. Recently co
 The SQLite DB is now the source of truth, ensuring that internal metadata (like `aiProcessed`, `aiProcessedDate`) is preserved across client data uploads and application restarts.
 
 ## Recent Changes
+- **Legacy Dead Code Cleanup (March 11, 2026):**
+  - Analyzed the codebase using CodeGraphContext to verify zero dependencies for legacy components.
+  - Safely removed 14 legacy files related to the "old format" pipeline (including `main.py`, `src/core/data_pipeline.py`, old GUI elements, and `ai_enhancer.py`).
+  - Fixed test assertions in `test_pipeline_new_format.py` to accommodate realistic pipeline output from the production SQLite DB, maintaining 176/176 passing tests.
 - **SQLite Database Integration:**
   - Added `ProductDatabase` class (`src/core/database.py`) to manage a local SQLite database (`data/products.db`).
   - Adapted `PipelineNewFormat` to use the DB as the source of truth instead of starting empty.
@@ -146,8 +150,10 @@ The SQLite DB is now the source of truth, ensuring that internal metadata (like 
 5. ⏳ Deploy to production
 
 ## Active Decisions
-- **Migration Strategy**: TDD approach - write tests first, then implement
-- **Format Support**: New 139-column format (138 + source + last_updated)
+- **Migration Strategy**: TDD approach - write tests first, then implement. Tests are mandatory for new, complex features.
+- **Format Support**: Strict adherence to the New 138-column pipeline format.
+- **Legacy Deprecation**: Do not mix legacy implementations with the modern pipeline. Legacy code is actively ignored and scheduled for cleanup.
+- **Design Philosophy**: KISS (Keep It Simple, Stupid). Do not proactively propose unrequested features or complexity.
 - **File Format**: XLSX as primary, CSV as fallback
 - **Image Merging**: Use source with most images available
 - **Merging Logic**: Feed products always included, main data filtered by category

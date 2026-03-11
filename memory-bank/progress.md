@@ -53,6 +53,12 @@
 - ✅ Standalone transformation script (`scripts/transform_to_new_format.py`)
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
+## Recently Completed (March 11, 2026)
+- ✅ **Legacy Dead Code Cleanup**
+  - Safely removed 14 unused files from the legacy pipeline architecture.
+  - Cleaned up obsolete GUI entries, old pipeline workers, and legacy AI tracking.
+  - Verified codebase stability utilizing CodeGraphContext and comprehensive testing (176 tests passing).
+
 ## Recently Completed (March 09, 2026)
 - ✅ **Gastromarket Stalgast Feed Integration**
   - Configured secondary feed URL (`B2B_Product_Feed_Stalgast.xml`)
