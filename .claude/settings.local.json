@@ -28,5 +28,11 @@
         ]
       }
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "python-sdk",
+    "memory-bank",
+    "sequential-thinking",
+    "CodeGraphContext"
+  ]
 }
