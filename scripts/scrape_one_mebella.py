@@ -29,20 +29,6 @@ def scrape_single_product():
 
     logger.info(f"Scraping product: {url}")
 
-    # TEST FIX: Add language cookie explicitly in headers
-    scraper.session.headers.update(
-        {"Cookie": "pll_language=en; wp-wpml_current_language=en"}
-    )
-
-    # Save HTML for inspection
-    try:
-        response = scraper.session.get(url)
-        with open("bea_debug.html", "wb") as f:
-            f.write(response.content)
-        logger.info("Saved bea_debug.html")
-    except Exception as e:
-        logger.error(f"Error saving HTML: {e}")
-
     # Save HTML for inspection
     try:
         response = scraper.session.get(url)
