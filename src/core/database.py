@@ -47,56 +47,19 @@ class ProductDatabase:
 
     def _get_defined_columns(self) -> List[str]:
         """
-        Get all defined columns from config.json to construct table schema.
-        We combine final_csv_columns and new_output_columns to ensure we have all possible columns.
+        Get the essential database schema columns for the Document Store format.
         """
-        final_cols = self.config.get("final_csv_columns", [])
-        new_cols = self.config.get("new_output_columns", [])
-        
-        # Add essential tracking columns just in case
-        internal_cols = ["source", "last_updated", "aiProcessed", "aiProcessedDate"]
-        
-        all_cols = []
-        # Maintain order roughly prioritizing new formats
-        for c in new_cols + final_cols + internal_cols:
-            if c not in all_cols:
-                all_cols.append(c)
-                
-        # Ensure 'code' is the first column as it's our primary key
-        if "code" in all_cols:
-            all_cols.remove("code")
-        all_cols.insert(0, "code")
-        
-        return all_cols
+        return ["code", "product_data", "source", "last_updated", "aiProcessed", "aiProcessedDate"]
 
     def init_db(self):
         """Initialize database, creating the main table if it does not exist."""
         columns = self._get_defined_columns()
         
-        # Build CREATE TABLE statement
-        # Using TEXT for all columns to match pandas flexibility, except 'code' as primary key
-        col_defs = ["\"code\" TEXT PRIMARY KEY"]
-        for col in columns:
-            if col != "code":
-                col_defs.append(f"\"{col}\" TEXT")
-                
-        create_stmt = f"CREATE TABLE IF NOT EXISTS {self.table_name} ({', '.join(col_defs)})"
-        
         with self._get_connection() as conn:
             cursor = conn.cursor()
-            cursor.execute(create_stmt)
             
-            # Add missing columns dynamically if configuration evolved
-            cursor.execute(f"PRAGMA table_info({self.table_name})")
-            existing_cols = [row[1] for row in cursor.fetchall()]
-            
-            for col in columns:
-                if col not in existing_cols:
-                    try:
-                        cursor.execute(f"ALTER TABLE {self.table_name} ADD COLUMN \"{col}\" TEXT")
-                    except sqlite3.OperationalError as e:
-                        print(f"Warning: Could not add column {col}: {e}")
-                        
+            self._create_main_table(cursor, columns)
+                
             # Initialize batch jobs table
             batch_table_stmt = """
             CREATE TABLE IF NOT EXISTS batch_jobs (
@@ -109,8 +72,16 @@ class ProductDatabase:
             )
             """
             cursor.execute(batch_table_stmt)
-
             conn.commit()
+
+    def _create_main_table(self, cursor, columns):
+        col_defs = ["\"code\" TEXT PRIMARY KEY"]
+        for col in columns:
+            if col != "code":
+                col_defs.append(f"\"{col}\" TEXT")
+                
+        create_stmt = f"CREATE TABLE IF NOT EXISTS {self.table_name} ({', '.join(col_defs)})"
+        cursor.execute(create_stmt)
 
     def backup_db(self, max_backups: int = 10) -> Optional[str]:
         """
@@ -195,15 +166,38 @@ class ProductDatabase:
 
     def get_all_products_df(self) -> pd.DataFrame:
         """
-        Retrieve all products from the database as a pandas DataFrame.
+        Retrieve all products from the database, expanding the JSON product_data back into columns.
         """
         with self._get_connection() as conn:
-            # First check if table exists and has data
             try:
                 df = pd.read_sql_query(f"SELECT * FROM {self.table_name}", conn)
+                if df.empty:
+                    return pd.DataFrame()
+                    
+                # Unpack product_data JSON string
+                if 'product_data' in df.columns:
+                    def parse_json(val):
+                        try:
+                            return json.loads(val) if val else {}
+                        except:
+                            return {}
+                            
+                    # Apply parsing and convert back into columns
+                    json_data = df['product_data'].apply(parse_json).tolist()
+                    json_df = pd.DataFrame(json_data)
+                    
+                    df = df.drop(columns=['product_data'])
+                    
+                    # Concat avoiding duplicate columns
+                    result_df = pd.concat([df, json_df], axis=1)
+                    
+                    # If duplicate columns somehow appeared, drop them (pandas keeps the first by default if we loc, but easier to handle generic duplicates:
+                    result_df = result_df.loc[:,~result_df.columns.duplicated()]
+                    return result_df
+                
                 return df
+                
             except pd.errors.DatabaseError:
-                # Table might not exist yet if empty db
                 return pd.DataFrame()
 
     def upsert_from_client(self, client_df: pd.DataFrame) -> pd.DataFrame:
@@ -283,44 +277,48 @@ class ProductDatabase:
     def upsert_final(self, final_df: pd.DataFrame):
         """
         Replaces/Upserts all records in the DB with the provided final DataFrame.
-        This is typically called at the end of the pipeline when external feeds and AI 
-        have run, and we want to solidify the state.
-        
-        Args:
-            final_df: The final processed DataFrame to save
+        Packs all dynamic columns into `product_data` JSON string.
         """
         if final_df.empty or "code" not in final_df.columns:
             return
             
-        # Ensure column types match (SQLite TEXT)
         save_df = final_df.copy()
+        
+        # Convert all standard columns to strings to prevent json issues
         for col in save_df.columns:
-            # Handle list/dict objects if they accidentally got here
             save_df[col] = save_df[col].apply(lambda x: str(x) if pd.notna(x) else "")
             
-        # Exclude columns not in DB schema (though schema should adapt)
         db_columns = self._get_defined_columns()
-        valid_cols = [c for c in save_df.columns if c in db_columns]
+        internal_cols = [c for c in db_columns if c != "product_data"]
         
-        if "code" not in valid_cols:
-            valid_cols.append("code")
+        # Create a new structure specifically for the DB schema
+        packed_df = pd.DataFrame(index=save_df.index)
+        
+        for int_col in internal_cols:
+            if int_col in save_df.columns:
+                packed_df[int_col] = save_df[int_col]
+            else:
+                packed_df[int_col] = ""
+                
+        # All extra columns belong to product_data
+        extra_cols = [c for c in save_df.columns if c not in internal_cols]
+        
+        def dict_to_json(row):
+            d = {k: row[k] for k in extra_cols if row[k] and str(row[k]) not in ("nan", "None", "")}
+            return json.dumps(d, ensure_ascii=False)
             
-        save_df = save_df[valid_cols]
+        packed_df["product_data"] = save_df.apply(dict_to_json, axis=1)
         
         with self._get_connection() as conn:
-            # Pandas default to_sql with if_exists='append' doesn't handle UPSERT gracefully
-            # Instead we create a temporary table, then INSERT ON CONFLICT DO UPDATE
-            
             temp_table = f"{self.table_name}_temp"
-            save_df.to_sql(temp_table, conn, if_exists="replace", index=False)
+            packed_df.to_sql(temp_table, conn, if_exists="replace", index=False)
             
-            # Build the UPDATE clause mapping for EXCLUDED
-            update_cols = [c for c in save_df.columns if c != "code"]
+            update_cols = [c for c in packed_df.columns if c != "code"]
             set_clause = ", ".join([f"\"{c}\"=EXCLUDED.\"{c}\"" for c in update_cols])
             
             insert_stmt = f"""
-            INSERT INTO {self.table_name} ("{'", "'.join(save_df.columns)}")
-            SELECT "{"\", \"".join(save_df.columns)}" FROM {temp_table}
+            INSERT INTO {self.table_name} ("{'", "'.join(packed_df.columns)}")
+            SELECT "{"\", \"".join(packed_df.columns)}" FROM {temp_table}
             WHERE "code" IS NOT NULL AND "code" != ''
             ON CONFLICT("code") DO UPDATE SET
             {set_clause}
