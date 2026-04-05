@@ -132,9 +132,16 @@ class ProductMerger:
     ) -> MergeResult
 
 @dataclass
+class MergeStats:
+    created: int                # new products from feeds
+    updated: int                # existing products updated by feeds
+    removed: int                # discontinued products removed
+    kept: int                   # main data products kept as-is
+
+@dataclass
 class MergeResult:
     products: pd.DataFrame      # merged output (new copy, inputs untouched)
-    stats: MergeStats           # created/updated/removed/kept counts
+    stats: MergeStats
 ```
 
 Key rules:
@@ -234,6 +241,15 @@ class ProductEnricher:
 
 High-level coordinator the pipeline calls. Filters products needing enhancement, groups by category, delegates to orchestrator, uses parser to match results, returns enriched DataFrame + stats.
 
+```python
+@dataclass
+class EnrichmentResult:
+    products: pd.DataFrame      # DataFrame with AI-generated fields filled in
+    processed: int              # number of products enhanced
+    skipped: int                # already processed (aiProcessed=True)
+    failed: int                 # enhancement failed
+```
+
 ### Pipeline Layer
 
 #### Pipeline
@@ -264,8 +280,28 @@ class Pipeline:
         # 11. Write output file
 ```
 
-- **PipelineOptions** — typed dataclass replacing the loose options dict
-- **PipelineResult** — dataclass with output path, merge stats, AI stats, timing info
+- **PipelineOptions** — typed dataclass replacing the loose options dict:
+  ```python
+  @dataclass
+  class PipelineOptions:
+      main_file_path: str
+      output_path: str
+      selected_categories: list[str]
+      enable_scraping: bool = False
+      enable_ai_enhancement: bool = False
+      preserve_client_edits: bool = False
+      force_ai_reprocess: bool = False
+  ```
+- **PipelineResult** — typed dataclass:
+  ```python
+  @dataclass
+  class PipelineResult:
+      output_path: str
+      merge_stats: MergeStats
+      enrichment_stats: EnrichmentResult | None
+      product_count: int
+      duration_seconds: float
+  ```
 - **Callbacks** for user interaction: `on_unknown_category`, `on_unmapped_price`
 - **Linear flow** — each step takes input and returns output, no hidden side effects
 
