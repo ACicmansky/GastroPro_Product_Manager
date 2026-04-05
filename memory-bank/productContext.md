@@ -8,7 +8,7 @@ GastroPro Product Manager provides an automated solution for merging and synchro
 
 In addition to XML feeds and CSV, the system can augment the catalog via multi-threaded web scraping to download additional products and fill missing attributes. Scraping is integrated into the same processing pipeline and follows the Parallel Processing Pattern for performance.
 
-To further enhance data quality, the app uses a web-search-enabled LLM agent to improve or generate B2B-ready short and long descriptions and SEO metadata (SEO titulka, SEO popis, SEO kľúčové slová). The agent leverages a web search tool to gather missing context when product details are sparse, and relies on robust prompt engineering and parallel batch execution for efficiency and consistency.
+To further enhance data quality, the app uses a web-search-enabled LLM agent to improve or generate B2B-ready short and long descriptions, SEO metadata, and AI-generated filtering parameters (mapped to `filteringProperty:{parameter_name}`). The agent leverages the asynchronous Google Gemini Batch API replacing parallel sync streams for performance and economy, and relies on robust prompt engineering.
 
 The system also includes advanced product variant detection and difference extraction, allowing users to automatically identify related product variants and extract their differences (dimensions, power, volume, etc.) based on configurable rules.
 
@@ -27,8 +27,9 @@ The system also includes advanced product variant detection and difference extra
 4. Optionally performs multi-threaded web scraping to augment the catalog and fill missing fields
 5. System merges the selected local data with the feed and scraped data
 6. **Interactive Price Mapping**: For products with missing prices, the user is prompted to manually select or enter a price via a smart dialog with suggestions.
-7. System enhances data with AI: generates/improves B2B short and long descriptions and SEO meta (title, description, keywords) using a web-search-enabled LLM
-8. System identifies product variants and extracts differences based on configuration
+7. System groups products by categories and generates comprehensive Asynchronous Batch API assignments.
+8. System enhances data with AI via Jobs: generates/improves B2B descriptions, SEO attributes, and perfectly formatted generated parameters (e.g. `filteringProperty:Napätie`). System tracks active jobs passively via the database.
+9. System identifies product variants and extracts differences based on configuration
 9. User reviews the detected variants and extracted differences
 10. System generates detailed reports of variant groups and differences
 11. User saves the final CSV output with variant relationships, differences, and enhanced content

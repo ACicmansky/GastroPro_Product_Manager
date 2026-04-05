@@ -29,14 +29,14 @@ src/
 ┌───────────────────────────────────────────────────────────────────────────────┐
 │                                AI Enhancement                                 │
 │  ┌─────────────┐     ┌────────────────┐     ┌─────────────────────────┐       │
-│  │  Batch      │     │  Parallel      │     │  Quota & Rate           │       │
-│  │  Processor  │◄───►│  Executor      │◄───►│  Limiter                │       │
+│  │  Categories │     │  Batch API     │     │  Background Job       │       │
+│  │  Grouper    │◄───►│  Generation    │◄───►│  Polling (SQLite)       │       │
 │  └─────────────┘     └────────────────┘     └─────────────────────────┘       │
 │         │                      │                       │                      │
 │         ▼                      ▼                       ▼                      │
 │  ┌─────────────┐     ┌────────────────┐     ┌─────────────────────────┐       │
-│  │  Progress   │     │  Error         │     │  Token & Call           │       │
-│  │  Tracking   │     │  Handling      │     │  Management             │       │
+│  │  Prompt     │     │  Asynchronous  │     │  DataFrame UI           │       │
+│  │  Injection  │     │  Retrieval     │     │  Event Blocking         │       │
 │  └─────────────┘     └────────────────┘     └─────────────────────────┘       │
 └───────────────────────────────────────────────────────────────────────────────┘
 ```
@@ -103,17 +103,12 @@ src/
      1. Process feed/scraped products (always included, update existing)
      2. Process main data products (category filtered, skip if already processed)
 
-9. **AI Enhancement System (Phase 13)**:
-   - **Full Gemini API Integration**: Real API client with web search grounding
-   - **Quota Management**: Thread-safe tracking (15 calls/min, 250K tokens/min)
-   - **Batch Processing**: Configurable batch size (45 products), parallel execution
-   - **Retry Logic**: 3 attempts with exponential backoff, rate limit detection
-   - **Fuzzy Matching**: 3-strategy matching (exact code, fuzzy code, fuzzy name)
-   - **Parallel Processing**: ThreadPoolExecutor with 5 workers
-   - **Incremental Saving**: Progress saved after each batch
-   - **Column Name Migration**: Slovak → English (code, name, shortDescription, etc.)
-   - **Enhanced Fields**: shortDescription, description, seoTitle, seoDescription, seoKeywords
-   - **Processing Tracking**: aiProcessed flag, aiProcessedDate timestamp
+9. **AI Enhancement System (Phase 13 / April 2026 Update)**:
+   - **Full Gemini API Integration**: Real API client utilizing asynchronous **Batch API**.
+   - **JSON-based Parsing**: Gemini produces `application/json` enforced schemas, avoiding markdown code-block discrepancies entirely.
+   - **Parameter Extraction**: AI groups products by category automatically drawing exact attributes matching `categories_with_parameters.json`.
+   - **Background Polling**: GUI seamlessly locks overlapping activities while tracking the backend API request across days via SQLite persistence.
+   - **Enhanced Fields**: shortDescription, description, seoTitle, seoDescription, seoKeywords, *and* unpredictable `filteringProperty:{parameter_name}` columns.
 
 10. **AI Enhancement Grouping Logic (November 2025)**:
     - **Product Variants (Group 1)**: Products with `pairCode` OR whose `code` is used as a `pairCode` by another product
@@ -126,11 +121,10 @@ src/
     - **Data Preservation**: `pairCode` preserved through merger via `DataMergerNewFormat`
     - **Verification**: `verify_ai_grouping.py` script confirms correct prompt selection
 
-11. **Database as Single Source of Truth**:
-    - **Persistence**: Replaces transient DataFrame loading with a persistent SQLite database (`products.db`).
-    - **Robust Upsert**: Client uploads (CSV/XLSX) are upserted into the database. Internal columns (`aiProcessed`, `aiProcessedDate`, `source`, `last_updated`) are preserved from the database if missing or empty in the client data.
-    - **Automated Backup**: Before any final overwrite, the system creates a timestamped copy of the database and maintains a rotating retention policy (last 10 backups).
-    - **Pipeline Integration**: The pipeline reads fully from the DB at instantiation and pushes the finalized dataset back to the DB at conclusion.
+11. **Database as Single Source of Truth (Document Store)**:
+    - **Persistence Paradigm**: Completely abstracts multi-column formats to a flexible 6-column database core treating properties as a dynamic `product_data` JSON.
+    - **Robust Upsert**: In and outbound data operates universally seamlessly; `get_all_products` unpacks the JSON back into wide pandas data.
+    - **Automated Backup**: Native rotation and retention.
 
 ## Component Relationships
 - **main.py**: The main entry point of the application; initializes and runs the GUI.

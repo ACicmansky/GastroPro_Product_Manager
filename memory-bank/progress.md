@@ -53,6 +53,15 @@
 - ✅ Standalone transformation script (`scripts/transform_to_new_format.py`)
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
+## Recently Completed (April 2026)
+- ✅ **Gemini Batch API & Category-Specific Parameters**
+  - Integrated asynchronous Google Gemini Batch API (`client.batches.create`) replacing parallel blocking REST streams to improve throughput and reduce costs.
+  - Implemented dynamic grouped parameter generation allowing AI to extract structured dictionary attributes matching exactly category strings defined in `categories_with_parameters.json` (such as Dimensions, Type, Power, mapped explicitly over into `filteringProperty:{parameter_name}` columns).
+  - Designed robust asynchronous UX locking via `batch_jobs` SQLite tracking preventing concurrent UI tasks overriding long-running backend data enhancements.
+- ✅ **SQLite Flexible JSON Document-Store Refactoring**
+  - Eliminated the 138-column hardcoded SQLite schema in favor of 6 discrete internal columns combined with a `product_data` text blob natively parsing and saving JSON via seamless Pandas translation in `get_all_products_df()` and `upsert_final()`.
+  - Allowed dynamic filtering properties to propagate automatically through system schemas without migrations.
+
 ## Recently Completed (March 22, 2026)
 - ✅ **New Utility Script for Categories**
   - Added `get_unique_categories.py` script to generate a sorted text file (`unique_categories.txt`) with all unique `newCategory` values found in `categories.json`.

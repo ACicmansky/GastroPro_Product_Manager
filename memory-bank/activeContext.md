@@ -1,11 +1,18 @@
 # GastroPro Product Manager - Active Context
 
-## Current Focus
-The current focus is on **monitoring and refining the application**. Recently completed major features include the new dynamic column configuration (Phase 10), integration of the Gastromarket Stalgast feed, and most significantly, the **SQLite Database Integration (Phase 11)**.
+The current focus is on **monitoring and refining the application**. Recently completed major features include the new dynamic column configuration (Phase 10), integration of the Gastromarket Stalgast feed, the **SQLite Database Integration (Phase 11)**, and most recently, the **Gemini Batch API & SQLite Document Store Architecture (April 2026)**.
 
-The SQLite DB is now the source of truth, ensuring that internal metadata (like `aiProcessed`, `aiProcessedDate`) is preserved across client data uploads and application restarts.
+The SQLite DB is now the source of truth, ensuring that internal metadata (like `aiProcessed`, `aiProcessedDate`) is preserved across client data uploads and application restarts, utilizing a NoSQL-like JSON properties field called `product_data` for maximum elasticity.
 
 ## Recent Changes
+- **Gemini Batch API & Parameter Extraction (April 2026):**
+  - Refactored the core AI Enhancement execution from blocking parallel REST calls to the asynchronous Google Gemini Batch API (`client.batches.create`).
+  - Added grouped category AI parameter generation to derive distinct filtering properties tailored to categories based on `categories_with_parameters.json` lists (e.g. Dimensions, Power, Type).
+  - Designed the `AIEnhancerNewFormat` module to pause and gracefully resume passive polling while returning control to the user via background UI tracking via the `batch_jobs` SQLite schema.
+- **SQLite Document Store Architecture (April 2026):**
+  - Pivot the `products` SQLite schema from explicitly defining 138 rigid columns to a flexible Document Store paradigm consisting of 6 columns: `code`, `product_data` (JSON text blob), `source`, `last_updated`, `aiProcessed`, and `aiProcessedDate`.
+  - Upgraded Pandas dataframe interactions around SQLite: automatically packing arbitrary properties like `filteringProperty:*` straight into JSON dictionaries via `dict_to_json` upon saves, and universally unpacking them natively via `json.loads` horizontally during read loads via `get_all_products_df()`.
+  - Added robust initialization mechanism to smoothly ingest active legacy DB states into the new 6-column document paradigm in `init_db`.
 - **Added `get_unique_categories` Script (March 22, 2026):**
   - Created a helper script in `scripts/get_unique_categories.py` to extract all unique `newCategory` values from `categories.json` and save them to `unique_categories.txt`.
 - **Legacy Dead Code Cleanup (March 11, 2026):**

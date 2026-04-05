@@ -6,13 +6,16 @@
 - **PyQt5**: GUI framework for desktop application
 - **Pandas**: Data manipulation library for CSV and data processing
 - **openpyxl**: Excel file (XLSX) reading and writing
-- **Requests**: HTTP client for XML feed fetching and web scraping
-- **BeautifulSoup4**: HTML parsing for web scraping
-- **ElementTree**: XML parsing library (built into Python standard library)
+- **Network & AI**:
+  - `requests` for fetching Google Sheets, web scraping, and API calls (Feed/Scraping/API integration)
+  - `beautifulsoup4` and `lxml` for HTML parsing
+  - `playwright` for end-to-end automated testing
+  - `google-generativeai` and `google-cloud-storage` for invoking the async Google Gemini Batch API.
+- **Data Persistence**:
+  - `sqlite3` for robust local state and mapping schemas to flexible document blob structures.
 - **Concurrent.futures**: Multi-threading for parallel operations
 - **difflib**: For string similarity comparison in variant detection
 - **regex**: Advanced pattern matching for product difference extraction
-- **google-generativeai**: For AI-powered product description enhancement
 - **python-dotenv**: For managing environment variables (API keys)
 - **threading**: For thread-safe quota management
 - **pytest**: Testing framework (158 tests)
@@ -96,9 +99,10 @@
      - Prefixed namespace: `xmlns:g="http://base.google.com/ns/1.0"`
      - RSS structure elements (`<rss>`, `<channel>`, `<item>`) are NOT namespaced
      - Data elements use `g:` prefix: `<g:KATALOG_CISLO>`, `<g:MENO>`, etc.
-     - Parsed using ElementTree with namespace dictionary
-   - **Gastromarket Stalgast Feed**: Same structure as the primary Gastromarket feed, providing additional Stalgast-specific products.
-   - **ForGastro Feed**: Standard XML without namespace
+   1. **Google Gemini API**: Used via `google-generativeai` asynchronously using Google's newest Batch API for maximum parallel generation speeds at half costs.
+2. **Gastromarket (Stalgast) Feed**: XML feed serving as the primary automated data source
+3. **Google Sheets**: Optional source mapping configurations
+4. **Local Document Store Database**: Maintained SQLite schema transitioning from 138-rigid columns to a 6 column paradigm (`product_data` serving as a text JSON blob) for endless parameter generation scale by AI (handling infinite `filteringProperty:{parameter_name}` fields).
    - Product entries with identifiers, details, and category information
 
 5. **Internal Data Representation**:

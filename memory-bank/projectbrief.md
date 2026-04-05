@@ -9,8 +9,9 @@ GastroPro Product Manager is a Python desktop application designed to manipulate
 3. XML Feed Processing: Load, parse, and process online XML feeds to enhance product data
 4. Web Scraping: Multi-threaded scraping to download additional products and fill missing attributes (optional)
 5. AI Enhancement: Improve or generate B2B short/long descriptions and SEO metadata (title/description/keywords) using an LLM with web search grounding
-6. Output Generation: Create and save a final CSV file that maintains the structure of the local CSV but incorporates data from feeds/scraping/AI
-7. Data Persistence: Maintain a local SQLite database acting as the single source of truth to preserve vital internal metadata between data loads.
+6. Category-Specific Parameters: Dynamically extract structured filtering parameters using AI tailored to unique product categories (stored dynamically as `filteringProperty:{parameter_name}`).
+7. Output Generation: Create and save a final CSV file that maintains the structure of the local CSV but incorporates data from feeds/scraping/AI (flattening generated properties).
+8. Data Persistence: Maintain a local SQLite database acting as the single source of truth (now utilizing a JSON Document-Store schema) to preserve vital internal metadata between data loads.
 
 ## Project Goals
 - Streamline product data management for e-shop operators
@@ -24,12 +25,13 @@ GastroPro Product Manager is a Python desktop application designed to manipulate
 - XML feed integration
 - Multi-threaded web scraping integration
 - AI-generated B2B descriptions and SEO metadata with web search grounding
-- Data transformation and merging
+- AI-driven dynamic extraction of product parameter arrays (e.g. dimensions, types) based on category assignments via optimal Batch API throughput
+- Data transformation, filtering, and merging
 
 ## Technical Requirements
 - Python desktop application with PyQt5 GUI
 - Support for CSV, XML, and web scraping data sources
-- SQLite database for robust data persistence and source-of-truth management
+- SQLite acting as a flexible JSON Document Store for robust data persistence
 - Configuration management
 - Error handling and validation
-- Parallel processing with ThreadPoolExecutor and API quota management (calls/tokens)
+- Parallel processing and Google Gemini Asynchronous Batch API management for maximum throughput and economy
