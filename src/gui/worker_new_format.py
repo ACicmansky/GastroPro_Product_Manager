@@ -12,6 +12,7 @@ from src.pipeline.pipeline_new_format import PipelineNewFormat
 from src.ai.ai_enhancer_new_format import AIEnhancerNewFormat
 from src.scrapers.mebella_scraper import MebellaScraper
 from src.scrapers.topchladenie_scraper import TopchladenieScraper
+from src.core.database import ProductDatabase
 
 
 class WorkerNewFormat(QObject):
@@ -328,8 +329,12 @@ class WorkerNewFormat(QObject):
 
         if to_process > 0:
             self.progress.emit(f"AI vylepšenie: {to_process} produktov...")
+            
+            # Initialize ProductDatabase to manage batch tracking
+            db_instance = ProductDatabase(self.config)
+            
             result_df, ai_stats = enhancer.enhance_dataframe_with_stats(
-                df, force_reprocess
+                df, force_reprocess, database_instance=db_instance
             )
 
             # Update statistics

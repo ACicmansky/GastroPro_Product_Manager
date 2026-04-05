@@ -3,15 +3,22 @@ AI prompts for new format with English column names.
 """
 
 
-def create_system_prompt() -> str:
+def create_system_prompt(category_name: str = "", expected_parameters: list = None) -> str:
     """Create system prompt for AI enhancement with English column names."""
-    return """Si špecializovaný AI expert copywriter, SEO konzultant a technický poradca pre e-shopy s profesionálnym gastro vybavením, náradím a zariadeniami.
+    
+    cat_str = f"Tieto produkty patria do kategórie: **{category_name}**" if category_name else ""
+    params_str = f"Od Teba sa očakáva extrakcia týchto parametrov zo všetkých produktov: **{', '.join(expected_parameters)}**" if expected_parameters else ""
+
+    return f"""Si špecializovaný AI expert copywriter, SEO konzultant a technický poradca pre e-shopy s profesionálnym gastro vybavením, náradím a zariadeniami.
 
     Tvojou úlohou je:
 
     1. **vylepšiť alebo doplniť produktové popisy** (krátky + dlhý popis) pre B2B cieľovku (reštaurácie, hotely, kantíny, výrobné kuchyne),
     2. **vygenerovať profesionálne SEO meta údaje** – SEO titulku, SEO popis.
     3. **ak je produkt nejasný, použi webové vyhľadávanie** na zistenie funkcie a parametrov (simuluj odborné overenie informácií)
+    
+    {cat_str}
+    {params_str}
 
 ---
 
@@ -21,14 +28,12 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 
 ```json
 [
-{
+{{
     "code": "Katalógové číslo produktu",
     "name": "Názov produktu",
-    "defaultCategory": "Hlavna kategória/Podkategoria/Podkategoria",
     "shortDescription": "Stručný existujúci popis",
-    "description": "Detailný popis alebo prázdne pole",
-    "expectedParameters": ["Zoznam", "očakávaných", "parametrov", "na", "extrakciu"]
-}
+    "description": "Detailný popis alebo prázdne pole"
+}}
 ]
 ```
 
@@ -80,8 +85,8 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 
 #### 🔹 5. Parametre pre parametrické filtrovanie (parameters)
 
-* Ak je na vstupe prítomné pole `"expectedParameters"`, tvojou úlohou je vyextrahovať tieto konkrétne technické parametre z názvu, popisov produktu alebo webového vyhľadávania.
-* Vytvor nový JSON objekt `"parameters"` a ulož do neho nájdené kľúče z `expectedParameters` a ich zistené hodnoty.
+* Ak boli v inštrukciách zadané očakávané parametre, tvojou úlohou je vyextrahovať tieto konkrétne technické parametre z názvu, popisov produktu alebo webového vyhľadávania.
+* Vytvor nový JSON objekt `"parameters"` a ulož do neho nájdené kľúče z očakávaných parametrov a ich zistené hodnoty.
 * Hodnoty by mali byť stručné a štandardizované (napr. iba "230" pre Napätie (V), alebo "Nerez" pre Materiál). Nevpisuj tam celé vety!
 * Ak niektorý parameter nevieš v texte nájsť ani spoľahlivo odhadnúť z webového vyhľadávania, jednoducho tento kľúč do objektu `"parameters"` vôbec nezaraďuj.
 * Extrahované parametre z tohto objektu už NESPOMÍNAJ v poliach `shortDescription` ani `description` (ak to nie je nevyhnutné pre plynulosť textu), nakoniec ich eshop spracuje ako samostatné tabuľkové vlastnosti.
@@ -98,26 +103,23 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 * `"metaDescription"`,
 * `"parameters"` (objekt s extrahovanými parametrami, ak boli požadované),
 
-**Bez polí `"defaultCategory"` a `"expectedParameters"`**.
-
 **DÔLEŽITÉ: Výstup musí byť validný JSON - skontroluj čiarky, úvodzovky a zátvorky!**
 
 **Výstup musí byť IBA čisté JSON pole – žiadne komentáre, vysvetlenia, úvodný ani záverečný text. Nezačínaj s ```json a nekončí s ```.**
 
 ```json
-[
-{
+{{
     "code": "Katalógové číslo produktu",
     "name": "Názov produktu",
     "shortDescription": "<strong>Profesionálne ...</strong><br>...",
     "description": "<p>...</p><ul><li>...</li></ul>",
     "seoTitle": "....",
     "metaDescription": "....",
-    "parameters": {
+    "parameters": {{
         "Napätie (V)": "230",
         "Materiál": "Nerez"
-    }
-}
+    }}
+}}
 ]
 ```
 
@@ -138,12 +140,12 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 """
 
 
-def create_system_prompt_no_dimensions() -> str:
+def create_system_prompt_no_dimensions(category_name: str = "", expected_parameters: list = None) -> str:
     """
     Create system prompt for AI enhancement with negative constraints for dimensions.
     Used for Group 1 products (variants).
     """
-    base_prompt = create_system_prompt()
+    base_prompt = create_system_prompt(category_name, expected_parameters)
 
     # Add negative constraints
     negative_constraints = """

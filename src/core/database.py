@@ -97,6 +97,19 @@ class ProductDatabase:
                     except sqlite3.OperationalError as e:
                         print(f"Warning: Could not add column {col}: {e}")
                         
+            # Initialize batch jobs table
+            batch_table_stmt = """
+            CREATE TABLE IF NOT EXISTS batch_jobs (
+                job_name TEXT PRIMARY KEY,
+                created_at TEXT,
+                status TEXT,
+                input_file TEXT,
+                uploaded_file_name TEXT,
+                details TEXT
+            )
+            """
+            cursor.execute(batch_table_stmt)
+
             conn.commit()
 
     def backup_db(self, max_backups: int = 10) -> Optional[str]:
@@ -135,6 +148,50 @@ class ProductDatabase:
                     print(f"Failed to delete old backup {old_backup}: {e}")
                     
         return backup_path
+
+    # --- Batch Job Operations ---
+    
+    def add_batch_job(self, job_name: str, status: str, input_file: str, uploaded_file_name: str):
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            timestamp = datetime.now().isoformat()
+            cursor.execute(
+                "INSERT INTO batch_jobs (job_name, created_at, status, input_file, uploaded_file_name, details) VALUES (?, ?, ?, ?, ?, ?)",
+                (job_name, timestamp, status, input_file, uploaded_file_name, "")
+            )
+            conn.commit()
+
+    def update_batch_job_status(self, job_name: str, new_status: str, details: str = ""):
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "UPDATE batch_jobs SET status = ?, details = ? WHERE job_name = ?",
+                (new_status, details, job_name)
+            )
+            conn.commit()
+
+    def get_active_batch_job(self) -> Optional[dict]:
+        """Returns the most recent active batch job if any"""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT * FROM batch_jobs WHERE status NOT IN ('JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED', 'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED') ORDER BY created_at DESC LIMIT 1"
+            )
+            row = cursor.fetchone()
+            if row:
+                return dict(row)
+            return None
+
+    def get_batch_job(self, job_name: str) -> Optional[dict]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM batch_jobs WHERE job_name = ?", (job_name,))
+            row = cursor.fetchone()
+            if row:
+                return dict(row)
+            return None
+
+    # --- End Batch Job Operations ---
 
     def get_all_products_df(self) -> pd.DataFrame:
         """

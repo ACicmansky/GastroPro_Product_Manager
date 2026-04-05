@@ -94,7 +94,7 @@ class AIEnhancerNewFormat:
         self.category_parameters = {}
         cat_params_path = os.path.join(
             os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
-            "category_parameters.json"
+            "categories_with_parameters.json"
         )
         if os.path.exists(cat_params_path):
             try:
@@ -102,8 +102,8 @@ class AIEnhancerNewFormat:
                     params_data = json.load(f)
                     if isinstance(params_data, list):
                         for item in params_data:
-                            if isinstance(item, dict) and "category" in item and "parameters" in item:
-                                self.category_parameters[item["category"]] = item["parameters"]
+                            if isinstance(item, dict) and "kategoria" in item and "filtre" in item:
+                                self.category_parameters[item["kategoria"]] = item["filtre"]
                 logger.info(f"Loaded {len(self.category_parameters)} category parameter configurations.")
             except Exception as e:
                 logger.warning(f"Failed to load category parameters: {e}")
@@ -173,15 +173,12 @@ class AIEnhancerNewFormat:
             product = {
                 "code": str(row.get("code", "")),
                 "name": str(row.get("name", "")),
-                "defaultCategory": category,
                 "shortDescription": str(row.get("shortDescription", "")),
                 "description": str(row.get("description", "")),
             }
 
-            # Inject expected parameters if we have category mapping
-            expected_params = self.category_parameters.get(category, [])
-            if expected_params:
-                product["expectedParameters"] = expected_params
+            # We DO NOT inject expected parameters per-product anymore; 
+            # it's handled at the batch's system_instruction level.
 
             products.append(product)
 
@@ -428,13 +425,15 @@ class AIEnhancerNewFormat:
         df: pd.DataFrame,
         progress_callback=None,
         force_reprocess: bool = False,
+        database_instance=None
     ) -> Tuple[pd.DataFrame, Dict]:
         """
-        Process entire dataframe with AI enhancement using parallel processing.
+        Process entire dataframe with AI enhancement using Gemini Batch API.
 
         Args:
             df: DataFrame to process
             progress_callback: Optional callback for progress updates
+            database_instance: A ProductDatabase instance to manage job state
 
         Returns:
             Tuple of (processed dataframe, statistics dict)
@@ -443,6 +442,16 @@ class AIEnhancerNewFormat:
             logger.warning("No API key provided, skipping AI enhancement")
             return df, {"ai_should_process": 0, "ai_processed": 0}
 
+        # Check if there is an active batch job to resume
+        if database_instance:
+            active_job = database_instance.get_active_batch_job()
+            if active_job:
+                logger.info(f"Resuming active batch job: {active_job['job_name']}")
+                if progress_callback:
+                    progress_callback(0, 0, f"Obnovovanie existujúcej úlohy (Job ID: {active_job['job_name'][-10:]})...")
+                # Resume tracking this job instead of starting a new one
+                return self._monitor_and_apply_batch_job(df, active_job["job_name"], active_job["uploaded_file_name"], database_instance, progress_callback)
+
         # Add AI processing columns if they don't exist
         if "aiProcessed" not in df.columns:
             df["aiProcessed"] = ""
@@ -450,8 +459,6 @@ class AIEnhancerNewFormat:
             df["aiProcessedDate"] = ""
 
         # Normalize 'aiProcessed' column
-        # "1", "TRUE", "YES", "1.0" → "1" (already processed)
-        # "0", "FALSE", "NO", "" → "0" (needs processing)
         df["aiProcessed"] = df["aiProcessed"].apply(
             lambda x: (
                 "1"
@@ -462,149 +469,229 @@ class AIEnhancerNewFormat:
             )
         )
 
-        # Filter products needing processing
         if force_reprocess:
             needs_processing = df
         else:
             needs_processing = df[df["aiProcessed"] != "1"]
+            
         total_products = len(needs_processing)
 
         if total_products == 0:
             logger.info("No products need AI enhancement")
-            print("No products need AI enhancement")
+            if progress_callback:
+                progress_callback(0, 0, "Žiadne produkty na vylepšenie.")
             return df, {"ai_should_process": 0, "ai_processed": 0}
 
-        logger.info(f"Processing {total_products} products with AI enhancement")
-        print(f"Starting AI enhancement for {total_products} products...")
-
-        # Identify Group 1 and Group 2 products for correct config selection
-        # Group 1: Products with a pairCode OR whose code is used as a pairCode
+        logger.info(f"Processing {total_products} products with Batch API")
+        
+        # Identify Group 1 indices (Variants / PairCodes)
         group1_indices = set()
-
         if "pairCode" in df.columns:
-            # Get all pairCodes that are present in the dataframe
             all_pair_codes = set(df["pairCode"].dropna().unique())
-            # Remove empty strings if any
             all_pair_codes.discard("")
-
             for idx, row in needs_processing.iterrows():
                 code = str(row.get("code", "")).strip()
                 pair_code = str(row.get("pairCode", "")).strip()
-
-                # Condition 1: Has a pairCode
-                if pair_code:
-                    group1_indices.add(idx)
-                # Condition 2: Its code is used as a pairCode by another product
-                elif code and code in all_pair_codes:
+                if pair_code or (code and code in all_pair_codes):
                     group1_indices.add(idx)
 
-        # Store the indices of products that need processing
-        needs_processing_indices = needs_processing.index
-        processed_count = 0
-
-        # Prepare batches
-        batches = []
-
-        # Helper to create batches for a group
-        def create_batches_for_group(indices, config):
+        # Build requests for Group 1 (no dimensions) and Group 2 (standard)
+        from .ai_prompts_new_format import create_system_prompt, create_system_prompt_no_dimensions
+        
+        jsonl_requests = []
+        
+        # Helper to group by category and generate requests
+        def build_category_requests(indices, is_group1):
             if not indices:
                 return
             group_df = needs_processing.loc[indices]
-            for i in range(0, len(group_df), self.batch_size):
-                batch_end = min(i + self.batch_size, len(group_df))
-                batch_indices = group_df.index[i:batch_end]
-                products = self.prepare_batch_data(group_df, i, batch_end)
-                if products:
-                    batches.append((products, batch_indices, len(batches) + 1, config))
+            # Group by category (fallback to empty string if missing)
+            group_df["_temp_cat"] = group_df.apply(lambda r: str(r.get("newCategory", r.get("defaultCategory", ""))), axis=1)
+            
+            for category_name, cat_subset in group_df.groupby("_temp_cat"):
+                # If category is missing/skipping logic (we decided to skip products with unknown categories if needed, 
+                # but currently we just pass empty lists for parameters if category not found)
+                if not category_name and len(self.category_parameters) > 0:
+                    logger.warning(f"Skipping {len(cat_subset)} products because they have no defaultCategory mapped.")
+                    continue
+                
+                expected_params = self.category_parameters.get(category_name, [])
+                
+                # Get the correct system prompt content
+                if is_group1:
+                    sys_prompt_text = create_system_prompt_no_dimensions(category_name, expected_params)
+                else:
+                    sys_prompt_text = create_system_prompt(category_name, expected_params)
+                    
+                # Batch products inside this category
+                for i in range(0, len(cat_subset), self.batch_size):
+                    batch_end = min(i + self.batch_size, len(cat_subset))
+                    products_subset = self.prepare_batch_data(cat_subset, i, batch_end)
+                    if products_subset:
+                        req_key = f"req_{'g1' if is_group1 else 'g2'}_{hash(category_name)}_{i}"
+                        
+                        # Build standard GenerateContentRequest dictionary compatible with JSONL upload
+                        jsonl_requests.append({
+                            "key": req_key,
+                            "request": {
+                                "systemInstruction": {"parts": [{"text": sys_prompt_text}]},
+                                "contents": [{"role": "user", "parts": [{"text": json.dumps(products_subset, ensure_ascii=False)}] }],
+                                "generationConfig": {"temperature": self.temperature, "responseMimeType": "application/json"}
+                            }
+                        })
+        
+        # Build for both groups
+        if progress_callback:
+            progress_callback(0, total_products, "Príprava dávok (Batch Requests)...")
+            
+        build_category_requests(list(group1_indices), True)
+        group2_indices = [idx for idx in needs_processing.index if idx not in group1_indices]
+        build_category_requests(group2_indices, False)
 
-        # Create batches for Group 1
-        create_batches_for_group(list(group1_indices), self.api_config_no_dimensions)
+        if not jsonl_requests:
+            logger.info("No valid batch requests generated (perhaps missing categories?).")
+            return df, {"ai_should_process": total_products, "ai_processed": 0}
 
-        # Create batches for Group 2 (indices in needs_processing but not in group1_indices)
-        group2_indices = [
-            idx for idx in needs_processing.index if idx not in group1_indices
-        ]
-        create_batches_for_group(group2_indices, self.api_config_standard)
+        # Write requests to a temporary JSONL file
+        jsonl_file_path = os.path.join(self.tmp_dir, f"batch_requests_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jsonl")
+        with open(jsonl_file_path, "w", encoding="utf-8") as f:
+            for req in jsonl_requests:
+                f.write(json.dumps(req, ensure_ascii=False) + "\n")
 
-        # Re-number batches for logging consistency
-        batches = [(b[0], b[1], i + 1, b[3]) for i, b in enumerate(batches)]
+        # Upload and create batch
+        if progress_callback:
+            progress_callback(0, total_products, "Nahrávanie súboru na Google Cloud...")
+            
+        try:
+            uploaded_file = self.client.files.upload(
+                file=jsonl_file_path, 
+                config=types.UploadFileConfig(mime_type='application/jsonl')
+            )
+            
+            if progress_callback:
+                progress_callback(0, total_products, "Vytváranie dávkovej úlohy (Batch Job)...")
+                
+            batch_job = self.client.batches.create(
+                model=self.model_name, 
+                src=uploaded_file.name
+            )
+            
+            logger.info(f"Batch Job Created: {batch_job.name}")
+            
+            # Save into database
+            if database_instance:
+                database_instance.add_batch_job(batch_job.name, batch_job.state.name, jsonl_file_path, uploaded_file.name)
+            
+            # Monitor the job
+            return self._monitor_and_apply_batch_job(df, batch_job.name, uploaded_file.name, database_instance, progress_callback, total_products)
 
-        print(
-            f"Created {len(batches)} batches for processing (Group 1: {len(group1_indices)}, Group 2: {len(group2_indices)})"
-        )
+        except Exception as e:
+            logger.error(f"Failed to create Batch Job: {e}")
+            return df, {"ai_should_process": total_products, "ai_processed": 0}
 
-        # Process batches in parallel
-        with ThreadPoolExecutor(max_workers=self.max_parallel_calls) as executor:
-            # Submit all batches
-            future_to_batch = {
-                executor.submit(
-                    self._process_single_batch,
-                    batch_data,
-                    batch_indices,
-                    batch_num,
-                    config,
-                ): batch_num
-                for batch_data, batch_indices, batch_num, config in batches
-            }
-
-            # Process completed batches
-            for future in as_completed(future_to_batch):
-                batch_num = future_to_batch[future]
-                try:
-                    result = future.result()
-                    if result:
-                        enhanced_products, batch_indices = result
-                        df, updated_count = self.update_dataframe(
-                            df,
-                            enhanced_products,
-                            valid_indices=needs_processing_indices,
-                        )
-                        processed_count += updated_count
-
-                        logger.info(f"Processed batch {batch_num}/{len(batches)}")
-                        print(
-                            f"Processed batch {batch_num}/{len(batches)} - Total processed: {processed_count}/{total_products}"
-                        )
-                except Exception as e:
-                    logger.error(f"Error processing batch {batch_num}: {e}")
-                    print(f"Error processing batch {batch_num}: {e}")
-
-                # Update progress
-                if progress_callback:
-                    progress_callback(processed_count, total_products)
-
-        logger.info(
-            f"AI enhancement completed. Processed {processed_count} products out of {total_products}"
-        )
-        statistics = {
-            "ai_should_process": total_products,
-            "ai_processed": processed_count,
-        }
-        return df, statistics
-
-    def _process_single_batch(
-        self,
-        products: List[Dict[str, str]],
-        batch_indices: pd.Index,
-        batch_num: int,
-        config: Optional[types.GenerateContentConfig] = None,
-    ):
+    def _monitor_and_apply_batch_job(
+        self, df: pd.DataFrame, job_name: str, uploaded_file_name: str, database_instance, progress_callback=None, original_total: int = 0
+    ) -> Tuple[pd.DataFrame, Dict]:
         """
-        Process a single batch of products.
-
-        Args:
-            products: List of product dicts to process
-            batch_indices: Original DataFrame indices for these products
-            batch_num: Batch number for logging
-            config: Optional API config to use
-
-        Returns:
-            Tuple of (enhanced products, batch indices) or None
+        Polls the Google Batch API until completion and applies results to DataFrame.
         """
-        enhanced_products = self.process_batch_with_retry(products, config)
-        if enhanced_products:
-            return enhanced_products, batch_indices
-        return None
+        start_time = time.time()
+        completed_states = {'JOB_STATE_SUCCEEDED', 'JOB_STATE_FAILED', 'JOB_STATE_CANCELLED', 'JOB_STATE_EXPIRED'}
+        
+        while True:
+            try:
+                batch_job = self.client.batches.get(name=job_name)
+                state = batch_job.state.name
+            except Exception as e:
+                logger.error(f"Error polling job {job_name}: {e}")
+                time.sleep(30)
+                continue
+                
+            if database_instance:
+                database_instance.update_batch_job_status(job_name, state)
+                
+            logger.info(f"Batch Job {job_name} Status: {state}")
+            if progress_callback:
+                elapsed_mins = int((time.time() - start_time) / 60)
+                progress_callback(0, original_total or 100, f"Spracováva sa v cloude (Čas: {elapsed_mins}m, Stav: {state})...")
+                
+            if state in completed_states:
+                break
+                
+            time.sleep(30)
+            
+        # Job ended
+        if state != 'JOB_STATE_SUCCEEDED':
+            logger.error(f"Batch Job failed or cancelled. Final state: {state}")
+            return df, {"ai_should_process": original_total, "ai_processed": 0}
+            
+        # Download results
+        if progress_callback:
+            progress_callback(90, 100, "Sťahovanie výsledkov...")
+            
+        if not batch_job.dest or not batch_job.dest.file_name:
+            logger.error("No destination file name found in batch job response.")
+            return df, {"ai_should_process": original_total, "ai_processed": 0}
+            
+        result_file_name = batch_job.dest.file_name
+        try:
+            file_content_bytes = self.client.files.download(file=result_file_name)
+            file_content = file_content_bytes.decode('utf-8')
+        except Exception as e:
+            logger.error(f"Failed to download results: {e}")
+            return df, {"ai_should_process": original_total, "ai_processed": 0}
+            
+        # Clean up input file if exists
+        try:
+            if uploaded_file_name:
+                self.client.files.delete(name=uploaded_file_name)
+        except Exception as e:
+            logger.warning(f"Could not delete uploaded file {uploaded_file_name}: {e}")
+            
+        return self._parse_batch_results(df, file_content, progress_callback)
+        
+    def _parse_batch_results(self, df: pd.DataFrame, file_content: str, progress_callback=None) -> Tuple[pd.DataFrame, Dict]:
+        """Parse JSONL output from Batch API and update the DataFrame."""
+        if progress_callback:
+            progress_callback(95, 100, "Aplikovanie výsledkov do tabuľky...")
+            
+        enhanced_products_all = []
+        
+        for line in file_content.splitlines():
+            if not line:
+                continue
+            try:
+                parsed_response = json.loads(line)
+                
+                # Check for successful response
+                if 'response' in parsed_response and parsed_response['response']:
+                    # Extract the generated text piece
+                    for part in parsed_response['response']['candidates'][0]['content']['parts']:
+                        if 'text' in part:
+                            json_str = part['text'].strip()
+                            json_str = json_str.replace("```json", "").replace("```", "")
+                            
+                            try:
+                                # This should be a list of enhanced product dicts for this category batch
+                                enhanced_list = json.loads(json_str)
+                                if isinstance(enhanced_list, list):
+                                    enhanced_products_all.extend(enhanced_list)
+                            except json.JSONDecodeError as je:
+                                logger.error(f"Failed to decode text payload inside batch response: {je}")
+                                
+                elif 'error' in parsed_response:
+                    logger.error(f"Batch item error: {parsed_response['error']}")
+            except Exception as e:
+                logger.error(f"Error parsing batch line: {e}")
+
+        # Update DataFrame with collected products
+        if enhanced_products_all:
+            updated_df, updated_count = self.update_dataframe(df, enhanced_products_all)
+            return updated_df, {"ai_should_process": len(enhanced_products_all), "ai_processed": updated_count}
+            
+        return df, {"ai_should_process": 0, "ai_processed": 0}
+
+
 
     def enhance_product(
         self,
@@ -655,7 +742,7 @@ class AIEnhancerNewFormat:
         return result
 
     def enhance_dataframe_with_stats(
-        self, df: pd.DataFrame, force_reprocess: bool = False
+        self, df: pd.DataFrame, force_reprocess: bool = False, database_instance=None
     ) -> Tuple[pd.DataFrame, Dict]:
         """
         Enhance DataFrame and return statistics.
@@ -667,9 +754,8 @@ class AIEnhancerNewFormat:
         Returns:
             Tuple of (enhanced DataFrame, statistics dict)
         """
-        # Use the parallel batch processing method which is much more efficient
-        # and handles grouping correctly
-        return self.process_dataframe(df, force_reprocess=force_reprocess)
+        # Pass the database implementation to track Batch Jobs
+        return self.process_dataframe(df, force_reprocess=force_reprocess, database_instance=database_instance)
 
     def _call_ai_api(
         self, product: pd.Series, config: Optional[types.GenerateContentConfig] = None

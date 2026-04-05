@@ -459,10 +459,10 @@ class MainWindowNewFormat(QMainWindow):
             ),
         }
 
-        # Show progress
+        # Show progress and disable UI
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0)  # Indeterminate
-        self.process_button.setEnabled(False)
+        self._set_ui_enabled(False)
         self.stats_group.setVisible(False)
 
         # Create worker thread
@@ -485,11 +485,46 @@ class MainWindowNewFormat(QMainWindow):
         self.worker.progress.connect(self.update_progress)
 
         # Cleanup
-        self.thread.finished.connect(lambda: self.process_button.setEnabled(True))
+        self.thread.finished.connect(lambda: self._set_ui_enabled(True))
         self.thread.finished.connect(lambda: self.progress_bar.setVisible(False))
 
         # Start processing
         self.thread.start()
+
+    def _set_ui_enabled(self, enabled: bool):
+        """Enable or disable all UI inputs during processing."""
+        self.process_button.setEnabled(enabled)
+        self.select_main_button.setEnabled(enabled)
+        # Only enable clear if there is a main file loaded
+        self.clear_main_button.setEnabled(enabled and self.main_data_file is not None)
+        
+        # XML Feeds
+        self.gastromarket_checkbox.setEnabled(enabled)
+        self.gastromarket_stalgast_checkbox.setEnabled(enabled)
+        self.forgastro_checkbox.setEnabled(enabled)
+        
+        # Options
+        self.ai_enhancement_checkbox.setEnabled(enabled)
+        self.web_scraping_checkbox.setEnabled(enabled)
+        self.mebella_scraping_checkbox.setEnabled(enabled)
+        self.update_categories_checkbox.setEnabled(enabled)
+        
+        # We only enable these conditionally so rely on their specific state checks
+        if enabled:
+            # Re-check ai force enabled state
+            self.force_reprocess_checkbox.setEnabled(self.ai_enhancement_checkbox.isChecked())
+            # Re-check preserve edits enabled state
+            self.preserve_edits_checkbox.setEnabled(self.main_data_file is not None)
+        else:
+            self.force_reprocess_checkbox.setEnabled(False)
+            self.preserve_edits_checkbox.setEnabled(False)
+            
+        # Filter section
+        self.category_search.setEnabled(enabled)
+        self.toggle_categories_button.setEnabled(enabled)
+        self.select_all_button.setEnabled(enabled)
+        self.deselect_all_button.setEnabled(enabled)
+        self.category_list.setEnabled(enabled)
 
     def update_progress(self, message: str):
         """Update progress bar with message."""
