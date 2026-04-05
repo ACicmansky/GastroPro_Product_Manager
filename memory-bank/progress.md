@@ -53,6 +53,10 @@
 - ✅ Standalone transformation script (`scripts/transform_to_new_format.py`)
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
+## Recently Completed (March 22, 2026)
+- ✅ **New Utility Script for Categories**
+  - Added `get_unique_categories.py` script to generate a sorted text file (`unique_categories.txt`) with all unique `newCategory` values found in `categories.json`.
+
 ## Recently Completed (March 11, 2026)
 - ✅ **Legacy Dead Code Cleanup**
   - Safely removed 14 unused files from the legacy pipeline architecture.

@@ -305,9 +305,16 @@ class OutputTransformer:
 
         # Keep important tracking columns that might not be in the config output list
         internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
-        extra_cols = [col for col in internal_tracking if col in df.columns and col not in self.new_output_columns]
+        
+        # Keep dynamic filtering properties extracted by AI
+        dynamic_cols = [col for col in df.columns if col.startswith("filteringProperty:") and col not in self.new_output_columns]
+        
+        extra_cols = dynamic_cols + [
+            col for col in internal_tracking 
+            if col in df.columns and col not in self.new_output_columns
+        ]
 
-        # Reorder columns to match configuration, followed by any internal tracking columns
+        # Reorder columns to match configuration, followed by any internal tracking columns and dynamic filtering properties
         ordered_cols = self.new_output_columns + extra_cols
         # Ensure we only select columns that actually exist in the dataframe 
         # (in case self.new_output_columns has extra config values or non-column names)

@@ -26,7 +26,8 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
     "name": "Názov produktu",
     "defaultCategory": "Hlavna kategória/Podkategoria/Podkategoria",
     "shortDescription": "Stručný existujúci popis",
-    "description": "Detailný popis alebo prázdne pole"
+    "description": "Detailný popis alebo prázdne pole",
+    "expectedParameters": ["Zoznam", "očakávaných", "parametrov", "na", "extrakciu"]
 }
 ]
 ```
@@ -77,6 +78,14 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 * Pridaj prefix "GastroPro.sk | "
 * Príklad: „GastroPro.sk | Robustný nerezový stôl GN1/1 so zásuvkami pre gastro prevádzky. Vysoká odolnosť, hygienické spracovanie, rýchle dodanie."
 
+#### 🔹 5. Parametre pre parametrické filtrovanie (parameters)
+
+* Ak je na vstupe prítomné pole `"expectedParameters"`, tvojou úlohou je vyextrahovať tieto konkrétne technické parametre z názvu, popisov produktu alebo webového vyhľadávania.
+* Vytvor nový JSON objekt `"parameters"` a ulož do neho nájdené kľúče z `expectedParameters` a ich zistené hodnoty.
+* Hodnoty by mali byť stručné a štandardizované (napr. iba "230" pre Napätie (V), alebo "Nerez" pre Materiál). Nevpisuj tam celé vety!
+* Ak niektorý parameter nevieš v texte nájsť ani spoľahlivo odhadnúť z webového vyhľadávania, jednoducho tento kľúč do objektu `"parameters"` vôbec nezaraďuj.
+* Extrahované parametre z tohto objektu už NESPOMÍNAJ v poliach `shortDescription` ani `description` (ak to nie je nevyhnutné pre plynulosť textu), nakoniec ich eshop spracuje ako samostatné tabuľkové vlastnosti.
+
 ---
 
 ### 📤 **VÝSTUP**
@@ -87,8 +96,9 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 * `"description"` (HTML),
 * `"seoTitle"`,
 * `"metaDescription"`,
+* `"parameters"` (objekt s extrahovanými parametrami, ak boli požadované),
 
-**Bez poľa `"defaultCategory"`**.
+**Bez polí `"defaultCategory"` a `"expectedParameters"`**.
 
 **DÔLEŽITÉ: Výstup musí byť validný JSON - skontroluj čiarky, úvodzovky a zátvorky!**
 
@@ -102,7 +112,11 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
     "shortDescription": "<strong>Profesionálne ...</strong><br>...",
     "description": "<p>...</p><ul><li>...</li></ul>",
     "seoTitle": "....",
-    "metaDescription": "...."
+    "metaDescription": "....",
+    "parameters": {
+        "Napätie (V)": "230",
+        "Materiál": "Nerez"
+    }
 }
 ]
 ```
@@ -119,6 +133,7 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 * [ ] Dlhý popis má 200-600 slov
 * [ ] SEO titulka má 50-60 znakov
 * [ ] metaDescription má 120-160 znakov
+* [ ] Objekt `"parameters"` obsahuje iba vyžiadané parametre so zmysluplnými číselnými/textovými hodnotami
 * [ ] Výstup je čistý JSON bez akýchkoľvek iných prvkov
 """
 

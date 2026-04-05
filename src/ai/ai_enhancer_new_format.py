@@ -90,6 +90,24 @@ class AIEnhancerNewFormat:
         )
         os.makedirs(self.tmp_dir, exist_ok=True)
 
+        # Load category parameters if available
+        self.category_parameters = {}
+        cat_params_path = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.dirname(__file__))),
+            "category_parameters.json"
+        )
+        if os.path.exists(cat_params_path):
+            try:
+                with open(cat_params_path, 'r', encoding='utf-8') as f:
+                    params_data = json.load(f)
+                    if isinstance(params_data, list):
+                        for item in params_data:
+                            if isinstance(item, dict) and "category" in item and "parameters" in item:
+                                self.category_parameters[item["category"]] = item["parameters"]
+                logger.info(f"Loaded {len(self.category_parameters)} category parameter configurations.")
+            except Exception as e:
+                logger.warning(f"Failed to load category parameters: {e}")
+
     def _check_and_wait_for_quota(self, tokens_needed: int = 0):
         """
         Check quota and wait if necessary.
@@ -151,13 +169,20 @@ class AIEnhancerNewFormat:
 
         products = []
         for _, row in batch_df.iterrows():
+            category = str(row.get("newCategory", row.get("defaultCategory", "")))
             product = {
                 "code": str(row.get("code", "")),
                 "name": str(row.get("name", "")),
-                "defaultCategory": str(row.get("defaultCategory", "")),
+                "defaultCategory": category,
                 "shortDescription": str(row.get("shortDescription", "")),
                 "description": str(row.get("description", "")),
             }
+
+            # Inject expected parameters if we have category mapping
+            expected_params = self.category_parameters.get(category, [])
+            if expected_params:
+                product["expectedParameters"] = expected_params
+
             products.append(product)
 
         return products
@@ -378,6 +403,12 @@ class AIEnhancerNewFormat:
                     df.at[best_match_idx, "metaDescription"] = enhanced_product[
                         "metaDescription"
                     ]
+
+                if "parameters" in enhanced_product and isinstance(enhanced_product["parameters"], dict):
+                    for param_key, param_val in enhanced_product["parameters"].items():
+                        if param_val:
+                            col_name = f"filteringProperty:{param_key}"
+                            df.at[best_match_idx, col_name] = str(param_val)
 
                 # Set tracking columns
                 df.at[best_match_idx, "aiProcessed"] = "1"

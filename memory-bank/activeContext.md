@@ -6,6 +6,8 @@ The current focus is on **monitoring and refining the application**. Recently co
 The SQLite DB is now the source of truth, ensuring that internal metadata (like `aiProcessed`, `aiProcessedDate`) is preserved across client data uploads and application restarts.
 
 ## Recent Changes
+- **Added `get_unique_categories` Script (March 22, 2026):**
+  - Created a helper script in `scripts/get_unique_categories.py` to extract all unique `newCategory` values from `categories.json` and save them to `unique_categories.txt`.
 - **Legacy Dead Code Cleanup (March 11, 2026):**
   - Analyzed the codebase using CodeGraphContext to verify zero dependencies for legacy components.
   - Safely removed 14 legacy files related to the "old format" pipeline (including `main.py`, `src/core/data_pipeline.py`, old GUI elements, and `ai_enhancer.py`).
