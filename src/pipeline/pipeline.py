@@ -187,3 +187,27 @@ class Pipeline:
     def load_main_data(self, file_path: str) -> pd.DataFrame:
         """Load main data file. Convenience method."""
         return DataLoaderFactory.load(file_path)
+
+    def parse_xml(self, feed_name: str, xml_content: str) -> pd.DataFrame:
+        """Parse an XML feed. Convenience method for testing."""
+        result = XMLParserFactory.parse(feed_name, xml_content, self.config)
+        return result if result is not None else pd.DataFrame()
+
+    def map_categories(self, df: pd.DataFrame, ask_interactive: bool = False) -> pd.DataFrame:
+        """Map category fields in-place. Convenience method for testing."""
+        df = df.copy()
+        for idx, row in df.iterrows():
+            old_cat = str(row.get("defaultCategory", ""))
+            if old_cat:
+                new_cat = self.category_service.map(old_cat)
+                df.at[idx, "defaultCategory"] = new_cat
+                df.at[idx, "categoryText"] = new_cat
+        return df
+
+    def apply_transformation(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Apply output format transformation. Convenience method."""
+        return self.transformer.transform(df)
+
+    def save_output(self, df: pd.DataFrame, file_path: str) -> None:
+        """Save DataFrame to xlsx. Convenience method."""
+        write_xlsx(df, file_path)

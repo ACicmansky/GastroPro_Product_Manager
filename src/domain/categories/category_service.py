@@ -8,16 +8,26 @@ Replaces three previous systems:
 
 import json
 import os
-from typing import List, Optional, Callable, Tuple
+from typing import Dict, List, Optional, Callable, Tuple, Union
 
+import pandas as pd
 from rapidfuzz import fuzz
 
 
 class CategoryService:
     """Single unified category mapping system."""
 
-    def __init__(self, mappings_path: str = "categories.json"):
-        self.mappings_path = mappings_path
+    def __init__(self, mappings_path_or_config: Union[str, Dict, None] = None):
+        if isinstance(mappings_path_or_config, dict):
+            self.config = mappings_path_or_config
+            self.mappings_path = mappings_path_or_config.get("categories_path", "categories.json")
+        elif isinstance(mappings_path_or_config, str):
+            self.config = None
+            self.mappings_path = mappings_path_or_config
+        else:
+            self.config = None
+            self.mappings_path = "categories.json"
+
         self._mappings: dict[str, str] = {}
         self._interactive_callback: Optional[Callable[[str, Optional[str]], str]] = None
         self._load()
@@ -49,14 +59,45 @@ class CategoryService:
         """Look up a known mapping. Returns None if not found."""
         return self._mappings.get(old_category)
 
-    def map_or_ask(self, old_category: str, product_name: Optional[str] = None) -> str:
-        """Map a category, using interactive callback if mapping is unknown.
+    def map_category(self, old_category: str) -> str:
+        """Map a category, returning original if no mapping found.
 
-        If no callback is set, returns the original category unchanged.
+        Alias for map_or_ask without interactive callback.
         """
         mapped = self.map(old_category)
         if mapped is not None:
             return mapped
+        return old_category
+
+    def map_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Map category columns in a DataFrame in-place (on a copy).
+
+        Updates both 'defaultCategory' and 'categoryText' columns.
+        """
+        df = df.copy()
+        for idx, row in df.iterrows():
+            if "defaultCategory" in df.columns:
+                old_cat = str(row.get("defaultCategory", ""))
+                new_cat = self.map_category(old_cat)
+                df.at[idx, "defaultCategory"] = new_cat
+                if "categoryText" in df.columns:
+                    df.at[idx, "categoryText"] = new_cat
+        return df
+
+    def map_or_ask(self, old_category: str, product_name: Optional[str] = None) -> str:
+        """Map a category, using interactive callback if mapping is unknown.
+
+        If the category is already a known target, returns it as-is without
+        invoking the callback.  If no callback is set, returns the original
+        category unchanged.
+        """
+        mapped = self.map(old_category)
+        if mapped is not None:
+            return mapped
+
+        # Already a valid target — no need to remap or ask
+        if self.is_target_category(old_category):
+            return old_category
 
         if self._interactive_callback:
             new_category = self._interactive_callback(old_category, product_name)

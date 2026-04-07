@@ -13,7 +13,7 @@ class TestOutputTransformerBasics:
 
     def test_transformer_initialization(self, config):
         """Test that OutputTransformer initializes correctly."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
         assert transformer is not None
@@ -21,7 +21,7 @@ class TestOutputTransformerBasics:
 
     def test_transformer_has_required_methods(self, config):
         """Test that OutputTransformer has all required methods."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
         assert hasattr(transformer, "transform")
@@ -37,7 +37,7 @@ class TestAIProcessedPreservation:
 
     def test_ensure_all_columns_preserves_ai_processed(self, config):
         """Test that aiProcessed column is kept and values preserved."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
         
         transformer = OutputTransformer(config)
         
@@ -63,7 +63,7 @@ class TestDirectMappings:
 
     def test_direct_mapping_basic(self, config):
         """Test basic direct mapping from old to new format."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -90,7 +90,7 @@ class TestDirectMappings:
 
     def test_direct_mapping_all_columns(self, sample_old_format_df, config):
         """Test that all configured direct mappings work."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
         result = transformer.apply_direct_mappings(sample_old_format_df)
@@ -109,7 +109,7 @@ class TestImageSplitting:
 
     def test_split_single_image(self, config):
         """Test splitting single image URL."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -129,7 +129,7 @@ class TestImageSplitting:
 
     def test_split_multiple_images(self, config):
         """Test splitting multiple comma-separated image URLs."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -146,7 +146,7 @@ class TestImageSplitting:
 
     def test_split_max_8_images(self, config):
         """Test that only first 8 images are kept."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -163,7 +163,7 @@ class TestImageSplitting:
 
     def test_split_empty_images(self, config):
         """Test handling of empty image column."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -181,7 +181,7 @@ class TestCategoryTransformation:
 
     def test_category_add_prefix(self, config):
         """Test adding 'Tovary a kategórie > ' prefix."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -195,7 +195,7 @@ class TestCategoryTransformation:
 
     def test_category_replace_separator(self, config):
         """Test replacing '/' with ' > '."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -208,7 +208,7 @@ class TestCategoryTransformation:
 
     def test_category_empty(self, config):
         """Test handling of empty category."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -225,7 +225,7 @@ class TestCodeUppercase:
 
     def test_code_to_uppercase(self, config):
         """Test converting catalog code to uppercase."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -239,7 +239,7 @@ class TestCodeUppercase:
 
     def test_code_empty(self, config):
         """Test handling of empty code."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -255,7 +255,7 @@ class TestDefaultValues:
 
     def test_apply_defaults_to_empty_cells(self, config):
         """Test that defaults are applied only to empty cells."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -282,7 +282,7 @@ class TestDefaultValues:
 
     def test_defaults_from_config(self, config):
         """Test that default values come from config."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -304,7 +304,7 @@ class TestFullTransformation:
 
     def test_transform_complete(self, sample_old_format_df, config):
         """Test complete transformation from old to new format."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -326,7 +326,7 @@ class TestFullTransformation:
 
     def test_transform_preserves_row_count(self, sample_old_format_df, config):
         """Test that transformation preserves number of rows."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -336,7 +336,7 @@ class TestFullTransformation:
 
     def test_transform_all_columns_present(self, sample_old_format_df, config):
         """Test that all 138 columns are present after transformation."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
@@ -350,7 +350,7 @@ class TestFullTransformation:
 
     def test_transform_no_formatting(self, sample_old_format_df, config):
         """Test that transformation doesn't format values (raw data)."""
-        from src.transformers.output_transformer import OutputTransformer
+        from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 

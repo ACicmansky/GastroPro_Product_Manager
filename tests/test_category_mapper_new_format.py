@@ -12,18 +12,18 @@ class TestCategoryMapperNewFormat:
 
     def test_mapper_initialization(self, config):
         """Test category mapper initializes with config."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from src.domain.categories.category_service import CategoryService
 
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
 
         assert mapper.config is not None
         assert hasattr(mapper, "map_category")
 
     def test_map_category_returns_original_if_no_mapping(self, config):
         """Test that map_category returns original category if no mapping found."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from src.domain.categories.category_service import CategoryService
 
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
 
         # Input: category with no mapping
         input_category = "Vitríny/Chladiace vitríny"
@@ -39,7 +39,7 @@ class TestCategoryMappingDataFrame:
 
     def test_map_dataframe_categories(self, config):
         """Test mapping categories in DataFrame."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from src.domain.categories.category_service import CategoryService
 
         df = pd.DataFrame(
             {
@@ -49,7 +49,7 @@ class TestCategoryMappingDataFrame:
             }
         )
 
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
         result = mapper.map_dataframe(df)
 
         # Should NOT have transformed categories (no prefix added automatically)
@@ -61,7 +61,7 @@ class TestCategoryMappingDataFrame:
 
     def test_map_updates_both_category_columns(self, config):
         """Test that both defaultCategory and categoryText are updated."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from src.domain.categories.category_service import CategoryService
 
         df = pd.DataFrame(
             {
@@ -72,7 +72,7 @@ class TestCategoryMappingDataFrame:
             }
         )
 
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
         result = mapper.map_dataframe(df)
 
         # Both should be updated with same value
@@ -81,7 +81,7 @@ class TestCategoryMappingDataFrame:
 
     def test_map_preserves_other_columns(self, config):
         """Test that mapping preserves other columns."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from src.domain.categories.category_service import CategoryService
 
         df = pd.DataFrame(
             {
@@ -92,7 +92,7 @@ class TestCategoryMappingDataFrame:
             }
         )
 
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
         result = mapper.map_dataframe(df)
 
         # Other columns should be unchanged
@@ -106,9 +106,9 @@ class TestCategoryMappingWithMappingFile:
 
     def test_fallback_to_original_if_no_mapping(self, config):
         """Test fallback to original category if no mapping exists."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from src.domain.categories.category_service import CategoryService
 
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
 
         # Category with no mapping
         result = mapper.map_category("Unknown Category")
@@ -117,31 +117,25 @@ class TestCategoryMappingWithMappingFile:
         assert result == "Unknown Category"
 
     def test_map_returns_existing_target_category(self, config):
-        """Test that map_category returns category as-is if it is already a target category."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        """Test that map_or_ask returns a target category as-is without calling callback."""
+        from src.domain.categories.category_service import CategoryService
         from unittest.mock import MagicMock
 
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
 
-        # Mock the category manager
-        mapper.category_manager = MagicMock()
-        mapper.category_manager.find_mapping.return_value = None
-        mapper.category_manager.is_target_category.return_value = True
+        # Seed one mapping so the TARGET category is known
+        target_category = "Gastro Prevádzky a Profesionáli > Nerezový nábytok"
+        mapper.add_mapping("Nerezový nábytok/Pracovné stoly", target_category)
 
         # Set interactive callback to ensure it's NOT called
         mock_callback = MagicMock()
         mapper.set_interactive_callback(mock_callback)
 
-        # Input: category that is already a target category
-        input_category = "Gastro Prevádzky a Profesionáli > Nerezový nábytok"
+        # Ask for the category that is already a TARGET (not a source key)
+        result = mapper.map_or_ask(target_category)
 
-        # Expected: original category (because is_target_category returns True)
-        result = mapper.map_category(input_category)
-
-        assert result == input_category
-        # Verify is_target_category was called
-        mapper.category_manager.is_target_category.assert_called_with(input_category)
-        # Verify interactive callback was NOT called
+        assert result == target_category
+        # Callback should NOT have been invoked (target category passes through)
         mock_callback.assert_not_called()
 
 
@@ -150,15 +144,15 @@ class TestCategoryMappingIntegration:
 
     def test_map_after_xml_parsing(self, config, sample_xml_gastromarket):
         """Test category mapping after XML parsing."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from src.data.parsers.xml_parser import XMLParser
+        from src.domain.categories.category_service import CategoryService
 
         # Parse XML
-        parser = XMLParserNewFormat(config)
+        parser = XMLParser(config)
         parsed_df = parser.parse_gastromarket(sample_xml_gastromarket)
 
         # Map categories
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
         result = mapper.map_dataframe(parsed_df)
 
         # Categories should NOT be transformed automatically
@@ -169,7 +163,7 @@ class TestCategoryMappingIntegration:
 
     def test_map_preserves_feed_name(self, config):
         """Test that category mapping preserves source."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from src.domain.categories.category_service import CategoryService
 
         df = pd.DataFrame(
             {
@@ -180,7 +174,7 @@ class TestCategoryMappingIntegration:
             }
         )
 
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
         result = mapper.map_dataframe(df)
 
         # source should be preserved
@@ -188,7 +182,7 @@ class TestCategoryMappingIntegration:
 
     def test_map_works_with_merged_data(self, config):
         """Test category mapping works with merged data."""
-        from src.mappers.category_mapper_new_format import CategoryMapperNewFormat
+        from src.domain.categories.category_service import CategoryService
 
         # Simulated merged data
         df = pd.DataFrame(
@@ -200,7 +194,7 @@ class TestCategoryMappingIntegration:
             }
         )
 
-        mapper = CategoryMapperNewFormat(config)
+        mapper = CategoryService(config)
         result = mapper.map_dataframe(df)
 
         # Categories should NOT be transformed automatically

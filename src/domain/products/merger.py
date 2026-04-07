@@ -13,10 +13,16 @@ logger = logging.getLogger(__name__)
 class ProductMerger:
     """Merges product data from main file and XML feed sources."""
 
-    IMAGE_COLUMNS = [
-        "image1", "image2", "image3", "image4", "image5",
-        "image6", "image7", "image8", "image9", "image10",
-    ]
+    # Image columns in priority order (first is the primary image)
+    IMAGE_COLUMNS = ["image"] + [f"image{i}" for i in range(2, 11)]
+
+    # Fields that are never overridden by feed data when they exist in main.
+    # These are AI-enhanced, manually edited, or tracking fields.
+    PRESERVED_FIELDS = {"name", "shortDescription", "longDescription", "description",
+                        "aiProcessed", "AI_Processed_Date", "Spracovane AI"}
+
+    # Category fields — only updated when update_categories=True
+    CATEGORY_FIELDS = {"defaultCategory", "categoryText"}
 
     def merge(
         self,
@@ -24,14 +30,17 @@ class ProductMerger:
         feed_dfs: Dict[str, pd.DataFrame],
         selected_categories: Optional[List[str]] = None,
         preserve_edits: bool = False,
+        update_categories: bool = False,
     ) -> MergeResult:
         """Merge main data with feed data.
 
         Args:
             main_df: Main product DataFrame
             feed_dfs: Dict of source_name -> DataFrame from feeds
-            selected_categories: Categories to include (None = all)
-            preserve_edits: If True, only update price/stock from feeds
+            selected_categories: Categories to include from main (None = all)
+            preserve_edits: If True, only update price/stock from feeds and
+                            remove products no longer present in feeds
+            update_categories: If True, allow feed data to update category fields
 
         Returns:
             MergeResult with merged products and statistics
@@ -52,6 +61,11 @@ class ProductMerger:
                 feed_df["code"] = feed_df["code"].astype(str).str.upper().str.strip()
             feed_dfs[source_name] = feed_df
 
+        # Determine which fields to skip when updating from feed into main data
+        skip_fields = set(self.PRESERVED_FIELDS)
+        if not update_categories:
+            skip_fields |= self.CATEGORY_FIELDS
+
         # Step 1: Process feed products (always included)
         for source_name, feed_df in feed_dfs.items():
             for _, feed_row in feed_df.iterrows():
@@ -63,21 +77,19 @@ class ProductMerger:
                     # Already have this product — update with feed data
                     existing = merged_products[code]
                     if preserve_edits:
-                        # Only update price and stock
                         for field in ["price", "stock", "availability"]:
                             if field in feed_row.index and pd.notna(feed_row[field]):
                                 existing[field] = feed_row[field]
                     else:
-                        # Full update, but preserve images if feed has fewer
                         feed_images = self._count_images(feed_row)
                         existing_images = self._count_images(pd.Series(existing))
                         if feed_images >= existing_images:
                             for col in feed_row.index:
-                                if pd.notna(feed_row[col]):
+                                if pd.notna(feed_row[col]) and col not in skip_fields:
                                     existing[col] = feed_row[col]
                         else:
                             for col in feed_row.index:
-                                if col not in self.IMAGE_COLUMNS and pd.notna(feed_row[col]):
+                                if col not in self.IMAGE_COLUMNS and col not in skip_fields and pd.notna(feed_row[col]):
                                     existing[col] = feed_row[col]
                     existing["source"] = source_name
                     stats.updated += 1
@@ -97,11 +109,11 @@ class ProductMerger:
                             main_images = self._count_images(main_match.iloc[0])
                             if feed_images >= main_images:
                                 for col in feed_row.index:
-                                    if pd.notna(feed_row[col]):
+                                    if pd.notna(feed_row[col]) and col not in skip_fields:
                                         base[col] = feed_row[col]
                             else:
                                 for col in feed_row.index:
-                                    if col not in self.IMAGE_COLUMNS and pd.notna(feed_row[col]):
+                                    if col not in self.IMAGE_COLUMNS and col not in skip_fields and pd.notna(feed_row[col]):
                                         base[col] = feed_row[col]
                         base["source"] = source_name
                         merged_products[code] = base
@@ -110,12 +122,15 @@ class ProductMerger:
                         # New product from feed
                         new_product = feed_row.to_dict()
                         new_product["source"] = source_name
+                        # New products start with aiProcessed = "0"
+                        if "aiProcessed" not in new_product or not new_product.get("aiProcessed"):
+                            new_product["aiProcessed"] = "0"
                         merged_products[code] = new_product
                         stats.created += 1
 
                 processed_codes.add(code)
 
-        # Step 2: Process main data products
+        # Step 2: Process main data products not in feeds
         for _, main_row in main_df.iterrows():
             code = str(main_row.get("code", "")).strip()
             if not code or code in processed_codes:
@@ -123,6 +138,7 @@ class ProductMerger:
 
             category = str(main_row.get("defaultCategory", ""))
             if selected_categories and category not in selected_categories:
+                stats.removed += 1
                 continue
 
             merged_products[code] = main_row.to_dict()

@@ -13,7 +13,7 @@ class TestXMLParserNewFormat:
 
     def test_parse_gastromarket_to_new_format(self, sample_xml_gastromarket, config):
         """Test parsing Gastromarket XML to new 138-column format."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_gastromarket(sample_xml_gastromarket)
@@ -30,7 +30,7 @@ class TestXMLParserNewFormat:
 
     def test_parse_forgastro_to_new_format(self, sample_xml_forgastro, config):
         """Test parsing ForGastro XML to new 138-column format."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_forgastro(sample_xml_forgastro)
@@ -45,7 +45,7 @@ class TestXMLParserNewFormat:
 
     def test_xml_feed_name_added(self, sample_xml_gastromarket, config):
         """Test that source is added to parsed data."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_gastromarket(sample_xml_gastromarket)
@@ -56,7 +56,7 @@ class TestXMLParserNewFormat:
 
     def test_parse_maps_to_new_column_names(self, sample_xml_gastromarket, config):
         """Test that XML fields are mapped to new column names."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_gastromarket(sample_xml_gastromarket)
@@ -75,7 +75,7 @@ class TestXMLParserNewFormat:
 
     def test_parse_handles_images(self, sample_xml_gastromarket, config):
         """Test that images are parsed and split correctly."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_gastromarket(sample_xml_gastromarket)
@@ -94,7 +94,7 @@ class TestXMLParserFactory:
 
     def test_factory_detects_gastromarket(self, config):
         """Test factory detects Gastromarket feed."""
-        from src.parsers.xml_parser_factory import XMLParserFactory
+        from src.data.parsers.xml_parser_factory import XMLParserFactory
 
         parser = XMLParserFactory.get_parser("gastromarket", config)
 
@@ -103,7 +103,7 @@ class TestXMLParserFactory:
 
     def test_factory_detects_forgastro(self, config):
         """Test factory detects ForGastro feed."""
-        from src.parsers.xml_parser_factory import XMLParserFactory
+        from src.data.parsers.xml_parser_factory import XMLParserFactory
 
         parser = XMLParserFactory.get_parser("forgastro", config)
 
@@ -112,7 +112,7 @@ class TestXMLParserFactory:
 
     def test_factory_parse_method(self, sample_xml_gastromarket, config):
         """Test factory parse method."""
-        from src.parsers.xml_parser_factory import XMLParserFactory
+        from src.data.parsers.xml_parser_factory import XMLParserFactory
 
         result = XMLParserFactory.parse("gastromarket", sample_xml_gastromarket, config)
 
@@ -125,7 +125,7 @@ class TestXMLToNewFormatMapping:
 
     def test_gastromarket_field_mapping(self, config):
         """Test Gastromarket field mapping configuration."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
 
@@ -142,7 +142,7 @@ class TestXMLToNewFormatMapping:
 
     def test_forgastro_field_mapping(self, config):
         """Test ForGastro field mapping configuration."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
 
@@ -154,7 +154,7 @@ class TestXMLToNewFormatMapping:
 
     def test_mapping_covers_all_fields(self, sample_xml_gastromarket, config):
         """Test that all XML fields are mapped."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_gastromarket(sample_xml_gastromarket)
@@ -172,7 +172,7 @@ class TestXMLParserImageHandling:
 
     def test_single_image_to_image(self, config):
         """Test single image goes to image."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
 
@@ -186,7 +186,7 @@ class TestXMLParserImageHandling:
 
     def test_multiple_images_split(self, config):
         """Test multiple images are split correctly."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
 
@@ -207,7 +207,7 @@ class TestXMLParserDataCleaning:
 
     def test_price_cleaning(self, config):
         """Test price values are cleaned."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
 
@@ -221,7 +221,7 @@ class TestXMLParserDataCleaning:
 
     def test_empty_values_handling(self, sample_xml_gastromarket, config):
         """Test that empty values are handled correctly."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_gastromarket(sample_xml_gastromarket)
@@ -237,8 +237,8 @@ class TestXMLParserIntegration:
 
     def test_parse_and_transform_pipeline(self, sample_xml_gastromarket, config):
         """Test complete parse and transform pipeline."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
-        from src.transformers.output_transformer import OutputTransformer
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
+        from src.domain.transform.output_transformer import OutputTransformer
 
         # Parse XML to new format
         parser = XMLParserNewFormat(config)
@@ -258,7 +258,7 @@ class TestXMLParserIntegration:
         self, sample_xml_gastromarket, sample_xml_forgastro, config
     ):
         """Test that multiple feeds output same format."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
 
@@ -276,7 +276,7 @@ class TestXMLParserIntegration:
 
     def test_parsed_data_ready_for_merge(self, sample_xml_gastromarket, config):
         """Test that parsed data is ready for merging."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_gastromarket(sample_xml_gastromarket)
@@ -294,7 +294,7 @@ class TestForGastroHTMLProcessing:
 
     def test_forgastro_html_processing(self, sample_xml_forgastro_with_html, config):
         """Test that ForGastro HTML content is properly processed."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_forgastro(sample_xml_forgastro_with_html)
@@ -322,7 +322,7 @@ class TestForGastroHTMLProcessing:
 
     def test_forgastro_without_html_unchanged(self, sample_xml_forgastro, config):
         """Test that products without HTML tabs are not affected."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         parser = XMLParserNewFormat(config)
         result = parser.parse_forgastro(sample_xml_forgastro)
@@ -336,7 +336,7 @@ class TestForGastroHTMLProcessing:
 
     def test_forgastro_html_empty_handling(self, config):
         """Test handling of empty or missing HTML content."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 <products>
@@ -357,7 +357,7 @@ class TestForGastroHTMLProcessing:
 
     def test_forgastro_html_appends_to_existing_short_desc(self, config):
         """Test that params are appended to existing shortDescription."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 <products>
@@ -385,7 +385,7 @@ class TestForGastroHTMLProcessing:
 
     def test_forgastro_html_without_tabs(self, config):
         """Test handling of HTML without tab structure."""
-        from src.parsers.xml_parser_new_format import XMLParserNewFormat
+        from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
         xml_content = """<?xml version="1.0" encoding="UTF-8"?>
 <products>

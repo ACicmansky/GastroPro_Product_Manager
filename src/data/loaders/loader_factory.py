@@ -8,6 +8,7 @@ from typing import Union
 import pandas as pd
 
 from .xlsx_loader import XLSXLoader
+from .csv_loader import CSVLoader
 
 
 class DataLoaderFactory:
@@ -15,20 +16,14 @@ class DataLoaderFactory:
 
     @staticmethod
     def get_loader(file_path: Union[str, Path]):
-        """
-        Get appropriate loader based on file extension.
-
-        Args:
-            file_path: Path to data file
-
-        Returns:
-            Appropriate loader instance (XLSXLoader)
-        """
+        """Return appropriate loader for the given file extension."""
         file_path = Path(file_path)
         extension = file_path.suffix.lower()
 
         if extension in [".xlsx", ".xls"]:
             return XLSXLoader()
+        if extension == ".csv":
+            return CSVLoader()
 
     @staticmethod
     def load(file_path: Union[str, Path]) -> pd.DataFrame:

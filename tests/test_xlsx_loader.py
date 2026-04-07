@@ -14,7 +14,7 @@ class TestXLSXLoading:
 
     def test_load_xlsx_file(self, test_data_dir):
         """Test loading XLSX file."""
-        from src.loaders.xlsx_loader import XLSXLoader
+        from src.data.loaders.xlsx_loader import XLSXLoader
 
         # Create a sample XLSX file for testing
         xlsx_path = test_data_dir / "sample_new_format.xlsx"
@@ -39,7 +39,7 @@ class TestXLSXLoading:
 
     def test_load_xlsx_with_encoding(self, test_data_dir):
         """Test loading XLSX with special characters."""
-        from src.loaders.xlsx_loader import XLSXLoader
+        from src.data.loaders.xlsx_loader import XLSXLoader
 
         xlsx_path = test_data_dir / "sample_special_chars.xlsx"
 
@@ -60,7 +60,7 @@ class TestXLSXLoading:
 
     def test_load_xlsx_empty_file(self, test_data_dir):
         """Test loading empty XLSX file."""
-        from src.loaders.xlsx_loader import XLSXLoader
+        from src.data.loaders.xlsx_loader import XLSXLoader
 
         xlsx_path = test_data_dir / "empty.xlsx"
 
@@ -76,7 +76,7 @@ class TestXLSXLoading:
 
     def test_load_xlsx_preserves_data_types(self, test_data_dir):
         """Test that XLSX loading preserves data correctly."""
-        from src.loaders.xlsx_loader import XLSXLoader
+        from src.data.loaders.xlsx_loader import XLSXLoader
 
         xlsx_path = test_data_dir / "sample_types.xlsx"
 
@@ -105,7 +105,7 @@ class TestDataLoaderFactory:
 
     def test_factory_detects_xlsx(self, test_data_dir):
         """Test factory detects XLSX format."""
-        from src.loaders.data_loader_factory import DataLoaderFactory
+        from src.data.loaders.loader_factory import DataLoaderFactory
 
         xlsx_path = test_data_dir / "test.xlsx"
 
@@ -115,13 +115,13 @@ class TestDataLoaderFactory:
 
         loader = DataLoaderFactory.get_loader(xlsx_path)
 
-        from src.loaders.xlsx_loader import XLSXLoader
+        from src.data.loaders.xlsx_loader import XLSXLoader
 
         assert isinstance(loader, XLSXLoader)
 
     def test_factory_load_method(self, test_data_dir):
         """Test factory load method."""
-        from src.loaders.data_loader_factory import DataLoaderFactory
+        from src.data.loaders.loader_factory import DataLoaderFactory
 
         xlsx_path = test_data_dir / "test_factory.xlsx"
 
@@ -142,7 +142,7 @@ class TestXLSXSaving:
 
     def test_save_xlsx_file(self, tmp_path):
         """Test saving DataFrame to XLSX."""
-        from src.loaders.xlsx_loader import XLSXLoader
+        from src.data.loaders.xlsx_loader import XLSXLoader
 
         df = pd.DataFrame(
             {
@@ -167,7 +167,7 @@ class TestXLSXSaving:
 
     def test_save_xlsx_with_special_chars(self, tmp_path):
         """Test saving XLSX with special characters."""
-        from src.loaders.xlsx_loader import XLSXLoader
+        from src.data.loaders.xlsx_loader import XLSXLoader
 
         df = pd.DataFrame(
             {
@@ -188,7 +188,7 @@ class TestXLSXSaving:
 
     def test_save_preserves_column_order(self, tmp_path):
         """Test that saving preserves column order."""
-        from src.loaders.xlsx_loader import XLSXLoader
+        from src.data.loaders.xlsx_loader import XLSXLoader
 
         columns = ["code", "name", "price", "image", "defaultCategory"]
         df = pd.DataFrame({col: ["test"] for col in columns})
@@ -208,7 +208,7 @@ class TestCSVLoader:
 
     def test_csv_loader_with_semicolon(self, test_data_dir):
         """Test CSV loader with semicolon separator."""
-        from src.loaders.csv_loader import CSVLoader
+        from src.data.loaders.csv_loader import CSVLoader
 
         csv_path = test_data_dir / "test_semicolon.csv"
 
@@ -226,7 +226,7 @@ class TestCSVLoader:
 
     def test_csv_loader_encoding_fallback(self, test_data_dir):
         """Test CSV loader with encoding fallback."""
-        from src.loaders.csv_loader import CSVLoader
+        from src.data.loaders.csv_loader import CSVLoader
 
         csv_path = test_data_dir / "test_encoding.csv"
 
@@ -246,7 +246,7 @@ class TestDataLoadingIntegration:
 
     def test_load_new_format_xlsx(self, test_data_dir, config):
         """Test loading new 138-column format from XLSX."""
-        from src.loaders.data_loader_factory import DataLoaderFactory
+        from src.data.loaders.loader_factory import DataLoaderFactory
 
         xlsx_path = test_data_dir / "new_format.xlsx"
 
@@ -263,7 +263,7 @@ class TestDataLoadingIntegration:
 
     def test_load_handles_missing_columns(self, test_data_dir):
         """Test loading handles files with missing columns gracefully."""
-        from src.loaders.data_loader_factory import DataLoaderFactory
+        from src.data.loaders.loader_factory import DataLoaderFactory
 
         xlsx_path = test_data_dir / "partial_columns.xlsx"
 

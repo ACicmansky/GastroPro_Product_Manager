@@ -46,7 +46,7 @@ class TestCategoryExtraction:
 
     def test_extract_categories_from_data(self, sample_data):
         """Test extracting unique categories from DataFrame."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         filter = CategoryFilter()
         categories = filter.extract_categories(sample_data)
@@ -60,7 +60,7 @@ class TestCategoryExtraction:
 
     def test_extract_categories_sorted(self, sample_data):
         """Test categories are returned sorted."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         filter = CategoryFilter()
         categories = filter.extract_categories(sample_data)
@@ -70,7 +70,7 @@ class TestCategoryExtraction:
 
     def test_extract_categories_no_duplicates(self, sample_data):
         """Test no duplicate categories returned."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         filter = CategoryFilter()
         categories = filter.extract_categories(sample_data)
@@ -80,7 +80,7 @@ class TestCategoryExtraction:
 
     def test_extract_categories_missing_column(self, empty_data):
         """Test handling when defaultCategory column missing."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         filter = CategoryFilter()
         categories = filter.extract_categories(empty_data)
@@ -90,7 +90,7 @@ class TestCategoryExtraction:
 
     def test_extract_categories_with_nan(self):
         """Test handling NaN values in categories."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         df = pd.DataFrame(
             {
@@ -112,7 +112,7 @@ class TestCategoryExtraction:
 
     def test_extract_categories_with_empty_strings(self):
         """Test handling empty string categories."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         df = pd.DataFrame(
             {
@@ -138,7 +138,7 @@ class TestCategorySearch:
 
     def test_search_categories_by_text(self):
         """Test searching categories by text."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         filter = CategoryFilter()
         categories = [
@@ -156,7 +156,7 @@ class TestCategorySearch:
 
     def test_search_categories_case_insensitive(self):
         """Test search is case-insensitive."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         filter = CategoryFilter()
         categories = [
@@ -172,7 +172,7 @@ class TestCategorySearch:
 
     def test_search_categories_empty_query(self):
         """Test search with empty query returns all."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         filter = CategoryFilter()
         categories = [
@@ -187,7 +187,7 @@ class TestCategorySearch:
 
     def test_search_categories_no_matches(self):
         """Test search with no matches returns empty list."""
-        from src.filters.category_filter import CategoryFilter
+        from src.domain.categories.category_filter import CategoryFilter
 
         filter = CategoryFilter()
         categories = [

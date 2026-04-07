@@ -84,15 +84,25 @@ class OutputTransformer:
 
         output_df = pd.DataFrame(index=df.index)
 
+        # Collect new-format column names from mappings
+        new_format_cols = set(self.new_output_columns)
+        mapped_new_cols: set = set()
+
         for old_col, new_col in self.mappings.items():
             if old_col in df.columns and new_col != "Obrázky":
                 output_df[new_col] = df[old_col].astype(str).fillna("")
+                mapped_new_cols.add(new_col)
                 print(f"  Mapped: {old_col} -> {new_col}")
-                
-        # Forward internal columns that shouldn't be lost
+
+        # Preserve columns already in new format that weren't covered by mappings
+        for col in df.columns:
+            if col in new_format_cols and col not in mapped_new_cols and col not in output_df.columns:
+                output_df[col] = df[col]
+
+        # Forward internal tracking columns that shouldn't be lost
         internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
         for col in internal_tracking:
-            if col in df.columns:
+            if col in df.columns and col not in output_df.columns:
                 output_df[col] = df[col]
 
         print(f"  Mapped {len(output_df.columns)} columns")
@@ -282,18 +292,21 @@ class OutputTransformer:
 
     def _ensure_all_columns(self, df: pd.DataFrame) -> pd.DataFrame:
         """
-        Ensure all 138 columns exist in the output DataFrame.
+        Ensure all output columns exist.
 
-        Args:
-            df: DataFrame to check
-
-        Returns:
-            DataFrame with all columns
+        Uses schema.get_output_columns() as the base set. If config also
+        provides `new_output_columns`, those are included as well (they may
+        contain product-variant columns specific to the e-shop format).
         """
+        from src.config.schema import get_output_columns as _schema_cols
+
         print("\nEnsuring all columns exist...")
 
+        # Merge schema-generated columns with any config-supplied ones
+        required_cols = list(dict.fromkeys(_schema_cols() + self.new_output_columns))
+
         missing_columns = []
-        for col in self.new_output_columns:
+        for col in required_cols:
             if col not in df.columns:
                 df[col] = ""
                 missing_columns.append(col)
@@ -307,15 +320,15 @@ class OutputTransformer:
         internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
         
         # Keep dynamic filtering properties extracted by AI
-        dynamic_cols = [col for col in df.columns if col.startswith("filteringProperty:") and col not in self.new_output_columns]
-        
+        dynamic_cols = [col for col in df.columns if col.startswith("filteringProperty:") and col not in required_cols]
+
         extra_cols = dynamic_cols + [
-            col for col in internal_tracking 
-            if col in df.columns and col not in self.new_output_columns
+            col for col in internal_tracking
+            if col in df.columns and col not in required_cols
         ]
 
-        # Reorder columns to match configuration, followed by any internal tracking columns and dynamic filtering properties
-        ordered_cols = self.new_output_columns + extra_cols
+        # Reorder: schema+config columns first, then extra tracking/dynamic columns
+        ordered_cols = required_cols + extra_cols
         # Ensure we only select columns that actually exist in the dataframe 
         # (in case self.new_output_columns has extra config values or non-column names)
         final_cols = [c for c in ordered_cols if c in df.columns]

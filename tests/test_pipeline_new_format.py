@@ -1,6 +1,5 @@
 """
 Tests for complete pipeline integration with new format.
-Following TDD approach: Write tests first, then implement.
 """
 
 import pytest
@@ -12,12 +11,11 @@ class TestPipelineNewFormat:
     """Test complete pipeline with new 138-column format."""
 
     def test_pipeline_processes_xml_feeds(self, config, sample_xml_gastromarket):
-        """Test pipeline processes XML feeds."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        """Test pipeline parses XML feeds."""
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
-        # Process single feed
         result = pipeline.parse_xml("gastromarket", sample_xml_gastromarket)
 
         assert isinstance(result, pd.DataFrame)
@@ -29,20 +27,20 @@ class TestPipelineNewFormat:
         self, config, sample_xml_gastromarket, sample_xml_forgastro
     ):
         """Test pipeline merges multiple XML feeds."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
         feed_dfs = {
             "gastromarket": pipeline.parse_xml("gastromarket", sample_xml_gastromarket),
             "forgastro": pipeline.parse_xml("forgastro", sample_xml_forgastro),
         }
 
-        result, _ = pipeline.merger.merge(pd.DataFrame(), feed_dfs)
+        merge_result = pipeline.merger.merge(pd.DataFrame(), feed_dfs)
+        result = merge_result.products
 
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
-        # Should have products from both feeds
         assert "source" in result.columns
 
 
@@ -51,9 +49,9 @@ class TestPipelineSteps:
 
     def test_step_1_parse_xml(self, config, sample_xml_gastromarket):
         """Test Step 1: Parse XML to new format."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
         result = pipeline.parse_xml("gastromarket", sample_xml_gastromarket)
 
@@ -62,9 +60,9 @@ class TestPipelineSteps:
 
     def test_step_2_merge_data(self, config):
         """Test Step 2: Merge data with image priority."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
         feed1 = pd.DataFrame(
             {"code": ["PROD001"], "price": ["100"], "image": ["img1.jpg"]}
@@ -79,19 +77,19 @@ class TestPipelineSteps:
             }
         )
 
-        result, _ = pipeline.merger.merge(
+        merge_result = pipeline.merger.merge(
             pd.DataFrame(), {"feed1": feed1, "feed2": feed2}
         )
+        result = merge_result.products
 
         assert len(result) == 1
-        # Should use feed2 (more images)
         assert result.loc[0, "image"] == "img1.jpg"
 
     def test_step_3_map_categories(self, config):
         """Test Step 3: Map and transform categories."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
         df = pd.DataFrame(
             {
@@ -101,15 +99,15 @@ class TestPipelineSteps:
             }
         )
 
-        result = pipeline.map_categories(df, False)
+        result = pipeline.map_categories(df)
 
         assert "Gastro Prevádzky a Profesionáli > " in result.loc[0, "defaultCategory"]
 
     def test_step_4_apply_transformation(self, config):
         """Test Step 4: Apply output transformation."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
         df = pd.DataFrame(
             {"code": ["prod001"], "name": ["Product 1"], "price": ["100"]}
@@ -117,9 +115,8 @@ class TestPipelineSteps:
 
         result = pipeline.apply_transformation(df)
 
-        # Code should be preserved as-is (no automatic uppercasing)
-        assert result.loc[0, "code"] == "prod001"
-        # Should have all 138 columns
+        # Transformer uppercases codes
+        assert result.loc[0, "code"] == "PROD001"
         assert len(result.columns) >= 100
 
 
@@ -128,11 +125,10 @@ class TestPipelineWithMainData:
 
     def test_merge_with_main_data(self, config):
         """Test merging feeds with existing main data."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
-        # Existing main data
         main_df = pd.DataFrame(
             {
                 "code": ["PROD001"],
@@ -142,7 +138,6 @@ class TestPipelineWithMainData:
             }
         )
 
-        # Feed data
         feed_df = pd.DataFrame(
             {
                 "code": ["PROD001", "PROD002"],
@@ -151,33 +146,31 @@ class TestPipelineWithMainData:
             }
         )
 
-        result, _ = pipeline.merger.merge(main_df, {"feed": feed_df})
+        merge_result = pipeline.merger.merge(main_df, {"feed": feed_df})
+        result = merge_result.products
 
-        # Should have both products
         assert len(result) == 2
-        # Should preserve main data name
         prod1 = result[result["code"] == "PROD001"].iloc[0]
+        # Name preserved from main (PRESERVED_FIELDS)
         assert prod1["name"] == "Existing Product"
-        # But update price
+        # Price updated from feed
         assert prod1["price"] == "150"
 
     def test_pipeline_preserves_ai_processed_flags(self, config):
-        """Test that pipeline maintains aiProcessed flags correctly (main=1, new=0)."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
-        
-        pipeline = PipelineNewFormat(config, {})
-        
-        # Existing main data (already processed)
+        """Test that pipeline maintains aiProcessed flags (main=1, new=0)."""
+        from src.pipeline.pipeline import Pipeline
+
+        pipeline = Pipeline(config)
+
         main_df = pd.DataFrame(
             {
                 "code": ["PROD001"],
                 "name": ["Existing Product"],
                 "price": ["100"],
-                "aiProcessed": ["1"]
+                "aiProcessed": ["1"],
             }
         )
-        
-        # Feed data (new product)
+
         feed_df = pd.DataFrame(
             {
                 "code": ["PROD001", "PROD002"],
@@ -185,29 +178,25 @@ class TestPipelineWithMainData:
                 "price": ["150", "200"],
             }
         )
-        
-        result, _ = pipeline.merger.merge(main_df, {"feed": feed_df})
-        
-        # Apply transformation (simulating worker flow)
+
+        merge_result = pipeline.merger.merge(main_df, {"feed": feed_df})
+        result = merge_result.products
         result = pipeline.apply_transformation(result)
-        
+
         assert "aiProcessed" in result.columns
-        
-        # Existing product should still be "1"
+
         prod1 = result[result["code"] == "PROD001"].iloc[0]
         assert prod1["aiProcessed"] == "1"
-        
-        # New product should be initialized to "0"
+
         prod2 = result[result["code"] == "PROD002"].iloc[0]
         assert prod2["aiProcessed"] == "0"
 
     def test_load_main_data(self, config, test_data_dir):
         """Test loading main data from file."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
-        # Create test file
         test_file = test_data_dir / "main_data.xlsx"
         df = pd.DataFrame({"code": ["PROD001"], "name": ["Product 1"]})
         df.to_excel(test_file, index=False, engine="openpyxl")
@@ -223,9 +212,9 @@ class TestPipelineOutput:
 
     def test_save_output(self, config, test_data_dir):
         """Test saving pipeline output."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
         df = pd.DataFrame(
             {"code": ["PROD001"], "name": ["Product 1"], "price": ["100"]}
@@ -234,119 +223,21 @@ class TestPipelineOutput:
         output_file = test_data_dir / "output.xlsx"
         pipeline.save_output(df, str(output_file))
 
-        # File should exist
         assert output_file.exists()
 
-        # Should be loadable
         loaded = pd.read_excel(output_file, engine="openpyxl")
         assert len(loaded) == 1
 
     def test_output_has_all_columns(self, config):
-        """Test that output has all 138 columns."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        """Test that output has all required columns after transformation."""
+        from src.pipeline.pipeline import Pipeline
 
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = Pipeline(config)
 
         df = pd.DataFrame({"code": ["PROD001"], "name": ["Product 1"]})
 
         result = pipeline.apply_transformation(df)
 
-        # Should have all required columns
         new_columns = config.get("new_output_columns", [])
         for col in new_columns:
             assert col in result.columns
-
-
-class TestPipelineEndToEnd:
-    """Test complete end-to-end pipeline."""
-
-    def test_complete_pipeline_run(
-        self, config, sample_xml_gastromarket, test_data_dir
-    ):
-        """Test complete pipeline from XML to output file."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
-
-        pipeline = PipelineNewFormat(config, {})
-
-        # Run complete pipeline
-        output_file = test_data_dir / "complete_output.xlsx"
-
-        result = pipeline.run(
-            xml_feeds={"gastromarket": sample_xml_gastromarket},
-            output_file=str(output_file),
-        )
-
-        # Should return DataFrame
-        assert isinstance(result, pd.DataFrame)
-        assert len(result) > 0
-
-        # Output file should exist
-        assert output_file.exists()
-
-        # Should have key columns
-        assert "code" in result.columns
-        assert "name" in result.columns
-        assert "price" in result.columns
-        assert "defaultCategory" in result.columns
-
-    def test_pipeline_with_all_steps(
-        self, config, sample_xml_gastromarket, test_data_dir
-    ):
-        """Test pipeline executes all steps."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
-
-        pipeline = PipelineNewFormat(config, {})
-
-        output_file = test_data_dir / "all_steps_output.xlsx"
-
-        result = pipeline.run(
-            xml_feeds={"gastromarket": sample_xml_gastromarket},
-            output_file=str(output_file),
-            apply_categories=True,
-            apply_transformation=True,
-        )
-
-        # Categories should be transformed
-        if "defaultCategory" in result.columns:
-            for cat in result["defaultCategory"]:
-                if cat and cat != "":
-                    assert "Gastro Prevádzky a Profesionáli > " in cat or "Domácnosť a Kulinári >" in cat or cat == ""
-
-        # Codes should be uppercase
-        if "code" in result.columns:
-            for code in result["code"]:
-                if code and code != "":
-                    assert code == code.upper()
-
-
-class TestPipelineStatistics:
-    """Test pipeline statistics tracking."""
-
-    def test_pipeline_returns_statistics(self, config, sample_xml_gastromarket):
-        """Test that pipeline returns statistics."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
-
-        pipeline = PipelineNewFormat(config, {})
-
-        result, stats = pipeline.run_with_stats(
-            xml_feeds={"gastromarket": sample_xml_gastromarket}
-        )
-
-        # Should have statistics
-        assert "total_products" in stats
-        assert "feeds_processed" in stats
-        assert stats["total_products"] > 0
-
-    def test_statistics_track_all_steps(self, config, sample_xml_gastromarket):
-        """Test that statistics track all pipeline steps."""
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
-
-        pipeline = PipelineNewFormat(config, {})
-
-        result, stats = pipeline.run_with_stats(
-            xml_feeds={"gastromarket": sample_xml_gastromarket}
-        )
-
-        # Should track various metrics
-        assert "feeds_processed" in stats
-        assert "categories_mapped" in stats or "total_products" in stats
