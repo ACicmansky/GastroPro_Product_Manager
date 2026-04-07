@@ -8,7 +8,6 @@ from typing import Union
 import pandas as pd
 
 from .xlsx_loader import XLSXLoader
-from .csv_loader import CSVLoader
 
 
 class DataLoaderFactory:
@@ -22,8 +21,7 @@ class DataLoaderFactory:
 
         if extension in [".xlsx", ".xls"]:
             return XLSXLoader()
-        if extension == ".csv":
-            return CSVLoader()
+        raise ValueError(f"Unsupported file extension: {extension}")
 
     @staticmethod
     def load(file_path: Union[str, Path]) -> pd.DataFrame:

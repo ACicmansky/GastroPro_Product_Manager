@@ -2,10 +2,15 @@
 XML Parser Factory for automatic feed detection.
 """
 
+import logging
+import urllib.request
+
 import pandas as pd
 from typing import Dict
 
 from .xml_parser import XMLParser
+
+logger = logging.getLogger(__name__)
 
 
 class XMLParserFactory:
@@ -24,6 +29,20 @@ class XMLParserFactory:
             XMLParser instance
         """
         return XMLParser(config)
+
+    @staticmethod
+    def fetch_and_parse(feed_name: str, url: str, config: Dict) -> pd.DataFrame:
+        """Fetch XML feed from URL and parse it.
+
+        Returns an empty DataFrame on fetch failure.
+        """
+        try:
+            with urllib.request.urlopen(url) as response:
+                xml_content = response.read().decode("utf-8")
+        except Exception as e:
+            logger.error(f"Failed to fetch feed {feed_name} from {url}: {e}")
+            return pd.DataFrame()
+        return XMLParserFactory.parse(feed_name, xml_content, config)
 
     @staticmethod
     def parse(feed_name: str, xml_content: str, config: Dict) -> pd.DataFrame:

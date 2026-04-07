@@ -10,8 +10,12 @@ This module handles:
 - Ensuring all 138 columns exist
 """
 
+import logging
+
 import pandas as pd
 from typing import Dict, List
+
+logger = logging.getLogger(__name__)
 
 
 class OutputTransformer:
@@ -24,11 +28,14 @@ class OutputTransformer:
         Args:
             config: Configuration dictionary from config.json
         """
+        from src.config.schema import get_output_columns
+
         self.config = config
         self.output_mapping = config.get("output_mapping", {})
         self.mappings = self.output_mapping.get("mappings", {})
         self.default_values = self.output_mapping.get("default_values", {})
-        self.new_output_columns = config.get("new_output_columns", [])
+        # Output columns now come from schema.py (single source of truth).
+        self.new_output_columns = get_output_columns()
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         """
@@ -40,9 +47,7 @@ class OutputTransformer:
         Returns:
             DataFrame with new 138-column format
         """
-        print("\n" + "=" * 60)
-        print("OUTPUT TRANSFORMATION PROCESS")
-        print("=" * 60)
+        logger.info("Starting output transformation")
 
         # 1. Apply direct mappings (excluding Obrázky which we'll handle specially)
         output_df = self.apply_direct_mappings(df)
@@ -62,11 +67,9 @@ class OutputTransformer:
         # 6. Apply default values
         output_df = self.apply_default_values(output_df)
 
-        print("\n" + "=" * 60)
-        print("TRANSFORMATION COMPLETE")
-        print(f"Output columns: {len(output_df.columns)}")
-        print(f"Output rows: {len(output_df)}")
-        print("=" * 60)
+        logger.info(
+            f"Transformation complete: {len(output_df.columns)} columns, {len(output_df)} rows"
+        )
 
         return output_df
 
@@ -80,7 +83,7 @@ class OutputTransformer:
         Returns:
             DataFrame with mapped columns
         """
-        print("\nApplying direct mappings...")
+        logger.debug("Applying direct mappings")
 
         output_df = pd.DataFrame(index=df.index)
 
@@ -92,7 +95,7 @@ class OutputTransformer:
             if old_col in df.columns and new_col != "Obrázky":
                 output_df[new_col] = df[old_col].astype(str).fillna("")
                 mapped_new_cols.add(new_col)
-                print(f"  Mapped: {old_col} -> {new_col}")
+                logger.debug(f"  Mapped: {old_col} -> {new_col}")
 
         # Preserve columns already in new format that weren't covered by mappings
         for col in df.columns:
@@ -105,7 +108,7 @@ class OutputTransformer:
             if col in df.columns and col not in output_df.columns:
                 output_df[col] = df[col]
 
-        print(f"  Mapped {len(output_df.columns)} columns")
+        logger.debug(f"  Mapped {len(output_df.columns)} columns")
         return output_df
 
     def split_images(
@@ -121,13 +124,13 @@ class OutputTransformer:
         Returns:
             DataFrame with split image columns
         """
-        print("\nSplitting image URLs...")
+        logger.debug("Splitting image URLs")
 
         if output_df is None:
             output_df = pd.DataFrame(index=df.index)
 
         if "Obrázky" not in df.columns:
-            print("  Warning: 'Obrázky' column not found")
+            logger.warning("'Obrázky' column not found")
             # Initialize empty image columns
             image_columns = [
                 "image",
@@ -170,7 +173,7 @@ class OutputTransformer:
                 for i, img_url in enumerate(images[:8]):
                     output_df.at[idx, image_columns[i]] = img_url
 
-        print(f"  Split images into {len(image_columns)} columns")
+        logger.debug(f"  Split images into {len(image_columns)} columns")
         return output_df
 
     def transform_category(
@@ -190,13 +193,13 @@ class OutputTransformer:
         Returns:
             DataFrame with transformed categories
         """
-        print("\nTransforming categories...")
+        logger.debug("Transforming categories")
 
         if output_df is None:
             output_df = pd.DataFrame(index=df.index)
 
         if "Hlavna kategória" not in df.columns:
-            print("  Warning: 'Hlavna kategória' column not found")
+            logger.warning("'Hlavna kategória' column not found")
             output_df["defaultCategory"] = ""
             output_df["categoryText"] = ""
             return output_df
@@ -225,7 +228,7 @@ class OutputTransformer:
         output_df["defaultCategory"] = transformed_categories
         output_df["categoryText"] = transformed_categories
 
-        print(f"  Transformed {len(transformed_categories)} categories")
+        logger.debug(f"  Transformed {len(transformed_categories)} categories")
         return output_df
 
     def uppercase_code(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -238,13 +241,13 @@ class OutputTransformer:
         Returns:
             DataFrame with uppercased codes
         """
-        print("\nConverting codes to uppercase...")
+        logger.debug("Converting codes to uppercase")
 
         if "code" in df.columns:
             df["code"] = df["code"].astype(str).str.upper()
-            print(f"  Converted {len(df)} codes to uppercase")
+            logger.debug(f"  Converted {len(df)} codes to uppercase")
         else:
-            print("  Warning: 'code' column not found")
+            logger.warning("'code' column not found")
 
         return df
 
@@ -258,7 +261,7 @@ class OutputTransformer:
         Returns:
             DataFrame with defaults applied
         """
-        print("\nApplying default values...")
+        logger.debug("Applying default values")
 
         applied_count = 0
         for col, default_value in self.default_values.items():
@@ -268,7 +271,7 @@ class OutputTransformer:
                 df.loc[mask, col] = default_value
                 applied_count += mask.sum()
 
-        print(f"  Applied {applied_count} default values")
+        logger.debug(f"  Applied {applied_count} default values")
         return df
 
     def _change_GastroMarket_string(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -300,7 +303,7 @@ class OutputTransformer:
         """
         from src.config.schema import get_output_columns as _schema_cols
 
-        print("\nEnsuring all columns exist...")
+        logger.debug("Ensuring all columns exist")
 
         # Merge schema-generated columns with any config-supplied ones
         required_cols = list(dict.fromkeys(_schema_cols() + self.new_output_columns))
@@ -312,9 +315,9 @@ class OutputTransformer:
                 missing_columns.append(col)
 
         if missing_columns:
-            print(f"  Added {len(missing_columns)} missing columns")
+            logger.debug(f"  Added {len(missing_columns)} missing columns")
         else:
-            print("  All columns already present")
+            logger.debug("  All columns already present")
 
         # Keep important tracking columns that might not be in the config output list
         internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]

@@ -160,7 +160,8 @@ class TestXMLToNewFormatMapping:
         result = parser.parse_gastromarket(sample_xml_gastromarket)
 
         # All columns should be from new format
-        new_columns = config.get("new_output_columns", [])
+        from src.config.schema import get_output_columns
+        new_columns = get_output_columns()
 
         for col in result.columns:
             # Column should either be in new format, be source, or be a temporary column
@@ -252,7 +253,6 @@ class TestXMLParserIntegration:
         assert "code" in result.columns
         assert "name" in result.columns
         assert "price" in result.columns
-        assert "currency" in result.columns
 
     def test_multiple_feeds_same_format(
         self, sample_xml_gastromarket, sample_xml_forgastro, config

@@ -2,7 +2,6 @@
 
 import logging
 import time
-import urllib.request
 from typing import Callable, Dict, Optional
 
 import pandas as pd
@@ -102,14 +101,9 @@ class Pipeline:
             if not url:
                 continue
             progress(f"Parsing XML feed: {feed_name}")
-            try:
-                with urllib.request.urlopen(url) as response:
-                    xml_content = response.read().decode("utf-8")
-                feed_df = XMLParserFactory.parse(feed_name, xml_content, self.config)
-                if feed_df is not None and not feed_df.empty:
-                    feed_dfs[feed_name] = feed_df
-            except Exception as e:
-                logger.error(f"Failed to parse feed {feed_name}: {e}")
+            feed_df = XMLParserFactory.fetch_and_parse(feed_name, url, self.config)
+            if feed_df is not None and not feed_df.empty:
+                feed_dfs[feed_name] = feed_df
 
         # 4. Scrape (if enabled)
         if options.enable_scraping:

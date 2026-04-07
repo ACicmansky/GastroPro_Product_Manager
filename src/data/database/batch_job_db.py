@@ -1,8 +1,8 @@
 """Batch job tracking for AI processing."""
 
 import sqlite3
-import os
 from datetime import datetime
+from pathlib import Path
 from typing import Optional
 
 
@@ -11,7 +11,7 @@ class BatchJobDB:
 
     def __init__(self, db_path: str):
         self.db_path = db_path
-        os.makedirs(os.path.dirname(db_path), exist_ok=True)
+        Path(db_path).parent.mkdir(parents=True, exist_ok=True)
         self._init_table()
 
     def _get_connection(self):

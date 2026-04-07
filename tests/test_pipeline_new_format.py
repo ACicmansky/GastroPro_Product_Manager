@@ -238,6 +238,6 @@ class TestPipelineOutput:
 
         result = pipeline.apply_transformation(df)
 
-        new_columns = config.get("new_output_columns", [])
-        for col in new_columns:
+        from src.config.schema import get_output_columns
+        for col in get_output_columns():
             assert col in result.columns

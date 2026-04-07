@@ -17,15 +17,16 @@ class ProductDB:
 
     def __init__(self, db_path: str):
         self.db_path = db_path
-        self.backups_dir = os.path.join(os.path.dirname(db_path), "backups")
+        parent = Path(db_path).parent
+        self.backups_dir = str(parent / "backups")
         self.table_name = "products"
         self.primary_key = "code"
         self._ensure_directories()
         self.init_db()
 
     def _ensure_directories(self):
-        os.makedirs(os.path.dirname(self.db_path), exist_ok=True)
-        os.makedirs(self.backups_dir, exist_ok=True)
+        Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(self.backups_dir).mkdir(parents=True, exist_ok=True)
 
     def _get_connection(self):
         conn = sqlite3.connect(self.db_path)

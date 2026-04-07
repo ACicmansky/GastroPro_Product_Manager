@@ -203,44 +203,6 @@ class TestXLSXSaving:
         assert list(loaded_df.columns) == columns
 
 
-class TestCSVLoader:
-    """Test CSV loader for backward compatibility."""
-
-    def test_csv_loader_with_semicolon(self, test_data_dir):
-        """Test CSV loader with semicolon separator."""
-        from src.data.loaders.csv_loader import CSVLoader
-
-        csv_path = test_data_dir / "test_semicolon.csv"
-
-        # Create CSV with semicolon
-        df = pd.DataFrame(
-            {"code": ["TEST001"], "name": ["Product 1"], "price": ["100.50"]}
-        )
-        df.to_csv(csv_path, index=False, sep=";", encoding="utf-8")
-
-        loader = CSVLoader()
-        result = loader.load(csv_path)
-
-        assert isinstance(result, pd.DataFrame)
-        assert len(result) == 1
-
-    def test_csv_loader_encoding_fallback(self, test_data_dir):
-        """Test CSV loader with encoding fallback."""
-        from src.data.loaders.csv_loader import CSVLoader
-
-        csv_path = test_data_dir / "test_encoding.csv"
-
-        # Create CSV
-        df = pd.DataFrame({"code": ["TEST001"], "name": ["Produkt č. 1"]})
-        df.to_csv(csv_path, index=False, sep=";", encoding="utf-8")
-
-        loader = CSVLoader()
-        result = loader.load(csv_path)
-
-        assert "code" in result.columns
-        assert "name" in result.columns
-
-
 class TestDataLoadingIntegration:
     """Test integration of data loading with new format."""
 
@@ -251,7 +213,8 @@ class TestDataLoadingIntegration:
         xlsx_path = test_data_dir / "new_format.xlsx"
 
         # Create sample with new format columns
-        new_columns = config.get("new_output_columns", [])[:10]  # First 10 for testing
+        from src.config.schema import get_output_columns
+        new_columns = get_output_columns()[:10]  # First 10 for testing
         df = pd.DataFrame({col: ["test"] for col in new_columns})
         df.to_excel(xlsx_path, index=False, engine="openpyxl")
 

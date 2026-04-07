@@ -1,8 +1,11 @@
-"""Output column definitions — generated, not hardcoded."""
+"""Output column definitions — generated, not hardcoded.
+
+The e-shop format is conventionally referred to as "138-column" but the
+actual generated count is 329 = 29 base + 150 image + 150 imageDesc.
+"""
 
 
-# Base columns in the 138-column output format.
-# These are the non-image, non-repeating columns.
+# Base (non-image) columns in the e-shop output format.
 BASE_COLUMNS = [
     "code", "name", "pairCode", "defaultCategory", "categoryText",
     "shortDescription", "description", "price", "standardPrice",
@@ -21,8 +24,9 @@ IMAGE_SLOT_COUNT = 150
 def get_output_columns() -> list:
     """Generate the full list of output columns.
 
-    Returns ~338 columns: base + image1..150 + imageDesc1..150
+    Returns 329 columns: 29 base + image,image2..image150 + imageDesc,imageDesc2..imageDesc150.
+    First image slot is "image" (not "image1") to match the e-shop convention.
     """
-    images = [f"image{i}" for i in range(1, IMAGE_SLOT_COUNT + 1)]
-    image_descs = [f"imageDesc{i}" for i in range(1, IMAGE_SLOT_COUNT + 1)]
+    images = ["image"] + [f"image{i}" for i in range(2, IMAGE_SLOT_COUNT + 1)]
+    image_descs = ["imageDesc"] + [f"imageDesc{i}" for i in range(2, IMAGE_SLOT_COUNT + 1)]
     return BASE_COLUMNS + images + image_descs

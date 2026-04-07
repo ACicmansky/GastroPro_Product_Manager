@@ -342,10 +342,10 @@ class TestFullTransformation:
 
         result = transformer.transform(sample_old_format_df)
 
-        new_output_columns = config.get("new_output_columns", [])
+        from src.config.schema import get_output_columns
 
-        # Check all configured columns exist
-        for col in new_output_columns:
+        # Check all schema-generated columns exist
+        for col in get_output_columns():
             assert col in result.columns, f"Column '{col}' missing"
 
     def test_transform_no_formatting(self, sample_old_format_df, config):
