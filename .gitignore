@@ -1,8 +1,9 @@
 __pycache__
 .env
 .pytest_cache
-data/
+/data/
 tests/test_data/
 test_output.txt
 test_output_pipeline.txt
 cache/
+.worktrees/

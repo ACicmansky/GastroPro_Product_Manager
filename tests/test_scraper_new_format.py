@@ -271,10 +271,10 @@ class TestScraperIntegration:
     def test_scraper_integrates_with_pipeline(self, config):
         """Test scraped data can be processed by pipeline."""
         from src.scrapers.topchladenie_scraper import TopchladenieScraper
-        from src.pipeline.pipeline_new_format import PipelineNewFormat
+        from src.pipeline.pipeline import Pipeline as PipelineNewFormat
 
         scraper = TopchladenieScraper(config)
-        pipeline = PipelineNewFormat(config, {})
+        pipeline = PipelineNewFormat(config)
 
         # Create mock scraped data (already in new format)
         scraped_df = pd.DataFrame(

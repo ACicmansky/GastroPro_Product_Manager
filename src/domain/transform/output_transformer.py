@@ -1,0 +1,340 @@
+"""
+OutputTransformer module for converting internal format to new 138-column e-shop format.
+
+This module handles:
+- Direct column mappings
+- Image URL splitting (1 column -> 8 columns)
+- Category transformation (prefix + separator replacement)
+- Code uppercase conversion
+- Default value application
+- Ensuring all 138 columns exist
+"""
+
+import logging
+
+import pandas as pd
+from typing import Dict, List
+
+logger = logging.getLogger(__name__)
+
+
+class OutputTransformer:
+    """Transforms internal data format to new 138-column e-shop output format."""
+
+    def __init__(self, config: Dict):
+        """
+        Initialize OutputTransformer with configuration.
+
+        Args:
+            config: Configuration dictionary from config.json
+        """
+        from src.config.schema import get_output_columns
+
+        self.config = config
+        self.output_mapping = config.get("output_mapping", {})
+        self.mappings = self.output_mapping.get("mappings", {})
+        self.default_values = self.output_mapping.get("default_values", {})
+        # Output columns now come from schema.py (single source of truth).
+        self.new_output_columns = get_output_columns()
+
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Complete transformation from old format to new 138-column format.
+
+        Args:
+            df: Input DataFrame with old format
+
+        Returns:
+            DataFrame with new 138-column format
+        """
+        logger.info("Starting output transformation")
+
+        # 1. Apply direct mappings (excluding Obrázky which we'll handle specially)
+        output_df = self.apply_direct_mappings(df)
+
+        # 2. Split images into multiple columns
+        output_df = self.split_images(df, output_df)
+
+        # 3. Apply category transformation
+        output_df = self.transform_category(df, output_df)
+
+        # 4. Apply code uppercase
+        output_df = self.uppercase_code(output_df)
+
+        # 5. Ensure all columns exist
+        output_df = self._ensure_all_columns(output_df)
+
+        # 6. Apply default values
+        output_df = self.apply_default_values(output_df)
+
+        logger.info(
+            f"Transformation complete: {len(output_df.columns)} columns, {len(output_df)} rows"
+        )
+
+        return output_df
+
+    def apply_direct_mappings(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Apply direct column mappings from old to new format.
+
+        Args:
+            df: Input DataFrame
+
+        Returns:
+            DataFrame with mapped columns
+        """
+        logger.debug("Applying direct mappings")
+
+        output_df = pd.DataFrame(index=df.index)
+
+        # Collect new-format column names from mappings
+        new_format_cols = set(self.new_output_columns)
+        mapped_new_cols: set = set()
+
+        for old_col, new_col in self.mappings.items():
+            if old_col in df.columns and new_col != "Obrázky":
+                output_df[new_col] = df[old_col].astype(str).fillna("")
+                mapped_new_cols.add(new_col)
+                logger.debug(f"  Mapped: {old_col} -> {new_col}")
+
+        # Preserve columns already in new format that weren't covered by mappings
+        for col in df.columns:
+            if col in new_format_cols and col not in mapped_new_cols and col not in output_df.columns:
+                output_df[col] = df[col]
+
+        # Forward internal tracking columns that shouldn't be lost
+        internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
+        for col in internal_tracking:
+            if col in df.columns and col not in output_df.columns:
+                output_df[col] = df[col]
+
+        logger.debug(f"  Mapped {len(output_df.columns)} columns")
+        return output_df
+
+    def split_images(
+        self, df: pd.DataFrame, output_df: pd.DataFrame = None
+    ) -> pd.DataFrame:
+        """
+        Split comma-separated image URLs into 8 separate columns.
+
+        Args:
+            df: Input DataFrame with 'Obrázky' column
+            output_df: Output DataFrame to populate (optional)
+
+        Returns:
+            DataFrame with split image columns
+        """
+        logger.debug("Splitting image URLs")
+
+        if output_df is None:
+            output_df = pd.DataFrame(index=df.index)
+
+        if "Obrázky" not in df.columns:
+            logger.warning("'Obrázky' column not found")
+            # Initialize empty image columns
+            image_columns = [
+                "image",
+                "image2",
+                "image3",
+                "image4",
+                "image5",
+                "image6",
+                "image7",
+                "image8",
+            ]
+            for col in image_columns:
+                output_df[col] = ""
+            return output_df
+
+        # Define image column names in order
+        image_columns = [
+            "image",
+            "image2",
+            "image3",
+            "image4",
+            "image5",
+            "image6",
+            "image7",
+            "image8",
+        ]
+
+        # Initialize all image columns as empty
+        for col in image_columns:
+            output_df[col] = ""
+
+        # Split and assign images
+        for idx, row in df.iterrows():
+            images_str = str(row["Obrázky"]) if pd.notna(row["Obrázky"]) else ""
+            if images_str and images_str != "nan":
+                # Split by comma and strip whitespace
+                images = [img.strip() for img in images_str.split(",") if img.strip()]
+
+                # Assign to columns (max 8)
+                for i, img_url in enumerate(images[:8]):
+                    output_df.at[idx, image_columns[i]] = img_url
+
+        logger.debug(f"  Split images into {len(image_columns)} columns")
+        return output_df
+
+    def transform_category(
+        self, df: pd.DataFrame, output_df: pd.DataFrame = None
+    ) -> pd.DataFrame:
+        """
+        Transform category: add prefix and replace separator.
+
+        Transformation:
+        - Add prefix: "Tovary a kategórie > "
+        - Replace "/" with " > "
+
+        Args:
+            df: Input DataFrame with 'Hlavna kategória' column
+            output_df: Output DataFrame to populate (optional)
+
+        Returns:
+            DataFrame with transformed categories
+        """
+        logger.debug("Transforming categories")
+
+        if output_df is None:
+            output_df = pd.DataFrame(index=df.index)
+
+        if "Hlavna kategória" not in df.columns:
+            logger.warning("'Hlavna kategória' column not found")
+            output_df["defaultCategory"] = ""
+            output_df["categoryText"] = ""
+            return output_df
+
+        # Transform each category
+        transformed_categories = []
+        for idx, row in df.iterrows():
+            category = (
+                str(row["Hlavna kategória"])
+                if pd.notna(row["Hlavna kategória"])
+                else ""
+            )
+
+            if category and category != "nan":
+                # Replace "/" with " > "
+                category = category.replace("/", " > ")
+                # Add prefix only if not already present
+                if not category.startswith("Tovary a kategórie > "):
+                    category = "Tovary a kategórie > " + category
+            else:
+                category = "Tovary a kategórie > "
+
+            transformed_categories.append(category)
+
+        # Apply to both defaultCategory and categoryText
+        output_df["defaultCategory"] = transformed_categories
+        output_df["categoryText"] = transformed_categories
+
+        logger.debug(f"  Transformed {len(transformed_categories)} categories")
+        return output_df
+
+    def uppercase_code(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Convert catalog codes to uppercase.
+
+        Args:
+            df: DataFrame with 'code' column
+
+        Returns:
+            DataFrame with uppercased codes
+        """
+        logger.debug("Converting codes to uppercase")
+
+        if "code" in df.columns:
+            df["code"] = df["code"].astype(str).str.upper()
+            logger.debug(f"  Converted {len(df)} codes to uppercase")
+        else:
+            logger.warning("'code' column not found")
+
+        return df
+
+    def apply_default_values(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Apply default values to empty cells only.
+
+        Args:
+            df: DataFrame to apply defaults to
+
+        Returns:
+            DataFrame with defaults applied
+        """
+        logger.debug("Applying default values")
+
+        applied_count = 0
+        for col, default_value in self.default_values.items():
+            if col in df.columns:
+                # Apply default only where cell is empty or NaN
+                mask = (df[col].isna()) | (df[col] == "") | (df[col] == "nan")
+                df.loc[mask, col] = default_value
+                applied_count += mask.sum()
+
+        logger.debug(f"  Applied {applied_count} default values")
+        return df
+
+    def _change_GastroMarket_string(self, df: pd.DataFrame) -> pd.DataFrame:
+        df["shortDescription"] = df["shortDescription"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        df["description"] = df["description"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        df["metaDescription"] = df["metaDescription"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        df["seoTitle"] = df["seoTitle"].str.replace(
+            "GastroMarket", "Gastro", case=False, regex=False
+        )
+        return df
+
+    def _update_variantVisibility(self, df: pd.DataFrame) -> pd.DataFrame:
+        df.loc[df["pairCode"] != "", "variantVisibility"] = "1"
+        return df
+
+    def _ensure_all_columns(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Ensure all output columns exist.
+
+        Uses schema.get_output_columns() as the base set. If config also
+        provides `new_output_columns`, those are included as well (they may
+        contain product-variant columns specific to the e-shop format).
+        """
+        from src.config.schema import get_output_columns as _schema_cols
+
+        logger.debug("Ensuring all columns exist")
+
+        # Merge schema-generated columns with any config-supplied ones
+        required_cols = list(dict.fromkeys(_schema_cols() + self.new_output_columns))
+
+        missing_columns = []
+        for col in required_cols:
+            if col not in df.columns:
+                df[col] = ""
+                missing_columns.append(col)
+
+        if missing_columns:
+            logger.debug(f"  Added {len(missing_columns)} missing columns")
+        else:
+            logger.debug("  All columns already present")
+
+        # Keep important tracking columns that might not be in the config output list
+        internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
+        
+        # Keep dynamic filtering properties extracted by AI
+        dynamic_cols = [col for col in df.columns if col.startswith("filteringProperty:") and col not in required_cols]
+
+        extra_cols = dynamic_cols + [
+            col for col in internal_tracking
+            if col in df.columns and col not in required_cols
+        ]
+
+        # Reorder: schema+config columns first, then extra tracking/dynamic columns
+        ordered_cols = required_cols + extra_cols
+        # Ensure we only select columns that actually exist in the dataframe 
+        # (in case self.new_output_columns has extra config values or non-column names)
+        final_cols = [c for c in ordered_cols if c in df.columns]
+        df = df[final_cols]
+
+        return df
