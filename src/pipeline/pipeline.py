@@ -6,18 +6,19 @@ from typing import Callable, Dict, Optional
 
 import pandas as pd
 
-from src.domain.models import PipelineOptions, PipelineResult, MergeStats
-from src.domain.products.merger import ProductMerger
-from src.domain.categories.category_service import CategoryService
-from src.domain.categories.category_filter import CategoryFilter
-from src.domain.pricing.pricing_service import PricingService
-from src.domain.transform.output_transformer import OutputTransformer
-from src.data.database.product_db import ProductDB
+from src.ai.product_enricher import ProductEnricher
 from src.data.database.batch_job_db import BatchJobDB
+from src.data.database.product_db import ProductDB
 from src.data.loaders.loader_factory import DataLoaderFactory
 from src.data.parsers.xml_parser_factory import XMLParserFactory
 from src.data.writers.xlsx_writer import write_xlsx
-from src.ai.product_enricher import ProductEnricher
+from src.domain.categories.category_filter import CategoryFilter
+from src.domain.categories.category_service import CategoryService
+from src.domain.models import MergeStats, PipelineOptions, PipelineResult
+from src.domain.pricing.pricing_service import PricingService
+from src.domain.products.merger import ProductMerger
+from src.domain.transform.output_transformer import OutputTransformer
+
 from .scraping import ScrapingOrchestrator
 
 logger = logging.getLogger(__name__)
@@ -140,7 +141,9 @@ class Pipeline:
         for idx, row in merged_df.iterrows():
             old_cat = str(row.get("defaultCategory", ""))
             if old_cat:
-                new_cat = self.category_service.map_or_ask(old_cat, str(row.get("name", "")))
+                new_cat = self.category_service.map_or_ask(
+                    old_cat, str(row.get("name", ""))
+                )
                 merged_df.at[idx, "defaultCategory"] = new_cat
                 merged_df.at[idx, "categoryText"] = new_cat
 
@@ -150,7 +153,9 @@ class Pipeline:
             enrichment = self.enricher.enrich(
                 merged_df,
                 force_reprocess=options.force_ai_reprocess,
-                progress_callback=lambda *args: progress(args[-1] if args else "AI processing..."),
+                progress_callback=lambda *args: progress(
+                    args[-1] if args else "AI processing..."
+                ),
             )
             merged_df = enrichment.products
             result.enrichment_stats = enrichment
@@ -173,7 +178,9 @@ class Pipeline:
         result.product_count = len(output_df)
         result.duration_seconds = time.time() - start_time
 
-        progress(f"Pipeline complete. {result.product_count} products processed in {result.duration_seconds:.1f}s")
+        progress(
+            f"Pipeline complete. {result.product_count} products processed in {result.duration_seconds:.1f}s"
+        )
         return result
 
     def _map_prices(
@@ -193,7 +200,8 @@ class Pipeline:
             return df
 
         unmapped = [
-            idx for idx, row in df.iterrows()
+            idx
+            for idx, row in df.iterrows()
             if str(row.get("code", "")).strip()
             and str(row.get("price", "")).strip() in ("", "0", "nan", "None")
         ]
@@ -201,7 +209,9 @@ class Pipeline:
             row = df.loc[idx]
             code = str(row.get("code", "")).strip()
             remaining = len(unmapped) - done
-            progress(f"Cena nenájdená pre: {code}, vyžaduje sa vstup (ostáva {remaining})...")
+            progress(
+                f"Cena nenájdená pre: {code}, vyžaduje sa vstup (ostáva {remaining})..."
+            )
             product_data = {
                 "code": code,
                 "width": row.get("width"),
@@ -210,7 +220,9 @@ class Pipeline:
                 "image_url": row.get("image"),
                 "remaining_count": remaining,
             }
-            new_price = on_unmapped_price(product_data, self.pricing_service.as_dataframe())
+            new_price = on_unmapped_price(
+                product_data, self.pricing_service.as_dataframe()
+            )
             if new_price:
                 df.at[idx, "price"] = new_price
                 dimension = f"{row.get('width')}x{row.get('depth')}x{row.get('height')}"
@@ -227,7 +239,9 @@ class Pipeline:
         result = XMLParserFactory.parse(feed_name, xml_content, self.config)
         return result if result is not None else pd.DataFrame()
 
-    def map_categories(self, df: pd.DataFrame, ask_interactive: bool = False) -> pd.DataFrame:
+    def map_categories(
+        self, df: pd.DataFrame, ask_interactive: bool = False
+    ) -> pd.DataFrame:
         """Map category fields in-place. Convenience method for testing."""
         df = df.copy()
         for idx, row in df.iterrows():
