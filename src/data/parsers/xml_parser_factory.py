@@ -37,7 +37,16 @@ class XMLParserFactory:
         Returns an empty DataFrame on fetch failure.
         """
         try:
-            with urllib.request.urlopen(url) as response:
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                                  "AppleWebKit/537.36 (KHTML, like Gecko) "
+                                  "Chrome/120.0.0.0 Safari/537.36",
+                    "Accept": "application/xml,text/xml,*/*;q=0.9",
+                },
+            )
+            with urllib.request.urlopen(req, timeout=120) as response:
                 xml_content = response.read().decode("utf-8")
         except Exception as e:
             logger.error(f"Failed to fetch feed {feed_name} from {url}: {e}")

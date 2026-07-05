@@ -664,8 +664,7 @@ class MainWindow(QMainWindow):
             product_name: Product name for context
         """
         # Get suggestions from CategoryService (uses categories.json mappings)
-        raw_suggestions = self.category_service.suggest(original_category, top_n=5)
-        suggestions = [cat for cat, score in raw_suggestions]
+        suggestions = self.category_service.suggest(original_category, top_n=5)
 
         # Show dialog with suggestions
         dialog = CategoryMappingDialog(
