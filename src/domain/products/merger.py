@@ -1,7 +1,7 @@
 """Product data merging from multiple sources."""
 
 import logging
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set
 
 import pandas as pd
 
@@ -48,25 +48,50 @@ class ProductMerger:
         # Work on copies to avoid mutating inputs
         main_df = main_df.copy()
         feed_dfs = {k: v.copy() for k, v in feed_dfs.items()}
+        self._normalize_codes(main_df, feed_dfs)
 
-        stats = MergeStats()
-        merged_products = {}
-        processed_codes = set()
-
-        # Normalize codes to uppercase
-        if "code" in main_df.columns:
-            main_df["code"] = main_df["code"].astype(str).str.upper().str.strip()
-        for source_name, feed_df in feed_dfs.items():
-            if "code" in feed_df.columns:
-                feed_df["code"] = feed_df["code"].astype(str).str.upper().str.strip()
-            feed_dfs[source_name] = feed_df
-
-        # Determine which fields to skip when updating from feed into main data
         skip_fields = set(self.PRESERVED_FIELDS)
         if not update_categories:
             skip_fields |= self.CATEGORY_FIELDS
 
-        # Step 1: Process feed products (always included)
+        stats = MergeStats()
+        merged_products: Dict[str, dict] = {}
+
+        processed_codes = self._merge_feed_products(
+            main_df, feed_dfs, merged_products, stats, preserve_edits, skip_fields
+        )
+        self._keep_main_products(
+            main_df, merged_products, processed_codes, selected_categories, stats
+        )
+        if preserve_edits and feed_dfs:
+            self._remove_discontinued(feed_dfs, merged_products, stats)
+
+        result_df = (
+            pd.DataFrame(list(merged_products.values()))
+            if merged_products
+            else pd.DataFrame()
+        )
+        return MergeResult(products=result_df, stats=stats)
+
+    def _normalize_codes(self, main_df: pd.DataFrame, feed_dfs: Dict[str, pd.DataFrame]):
+        """Normalize product codes to uppercase in place."""
+        if "code" in main_df.columns:
+            main_df["code"] = main_df["code"].astype(str).str.upper().str.strip()
+        for feed_df in feed_dfs.values():
+            if "code" in feed_df.columns:
+                feed_df["code"] = feed_df["code"].astype(str).str.upper().str.strip()
+
+    def _merge_feed_products(
+        self,
+        main_df: pd.DataFrame,
+        feed_dfs: Dict[str, pd.DataFrame],
+        merged_products: Dict[str, dict],
+        stats: MergeStats,
+        preserve_edits: bool,
+        skip_fields: Set[str],
+    ) -> Set[str]:
+        """Step 1: feed products are always included and update existing data."""
+        processed_codes: Set[str] = set()
         for source_name, feed_df in feed_dfs.items():
             for _, feed_row in feed_df.iterrows():
                 code = str(feed_row.get("code", "")).strip()
@@ -74,47 +99,21 @@ class ProductMerger:
                     continue
 
                 if code in merged_products:
-                    # Already have this product — update with feed data
-                    existing = merged_products[code]
-                    if preserve_edits:
-                        for field in ["price", "stock", "availability"]:
-                            if field in feed_row.index and pd.notna(feed_row[field]):
-                                existing[field] = feed_row[field]
-                    else:
-                        feed_images = self._count_images(feed_row)
-                        existing_images = self._count_images(pd.Series(existing))
-                        if feed_images >= existing_images:
-                            for col in feed_row.index:
-                                if pd.notna(feed_row[col]) and col not in skip_fields:
-                                    existing[col] = feed_row[col]
-                        else:
-                            for col in feed_row.index:
-                                if col not in self.IMAGE_COLUMNS and col not in skip_fields and pd.notna(feed_row[col]):
-                                    existing[col] = feed_row[col]
-                    existing["source"] = source_name
+                    # Already merged from an earlier feed — update it
+                    target = merged_products[code]
+                    self._update_from_feed(target, feed_row, preserve_edits, skip_fields)
+                    target["source"] = source_name
                     stats.updated += 1
                 else:
-                    # Check if exists in main data
-                    main_match = main_df[main_df["code"] == code] if "code" in main_df.columns else pd.DataFrame()
-
+                    main_match = (
+                        main_df[main_df["code"] == code]
+                        if "code" in main_df.columns
+                        else pd.DataFrame()
+                    )
                     if not main_match.empty:
                         # Merge feed into existing main data
                         base = main_match.iloc[0].to_dict()
-                        if preserve_edits:
-                            for field in ["price", "stock", "availability"]:
-                                if field in feed_row.index and pd.notna(feed_row[field]):
-                                    base[field] = feed_row[field]
-                        else:
-                            feed_images = self._count_images(feed_row)
-                            main_images = self._count_images(main_match.iloc[0])
-                            if feed_images >= main_images:
-                                for col in feed_row.index:
-                                    if pd.notna(feed_row[col]) and col not in skip_fields:
-                                        base[col] = feed_row[col]
-                            else:
-                                for col in feed_row.index:
-                                    if col not in self.IMAGE_COLUMNS and col not in skip_fields and pd.notna(feed_row[col]):
-                                        base[col] = feed_row[col]
+                        self._update_from_feed(base, feed_row, preserve_edits, skip_fields)
                         base["source"] = source_name
                         merged_products[code] = base
                         stats.updated += 1
@@ -123,14 +122,48 @@ class ProductMerger:
                         new_product = feed_row.to_dict()
                         new_product["source"] = source_name
                         # New products start with aiProcessed = "0"
-                        if "aiProcessed" not in new_product or not new_product.get("aiProcessed"):
+                        if not new_product.get("aiProcessed"):
                             new_product["aiProcessed"] = "0"
                         merged_products[code] = new_product
                         stats.created += 1
 
                 processed_codes.add(code)
+        return processed_codes
 
-        # Step 2: Process main data products not in feeds
+    def _update_from_feed(
+        self,
+        target: dict,
+        feed_row: pd.Series,
+        preserve_edits: bool,
+        skip_fields: Set[str],
+    ):
+        """Copy feed values into target, honoring edit preservation and image priority."""
+        if preserve_edits:
+            for field in ("price", "stock", "availability"):
+                if field in feed_row.index and pd.notna(feed_row[field]):
+                    target[field] = feed_row[field]
+            return
+
+        # Image merge prioritizes the source with more images
+        keep_existing_images = (
+            self._count_images(feed_row) < self._count_images(pd.Series(target))
+        )
+        for col in feed_row.index:
+            if col in skip_fields or pd.isna(feed_row[col]):
+                continue
+            if keep_existing_images and col in self.IMAGE_COLUMNS:
+                continue
+            target[col] = feed_row[col]
+
+    def _keep_main_products(
+        self,
+        main_df: pd.DataFrame,
+        merged_products: Dict[str, dict],
+        processed_codes: Set[str],
+        selected_categories: Optional[List[str]],
+        stats: MergeStats,
+    ):
+        """Step 2: keep main data products not present in any feed."""
         for _, main_row in main_df.iterrows():
             code = str(main_row.get("code", "")).strip()
             if not code or code in processed_codes:
@@ -142,33 +175,30 @@ class ProductMerger:
                 continue
 
             merged_products[code] = main_row.to_dict()
-            if "source" not in merged_products[code] or not merged_products[code]["source"]:
+            if not merged_products[code].get("source"):
                 merged_products[code]["source"] = "core"
             stats.kept += 1
 
-        # Step 3: Handle discontinued products in preserve_edits mode
-        if preserve_edits and feed_dfs:
-            active_feed_codes = set()
-            for feed_df in feed_dfs.values():
-                if "code" in feed_df.columns:
-                    active_feed_codes.update(feed_df["code"].tolist())
+    def _remove_discontinued(
+        self,
+        feed_dfs: Dict[str, pd.DataFrame],
+        merged_products: Dict[str, dict],
+        stats: MergeStats,
+    ):
+        """Step 3 (preserve_edits): drop feed-sourced products gone from all feeds."""
+        active_feed_codes: Set[str] = set()
+        for feed_df in feed_dfs.values():
+            if "code" in feed_df.columns:
+                active_feed_codes.update(feed_df["code"].tolist())
 
-            codes_to_remove = []
-            for code, product in merged_products.items():
-                if product.get("source") not in ("core",) and code not in active_feed_codes:
-                    codes_to_remove.append(code)
-
-            for code in codes_to_remove:
-                del merged_products[code]
-                stats.removed += 1
-
-        # Build result DataFrame
-        if merged_products:
-            result_df = pd.DataFrame(list(merged_products.values()))
-        else:
-            result_df = pd.DataFrame()
-
-        return MergeResult(products=result_df, stats=stats)
+        codes_to_remove = [
+            code
+            for code, product in merged_products.items()
+            if product.get("source") not in ("core",) and code not in active_feed_codes
+        ]
+        for code in codes_to_remove:
+            del merged_products[code]
+            stats.removed += 1
 
     def _count_images(self, row: pd.Series) -> int:
         """Count non-empty image columns in a row."""

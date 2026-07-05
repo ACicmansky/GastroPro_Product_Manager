@@ -13,9 +13,19 @@
       "Bash(cd:*)",
       "mcp__github__list_pull_requests",
       "Bash(gh pr:*)",
-      "mcp__github__pull_request_read"
+      "mcp__github__pull_request_read",
+      "mcp__tokensave__tokensave_complexity",
+      "mcp__tokensave__tokensave_redundancy",
+      "mcp__tokensave__tokensave_circular",
+      "mcp__tokensave__tokensave_dead_code"
     ]
   },
+  "enabledMcpjsonServers": [
+    "python-sdk",
+    "memory-bank",
+    "sequential-thinking",
+    "CodeGraphContext"
+  ],
   "hooks": {
     "PreToolUse": [
       {
@@ -29,10 +39,7 @@
       }
     ]
   },
-  "enabledMcpjsonServers": [
-    "python-sdk",
-    "memory-bank",
-    "sequential-thinking",
-    "CodeGraphContext"
-  ]
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:8787"
+  }
 }

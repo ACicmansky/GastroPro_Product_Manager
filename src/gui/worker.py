@@ -20,7 +20,7 @@ class PipelineWorker(QObject):
     result = pyqtSignal(object)  # PipelineResult
     statistics = pyqtSignal(dict)
     category_mapping_request = pyqtSignal(str, str)  # original_category, product_name
-    price_mapping_request = pyqtSignal(list)  # unmapped codes
+    price_mapping_request = pyqtSignal(dict, object)  # product_data, prices_df
 
     def __init__(self, config: Dict, options: PipelineOptions):
         super().__init__()
@@ -86,11 +86,15 @@ class PipelineWorker(QObject):
         if self._category_loop:
             self._category_loop.quit()
 
-    def _on_unmapped_price(self, unmapped_codes: list):
-        """Notify GUI about unmapped prices."""
-        self.price_mapping_request.emit(unmapped_codes)
+    def _on_unmapped_price(self, product_data: dict, prices_df) -> Optional[str]:
+        """Block and ask GUI for a price for one product."""
+        self._price_result = None
+        self._price_loop = QEventLoop()
+        self.price_mapping_request.emit(product_data, prices_df)
+        self._price_loop.exec_()
+        return self._price_result
 
-    def set_price_mapping_result(self, price: str):
+    def set_price_mapping_result(self, price: Optional[str]):
         """Called by GUI when user provides price mapping."""
         self._price_result = price
         if self._price_loop:

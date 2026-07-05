@@ -396,7 +396,7 @@ class MainWindow(QMainWindow):
             scrape_mebella=self.mebella_scraping_checkbox.isChecked(),
             scrape_topchladenie=self.web_scraping_checkbox.isChecked(),
             topchladenie_csv_path=getattr(self, "topchladenie_csv_path", ""),
-            enable_price_mapping=False,
+            enable_price_mapping=self.mebella_scraping_checkbox.isChecked(),
         )
 
         # Show progress and disable UI
@@ -685,10 +685,9 @@ class MainWindow(QMainWindow):
             # User cancelled - return original category
             self.worker.set_category_mapping_result(original_category)
 
-    def show_error_message(self, error_info):
+    def show_error_message(self, message: str):
         """Show error message."""
-        title, message = error_info
-        QMessageBox.critical(self, title, message)
+        QMessageBox.critical(self, "Chyba", message)
 
     def handle_price_mapping_request(self, product_data, prices_df):
         """

@@ -30,10 +30,9 @@ class Pipeline:
     1. Load existing data from DB
     2. Load main file (XLSX)
     3. Parse XML feeds
-    4. Scrape (if enabled)
+    4. Scrape (if enabled) + price mapping for Mebella (with callback for unmapped)
     5. Merge all sources
     6. Map categories (with callback for unknowns)
-    7. Apply pricing (with callback for unmapped)
     8. AI enhancement (if enabled)
     9. Transform to output format
     10. Save to DB
@@ -116,6 +115,13 @@ class Pipeline:
             )
             feed_dfs.update(scraped)
 
+            # Mebella table bases carry no price — map from known prices,
+            # asking the user (via callback) for unknown ones.
+            if options.enable_price_mapping and "mebella" in feed_dfs:
+                feed_dfs["mebella"] = self._map_prices(
+                    feed_dfs["mebella"], progress, on_unmapped_price
+                )
+
         # 5. Merge all sources
         progress("Merging product data...")
         merge_result = self.merger.merge(
@@ -137,14 +143,6 @@ class Pipeline:
                 new_cat = self.category_service.map_or_ask(old_cat, str(row.get("name", "")))
                 merged_df.at[idx, "defaultCategory"] = new_cat
                 merged_df.at[idx, "categoryText"] = new_cat
-
-        # 7. Apply pricing
-        if options.enable_price_mapping:
-            progress("Applying price mappings...")
-            merged_df = self.pricing_service.apply_mappings(merged_df)
-            unmapped = self.pricing_service.identify_unmapped(merged_df)
-            if unmapped and on_unmapped_price:
-                on_unmapped_price(unmapped)
 
         # 8. AI enhancement
         if options.enable_ai_enhancement:
@@ -177,6 +175,48 @@ class Pipeline:
 
         progress(f"Pipeline complete. {result.product_count} products processed in {result.duration_seconds:.1f}s")
         return result
+
+    def _map_prices(
+        self,
+        df: pd.DataFrame,
+        progress: Callable,
+        on_unmapped_price: Optional[Callable],
+    ) -> pd.DataFrame:
+        """Fill prices from known mappings; ask per product for unknown ones.
+
+        on_unmapped_price(product_data: dict, prices_df) -> Optional[str]
+        blocks until the user answers (or returns None to skip).
+        """
+        progress("Applying price mappings...")
+        df = self.pricing_service.apply_mappings(df)
+        if not on_unmapped_price:
+            return df
+
+        unmapped = [
+            idx for idx, row in df.iterrows()
+            if str(row.get("code", "")).strip()
+            and str(row.get("price", "")).strip() in ("", "0", "nan", "None")
+        ]
+        for done, idx in enumerate(unmapped):
+            row = df.loc[idx]
+            code = str(row.get("code", "")).strip()
+            remaining = len(unmapped) - done
+            progress(f"Cena nenájdená pre: {code}, vyžaduje sa vstup (ostáva {remaining})...")
+            product_data = {
+                "code": code,
+                "width": row.get("width"),
+                "depth": row.get("depth"),
+                "height": row.get("height"),
+                "image_url": row.get("image"),
+                "remaining_count": remaining,
+            }
+            new_price = on_unmapped_price(product_data, self.pricing_service.as_dataframe())
+            if new_price:
+                df.at[idx, "price"] = new_price
+                dimension = f"{row.get('width')}x{row.get('depth')}x{row.get('height')}"
+                self.pricing_service.add_mapping(code, new_price, dimension)
+                progress(f"Nová cena uložená pre: {code}")
+        return df
 
     def load_main_data(self, file_path: str) -> pd.DataFrame:
         """Load main data file. Convenience method."""

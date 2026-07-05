@@ -5,6 +5,7 @@ from typing import Dict, Optional, Callable
 
 import pandas as pd
 
+from src.domain.products.variant_service import get_pair_code
 from src.scrapers.mebella_scraper import MebellaScraper
 from src.scrapers.topchladenie_scraper import TopchladenieScraper
 
@@ -39,6 +40,10 @@ class ScrapingOrchestrator:
                 df = scraper.scrape_products()
                 if df is not None and not df.empty:
                     df["source"] = "web_scraping"
+                    if "code" in df.columns:
+                        # Variants share a pairCode (code minus BAR/DINING/COFFEE
+                        # suffix) — AI enrichment and variantVisibility rely on it.
+                        df["pairCode"] = df["code"].apply(get_pair_code)
                     results["mebella"] = df
                     logger.info(f"Scraped {len(df)} products from Mebella")
             except Exception as e:

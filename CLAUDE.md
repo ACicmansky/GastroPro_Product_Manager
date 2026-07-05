@@ -9,10 +9,7 @@ GastroPro Product Manager is a Python desktop application for merging product da
 ## Commands
 
 ```bash
-# Run the application (new format - primary)
-python main_new_format.py
-
-# Run the application (legacy format)
+# Run the application
 python main.py
 
 # Run all tests
@@ -24,7 +21,7 @@ pytest -m scraper
 pytest -m category_filter
 
 # Run specific test file
-pytest tests/test_ai_enhancer_new_format.py -v
+pytest tests/test_ai_enhancer.py -v
 ```
 
 ## Architecture
@@ -34,19 +31,17 @@ pytest tests/test_ai_enhancer_new_format.py -v
 Load (XLSX/CSV) → Parse XML Feeds → Merge Data → Map Categories → AI Enhance → Filter → Transform → Export CSV
 ```
 
-### Key Directories
-- `src/pipeline/` - Pipeline orchestration (`pipeline_new_format.py` is the primary entry point)
-- `src/parsers/` - XML parsing with namespace support for Gastromarket (RSS+g: prefix) and ForGastro
-- `src/mergers/` - Data merging with image priority and source tracking
-- `src/ai/` - Gemini API integration with quota management and web search grounding
-- `src/scrapers/` - Web scrapers (Topchladenie multi-threaded, Mebella Playwright-based)
-- `src/gui/` - PyQt5 interface (`main_window_new_format.py` is primary)
-- `src/filters/` - Category selection and filtering
-- `src/transformers/` - Output format conversion (138 columns)
+### Key Directories (layered architecture)
+- `src/pipeline/` - Orchestration: `pipeline.py` (linear coordinator), `scraping.py` (ScrapingOrchestrator)
+- `src/data/` - I/O layer: `loaders/` (XLSX/CSV), `parsers/` (XML with namespace support for Gastromarket RSS+g: prefix and ForGastro, via XMLParserFactory), `writers/`, `database/`
+- `src/domain/` - Business logic: `products/` (merger, variant service), `categories/` (CategoryService, filter), `pricing/`, `transform/` (OutputTransformer, 138 columns), `models.py`
+- `src/ai/` - Gemini integration: `api_client.py` (GeminiClient with quota management), `batch_orchestrator.py`, `product_enricher.py`, `prompts.py`, `result_parser.py`
+- `src/scrapers/` - Web scrapers (BaseScraper with configurable threading; Topchladenie multi-threaded, Mebella Playwright-based)
+- `src/gui/` - PyQt5 interface: `main_window.py`, `worker.py` (thin PipelineWorker), `widgets.py`
+- `src/config/` - Config loading and schema
 
 ### Entry Points
-- `main_new_format.py` - Primary GUI (138-column format)
-- `main.py` - Legacy GUI
+- `main.py` - GUI application (138-column format)
 - `scripts/scraping_cli.py` - CLI for web scraping
 
 ## Configuration
@@ -99,8 +94,6 @@ Load (XLSX/CSV) → Parse XML Feeds → Merge Data → Map Categories → AI Enh
 ```
 
 ## Memory Bank
-Project knowledge base in `memory-bank/`:
-- `activeContext.md` - Current status and recent changes
-- `progress.md` - Feature completion tracking
-- `techContext.md` - Technology stack details
-- `systemPatterns.md` - Design patterns
+Project knowledge base in `memory-bank/` (rules: `memory-bank/memory-bank-integration.md`, workflow: `memory-bank` skill):
+- Before non-trivial work, read `activeContext.md` (current state); other files only on demand
+- After significant changes, update `activeContext.md` + add a `journal/YYYY_MM_DD_topic.md` entry

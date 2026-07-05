@@ -248,16 +248,3 @@ class BatchOrchestrator:
             self.client.delete_file(uploaded_file_name)
 
         return self.parser.parse_batch_results(df, file_content, progress_callback)
-
-    def resume_active_job(self, df: pd.DataFrame, progress_callback=None) -> Optional[Tuple[pd.DataFrame, Dict]]:
-        """Resume an active batch job if one exists. Returns None if no active job."""
-        if not self.batch_job_db:
-            return None
-
-        active = self.batch_job_db.get_active_job()
-        if not active:
-            return None
-
-        return self._monitor_and_apply(
-            df, active["job_name"], active["uploaded_file_name"], progress_callback
-        )

@@ -53,6 +53,13 @@
 - ✅ Standalone transformation script (`scripts/transform_to_new_format.py`)
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
+## Recently Completed (July 2026)
+- ✅ **Layered Architecture Refactor + Audit**
+  - Restructured `src/` into layers: `pipeline` / `data` / `domain` / `ai` / `scrapers` / `gui` / `config`; deleted the old core/services/utils/mergers/mappers/parsers/transformers packages and `*_new_format` file names. Entry point is `main.py`.
+  - Post-refactor audit fixed regressions: interactive price mapping restored end-to-end (PricingService now stores `[{code, dimension, price}]` records with legacy dict migration), `pairCode` assignment restored for Mebella products, error dialog crash fixed, scripts (`scraping_cli.py`, `categories.py`, `cleaning.py`) rewritten against the new structure.
+  - Code health: `ProductMerger.merge` split into focused steps, dead `BatchOrchestrator.resume_active_job` removed, tests added for PricingService/ProductDB/BatchJobDB (196 tests total, all passing).
+  - Memory bank refreshed; integration instructions slimmed into a project skill.
+
 ## Recently Completed (April 2026)
 - ✅ **Gemini Batch API & Category-Specific Parameters**
   - Integrated asynchronous Google Gemini Batch API (`client.batches.create`) replacing parallel blocking REST streams to improve throughput and reduce costs.

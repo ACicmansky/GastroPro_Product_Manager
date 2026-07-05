@@ -1,27 +1,33 @@
 # GastroPro Product Manager - System Patterns
 
 ## Architecture Overview
-The application follows a modular, package-based architecture with a clear separation of concerns, organized within the `src` directory. This structure promotes maintainability, scalability, and testability.
+Layered architecture (July 2026 refactor). Dependencies flow downward only — GUI → pipeline → domain/data/ai/scrapers. Zero circular dependencies.
 
 ```
 src/
-├── core/         # Core business logic and data pipeline
-│   ├── data_pipeline.py
-│   └── models.py
-├── gui/          # All PyQt5 UI components and logic
-│   ├── main_window.py
-│   ├── widgets.py
-│   └── worker.py
-├── services/     # External service integrations
-│   ├── ai_enhancer.py
-│   ├── scraper.py
-│   └── variant_matcher.py
-└── utils/        # Shared utility functions
-    ├── config_loader.py
-    ├── data_loader.py
-    ├── category_mapper.py
-    ├── feed_processor.py
-    └── helpers.py
+├── pipeline/     # Orchestration
+│   ├── pipeline.py        # Pipeline — linear coordinator of the whole flow
+│   └── scraping.py        # ScrapingOrchestrator — runs enabled scrapers
+├── data/         # I/O layer
+│   ├── loaders/           # XLSX/CSV loading (factory picks by extension)
+│   ├── parsers/           # XML feed parsers via XMLParserFactory
+│   ├── writers/           # CSV export
+│   └── database/          # ProductDB (JSON document store), BatchJobDB
+├── domain/       # Business logic (pure, no I/O)
+│   ├── products/          # ProductMerger, variant_service (get_pair_code)
+│   ├── categories/        # CategoryService, category filter
+│   ├── pricing/           # PricingService (table_bases_prices.json records)
+│   ├── transform/         # OutputTransformer (138-column output)
+│   └── models.py          # MergeResult, MergeStats, PipelineOptions...
+├── ai/           # Gemini integration
+│   ├── api_client.py      # GeminiClient (quota, upload, batch jobs)
+│   ├── batch_orchestrator.py  # BatchOrchestrator (JSONL build, poll, resume)
+│   ├── product_enricher.py    # Grouping variants vs standard
+│   ├── prompts.py             # Dual prompt system
+│   └── result_parser.py       # ResultParser (3-strategy fuzzy matching)
+├── scrapers/     # BaseScraper + Topchladenie (threaded), Mebella (Playwright)
+├── gui/          # PyQt5: MainWindow, thin PipelineWorker, widgets, dialogs
+└── config/       # Config loading and schema
 ```
 
 ### AI Enhancement Layer
@@ -127,12 +133,13 @@ src/
     - **Automated Backup**: Native rotation and retention.
 
 ## Component Relationships
-- **main.py**: The main entry point of the application; initializes and runs the GUI.
-- **src/gui/main_window.py**: Contains the `MainWindow` class, which manages the entire UI, its state, and user interactions. It delegates data processing to the `worker`.
-- **src/gui/worker.py**: A thin `QThread` worker that runs the `DataPipeline` in the background to keep the UI responsive.
-- **src/core/data_pipeline.py**: The heart of the application's business logic. It orchestrates the entire data processing flow, from loading and filtering to merging, variant matching, and AI enhancement.
-- **src/services/**: A package containing modules that interact with external systems or perform complex, self-contained tasks (e.g., web scraping, AI enhancement, variant matching).
-- **src/utils/**: A package of small, focused modules providing reusable helper functions for tasks like loading data, processing feeds, and mapping categories.
+- **main.py**: Entry point; initializes and runs the GUI (`MainWindow`).
+- **src/gui/main_window.py**: `MainWindow` manages the UI and delegates processing to `PipelineWorker`.
+- **src/gui/worker.py**: Thin `QThread` worker running `Pipeline` in the background. Blocking interactive callbacks (category mapping, price mapping) use signal → dialog → `QEventLoop` → `set_*_result`.
+- **src/pipeline/pipeline.py**: `Pipeline` orchestrates the flow: load → parse feeds → scrape → price-map (pre-merge, Mebella) → merge → map categories → AI enhance → transform → export.
+- **src/domain/**: Pure business logic — `ProductMerger`, `CategoryService`, `PricingService`, `OutputTransformer`, `variant_service`.
+- **src/data/**: Loaders/parsers/writers/database; `XMLParserFactory` picks Gastromarket (namespaced) vs ForGastro parser.
+- **src/ai/**: `BatchOrchestrator` drives the Gemini Batch API through `GeminiClient`; `ResultParser` applies results back via 3-strategy fuzzy matching.
 
 ## Technical Decisions
 1. **PyQt5 for GUI**: Provides robust desktop application interface

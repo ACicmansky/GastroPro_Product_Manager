@@ -18,7 +18,7 @@
 - **regex**: Advanced pattern matching for product difference extraction
 - **python-dotenv**: For managing environment variables (API keys)
 - **threading**: For thread-safe quota management
-- **pytest**: Testing framework (158 tests)
+- **pytest**: Testing framework (196 tests)
 
 ## Development Setup
 - **Environment**: Windows operating system
@@ -122,21 +122,17 @@
 ## Web Scraping Architecture
 
 ### Scraping Components
-1. **Base Scraper Class**: `TopchladenieScraper`
-   - Core scraping logic and methods
-   - Session management and request handling
-   - Data extraction and parsing
+1. **Base Class**: `BaseScraper` (src/scrapers/base_scraper.py)
+   - Configurable multi-threading (`max_threads` clamped to 1-16), session management, progress callbacks
 
-2. **Enhanced Scraper**: `FastTopchladenieScraper`
-   - Extends base scraper with multi-threading capabilities
-   - Parallel product page processing
-   - Thread-safe progress tracking
-   - Optimized for performance with large catalogs
+2. **Scrapers**:
+   - `TopchladenieScraper` — multi-threaded (default 8 workers)
+   - `MebellaScraper` — Playwright with infinite scroll; caches URLs for 7 days in `cache/`
 
 3. **Integration Points**:
-   - Direct integration in Worker class for live scraping
-   - Alternative offline CSV loading via dedicated UI component
-   - Mutual exclusivity between scraping and CSV loading
+   - `ScrapingOrchestrator` (src/pipeline/scraping.py) runs enabled scrapers, tags `source="web_scraping"`, assigns `pairCode` to Mebella products
+   - Alternative offline CSV loading for Topchladenie (mutually exclusive with live scraping)
+   - CLI: `scripts/scraping_cli.py`
 
 ### Scraping Process Flow
 1. **Initialization**: Create scraper instance with configuration
@@ -151,45 +147,24 @@
 ## File Structure
 The application is organized into a `src` package to ensure clear separation of concerns:
 
-### Legacy Structure (Old Format)
-- **Status**: Completely deprecated and removed (March 2026).
-- The repository now relies purely on the 138-Column `new format`. Old entry points (`main.py`), obsolete GUI dialogs, and legacy pipelines have been purged.
-
-### New Format Structure (138-Column)
-- **main_new_format.py**: New application entry point
-- **src/parsers/**: XML parsing for new format
-  - `xml_parser_new_format.py` - Gastromarket & ForGastro parsers with namespace support
-  - `xml_parser_factory.py` - Parser factory
-  - **Namespace Handling**: Proper ElementTree prefix-based namespace parsing for Gastromarket RSS feed
-- **src/mergers/**: Smart data merging
-  - `data_merger_new_format.py` - Image priority merging
-- **src/mappers/**: Category transformation
-  - `category_mapper_new_format.py` - Category formatting
-- **src/transformers/**: Output transformation
-  - `output_transformer.py` - Final format transformation
-- **src/ai/**: AI enhancement
-  - `ai_enhancer_new_format.py` - Description generation with tracking
-- **src/loaders/**: File I/O
-  - `csv_loader.py` - CSV operations
-  - `xlsx_loader.py` - XLSX operations
-  - `data_loader_factory.py` - Format detection
-- **src/pipeline/**: Complete integration
-  - `pipeline_new_format.py` - End-to-end pipeline
-- **src/gui/**: New GUI components
-  - `main_window_new_format.py` - Modern interface
-  - `worker_new_format.py` - Background processing
-- **tests/**: Comprehensive test suite (158 tests)
-  - Test files for each component
-  - Integration tests
-  - Edge case coverage
+### Current Structure (post July 2026 layered refactor)
+- **main.py**: Application entry point (GUI, 138-column format)
+- **src/pipeline/**: `pipeline.py` (Pipeline coordinator), `scraping.py` (ScrapingOrchestrator)
+- **src/data/**: `loaders/` (CSV/XLSX + factory), `parsers/` (XMLParserFactory; Gastromarket namespaced `g:` prefix, ForGastro plain), `writers/`, `database/` (ProductDB document store, BatchJobDB)
+- **src/domain/**: `products/` (ProductMerger, variant_service), `categories/` (CategoryService, filter), `pricing/` (PricingService), `transform/` (OutputTransformer, 138 columns), `models.py`
+- **src/ai/**: `api_client.py` (GeminiClient), `batch_orchestrator.py`, `product_enricher.py`, `prompts.py`, `result_parser.py`
+- **src/scrapers/**: `base_scraper.py`, `topchladenie_scraper.py`, `mebella_scraper.py`
+- **src/gui/**: `main_window.py`, `worker.py` (thin PipelineWorker), `widgets.py`, dialogs
+- **src/config/**: config loading and schema
+- **tests/**: 196 tests (unit + integration, pytest markers)
 
 ## AI Enhancement Architecture
 
-- **Model & Tooling**: Gemini (google-generativeai) configured with a Google Search grounding tool to retrieve missing context when product inputs are sparse.
-- **Content Outputs**: Generates/improves B2B "Krátky popis" and "Dlhý popis" (HTML), plus SEO metadata: "SEO titulka", "SEO popis", "SEO kľúčové slová".
-- **Parallelism & Quotas**: Processes products in parallel batches via ThreadPoolExecutor while respecting API quotas (15 calls/min, 250k tokens/min) with token tracking and automatic backoff.
-- **Prompt Engineering**: Structured, domain-specific system prompt enforces professional B2B tone, HTML structure, and strict JSON-only responses for reliable parsing.
-- **Data Update Flow**: Fuzzy name matching updates the working DataFrame in-place; progress is saved incrementally with encoding fallback.
+- **Model**: `gemini-2.5-flash-lite` via the asynchronous **Gemini Batch API** (`client.batches.create`) — JSONL requests built per category, uploaded, polled every 30s until completion.
+- **Content Outputs**: B2B short/long descriptions (HTML) plus SEO metadata and `filteringProperty:{parameter}` columns per category.
+- **Dual Prompts**: Products with `pairCode` (variants) get dimension-free prompts; standard products get the full prompt.
+- **Job Tracking**: `batch_jobs` SQLite table; interrupted jobs resume automatically inside `BatchOrchestrator.process()`.
+- **Result Application**: `ResultParser` with 3-strategy fuzzy matching (exact code → fuzzy code → fuzzy name) updates the DataFrame; `aiProcessed`/`aiProcessedDate` track state.
 
 ## File Operations
 - Reading/writing CSV files

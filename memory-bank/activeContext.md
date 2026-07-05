@@ -1,190 +1,27 @@
 # GastroPro Product Manager - Active Context
 
-The current focus is on **monitoring and refining the application**. Recently completed major features include the new dynamic column configuration (Phase 10), integration of the Gastromarket Stalgast feed, the **SQLite Database Integration (Phase 11)**, and most recently, the **Gemini Batch API & SQLite Document Store Architecture (April 2026)**.
+*Last updated: 2026-07-05*
 
-The SQLite DB is now the source of truth, ensuring that internal metadata (like `aiProcessed`, `aiProcessedDate`) is preserved across client data uploads and application restarts, utilizing a NoSQL-like JSON properties field called `product_data` for maximum elasticity.
+## Current State
+The **layered architecture refactor is complete and audited**. The codebase moved from the old flat `src` layout (core/services/utils/parsers/mergers/...) to a clean layered structure: `src/pipeline` (orchestration), `src/data` (I/O), `src/domain` (business logic), `src/ai` (Gemini), `src/scrapers`, `src/gui`, `src/config`. Entry point is `main.py`. All 196 tests pass. Zero circular dependencies.
 
-## Recent Changes
-- **Gemini Batch API & Parameter Extraction (April 2026):**
-  - Refactored the core AI Enhancement execution from blocking parallel REST calls to the asynchronous Google Gemini Batch API (`client.batches.create`).
-  - Added grouped category AI parameter generation to derive distinct filtering properties tailored to categories based on `categories_with_parameters.json` lists (e.g. Dimensions, Power, Type).
-  - Designed the `AIEnhancerNewFormat` module to pause and gracefully resume passive polling while returning control to the user via background UI tracking via the `batch_jobs` SQLite schema.
-- **SQLite Document Store Architecture (April 2026):**
-  - Pivot the `products` SQLite schema from explicitly defining 138 rigid columns to a flexible Document Store paradigm consisting of 6 columns: `code`, `product_data` (JSON text blob), `source`, `last_updated`, `aiProcessed`, and `aiProcessedDate`.
-  - Upgraded Pandas dataframe interactions around SQLite: automatically packing arbitrary properties like `filteringProperty:*` straight into JSON dictionaries via `dict_to_json` upon saves, and universally unpacking them natively via `json.loads` horizontally during read loads via `get_all_products_df()`.
-  - Added robust initialization mechanism to smoothly ingest active legacy DB states into the new 6-column document paradigm in `init_db`.
-- **Added `get_unique_categories` Script (March 22, 2026):**
-  - Created a helper script in `scripts/get_unique_categories.py` to extract all unique `newCategory` values from `categories.json` and save them to `unique_categories.txt`.
-- **Legacy Dead Code Cleanup (March 11, 2026):**
-  - Analyzed the codebase using CodeGraphContext to verify zero dependencies for legacy components.
-  - Safely removed 14 legacy files related to the "old format" pipeline (including `main.py`, `src/core/data_pipeline.py`, old GUI elements, and `ai_enhancer.py`).
-  - Fixed test assertions in `test_pipeline_new_format.py` to accommodate realistic pipeline output from the production SQLite DB, maintaining 176/176 passing tests.
-- **SQLite Database Integration:**
-  - Added `ProductDatabase` class (`src/core/database.py`) to manage a local SQLite database (`data/products.db`).
-  - Adapted `PipelineNewFormat` to use the DB as the source of truth instead of starting empty.
-  - Implemented robust upsert logic to merge client-uploaded changes while preserving internal application columns.
-  - Automated backups of `products.db` file to a `backups/` folder before saving the final processed state.
-  - Added `db_path` to `config.json`.
-  - Fixed tests in `test_output_transformer.py` to correctly preserve the internal variables missing from the final configuration map.
-- **Gastromarket Stalgast Integration:**
-  - Added `enable_gastromarket_stalgast` to `config.json`.
-- **Default Change**: AI enhancement is now disabled by default in the UI to save costs and time when not explicitly needed.
-
-**Dynamic Column Configuration (November 25, 2025)**:
-- **New Feature**: Automatic detection of column differences between input XLSX and config.json
-- **GUI Dialog**: `ColumnConfigDialog` presents users with columns to add/remove with checkboxes
-- **Config    Update**: `save_config` utility function to persist changes to config.json
-- **Smart Filtering**: Ignores generated columns (variants, images, AI tracking) from removal suggestions
-- **Integration**: Triggered automatically when loading main data file in `MainWindowNewFormat`
-
-**AI Enhancement Fix & Optimization (November 25, 2025)**:
-- **Critical Fix**: Restored missing logic in `process_dataframe` (grouping, batching) that was accidentally removed.
-- **Optimization**: Increased batch size to 45 and parallel calls to 10 to maximize throughput (15 calls/min limit).
-- **Rate Limiting**: Refactored `_check_and_wait_for_quota` to be non-blocking during sleep, allowing other threads to proceed.
-- **UX**: Added progress prints to the terminal for better visibility.
-
-**AI Enhancement Grouping Logic (November 24, 2025)**:
-- **Dual-Prompt System**: Implemented differentiated AI processing for product variants
-- **Group 1 (Variants)**: Products with `pairCode` use `create_system_prompt_no_dimensions()` - excludes dimension keywords
-- **Group 2 (Standard)**: All other products use standard `create_system_prompt()`
-- **Implementation**: Modified `AIEnhancerNewFormat` to support dual `GenerateContentConfig` objects
-- **Data Preservation**: Updated `DataMergerNewFormat` to preserve `pairCode` during merging
-- **Verification**: Created `verify_ai_grouping.py` script to confirm correct prompt assignment
-
-**Mebella Scraper & GUI Fixes (November 24, 2025)**:
-- **Scraper Fix**: Implemented infinite scroll handling in `MebellaScraper` (Playwright) to retrieve all products (previously capped at ~12).
-- **Caching**: Added JSON-based URL caching (7-day validity) to `MebellaScraper` to speed up subsequent runs.
-- **GUI Fix**: Resolved `RuntimeError` in `PriceMappingDialog` by properly parenting `input_group` to the layout.
-- **UI Improvement**: Refined `PriceMappingDialog` manual input layout (fixed height, spacing) and added product image display.
-- **Feature**: Added "remaining count" indicator to price mapping dialog.
-
-**Scraper Refactoring & Testing (November 22, 2025)**:
-- **Architecture**: Refactored `MebellaScraper` and `TopchladenieScraper` to use `BaseScraper`.
-- **Playwright**: Integrated Playwright for Mebella pagination.
-- **Testing**: Achieved 100% mocked coverage for scraping logic (Playwright & requests).
-- **Feature**: Added `pairCode` variant grouping logic (removes last word from code).
-
-**Refine Category Mapping Logic (November 21, 2025)**:
-- **Optimization**: Prevented redundant interactive prompts for categories already in target format
-- **Implementation**: Added `is_target_category` check to `CategoryMappingManager`
-- **Logic**: `map_category` now checks if category is already a valid `newCategory` before prompting
-- **Tests**: Added new unit test `test_map_returns_existing_target_category`
-
-**XML Namespace Parsing Fix (November 16, 2025)**:
-- **Critical Bug Fix**: Fixed Gastromarket XML parser failing with production feed
-- **Root Cause**: Real feed uses prefixed namespace (`xmlns:g=`) not default namespace
-- **Solution**: Implemented proper prefix-based namespace handling with ElementTree
-- **Config Cleanup**: Removed `g:` prefixes from field names, added namespace URL to config
-- **Production Validation**: Successfully parsed 3,934 products from live Gastromarket feed
-- **Tests**: All 217 tests passing, zero regressions
-- **Pipeline Success**: Complete end-to-end processing with real data
-
-**Phase 13 Complete (November 16, 2025)**:
-- **Full Gemini API Integration**: Real API client with web search grounding tool
-- **Quota Management**: Thread-safe tracking (15 calls/min, 250K tokens/min) with automatic waiting
-- **Batch Processing**: Configurable batch size (45 products), JSON serialization, clean response parsing
-- **Retry Logic**: 3 attempts with exponential backoff, rate limit detection
-- **Fuzzy Matching**: 3-strategy matching (exact code, fuzzy code, fuzzy name) with RapidFuzz
-- **Parallel Processing**: ThreadPoolExecutor with 5 workers, thread-safe operations
-- **Incremental Saving**: Progress saved after each batch to tmp directory
-- **English Column Names**: Migrated all prompts and column names from Slovak to English
-- **Tests**: All 217 tests passing (38 AI enhancement tests, 23 new)
-
-**Phase 12 Complete (November 16, 2025)**:
-- **Category Filtering GUI**: Added category list widget with search, toggle all/none, and selection tracking
-- **Advanced Merging Logic**: Implemented new requirements - feeds always included, main data filtered by category, source tracking
-- **Source Tracking**: Added `source` column (gastromarket, forgastro, web_scraping, core) and `last_updated` timestamp
-- **Enhanced Statistics**: Detailed breakdown showing created/updated/kept/removed counts by source
-- **Bug Fix**: Fixed category prefix duplication issue (was adding "Tovary a kategórie > " multiple times)
-- **Tests**: All 194 tests passing (18 new category filter tests, 176 previous tests)
-
-**Phase 11 Complete (January 15, 2025)**:
-- **Web Scraping Refactored**: Removed 170+ lines of obsolete code, scraper now produces new format directly
-- **Terminal Logging**: Added detailed progress output with visual separators, counters, and status indicators
-- **Performance**: 5x faster with multi-threading (2-3 min vs 10-15 min), 20% memory reduction
-- **Tests**: All 176 tests passing (18 new scraper tests, 158 original tests)
-
-**Earlier Changes**:
-- **CategoryMappingManager**: Implemented centralized category mapping management with in-memory caching. Eliminates duplicate disk I/O, provides immediate availability of new mappings during processing, and ensures no repeated prompts for same category in single run
-- **Interactive Category Mapping with Auto-Save & Smart Suggestions**: Implemented real-time category mapping dialog that pauses processing when unmapped categories are encountered during XML parsing and web scraping. Features include: on-the-fly user input, automatic saving to `categories.json` with thread-safe operations, smart suggestions using rapidfuzz + hierarchical matching showing top 5 similar categories with confidence percentages, and product name context display
-- **Major Codebase Refactoring**: The entire application was refactored into a modular `src` package structure to improve maintainability and adhere to SOLID principles. This involved separating the GUI, core business logic, services, and utilities into distinct modules.
-- Enhanced Topchladenie.sk data acquisition with dual approach:
-  - Live scraping with multi-threaded parallel processing
-  - Alternative offline CSV loading with dedicated drop area
-- Fixed CSV loading to properly handle semicolon (;) separators for Topchladenie CSV files
-- Implemented enhanced data cleaning by filtering out products with empty catalog numbers
-- Added detailed statistics reporting in export success dialog
-- Enhanced category mapping system with unified approach for XML feeds and CSV input
-- Implemented optional user-controlled category mapping at export time
-- Added UI checkbox to control CSV category mapping behavior
-- Restructured category mapping to use a simpler universal JSON array format
-- Created centralized mapping functions to ensure consistent category standardization
-- Successfully implemented XML feed fetching and parsing for multiple vendors
-- Added specialized processing for forgastro feed HTML content extraction
-- Implemented gastromarket feed text processing for bullet points and categories
-- Modified merge operation to use outer join to include all products
-- Added automatic "Viditelný" field setting to "1" for all feed products
-- Enhanced HTML parsing with BeautifulSoup to extract tab content
-- Improved special character handling and text formatting
-- Introduced AI-based SEO metadata generation (SEO titulka, SEO popis, SEO kľúčové slová) with web search grounding to enrich missing context
-
-## Completed Migration (November 2025)
-✅ **All 8 Phases Complete - TDD Approach Success**
-1. ✅ **Phase 0-1**: Test infrastructure + current implementation tests (110 tests)
-2. ✅ **Phase 2**: OutputTransformer module (19 tests)
-3. ✅ **Phase 3**: XLSX/CSV loading with DataLoaderFactory (15 tests)
-4. ✅ **Phase 4**: XML parser for new format (18 tests)
-5. ✅ **Phase 5**: Data merging with image priority (11 tests)
-6. ✅ **Phase 6**: AI enhancement for new format (15 tests)
-7. ✅ **Phase 7**: Category mapper with transformation (18 tests)
-8. ✅ **Phase 8**: Pipeline integration (15 tests)
-**Total: 158 tests passing, 0 failures**
-
-## Completed Missing Features (January 2025)
-✅ **Phase 11: Web Scraping Migration - COMPLETE**
-- Created test infrastructure (18 scraper tests)
-- Implemented ScraperNewFormat with column mapping (Slovak → English)
-- Implemented EnhancedScraperNewFormat with multi-threading (8 workers)
-- Full TopChladenie.sk scraping (18 categories, pagination support)
-- GUI integration (checkbox, progress tracking)
-- Pipeline integration (seamless merge with XML feeds)
-- Data cleaning and duplicate handling
-**Total: 176 tests passing (158 + 18 scraper tests)**
-
-## Next Steps
-1. ✅ Phase 11: Web Scraping - COMPLETE
-2. ✅ Phase 12: Category Filtering & Advanced Merging - COMPLETE
-3. 🔄 Phase 13: Real AI Enhancement Migration - NEXT
-4. ⏳ Manual testing with all features
-5. ⏳ Deploy to production
+## Recent Changes (July 2026 — post-refactor audit)
+- **Regressions from the refactor found and fixed:**
+  - Interactive price mapping was silently disabled (hardcoded `False`, broken signal signature, worker never blocked on the dialog). Restored end-to-end: `Pipeline._map_prices` runs pre-merge on the Mebella feed; worker blocks via `QEventLoop`; `PricingService` now stores records (`[{code, dimension, price}]`) preserving dimension data, with legacy dict migration.
+  - `pairCode` was never assigned to scraped Mebella products — restored in `ScrapingOrchestrator` via `get_pair_code` (AI variant grouping and variantVisibility depend on it).
+  - Error dialog handler crashed on tuple unpacking — fixed.
+  - `scripts/scraping_cli.py`, `scripts/categories.py`, `scripts/cleaning.py` imported deleted modules — rewritten against the new structure.
+- **Improvements:** `ProductMerger.merge` (145 lines, deep nesting) split into `_merge_feed_products` / `_keep_main_products` / `_remove_discontinued` / `_update_from_feed`; dead `BatchOrchestrator.resume_active_job` deleted (resume happens inside `process()`); tests added for `PricingService`, `ProductDB`, `BatchJobDB`.
+- **Docs:** CLAUDE.md updated to post-refactor architecture; memory bank refreshed and integration slimmed to a project skill.
 
 ## Active Decisions
-- **Migration Strategy**: TDD approach - write tests first, then implement. Tests are mandatory for new, complex features.
-- **Format Support**: Strict adherence to the New 138-column pipeline format.
-- **Legacy Deprecation**: Do not mix legacy implementations with the modern pipeline. Legacy code is actively ignored and scheduled for cleanup.
-- **Design Philosophy**: KISS (Keep It Simple, Stupid). Do not proactively propose unrequested features or complexity.
-- **File Format**: XLSX as primary, CSV as fallback
-- **Image Merging**: Use source with most images available
-- **Merging Logic**: Feed products always included, main data filtered by category
-- **Source Tracking**: Track origin (gastromarket, forgastro, web_scraping, core)
-- **Timestamp Tracking**: Track last_updated for all products
-- **Default Values**: Apply at end of pipeline if cells are empty
-- **Breaking Changes**: Acceptable - clean migration
-- **Variant Matcher**: Skip updates (feature not used)
-- **Code Uppercase**: Apply on load and merge for consistency
-- **Category Transformation**: Add "Tovary a kategórie > " prefix once (check for duplicates)
-- **Category Filtering**: Filter main data by selected categories, feeds always included
-- Using Pandas DataFrames as the core data structure for manipulation
-- Providing detailed statistics with breakdown by source (created/updated/kept/removed)
+- SQLite document store (`data/products.db`, 6-column schema with JSON `product_data` blob) is the source of truth; `aiProcessed`/`aiProcessedDate` survive client re-uploads.
+- AI enhancement uses the asynchronous Gemini **Batch API** (job state tracked in `batch_jobs` SQLite table; interrupted jobs resume automatically inside `BatchOrchestrator.process`).
+- Variants (products with `pairCode`) get dimension-free AI prompts; others get the standard prompt.
+- Feed products always included in merge; main data filtered by selected categories; image merge prefers the source with more images; `PRESERVED_FIELDS` (AI/manual text) never overwritten by feeds.
+- AI enhancement disabled by default in the UI (cost control).
+- KISS + TDD: tests required for new non-trivial logic; no unrequested complexity.
 
-## Current Challenges
-- **Production Configuration**: Setting up real XML feed URLs
-- **AI API Integration**: Configuring and testing AI enhancement with production API
-- **Manual Testing**: Validating all features with real data
-- **E-shop Import**: Ensuring output format is compatible with e-shop system
-
-## User Experience Considerations
-- Providing clear feedback during data processing operations
-- Ensuring error messages are helpful and actionable
-- Maintaining consistent UI response during potentially lengthy operations
-
+## Known Gaps / Next Candidates
+- pyright runs in `typeCheckingMode: "off"` — switching to "basic" would need cleanup of loose typing first (deliberately deferred, not requested).
+- Manual end-to-end run with production feeds after the audit fixes is still pending.
