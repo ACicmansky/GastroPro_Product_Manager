@@ -9,3 +9,6 @@ cache/
 .worktrees/src/ai/tmp/
 .tokensave/
 graphify-out/
+
+logs/
+out/

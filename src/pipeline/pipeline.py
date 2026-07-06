@@ -100,10 +100,20 @@ class Pipeline:
             url = feed_config.get("url", "")
             if not url:
                 continue
+            if options.enabled_feeds is not None and feed_name not in options.enabled_feeds:
+                continue
             progress(f"Parsing XML feed: {feed_name}")
             feed_df = XMLParserFactory.fetch_and_parse(feed_name, url, self.config)
             if feed_df is not None and not feed_df.empty:
                 feed_dfs[feed_name] = feed_df
+                progress(f"Feed '{feed_name}': {len(feed_df)} products")
+            else:
+                warning = (
+                    f"Feed '{feed_name}' nevrátil žiadne produkty (chyba sťahovania?). "
+                    f"Produkty z tohto zdroja zostanú nezmenené."
+                )
+                result.warnings.append(warning)
+                progress(f"VAROVANIE: {warning}")
 
         # 4. Scrape (if enabled)
         if options.enable_scraping:
@@ -133,6 +143,11 @@ class Pipeline:
         )
         merged_df = merge_result.products
         result.merge_stats = merge_result.stats
+        stats = merge_result.stats
+        progress(
+            f"Merge: created={stats.created} updated={stats.updated} "
+            f"kept={stats.kept} removed={stats.removed} -> {len(merged_df)} products"
+        )
 
         # 6. Map categories
         if on_unknown_category:

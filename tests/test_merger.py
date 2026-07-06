@@ -64,3 +64,52 @@ class TestProductMerger:
         assert result.stats.created >= 0
         assert result.stats.updated >= 0
         assert result.stats.kept >= 0
+
+
+def _feed(codes):
+    return pd.DataFrame({
+        "code": codes,
+        "name": [f"Name {c}" for c in codes],
+        "defaultCategory": ["Cat A"] * len(codes),
+    })
+
+
+class TestRemoveDiscontinued:
+    """preserve_edits: only products of feeds actually fetched this run may be removed."""
+
+    @pytest.fixture
+    def mixed_main_df(self):
+        return pd.DataFrame({
+            "code": ["C1", "G1", "G2", "W1", "F1"],
+            "name": ["Core", "Gastro 1", "Gastro 2", "Scraped", "ForG"],
+            "defaultCategory": ["Cat A"] * 5,
+            "source": ["core", "gastromarket", "gastromarket", "web_scraping", "forgastro"],
+        })
+
+    def test_unfetched_source_products_survive(self, mixed_main_df):
+        # gastromarket download failed / disabled — its products must stay
+        merger = ProductMerger()
+        result = merger.merge(
+            mixed_main_df, {"forgastro": _feed(["F1"])}, preserve_edits=True
+        )
+        assert {"C1", "G1", "G2", "W1", "F1"} <= set(result.products["code"])
+
+    def test_fetched_source_missing_product_removed(self, mixed_main_df):
+        # gastromarket fetched, G2 gone from it — G2 removed, other sources untouched
+        merger = ProductMerger()
+        result = merger.merge(
+            mixed_main_df, {"gastromarket": _feed(["G1"])}, preserve_edits=True
+        )
+        codes = set(result.products["code"])
+        assert "G2" not in codes
+        assert {"C1", "G1", "W1", "F1"} <= codes
+
+    def test_legacy_web_scraping_removed_only_when_both_scrapers_ran(self, mixed_main_df):
+        merger = ProductMerger()
+        one_scraper = {"mebella": _feed(["M1"])}
+        result = merger.merge(mixed_main_df, one_scraper, preserve_edits=True)
+        assert "W1" in set(result.products["code"])
+
+        both_scrapers = {"mebella": _feed(["M1"]), "topchladenie": _feed(["T1"])}
+        result = merger.merge(mixed_main_df, both_scrapers, preserve_edits=True)
+        assert "W1" not in set(result.products["code"])

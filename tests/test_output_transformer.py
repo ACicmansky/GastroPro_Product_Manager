@@ -185,7 +185,7 @@ class TestCategoryTransformation:
 
         transformer = OutputTransformer(config)
 
-        df = pd.DataFrame({"Hlavna kategória": ["Vitríny/Chladiace vitríny"]})
+        df = pd.DataFrame({"defaultCategory": ["Vitríny/Chladiace vitríny"]})
 
         result = transformer.transform_category(df)
 
@@ -199,7 +199,7 @@ class TestCategoryTransformation:
 
         transformer = OutputTransformer(config)
 
-        df = pd.DataFrame({"Hlavna kategória": ["Cat1/Cat2/Cat3"]})
+        df = pd.DataFrame({"defaultCategory": ["Cat1/Cat2/Cat3"]})
 
         result = transformer.transform_category(df)
 
@@ -212,7 +212,7 @@ class TestCategoryTransformation:
 
         transformer = OutputTransformer(config)
 
-        df = pd.DataFrame({"Hlavna kategória": [""]})
+        df = pd.DataFrame({"defaultCategory": [""]})
 
         result = transformer.transform_category(df)
 

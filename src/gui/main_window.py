@@ -386,6 +386,15 @@ class MainWindow(QMainWindow):
             selected_categories=(
                 self.get_selected_categories() if self.main_data_file else []
             ),
+            enabled_feeds=[
+                name
+                for name, checkbox in (
+                    ("gastromarket", self.gastromarket_checkbox),
+                    ("gastromarket_stalgast", self.gastromarket_stalgast_checkbox),
+                    ("forgastro", self.forgastro_checkbox),
+                )
+                if checkbox.isChecked()
+            ],
             enable_scraping=(
                 self.web_scraping_checkbox.isChecked()
                 or self.mebella_scraping_checkbox.isChecked()
@@ -531,8 +540,13 @@ class MainWindow(QMainWindow):
                 f"<b>Produktov:</b> {pipeline_result.product_count}<br>"
                 f"<b>Čas spracovania:</b> {pipeline_result.duration_seconds:.1f}s"
             )
+            warnings = getattr(pipeline_result, "warnings", [])
+            if warnings:
+                message += "<br><br><b>Upozornenia:</b><br>" + "<br>".join(warnings)
             msg_box = QMessageBox()
-            msg_box.setIcon(QMessageBox.Information)
+            msg_box.setIcon(
+                QMessageBox.Warning if warnings else QMessageBox.Information
+            )
             msg_box.setText(message)
             msg_box.setWindowTitle("Export úspešný")
             msg_box.setTextFormat(Qt.RichText)

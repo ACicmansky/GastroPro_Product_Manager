@@ -24,6 +24,10 @@ class ProductMerger:
     # Category fields — only updated when update_categories=True
     CATEGORY_FIELDS = {"defaultCategory", "categoryText"}
 
+    # feed_dfs keys used by ScrapingOrchestrator (legacy rows carry
+    # source="web_scraping" instead)
+    SCRAPER_SOURCES = {"mebella", "topchladenie"}
+
     def merge(
         self,
         main_df: pd.DataFrame,
@@ -185,16 +189,32 @@ class ProductMerger:
         merged_products: Dict[str, dict],
         stats: MergeStats,
     ):
-        """Step 3 (preserve_edits): drop feed-sourced products gone from all feeds."""
+        """Step 3 (preserve_edits): drop feed-sourced products gone from all feeds.
+
+        Only products whose source feed was actually fetched this run are
+        eligible — a failed download or a disabled scraper must not
+        discontinue that source's products.
+        """
+        fetched_sources = set(feed_dfs.keys())
         active_feed_codes: Set[str] = set()
         for feed_df in feed_dfs.values():
             if "code" in feed_df.columns:
                 active_feed_codes.update(feed_df["code"].tolist())
 
+        def source_fetched(source) -> bool:
+            if source in fetched_sources:
+                return True
+            if source == "web_scraping":
+                # Legacy tag predating per-scraper source names — can't tell
+                # which site it came from, so only remove when both scrapers
+                # ran this session.
+                return self.SCRAPER_SOURCES <= fetched_sources
+            return False
+
         codes_to_remove = [
             code
             for code, product in merged_products.items()
-            if product.get("source") not in ("core",) and code not in active_feed_codes
+            if source_fetched(product.get("source")) and code not in active_feed_codes
         ]
         for code in codes_to_remove:
             del merged_products[code]

@@ -187,7 +187,7 @@ class OutputTransformer:
         - Replace "/" with " > "
 
         Args:
-            df: Input DataFrame with 'Hlavna kategória' column
+            df: Input DataFrame with 'defaultCategory' column
             output_df: Output DataFrame to populate (optional)
 
         Returns:
@@ -198,8 +198,8 @@ class OutputTransformer:
         if output_df is None:
             output_df = pd.DataFrame(index=df.index)
 
-        if "Hlavna kategória" not in df.columns:
-            logger.warning("'Hlavna kategória' column not found")
+        if "defaultCategory" not in df.columns:
+            logger.warning("'defaultCategory' column not found")
             output_df["defaultCategory"] = ""
             output_df["categoryText"] = ""
             return output_df
@@ -208,8 +208,8 @@ class OutputTransformer:
         transformed_categories = []
         for idx, row in df.iterrows():
             category = (
-                str(row["Hlavna kategória"])
-                if pd.notna(row["Hlavna kategória"])
+                str(row["defaultCategory"])
+                if pd.notna(row["defaultCategory"])
                 else ""
             )
 

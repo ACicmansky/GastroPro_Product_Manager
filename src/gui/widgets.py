@@ -1,3 +1,4 @@
+# pyright: reportGeneralTypeIssues=false, reportIncompatibleMethodOverride=false
 # src/gui/widgets.py
 import re
 from PyQt5.QtWidgets import (
@@ -18,10 +19,8 @@ from PyQt5.QtWidgets import (
     QSizePolicy,
     QDialogButtonBox,
 )
-from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtCore import Qt, QUrl
 from rapidfuzz import fuzz
-
 
 from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PyQt5.QtGui import QFont, QPixmap
@@ -49,12 +48,12 @@ class DropArea(QFrame):
         for url in event.mimeData().urls():
             file_path = url.toLocalFile()
             if file_path.endswith(".csv"):
-                self.parent().load_csv_file(file_path)
+                self.parent().load_csv_file(file_path)  # type: ignore
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             # The parent of DropArea is the central widget, its parent is the MainWindow
-            self.parent().parent().select_csv_file()
+            self.parent().parent().select_csv_file()  # type: ignore
         super().mousePressEvent(event)
 
 
@@ -83,11 +82,11 @@ class TopchladenieCsvDropArea(QFrame):
         for url in event.mimeData().urls():
             file_path = url.toLocalFile()
             if file_path.endswith(".csv"):
-                self.parent().load_topchladenie_csv_file(file_path)
+                self.parent().load_topchladenie_csv_file(file_path)  # type: ignore
 
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
-            self.parent().parent().parent().select_topchladenie_csv_file()
+            self.parent().parent().parent().select_topchladenie_csv_file()  # type: ignore
         super().mousePressEvent(event)
 
     def clear_file(self):
@@ -315,8 +314,6 @@ class PriceMappingDialog(QDialog):
         # Trigger image download
         image_url = self.product_data.get("image_url")
         if image_url:
-            from PyQt5.QtCore import QUrl
-
             request = QNetworkRequest(QUrl(image_url))
             self.network_manager.get(request)
         else:
@@ -473,8 +470,10 @@ class PriceMappingDialog(QDialog):
 
     def on_price_selected(self, item):
         row = item.row()
-        price = self.prices_table.item(row, 1).text()
-        self.manual_price_input.setText(str(price))
+        price_item = self.prices_table.item(row, 1)
+        if price_item:
+            price = price_item.text()
+            self.manual_price_input.setText(price)
 
     def on_suggestion_selected(self, item):
         price = item.data(Qt.UserRole)
@@ -562,6 +561,9 @@ class PriceMappingDialog(QDialog):
                             row_w is not None
                             and row_d is not None
                             and row_h is not None
+                            and target_w is not None
+                            and target_d is not None
+                            and target_h is not None
                         ):
                             # Calculate differences
                             diff_w = abs(target_w - row_w)

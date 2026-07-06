@@ -34,6 +34,8 @@ class PipelineOptions:
     main_file_path: str = ""
     output_path: str = ""
     selected_categories: list = field(default_factory=list)
+    # None = fetch all configured feeds; list = fetch only these feed names
+    enabled_feeds: Optional[list] = None
     enable_scraping: bool = False
     enable_ai_enhancement: bool = False
     preserve_client_edits: bool = False
@@ -52,3 +54,4 @@ class PipelineResult:
     enrichment_stats: Optional[EnrichmentResult] = None
     product_count: int = 0
     duration_seconds: float = 0.0
+    warnings: list = field(default_factory=list)

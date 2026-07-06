@@ -1,11 +1,23 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-07-05*
+*Last updated: 2026-07-06*
 
 ## Current State
-The **layered architecture refactor is complete and audited**. The codebase moved from the old flat `src` layout (core/services/utils/parsers/mergers/...) to a clean layered structure: `src/pipeline` (orchestration), `src/data` (I/O), `src/domain` (business logic), `src/ai` (Gemini), `src/scrapers`, `src/gui`, `src/config`. Entry point is `main.py`. All 196 tests pass. Zero circular dependencies.
+The **layered architecture refactor is complete and audited**. The codebase moved from the old flat `src` layout (core/services/utils/parsers/mergers/...) to a clean layered structure: `src/pipeline` (orchestration), `src/data` (I/O), `src/domain` (business logic), `src/ai` (Gemini), `src/scrapers`, `src/gui`, `src/config`. Entry point is `main.py`. All 199 tests pass. Zero circular dependencies.
 
-## Recent Changes (July 2026 — post-refactor audit)
+## Recent Changes (2026-07-06 — first production run failures fixed)
+First real run after the refactor produced 1,935 of 9,642 products. Root causes found via DB forensics and fixed (see `journal/2026_07_06_production_run_data_loss.md`):
+- `_remove_discontinued` (preserve-edits) deleted every product whose source feed wasn't fetched this run — now only products of feeds *actually fetched non-empty* can be discontinued; legacy `source="web_scraping"` rows require both scrapers to have run.
+- `OutputTransformer.transform_category` still read legacy `Hlavna kategória` and wiped `defaultCategory`/`categoryText` to "" on every export — now reads `defaultCategory`.
+- Feed download failures were silently swallowed — now collected into `PipelineResult.warnings` and shown in the GUI success dialog.
+- GastroMarket/ForGastro checkboxes were ignored (pipeline fetched all feeds) — wired via `PipelineOptions.enabled_feeds` (None = all).
+- Category recovery **done**: `2026_04_08_GastroPro_repaired.xlsx` (Downloads) backfilled 9,641/9,642 categories from `data/backups/products_20260322_201504.db`; use it as the next pipeline input (DB heals via upsert). IDE red underlines in `widgets.py` were phantom (wrong interpreter) — pinned `python.defaultInterpreterPath` in `.vscode/settings.json`; 69 real pyright-basic errors remain in `src` (deferred).
+
+## Recent Changes (2026-07-06 — audit tooling)
+- Persistent logging: `src/logging_setup.py` (rotating `logs/gastropro.log`), wired into `main.py` — previously the GUI configured no handler and all pipeline logs vanished. Pipeline now logs per-feed counts + merge stats.
+- `scripts/pipeline_cli.py`: run any stage independently (`feeds` / `merge` / `categories` / `transform` / `run`), files in → file out. REST API deliberately skipped (see `journal/2026_07_06_logging_and_stage_cli.md`).
+
+## Earlier Changes (July 2026 — post-refactor audit)
 - **Regressions from the refactor found and fixed:**
   - Interactive price mapping was silently disabled (hardcoded `False`, broken signal signature, worker never blocked on the dialog). Restored end-to-end: `Pipeline._map_prices` runs pre-merge on the Mebella feed; worker blocks via `QEventLoop`; `PricingService` now stores records (`[{code, dimension, price}]`) preserving dimension data, with legacy dict migration.
   - `pairCode` was never assigned to scraped Mebella products — restored in `ScrapingOrchestrator` via `get_pair_code` (AI variant grouping and variantVisibility depend on it).
