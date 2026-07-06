@@ -1,5 +1,3 @@
-# pyright: reportGeneralTypeIssues=false, reportIncompatibleMethodOverride=false
-# src/gui/widgets.py
 import re
 from PyQt5.QtWidgets import (
     QFrame,

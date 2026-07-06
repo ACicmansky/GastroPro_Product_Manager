@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <product>
+    <product_sku>F1</product_sku>
+    <product_name>FG sporák aktualizovaný</product_name>
+    <product_price>460.00</product_price>
+    <manufacturer>ForGastro</manufacturer>
+    <category>Varenie/Sporáky</category>
+    <product_s_desc>Plynový sporák.</product_s_desc>
+    <product_desc>&lt;p&gt;Plynový sporák so štyrmi horákmi.&lt;/p&gt;</product_desc>
+    <images>
+      <item>
+        <url>https://example.com/f1.jpg</url>
+      </item>
+    </images>
+    <product_weight>45</product_weight>
+  </product>
+</products>

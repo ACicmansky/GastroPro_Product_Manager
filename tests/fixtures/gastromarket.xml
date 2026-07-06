@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:g="http://base.google.com/ns/1.0" version="2.0">
+  <channel>
+    <title>Gastromarket fixture feed</title>
+    <item>
+      <g:KATALOG_CISLO>G1</g:KATALOG_CISLO>
+      <g:MENO>GM chladnička aktualizovaná</g:MENO>
+      <g:POPIS>Profesionálna chladnička.</g:POPIS>
+      <g:CENA_KATALOG>949,00</g:CENA_KATALOG>
+      <g:KATEGORIA_KOMPLET>Chladenie/Chladničky</g:KATEGORIA_KOMPLET>
+      <g:OBRAZOK_1>https://example.com/g1.jpg</g:OBRAZOK_1>
+    </item>
+    <item>
+      <g:KATALOG_CISLO>G3</g:KATALOG_CISLO>
+      <g:MENO>GM nová vitrína</g:MENO>
+      <g:POPIS>Chladiaca vitrína.</g:POPIS>
+      <g:CENA_KATALOG>1500,00</g:CENA_KATALOG>
+      <g:KATEGORIA_KOMPLET>Chladenie/Vitríny</g:KATEGORIA_KOMPLET>
+      <g:OBRAZOK_1>https://example.com/g3.jpg</g:OBRAZOK_1>
+    </item>
+  </channel>
+</rss>

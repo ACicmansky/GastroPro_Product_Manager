@@ -3,6 +3,8 @@ Tests for XML parser outputting to new 138-column format.
 Following TDD approach: Write tests first, then implement.
 """
 
+import urllib.error
+
 import pytest
 import pandas as pd
 from pathlib import Path
@@ -413,3 +415,35 @@ class TestForGastroHTMLProcessing:
         assert "<p>" not in desc
         assert "<span>" not in desc
         assert "style=" not in desc
+
+
+@pytest.mark.unit
+def test_fetch_and_parse_retries_transient_failure(monkeypatch):
+    """502 on first attempts, success on the last -> feed still parsed."""
+    from unittest.mock import MagicMock
+
+    from src.data.parsers.xml_parser_factory import XMLParserFactory
+
+    xml = (
+        '<?xml version="1.0"?><products><product>'
+        "<product_sku>F1</product_sku><product_name>N</product_name>"
+        "<product_price>1</product_price></product></products>"
+    )
+    calls = {"n": 0}
+
+    def fake_urlopen(req, timeout=0):
+        calls["n"] += 1
+        if calls["n"] < 3:
+            raise urllib.error.HTTPError(req.full_url, 502, "BAD GATEWAY", {}, None)
+        cm = MagicMock()
+        cm.__enter__.return_value.read.return_value = xml.encode("utf-8")
+        return cm
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+    monkeypatch.setattr("time.sleep", lambda s: None)
+
+    df = XMLParserFactory.fetch_and_parse(
+        "forgastro", "https://example.com/feed.xml", {}
+    )
+    assert calls["n"] == 3
+    assert len(df) == 1

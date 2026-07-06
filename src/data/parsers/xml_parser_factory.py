@@ -3,6 +3,7 @@ XML Parser Factory for automatic feed detection.
 """
 
 import logging
+import time
 import urllib.request
 
 import pandas as pd
@@ -31,27 +32,42 @@ class XMLParserFactory:
         return XMLParser(config)
 
     @staticmethod
-    def fetch_and_parse(feed_name: str, url: str, config: Dict) -> pd.DataFrame:
-        """Fetch XML feed from URL and parse it.
+    def fetch_and_parse(
+        feed_name: str, url: str, config: Dict, retries: int = 3
+    ) -> pd.DataFrame:
+        """Fetch XML feed from URL (with retries) and parse it.
 
-        Returns an empty DataFrame on fetch failure.
+        Feeds are generated on demand server-side and occasionally answer
+        with a transient 502 while generating. Returns an empty DataFrame
+        only after all attempts fail.
         """
-        try:
-            req = urllib.request.Request(
-                url,
-                headers={
-                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-                                  "AppleWebKit/537.36 (KHTML, like Gecko) "
-                                  "Chrome/120.0.0.0 Safari/537.36",
-                    "Accept": "application/xml,text/xml,*/*;q=0.9",
-                },
-            )
-            with urllib.request.urlopen(req, timeout=120) as response:
-                xml_content = response.read().decode("utf-8")
-        except Exception as e:
-            logger.error(f"Failed to fetch feed {feed_name} from {url}: {e}")
-            return pd.DataFrame()
-        return XMLParserFactory.parse(feed_name, xml_content, config)
+        req = urllib.request.Request(
+            url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                              "AppleWebKit/537.36 (KHTML, like Gecko) "
+                              "Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "application/xml,text/xml,*/*;q=0.9",
+            },
+        )
+        for attempt in range(1, retries + 1):
+            try:
+                with urllib.request.urlopen(req, timeout=120) as response:
+                    xml_content = response.read().decode("utf-8")
+                return XMLParserFactory.parse(feed_name, xml_content, config)
+            except Exception as e:
+                if attempt == retries:
+                    logger.error(
+                        f"Failed to fetch feed {feed_name} from {url} "
+                        f"after {retries} attempts: {e}"
+                    )
+                    return pd.DataFrame()
+                logger.warning(
+                    f"Fetch attempt {attempt}/{retries} for {feed_name} failed: "
+                    f"{e} — retrying in {5 * attempt}s"
+                )
+                time.sleep(5 * attempt)
+        return pd.DataFrame()
 
     @staticmethod
     def parse(feed_name: str, xml_content: str, config: Dict) -> pd.DataFrame:

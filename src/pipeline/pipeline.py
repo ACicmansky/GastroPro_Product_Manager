@@ -73,6 +73,7 @@ class Pipeline:
         """
         start_time = time.time()
         result = PipelineResult()
+        logger.info("Pipeline options: %s", options)
 
         def progress(msg: str):
             if on_progress:
