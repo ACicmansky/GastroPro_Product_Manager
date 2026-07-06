@@ -143,7 +143,7 @@
     "enabled": true,
     "model": "gemini-2.5-flash-lite",
     "batch_size": 30,
-    "temperature": 0.1,
+    "temperature": 0,
     "retry_attempts": 3,
     "retry_delay": 60,
     "max_parallel_calls": 10

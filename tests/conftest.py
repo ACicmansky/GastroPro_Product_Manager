@@ -15,11 +15,13 @@ def test_data_dir():
 
 
 @pytest.fixture
-def config():
-    """Load configuration from config.json."""
+def config(tmp_path):
+    """Load config.json with db_path redirected to tmp — tests must never touch data/products.db."""
     config_path = Path(__file__).parent.parent / "config.json"
     with open(config_path, "r", encoding="utf-8") as f:
-        return json.load(f)
+        cfg = json.load(f)
+    cfg["db_path"] = str(tmp_path / "products.db")
+    return cfg
 
 
 @pytest.fixture

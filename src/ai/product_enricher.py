@@ -7,6 +7,7 @@ import pandas as pd
 
 from .api_client import GeminiClient
 from .batch_orchestrator import BatchOrchestrator
+from .prompts import load_category_parameters
 from .result_parser import ResultParser
 from src.domain.models import EnrichmentResult
 from src.domain.products.variant_service import get_pair_code
@@ -20,8 +21,10 @@ class ProductEnricher:
 
     def __init__(self, config: Dict, batch_job_db: Optional[BatchJobDB] = None):
         self.client = GeminiClient(config)
+        category_params = load_category_parameters()
         self.parser = ResultParser(
-            similarity_threshold=config.get("ai_enhancement", {}).get("similarity_threshold", 85)
+            similarity_threshold=config.get("ai_enhancement", {}).get("similarity_threshold", 85),
+            allowed_params={f for filters in category_params.values() for f in filters},
         )
         self.orchestrator = BatchOrchestrator(
             client=self.client,

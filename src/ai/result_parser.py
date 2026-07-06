@@ -2,20 +2,54 @@
 
 import json
 import logging
+import re
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import pandas as pd
 from rapidfuzz import fuzz
 
 logger = logging.getLogger(__name__)
 
+# Scalar units whose values are stored as bare numbers (unit lives in the header)
+_SCALAR_UNITS = {
+    "mm", "cm", "m", "m2", "g", "kg", "l", "ml", "w", "kw", "v", "°c", "rpm",
+    "mikróny", "kg/h", "l/h", "ks/h", "kg/24h", "m3/h", "košov/h", "kg/cyklus",
+    "°c/h",
+}
+_UNIT_SUFFIX = re.compile(r"\s*\(([^)]*)\)\s*$")
+_NUMBER = re.compile(r"-?\d+(?:[.,]\d+)?")
+_YES = {"áno", "ano", "yes", "true", "1"}
+_NO = {"nie", "no", "false", "0"}
+
 
 class ResultParser:
     """Parses AI batch results and matches them back to source products."""
 
-    def __init__(self, similarity_threshold: int = 85):
+    def __init__(self, similarity_threshold: int = 85, allowed_params: Optional[Set[str]] = None):
         self.similarity_threshold = similarity_threshold
+        # Canonical map: exact name -> itself, plus unit-less base -> full name,
+        # so a model echoing "Šírka" still lands in "Šírka (mm)".
+        self.param_map: Dict[str, str] = {}
+        for name in allowed_params or ():
+            self.param_map[name] = name
+            base = _UNIT_SUFFIX.sub("", name)
+            self.param_map.setdefault(base, name)
+
+    @staticmethod
+    def normalize_param_value(param_name: str, value: str) -> str:
+        """Deterministic filter values: bare numbers for scalar units, canonical Áno/Nie."""
+        value = str(value).strip()
+        if "Áno/Nie" in param_name:
+            low = value.lower()
+            return "Áno" if low in _YES else "Nie" if low in _NO else value
+        m = _UNIT_SUFFIX.search(param_name)
+        # ponytail: ranges ("rozsah") keep their text, e.g. "-2 až +8"
+        if m and m.group(1).lower() in _SCALAR_UNITS and "rozsah" not in param_name.lower():
+            num = _NUMBER.search(value)
+            if num:
+                return num.group(0).replace(",", ".")
+        return value
 
     def find_best_match(
         self, enhanced_name: str, column_name: str, df: pd.DataFrame
@@ -95,8 +129,17 @@ class ResultParser:
 
                 if "parameters" in enhanced and isinstance(enhanced["parameters"], dict):
                     for param_key, param_val in enhanced["parameters"].items():
-                        if param_val:
-                            df.at[best_match_idx, f"filteringProperty:{param_key}"] = str(param_val)
+                        if not param_val:
+                            continue
+                        if self.param_map:
+                            canonical = self.param_map.get(param_key)
+                            if canonical is None:
+                                logger.debug(f"Dropping unrequested parameter '{param_key}'")
+                                continue
+                            param_key = canonical
+                        df.at[best_match_idx, f"filteringProperty:{param_key}"] = (
+                            self.normalize_param_value(param_key, param_val)
+                        )
 
                 df.at[best_match_idx, "aiProcessed"] = "1"
                 df.at[best_match_idx, "aiProcessedDate"] = datetime.now().strftime(

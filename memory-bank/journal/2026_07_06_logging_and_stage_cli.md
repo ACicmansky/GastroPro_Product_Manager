@@ -29,5 +29,24 @@ User ran the GUI pipeline and showed the log. Diagnosed from log alone:
 - `gastromarket_stalgast` got a transient HTTP 502 (gateway failed in <1 s; feed is generated on demand server-side, ~14 s + 7.5 MB when it works). Fix: `fetch_and_parse` now retries 3× with 5 s/10 s backoff (+ unit test with mocked urlopen).
 - "Category widget not visible" — log line `Extracted 0 unique categories` + `main_file_path=...2026_04_08_GastroPro.xlsx`: user loaded the **original** file, not `2026_04_08_GastroPro_repaired.xlsx`. Not a bug; wrong input file. That run also upserted category-less core products into the DB again — heals by re-running with the repaired file.
 
+## AI stage added to CLI (same evening)
+User asked how AI enhancement state is tracked and how to test it cheaply.
+- Tracking: `aiProcessed`/`aiProcessedDate` set by `ResultParser` on match, persisted in DB (dedicated columns) and forwarded through the output file (`internal_tracking` in OutputTransformer; `"Spracovane AI"` maps back on load). Merger `PRESERVED_FIELDS` keeps AI text safe from feed overwrites. DB state: 5,691 enhanced / 3,967 pending.
+- Only-unprocessed is already the default (`df[aiProcessed != "1"]`); `force_reprocess` overrides.
+- New: `pipeline_cli.py ai <in.xlsx> [--dry-run] [--limit N] [--force] [-o out.xlsx]` — micro-batch testing against the real Gemini Batch API; no `batch_job_db` passed, so test runs never resume/persist jobs. Test: `test_cli_ai_dry_run_selects_only_unprocessed`.
+- Fixed dead `pytest -m ai_enhancement` marker (CLAUDE.md documented it; 0 tests collected) via `pytestmark`.
+- **Live micro-batch test found a real bug**: `_build_category_requests` used `r.get("newCategory", r.get("defaultCategory", ""))` — falls back only when the *column is missing*, not when the value is empty. DB exports carry an empty `newCategory` column → all products skipped ("no category"). Fixed with `BatchOrchestrator._category_of` (first non-empty of newCategory/defaultCategory, NaN-safe) + unit test. Retest reached JSONL build + upload; blocked only by Google billing (`429 RESOURCE_EXHAUSTED: prepayment credits depleted`) — code path verified to the paid boundary. After top-up, live micro-batch succeeded: 3/3 processed in ~2 min, correct Slovak copy + category filteringProperty params + aiProcessed flags in `out/ai_test.xlsx`. AI enhancement confirmed working end-to-end.
+- Fixture row `GM001` (from `tests/conftest.py` sample XML, upserted 2026-04-08) leaked into `data/products.db`. Root cause: the `config` test fixture returned the real `config.json` without a `db_path` override, so `Pipeline(config)` in tests pointed at the production DB. Fixed: fixture now redirects `db_path` to `tmp_path`; GM001 deleted (backup taken first, 9,657 products remain); stale `data/test_products.db` removed. Full suite (205) leaves `data/` untouched.
+- Caveat noted: `Pipeline.run` loads `db.get_all()` but uses it only when no main file is given — a fresh e-shop export without the `Spracovane AI` column would look 100% unprocessed; DB flags are not merged into a loaded main file.
+
+## Deterministic filtering parameters (same evening)
+E-shop filters need stable values. Convention chosen: **units in headers, bare numbers in values** (all lengths mm, weights kg, power W, voltage V, temp °C).
+- `categories_with_parameters.json`: 771 renames (`Šírka` → `Šírka (mm)` etc.); counts/categoricals/composites untouched.
+- `ResultParser`: whitelist of allowed param keys (union of all `filtre`; unit-less echoes canonicalized back, ad-hoc keys dropped) + `normalize_param_value` (bare numbers for scalar-unit headers, canonical Áno/Nie; "rozsah" params keep range text).
+- Prompt: values must be bare numbers, units are in the key name; exact key names required. `temperature` 0.1 → 0 in config.json.
+- Live retest: 3/3, zero ad-hoc keys, `Príkon (W): 550`, `Šírka (mm): 800`, `So zásuvkou (Áno/Nie): Nie`. Suite: 206 passed.
+- Known ceiling: categorical values can still drift ("Nerez" vs "Nerezová oceľ") — escalation path is enum-constrained response schema per category.
+- **Open**: 5,691 already-enhanced products in DB carry old-style keys (`filteringProperty:Šírka`, values with units) — need key-rename+normalize migration or forced re-enhancement before e-shop import, else filters fragment old vs new.
+
 ## Verification
 Offline smoke chain on fixtures: `merge` (created=1 updated=1 kept=1 removed=0 → 3 rows) → `categories` → `transform` (329 cols); `logs/gastropro.log` written with timestamped entries. Full suite: 199 passed.

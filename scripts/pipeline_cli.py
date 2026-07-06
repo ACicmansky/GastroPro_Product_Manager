@@ -90,6 +90,40 @@ def cmd_transform(args, config):
     logger.info("%d rows x %d cols -> %s", len(out_df), len(out_df.columns), args.out)
 
 
+def cmd_ai(args, config):
+    from src.ai.product_enricher import ProductEnricher  # imports AI stack — keep lazy
+    import pandas as pd
+
+    df = DataLoaderFactory.load(args.input)
+    done = pd.Series(False, index=df.index)
+    if "aiProcessed" in df.columns:
+        done = (
+            df["aiProcessed"].astype(str).str.strip().str.upper()
+            .isin({"1", "TRUE", "YES", "1.0"})
+        )
+    pending = df if args.force else df[~done]
+    if args.limit:
+        pending = pending.head(args.limit)
+    logger.info(
+        "%d already enhanced, %d selected for enhancement (of %d total)",
+        int(done.sum()), len(pending), len(df),
+    )
+    if args.dry_run or pending.empty:
+        return int(done.sum()), len(pending)
+
+    # ponytail: no batch_job_db — isolated test runs never resume/persist jobs
+    result = ProductEnricher(config).enrich(
+        pending.copy(),
+        force_reprocess=args.force,
+        progress_callback=lambda *a: logger.info("%s", a[-1] if a else ""),
+    )
+    write_xlsx(result.products, args.out)
+    logger.info(
+        "AI: processed=%d failed=%d -> %s", result.processed, result.failed, args.out
+    )
+    return int(done.sum()), len(pending)
+
+
 def cmd_run(args, config):
     from src.pipeline.pipeline import Pipeline  # imports AI/DB stack — keep lazy
 
@@ -134,6 +168,14 @@ def main():
     p.add_argument("input")
     p.add_argument("-o", "--out", default="out/output.xlsx")
     p.set_defaults(func=cmd_transform)
+
+    p = sub.add_parser("ai", help="AI-enhance products (Gemini Batch API); --limit N for a micro test")
+    p.add_argument("input")
+    p.add_argument("-o", "--out", default="out/ai_enhanced.xlsx")
+    p.add_argument("--limit", type=int, help="enhance only the first N pending products")
+    p.add_argument("--force", action="store_true", help="reprocess already-enhanced products too")
+    p.add_argument("--dry-run", action="store_true", help="report counts only, no API calls")
+    p.set_defaults(func=cmd_ai)
 
     p = sub.add_parser("run", help="full headless pipeline (no scraping/AI)")
     p.add_argument("main")

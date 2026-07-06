@@ -47,3 +47,91 @@
 2026-07-06 22:46:34,699 INFO    src.pipeline.pipeline: Merging product data...
 2026-07-06 22:46:44,230 INFO    src.pipeline.pipeline: Merge: created=6 updated=9192 kept=2137 removed=24 -> 9624 products
 2026-07-06 22:46:44,230 INFO    src.pipeline.pipeline: Mapping categories...
+2026-07-06 22:46:45,397 INFO    src.pipeline.pipeline: Transforming to output format...
+2026-07-06 22:46:45,398 INFO    src.domain.transform.output_transformer: Starting output transformation
+2026-07-06 22:46:45,537 WARNING src.domain.transform.output_transformer: 'Obrázky' column not found
+2026-07-06 22:46:46,289 INFO    src.domain.transform.output_transformer: Transformation complete: 329 columns, 9624 rows
+2026-07-06 22:46:46,290 INFO    src.pipeline.pipeline: Saving to database...
+2026-07-06 22:46:51,649 INFO    src.pipeline.pipeline: Writing output to: C:/Users/Andrej/Downloads/2026_07_06_GastroPro.xlsx
+2026-07-06 22:47:27,984 INFO    src.pipeline.pipeline: Pipeline complete. 9624 products processed in 176.8s
+2026-07-06 22:55:07,751 INFO    src.logging_setup: === session start ===
+2026-07-06 22:55:09,865 INFO    pipeline_cli: 0 already enhanced, 3 selected for enhancement (of 3 total)
+2026-07-06 22:55:19,426 INFO    src.logging_setup: === session start ===
+2026-07-06 22:55:21,391 INFO    pipeline_cli: 0 already enhanced, 3 selected for enhancement (of 3 total)
+2026-07-06 22:55:22,140 INFO    src.ai.prompts: Loaded 211 category parameter configurations.
+2026-07-06 22:55:22,142 INFO    src.ai.batch_orchestrator: Processing 3 products with Batch API
+2026-07-06 22:55:22,142 INFO    pipeline_cli: Priprava davok (Batch Requests)...
+2026-07-06 22:55:22,147 WARNING src.ai.batch_orchestrator: Skipping 3 products with no category.
+2026-07-06 22:55:22,147 INFO    src.ai.batch_orchestrator: No valid batch requests generated.
+2026-07-06 22:55:22,190 INFO    pipeline_cli: AI: processed=0 failed=3 -> out/ai_test.xlsx
+2026-07-06 22:59:07,023 INFO    src.logging_setup: === session start ===
+2026-07-06 22:59:09,155 INFO    pipeline_cli: 0 already enhanced, 3 selected for enhancement (of 3 total)
+2026-07-06 22:59:09,898 INFO    src.ai.prompts: Loaded 211 category parameter configurations.
+2026-07-06 22:59:09,899 INFO    src.ai.batch_orchestrator: Processing 3 products with Batch API
+2026-07-06 22:59:09,899 INFO    pipeline_cli: Priprava davok (Batch Requests)...
+2026-07-06 22:59:09,904 INFO    pipeline_cli: Nahravanie suboru na Google Cloud...
+2026-07-06 22:59:10,410 INFO    httpx: HTTP Request: POST https://generativelanguage.googleapis.com/upload/v1beta/files "HTTP/1.1 429 Too Many Requests"
+2026-07-06 22:59:10,410 ERROR   src.ai.batch_orchestrator: Failed to create Batch Job: 429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ', 'status': 'RESOURCE_EXHAUSTED'}}
+2026-07-06 22:59:10,454 INFO    pipeline_cli: AI: processed=0 failed=3 -> out/ai_test.xlsx
+2026-07-06 23:04:09,460 INFO    src.logging_setup: === session start ===
+2026-07-06 23:04:11,415 INFO    pipeline_cli: 0 already enhanced, 3 selected for enhancement (of 3 total)
+2026-07-06 23:04:12,134 INFO    src.ai.prompts: Loaded 211 category parameter configurations.
+2026-07-06 23:04:12,135 INFO    src.ai.batch_orchestrator: Processing 3 products with Batch API
+2026-07-06 23:04:12,135 INFO    pipeline_cli: Priprava davok (Batch Requests)...
+2026-07-06 23:04:12,139 INFO    pipeline_cli: Nahravanie suboru na Google Cloud...
+2026-07-06 23:04:12,752 INFO    httpx: HTTP Request: POST https://generativelanguage.googleapis.com/upload/v1beta/files "HTTP/1.1 200 OK"
+2026-07-06 23:04:14,102 INFO    httpx: HTTP Request: POST https://generativelanguage.googleapis.com/upload/v1beta/files?upload_id=AJ5rDhF4jd80XW8fGnG6Kupx-X4TP_XfXYiKXKdGsYMe23GWSuBmzV2w-i_nWxU6B2GiO2QySA1oA3YbkMjFJ7YadoIMIrRRPvDpgI7gNbnRdw&upload_protocol=resumable "HTTP/1.1 200 OK"
+2026-07-06 23:04:14,105 INFO    pipeline_cli: Vytvaranie davkovej ulohy (Batch Job)...
+2026-07-06 23:04:21,313 INFO    httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:batchGenerateContent "HTTP/1.1 200 OK"
+2026-07-06 23:04:21,314 INFO    src.ai.batch_orchestrator: Batch Job Created: batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt
+2026-07-06 23:04:21,665 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt "HTTP/1.1 200 OK"
+2026-07-06 23:04:21,666 INFO    src.ai.batch_orchestrator: Batch Job batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt Status: JOB_STATE_RUNNING
+2026-07-06 23:04:21,666 INFO    pipeline_cli: Spracovava sa v cloude (Cas: 0m, Stav: JOB_STATE_RUNNING)...
+2026-07-06 23:04:52,023 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt "HTTP/1.1 200 OK"
+2026-07-06 23:04:52,023 INFO    src.ai.batch_orchestrator: Batch Job batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt Status: JOB_STATE_RUNNING
+2026-07-06 23:04:52,023 INFO    pipeline_cli: Spracovava sa v cloude (Cas: 0m, Stav: JOB_STATE_RUNNING)...
+2026-07-06 23:05:22,445 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt "HTTP/1.1 200 OK"
+2026-07-06 23:05:22,446 INFO    src.ai.batch_orchestrator: Batch Job batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt Status: JOB_STATE_RUNNING
+2026-07-06 23:05:22,446 INFO    pipeline_cli: Spracovava sa v cloude (Cas: 1m, Stav: JOB_STATE_RUNNING)...
+2026-07-06 23:05:52,868 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt "HTTP/1.1 200 OK"
+2026-07-06 23:05:52,869 INFO    src.ai.batch_orchestrator: Batch Job batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt Status: JOB_STATE_RUNNING
+2026-07-06 23:05:52,869 INFO    pipeline_cli: Spracovava sa v cloude (Cas: 1m, Stav: JOB_STATE_RUNNING)...
+2026-07-06 23:06:23,216 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt "HTTP/1.1 200 OK"
+2026-07-06 23:06:23,217 INFO    src.ai.batch_orchestrator: Batch Job batches/z18qjww6xorchvbvhvazclyi3jr52ppicstt Status: JOB_STATE_SUCCEEDED
+2026-07-06 23:06:23,217 INFO    pipeline_cli: Spracovava sa v cloude (Cas: 2m, Stav: JOB_STATE_SUCCEEDED)...
+2026-07-06 23:06:23,217 INFO    pipeline_cli: Stahovanie vysledkov...
+2026-07-06 23:06:23,248 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/files/batch-z18qjww6xorchvbvhvazclyi3jr52ppicstt:download?alt=media "HTTP/1.1 302 Found"
+2026-07-06 23:06:23,691 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/download/v1beta/files/batch-z18qjww6xorchvbvhvazclyi3jr52ppicstt:download?alt=media "HTTP/1.1 200 OK"
+2026-07-06 23:06:24,718 INFO    httpx: HTTP Request: DELETE https://generativelanguage.googleapis.com/v1beta/files/erzd51kv8ckn "HTTP/1.1 200 OK"
+2026-07-06 23:06:24,719 INFO    pipeline_cli: Aplikovanie vysledkov do tabulky...
+2026-07-06 23:06:24,774 INFO    pipeline_cli: AI: processed=3 failed=0 -> out/ai_test.xlsx
+2026-07-06 23:24:35,126 INFO    src.logging_setup: === session start ===
+2026-07-06 23:24:37,354 INFO    pipeline_cli: 0 already enhanced, 3 selected for enhancement (of 3 total)
+2026-07-06 23:24:38,200 INFO    src.ai.prompts: Loaded 211 category parameter configurations.
+2026-07-06 23:24:38,201 INFO    src.ai.prompts: Loaded 211 category parameter configurations.
+2026-07-06 23:24:38,203 INFO    src.ai.batch_orchestrator: Processing 3 products with Batch API
+2026-07-06 23:24:38,203 INFO    pipeline_cli: Priprava davok (Batch Requests)...
+2026-07-06 23:24:38,207 INFO    pipeline_cli: Nahravanie suboru na Google Cloud...
+2026-07-06 23:24:38,820 INFO    httpx: HTTP Request: POST https://generativelanguage.googleapis.com/upload/v1beta/files "HTTP/1.1 200 OK"
+2026-07-06 23:24:40,081 INFO    httpx: HTTP Request: POST https://generativelanguage.googleapis.com/upload/v1beta/files?upload_id=AJ5rDhFGs9v6T6EMGtkD7-BVApavsAkVro2C0AElPJ0GlxQG0NBP76tPy2U-YLnzb0fC1EAAP5n7KdqvfQDQz76tUuETj6lDypXPtVF93F-mOQ&upload_protocol=resumable "HTTP/1.1 200 OK"
+2026-07-06 23:24:40,082 INFO    pipeline_cli: Vytvaranie davkovej ulohy (Batch Job)...
+2026-07-06 23:24:46,431 INFO    httpx: HTTP Request: POST https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:batchGenerateContent "HTTP/1.1 200 OK"
+2026-07-06 23:24:46,432 INFO    src.ai.batch_orchestrator: Batch Job Created: batches/5mxi3972uzxduwmoth3i4yu4klafxdytgu8w
+2026-07-06 23:24:46,767 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/batches/5mxi3972uzxduwmoth3i4yu4klafxdytgu8w "HTTP/1.1 200 OK"
+2026-07-06 23:24:46,768 INFO    src.ai.batch_orchestrator: Batch Job batches/5mxi3972uzxduwmoth3i4yu4klafxdytgu8w Status: JOB_STATE_RUNNING
+2026-07-06 23:24:46,768 INFO    pipeline_cli: Spracovava sa v cloude (Cas: 0m, Stav: JOB_STATE_RUNNING)...
+2026-07-06 23:25:17,129 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/batches/5mxi3972uzxduwmoth3i4yu4klafxdytgu8w "HTTP/1.1 200 OK"
+2026-07-06 23:25:17,129 INFO    src.ai.batch_orchestrator: Batch Job batches/5mxi3972uzxduwmoth3i4yu4klafxdytgu8w Status: JOB_STATE_RUNNING
+2026-07-06 23:25:17,130 INFO    pipeline_cli: Spracovava sa v cloude (Cas: 0m, Stav: JOB_STATE_RUNNING)...
+2026-07-06 23:25:47,558 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/batches/5mxi3972uzxduwmoth3i4yu4klafxdytgu8w "HTTP/1.1 200 OK"
+2026-07-06 23:25:47,559 INFO    src.ai.batch_orchestrator: Batch Job batches/5mxi3972uzxduwmoth3i4yu4klafxdytgu8w Status: JOB_STATE_RUNNING
+2026-07-06 23:25:47,560 INFO    pipeline_cli: Spracovava sa v cloude (Cas: 1m, Stav: JOB_STATE_RUNNING)...
+2026-07-06 23:26:17,906 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/batches/5mxi3972uzxduwmoth3i4yu4klafxdytgu8w "HTTP/1.1 200 OK"
+2026-07-06 23:26:17,907 INFO    src.ai.batch_orchestrator: Batch Job batches/5mxi3972uzxduwmoth3i4yu4klafxdytgu8w Status: JOB_STATE_SUCCEEDED
+2026-07-06 23:26:17,907 INFO    pipeline_cli: Spracovava sa v cloude (Cas: 1m, Stav: JOB_STATE_SUCCEEDED)...
+2026-07-06 23:26:17,907 INFO    pipeline_cli: Stahovanie vysledkov...
+2026-07-06 23:26:17,942 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/v1beta/files/batch-5mxi3972uzxduwmoth3i4yu4klafxdytgu8w:download?alt=media "HTTP/1.1 302 Found"
+2026-07-06 23:26:18,377 INFO    httpx: HTTP Request: GET https://generativelanguage.googleapis.com/download/v1beta/files/batch-5mxi3972uzxduwmoth3i4yu4klafxdytgu8w:download?alt=media "HTTP/1.1 200 OK"
+2026-07-06 23:26:19,333 INFO    httpx: HTTP Request: DELETE https://generativelanguage.googleapis.com/v1beta/files/cz742ly8tw08 "HTTP/1.1 200 OK"
+2026-07-06 23:26:19,334 INFO    pipeline_cli: Aplikovanie vysledkov do tabulky...
+2026-07-06 23:26:19,396 INFO    pipeline_cli: AI: processed=3 failed=0 -> out/ai_test2.xlsx

@@ -15,7 +15,8 @@ First real run after the refactor produced 1,935 of 9,642 products. Root causes 
 
 ## Recent Changes (2026-07-06 — audit tooling)
 - Persistent logging: `src/logging_setup.py` (rotating `logs/gastropro.log`), wired into `main.py` — previously the GUI configured no handler and all pipeline logs vanished. Pipeline now logs per-feed counts + merge stats.
-- `scripts/pipeline_cli.py`: run any stage independently (`feeds` / `merge` / `categories` / `transform` / `run`), files in → file out. REST API deliberately skipped (see `journal/2026_07_06_logging_and_stage_cli.md`).
+- `scripts/pipeline_cli.py`: run any stage independently (`feeds` / `merge` / `categories` / `transform` / `ai` / `run`), files in → file out. REST API deliberately skipped (see `journal/2026_07_06_logging_and_stage_cli.md`).
+- `ai` stage supports `--dry-run` (pending counts, no API), `--limit N` (micro-batch test), `--force`. AI state audit (2026-07-06): DB has 5,691 enhanced / 3,967 pending. `pytest -m ai_enhancement` marker was dead (0 collected) — restored via `pytestmark` in `test_ai_enhancer.py`.
 - `tests/fixtures/` (sample main.xlsx + feed XMLs) + `tests/test_integration_pipeline.py`: offline e2e chain guarding the 2026-07-06 production bugs. `Pipeline.run` logs its options. Suite: 202 tests.
 
 ## Earlier Changes (July 2026 — post-refactor audit)

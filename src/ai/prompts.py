@@ -121,6 +121,9 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 * Ak boli v inštrukciách zadané očakávané parametre, tvojou úlohou je vyextrahovať tieto konkrétne technické parametre z názvu, popisov produktu alebo webového vyhľadávania.
 * Vytvor nový JSON objekt `"parameters"` a ulož do neho nájdené kľúče z očakávaných parametrov a ich zistené hodnoty.
 * Hodnoty by mali byť stručné a štandardizované (napr. iba "230" pre Napätie (V), alebo "Nerez" pre Materiál). Nevpisuj tam celé vety!
+* **Jednotka je už uvedená v názve parametra** (napr. "Šírka (mm)", "Príkon (W)") – hodnota musí byť **iba čisté číslo bez jednotky** (napr. "800", nie "800 mm"). Rozmery uvádzaj v jednotke z názvu parametra.
+* Pre parametre s "(Áno/Nie)" v názve použi presne hodnotu "Áno" alebo "Nie".
+* Používaj presne tie názvy parametrov (kľúče), ktoré boli zadané v inštrukciách – nevymýšľaj vlastné.
 * Ak niektorý parameter nevieš v texte nájsť ani spoľahlivo odhadnúť z webového vyhľadávania, jednoducho tento kľúč do objektu `"parameters"` vôbec nezaraďuj.
 * Extrahované parametre z tohto objektu už NESPOMÍNAJ v poliach `shortDescription` ani `description` (ak to nie je nevyhnutné pre plynulosť textu), nakoniec ich eshop spracuje ako samostatné tabuľkové vlastnosti.
 

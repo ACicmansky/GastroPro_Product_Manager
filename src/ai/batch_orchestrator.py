@@ -147,6 +147,15 @@ class BatchOrchestrator:
             logger.error(f"Failed to create Batch Job: {e}")
             return df, {"ai_should_process": total, "ai_processed": 0}
 
+    @staticmethod
+    def _category_of(row) -> str:
+        """First non-empty of newCategory/defaultCategory (empty column != missing column)."""
+        for col in ("newCategory", "defaultCategory"):
+            val = str(row.get(col) or "").strip()
+            if val and val.lower() != "nan":
+                return val
+        return ""
+
     def _build_category_requests(
         self, needs_processing: pd.DataFrame, indices: set,
         jsonl_requests: list, is_group1: bool
@@ -156,9 +165,7 @@ class BatchOrchestrator:
             return
 
         group_df = needs_processing.loc[list(indices)].copy()
-        group_df["_temp_cat"] = group_df.apply(
-            lambda r: str(r.get("newCategory", r.get("defaultCategory", ""))), axis=1
-        )
+        group_df["_temp_cat"] = group_df.apply(self._category_of, axis=1)
 
         for cat_name, cat_subset in group_df.groupby("_temp_cat"):
             if not cat_name and self.category_parameters:
