@@ -2,6 +2,13 @@
 
 Goal: every product gets deterministic filter values (currently 0 of 5,691 "enhanced" DB products have any filteringProperty values). Costs Gemini quota only — no AI assistant needed to run this.
 
+**Update 2026-07-07: resumable runs are implemented** (`plan_resumable_ai_runs.md`, all 3 phases). The run is now chunked (~500 products/job, `ai_enhancement.chunk_size`) and tracked in SQLite (`enhancement_runs`/`run_chunks`). If interrupted (quota, network, app close), it survives — see "Resuming" below. The old `--limit`-slicing workaround (step 2/3 below) is no longer required for interruption-safety, but still useful for a first micro-test.
+
+## Resuming an interrupted run
+- **GUI**: relaunch the app — a banner appears automatically ("Prerušené AI spracovanie: X/Y produktov hotových") with a **Pokračovať** button. No re-selecting the input file; it reads straight from the product DB.
+- **CLI**: `python scripts/pipeline_cli.py ai out/reset.xlsx --resume -o out/continued.xlsx` (check progress first with `--status`).
+- **Pause/cancel mid-run (GUI only)**: "Pozastaviť AI" / "Zrušiť AI" buttons appear once an AI stage starts; already-applied chunks stay saved either way.
+
 ## 0. One-time prep
 - `pip install -r requirements.txt` (fixed 2026-07-07: `google-genai`, not `google-generativeai`).
 - `.env` has `GOOGLE_API_KEY`.

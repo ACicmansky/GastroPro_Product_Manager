@@ -1,6 +1,6 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-07-07*
+*Last updated: 2026-07-07 (resumable AI runs implemented)*
 
 ## Current State
 The **layered architecture refactor is complete and audited**. The codebase moved from the old flat `src` layout (core/services/utils/parsers/mergers/...) to a clean layered structure: `src/pipeline` (orchestration), `src/data` (I/O), `src/domain` (business logic), `src/ai` (Gemini), `src/scrapers`, `src/gui`, `src/config`. Entry point is `main.py`. All 202 tests pass. Zero circular dependencies.
@@ -33,6 +33,15 @@ All 11 findings of the over-engineering audit applied (see `journal/2026_07_07_p
 - Batch JSONL tmp dir moved from `src/ai/tmp/` to gitignored `out/batch_requests` (config override `ai_enhancement.tmp_dir` still honored). Stale JSONL debris in `src/ai/tmp/` awaits manual deletion.
 - Suite: 206 passed (2 factory tests removed, `test_xlsx_loader.py` rewritten, `BatchJobDB` tests rewritten against `get_active_job`).
 
+## Recent Changes (2026-07-07 — resumable AI runs, all 3 phases)
+Implemented `plan_resumable_ai_runs.md` in full (details in `journal/2026_07_07_resumable_ai_runs.md`):
+- **`RunDB`** (`src/data/database/run_db.py`): new SQLite tables `enhancement_runs`/`run_chunks`. A run pins a fixed product-code set at creation, split into ~500-product chunks (`ai_enhancement.chunk_size`), each its own Gemini Batch job — applied + DB-upserted immediately after each chunk succeeds, bounding data loss on interruption to one in-flight chunk.
+- **`BatchOrchestrator`** rewritten around a sequential per-chunk loop (`src/ai/batch_orchestrator.py`): resumes `submitted` chunks via their stored `job_name` (no resubmission), replaces the old infinite poll-retry with a `poll_failure_limit` (default 20) that marks the run "interrupted" instead of hanging, and checks a `RunControl` (`src/ai/run_control.py`, pause/cancel `threading.Event`s) between chunks.
+- **Resume path**: `ProductEnricher.resume()` / `Pipeline.run_ai_resume()` reload products fresh from `ProductDB` (not from any file) — this is what makes "continue like nothing happened" work across app restarts. CLI: `pipeline_cli.py ai --resume` / `--status`.
+- **GUI**: `MainWindow` shows a resume banner on launch if `RunDB.get_resumable_run()` finds one, plus Pause/Cancel buttons during an AI run (`AIResumeWorker`, `src/gui/worker.py`).
+- `runbook_full_reenhancement.md` updated: the old `--limit`-slicing interruption workaround is now optional (kept for micro-testing), resuming is automatic/native.
+- Suite: 212 passed (206 + `test_run_db.py` + `test_batch_resume.py`, the latter using a fake Gemini client to cover interrupt→resume-without-resubmit, pause, and cancel).
+
 ## Earlier Changes (July 2026 — post-refactor audit)
 - **Regressions from the refactor found and fixed:**
   - Interactive price mapping was silently disabled (hardcoded `False`, broken signal signature, worker never blocked on the dialog). Restored end-to-end: `Pipeline._map_prices` runs pre-merge on the Mebella feed; worker blocks via `QEventLoop`; `PricingService` now stores records (`[{code, dimension, price}]`) preserving dimension data, with legacy dict migration.
@@ -44,12 +53,13 @@ All 11 findings of the over-engineering audit applied (see `journal/2026_07_07_p
 
 ## Active Decisions
 - SQLite document store (`data/products.db`, 6-column schema with JSON `product_data` blob) is the source of truth; `aiProcessed`/`aiProcessedDate` survive client re-uploads.
-- AI enhancement uses the asynchronous Gemini **Batch API** (job state tracked in `batch_jobs` SQLite table; interrupted jobs resume automatically inside `BatchOrchestrator.process`).
+- AI enhancement uses the asynchronous Gemini **Batch API**, chunked into ~500-product jobs tracked in `RunDB` (`enhancement_runs`/`run_chunks`); a run resumes automatically (GUI banner / CLI `--resume`) from wherever it was interrupted, reloading products from the DB rather than a file.
 - Variants (products with `pairCode`) get dimension-free AI prompts; others get the standard prompt.
 - Feed products always included in merge; main data filtered by selected categories; image merge prefers the source with more images; `PRESERVED_FIELDS` (AI/manual text) never overwritten by feeds.
 - AI enhancement disabled by default in the UI (cost control).
 - KISS + TDD: tests required for new non-trivial logic; no unrequested complexity.
 
 ## Known Gaps / Next Candidates
+- Stale JSONL debris in `src/ai/tmp/` from before the tmp-dir move to `out/batch_requests` — safe to delete manually.
 - pyright runs in `typeCheckingMode: "off"` — switching to "basic" would need cleanup of loose typing first (deliberately deferred, not requested).
 - Manual end-to-end run with production feeds after the audit fixes is still pending.
