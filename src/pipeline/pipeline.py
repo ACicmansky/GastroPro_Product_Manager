@@ -62,6 +62,7 @@ class Pipeline:
         on_unmapped_price: Optional[Callable] = None,
         ai_control=None,
         on_stage: Optional[Callable] = None,
+        on_ai_progress: Optional[Callable] = None,
     ) -> PipelineResult:
         """Execute the full pipeline.
 
@@ -183,9 +184,10 @@ class Pipeline:
             enrichment = self.enricher.enrich(
                 merged_df,
                 force_reprocess=options.force_ai_reprocess,
-                progress_callback=lambda *args: progress(
-                    args[-1] if args else "AI processing..."
-                ),
+                # orchestrator emits (current, total, message); numeric consumers
+                # (GUI determinate progress) take it raw, others get the message
+                progress_callback=on_ai_progress
+                or (lambda *args: progress(args[-1] if args else "AI processing...")),
                 control=ai_control,
                 on_chunk_applied=self.db.upsert,
             )
@@ -224,7 +226,10 @@ class Pipeline:
         return self.enricher.get_resumable_run()
 
     def run_ai_resume(
-        self, on_progress: Optional[Callable] = None, ai_control=None
+        self,
+        on_progress: Optional[Callable] = None,
+        ai_control=None,
+        on_ai_progress: Optional[Callable] = None,
     ) -> PipelineResult:
         """Continue an interrupted AI run against current DB data — no feeds/merge/file load."""
         start_time = time.time()
@@ -238,7 +243,8 @@ class Pipeline:
         df = self.db.get_all()
         enrichment = self.enricher.resume(
             df,
-            progress_callback=lambda *args: progress(args[-1] if args else "AI resume..."),
+            progress_callback=on_ai_progress
+            or (lambda *args: progress(args[-1] if args else "AI resume...")),
             control=ai_control,
             on_chunk_applied=self.db.upsert,
         )

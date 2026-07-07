@@ -19,6 +19,7 @@ class PipelineWorker(QObject):
     error = pyqtSignal(str)
     progress = pyqtSignal(str)
     stage = pyqtSignal(str)  # pipeline stage key (load/feeds/scrape/merge/categories/ai/export)
+    ai_progress = pyqtSignal(int, int, str)  # current, total, message
     result = pyqtSignal(object)  # PipelineResult
     statistics = pyqtSignal(dict)
     category_mapping_request = pyqtSignal(str, str)  # original_category, product_name
@@ -47,6 +48,9 @@ class PipelineWorker(QObject):
                 on_unmapped_price=self._on_unmapped_price,
                 ai_control=self.ai_control,
                 on_stage=self.stage.emit,
+                on_ai_progress=lambda current, total, message: self.ai_progress.emit(
+                    int(current), int(total), str(message)
+                ),
             )
 
             # Emit statistics
@@ -112,6 +116,7 @@ class AIResumeWorker(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
     progress = pyqtSignal(str)
+    ai_progress = pyqtSignal(int, int, str)  # current, total, message
     result = pyqtSignal(object)  # PipelineResult
 
     def __init__(self, config: Dict, ai_control: Optional[RunControl] = None):
@@ -125,6 +130,9 @@ class AIResumeWorker(QObject):
             pipeline_result = self.pipeline.run_ai_resume(
                 on_progress=lambda msg: self.progress.emit(msg),
                 ai_control=self.ai_control,
+                on_ai_progress=lambda current, total, message: self.ai_progress.emit(
+                    int(current), int(total), str(message)
+                ),
             )
             self.result.emit(pipeline_result)
         except Exception as e:

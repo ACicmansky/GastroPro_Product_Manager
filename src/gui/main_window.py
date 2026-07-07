@@ -29,12 +29,14 @@ from PyQt5.QtWidgets import (
     QAbstractItemView,
     QListView,
     QShortcut,
+    QPlainTextEdit,
 )
-from PyQt5.QtCore import Qt, QThread, QStandardPaths
-from PyQt5.QtGui import QKeySequence
+from PyQt5.QtCore import Qt, QThread, QStandardPaths, QSettings, QUrl
+from PyQt5.QtGui import QKeySequence, QDesktopServices
 
 from .worker import PipelineWorker, AIResumeWorker
 from .widgets import CategoryMappingDialog, PriceMappingDialog
+from .toast import ToastHost
 from src.config.config_loader import load_config
 from src.domain.categories.category_service import CategoryService
 from src.data.loaders.xlsx_loader import load_xlsx
@@ -75,6 +77,7 @@ class MainWindow(QMainWindow):
         self.all_categories = []
         self.main_data_df = None
         self.ai_control = RunControl()
+        self.last_output_path = None
 
         if not self.config:
             QMessageBox.critical(
@@ -85,8 +88,43 @@ class MainWindow(QMainWindow):
             sys.exit(1)
 
         self.init_ui()
-        self.center_window()
+        self.toasts = ToastHost(self)
+        self._restore_session()
         self._check_resumable_ai_run()
+
+    def _settings(self) -> QSettings:
+        return QSettings("GastroPro", "ProductManager")
+
+    def _persisted_checkboxes(self):
+        # ponytail: AI checkboxes deliberately NOT persisted — off-by-default is cost control
+        return {
+            "feed_gastromarket": self.gastromarket_checkbox,
+            "feed_stalgast": self.gastromarket_stalgast_checkbox,
+            "feed_forgastro": self.forgastro_checkbox,
+            "scrape_topchladenie": self.web_scraping_checkbox,
+            "scrape_mebella": self.mebella_scraping_checkbox,
+            "update_categories": self.update_categories_checkbox,
+        }
+
+    def _restore_session(self):
+        """Restore window geometry and last-used source options."""
+        settings = self._settings()
+        geometry = settings.value("geometry")
+        if geometry is not None:
+            self.restoreGeometry(geometry)
+        else:
+            self.center_window()
+        for name, checkbox in self._persisted_checkboxes().items():
+            value = settings.value(f"opts/{name}")
+            if value is not None:
+                checkbox.setChecked(value in (True, "true"))
+
+    def closeEvent(self, event):
+        settings = self._settings()
+        settings.setValue("geometry", self.saveGeometry())
+        for name, checkbox in self._persisted_checkboxes().items():
+            settings.setValue(f"opts/{name}", checkbox.isChecked())
+        super().closeEvent(event)
 
     def center_window(self):
         """Center window on screen."""
@@ -394,6 +432,7 @@ class MainWindow(QMainWindow):
         self.ai_worker.result.connect(self.handle_result)
         self.ai_worker.error.connect(self.show_error_message)
         self.ai_worker.progress.connect(self.update_progress)
+        self.ai_worker.ai_progress.connect(self._on_ai_progress)
 
         self.ai_thread.finished.connect(lambda: self._set_ui_enabled(True))
         self.ai_thread.finished.connect(lambda: self.progress_bar.setVisible(False))
@@ -421,11 +460,19 @@ class MainWindow(QMainWindow):
             row.addWidget(label)
             self.stage_labels[key] = label
         row.addStretch()
+        self.log_toggle = QPushButton("📜 Log")
+        self.log_toggle.setProperty("flat", True)
+        self.log_toggle.setCheckable(True)
+        self.log_toggle.setCursor(Qt.PointingHandCursor)
+        self.log_toggle.toggled.connect(lambda on: self.activity_log.setVisible(on))
+        row.addWidget(self.log_toggle)
         parent.addWidget(self.stage_row)
         self.stage_row.setVisible(False)
 
     def _set_stage(self, active_key):
         """Mark stages before active_key done, active_key active, the rest pending."""
+        if active_key != "ai":
+            self.progress_bar.setRange(0, 0)  # back to indeterminate after AI's N/M
         seen = False
         for key, name in PIPELINE_STAGES:
             if key == active_key:
@@ -462,6 +509,29 @@ class MainWindow(QMainWindow):
         parent.addWidget(self.status_label)
         self.status_label.setVisible(False)
 
+        self.activity_log = QPlainTextEdit()
+        self.activity_log.setObjectName("activityLog")
+        self.activity_log.setReadOnly(True)
+        self.activity_log.setMaximumHeight(130)
+        parent.addWidget(self.activity_log)
+        self.activity_log.setVisible(False)
+
+    def _log(self, message: str, error: bool = False):
+        prefix = "CHYBA: " if error else ""
+        self.activity_log.appendPlainText(
+            f"[{datetime.now().strftime('%H:%M:%S')}] {prefix}{message}"
+        )
+        scrollbar = self.activity_log.verticalScrollBar()
+        scrollbar.setValue(scrollbar.maximum())
+
+    def _on_ai_progress(self, current: int, total: int, message: str):
+        """Determinate progress for the AI stage (chunked batch runs)."""
+        if total:
+            self.progress_bar.setRange(0, total)
+            self.progress_bar.setValue(current)
+            self.progress_bar.setFormat("%v / %m produktov")
+        self.update_progress(message)
+
     def _create_process_button(self, parent):
         """Create process button."""
         self.process_button = QPushButton("Spracovať a exportovať")
@@ -486,9 +556,35 @@ class MainWindow(QMainWindow):
         self.stats_note.setWordWrap(True)
         layout.addWidget(self.stats_note)
 
+        actions = QHBoxLayout()
+        self.open_export_button = QPushButton("📂 Otvoriť export")
+        self.open_export_button.setProperty("flat", True)
+        self.open_export_button.setCursor(Qt.PointingHandCursor)
+        self.open_export_button.clicked.connect(self._open_export_file)
+        self.open_folder_button = QPushButton("📁 Otvoriť priečinok")
+        self.open_folder_button.setProperty("flat", True)
+        self.open_folder_button.setCursor(Qt.PointingHandCursor)
+        self.open_folder_button.clicked.connect(self._open_export_folder)
+        actions.addWidget(self.open_export_button)
+        actions.addWidget(self.open_folder_button)
+        actions.addStretch()
+        layout.addLayout(actions)
+        self.open_export_button.setVisible(False)
+        self.open_folder_button.setVisible(False)
+
         parent.addWidget(group)
         group.setVisible(False)
         self.stats_group = group
+
+    def _open_export_file(self):
+        if self.last_output_path:
+            QDesktopServices.openUrl(QUrl.fromLocalFile(self.last_output_path))
+
+    def _open_export_folder(self):
+        if self.last_output_path:
+            QDesktopServices.openUrl(
+                QUrl.fromLocalFile(str(Path(self.last_output_path).parent))
+            )
 
     def _kpi_tile(self, value, caption):
         tile = QFrame()
@@ -547,7 +643,7 @@ class MainWindow(QMainWindow):
             df = load_xlsx(file_path)
 
             if df is None or df.empty:
-                QMessageBox.warning(self, "Prázdny súbor", "Vybraný súbor je prázdny.")
+                self.toasts.show("Vybraný súbor je prázdny.", "warning")
                 return
 
             self.main_data_file = file_path
@@ -563,11 +659,12 @@ class MainWindow(QMainWindow):
 
             # Extract and display categories
             self._extract_and_display_categories(df)
+            self.toasts.show(
+                f"Načítané: {filename} • {len(df)} produktov", "success", duration=3500
+            )
 
         except Exception as e:
-            QMessageBox.critical(
-                self, "Chyba načítania", f"Nepodarilo sa načítať súbor.\nChyba: {e}"
-            )
+            self.toasts.show(f"Nepodarilo sa načítať súbor: {e}", "error")
 
     def clear_main_data(self):
         """Clear main data file selection."""
@@ -596,23 +693,26 @@ class MainWindow(QMainWindow):
             and not self.web_scraping_checkbox.isChecked()
             and not self.mebella_scraping_checkbox.isChecked()
         ):
-            QMessageBox.warning(
-                self,
-                "Chýbajúce dáta",
-                "Vyberte aspoň jeden zdroj dát na spracovanie (XML feed alebo web scraping).",
+            self.toasts.show(
+                "Vyberte aspoň jeden zdroj dát (súbor, XML feed alebo scraping).",
+                "warning",
             )
             return
 
-        # Ask for output path before starting
+        # Ask for output path before starting (default to last-used folder)
+        default_dir = self._settings().value(
+            "last_output_dir",
+            QStandardPaths.writableLocation(QStandardPaths.DownloadLocation),
+        )
         output_path, _ = QFileDialog.getSaveFileName(
             self,
             "Uložiť výsledný súbor",
-            QStandardPaths.writableLocation(QStandardPaths.DownloadLocation)
-            + f"/{datetime.now().strftime('%Y_%m_%d')}_GastroPro.xlsx",
+            f"{default_dir}/{datetime.now().strftime('%Y_%m_%d')}_GastroPro.xlsx",
             "XLSX files (*.xlsx)",
         )
         if not output_path:
             return
+        self._settings().setValue("last_output_dir", str(Path(output_path).parent))
 
         # Prepare options
         options = PipelineOptions(
@@ -651,7 +751,10 @@ class MainWindow(QMainWindow):
         self._reset_stages()
         self.stage_row.setVisible(True)
         self._set_ui_enabled(False)
+        self.process_button.setText("⏳ Spracovávam...")
         self.stats_group.setVisible(False)
+        self.open_export_button.setVisible(False)
+        self.open_folder_button.setVisible(False)
         self._update_right_pane()
 
         # Create worker thread
@@ -677,11 +780,15 @@ class MainWindow(QMainWindow):
         self.worker.error.connect(self.show_error_message)
         self.worker.progress.connect(self.update_progress)
         self.worker.stage.connect(self._set_stage)
+        self.worker.ai_progress.connect(self._on_ai_progress)
 
         # Cleanup
         self.thread.finished.connect(lambda: self._set_ui_enabled(True))
         self.thread.finished.connect(lambda: self.progress_bar.setVisible(False))
         self.thread.finished.connect(lambda: self.status_label.setVisible(False))
+        self.thread.finished.connect(
+            lambda: self.process_button.setText("Spracovať a exportovať")
+        )
         self.thread.finished.connect(lambda: self.ai_pause_button.setEnabled(False))
         self.thread.finished.connect(lambda: self.ai_cancel_button.setEnabled(False))
         self.thread.finished.connect(self._check_resumable_ai_run)
@@ -726,8 +833,9 @@ class MainWindow(QMainWindow):
         self.category_list.setEnabled(enabled)
 
     def update_progress(self, message: str):
-        """Show the current pipeline message in the status line."""
+        """Show the current pipeline message in the status line and activity log."""
         self.status_label.setText(message)
+        self._log(message)
 
     def handle_statistics(self, stats: dict):
         """Render worker statistics as KPI tiles."""
@@ -761,31 +869,44 @@ class MainWindow(QMainWindow):
             self.kpi_grid.addWidget(self._kpi_tile(value, caption), i // 3, i % 3)
 
         self.stats_note.setText("")
+        set_variant(self.stats_note, "hint")
         self.stats_group.setVisible(True)
         self._update_right_pane()
 
     def handle_result(self, pipeline_result):
-        """Handle PipelineResult from worker."""
+        """Handle PipelineResult from worker: toast + result actions, no modal."""
         if pipeline_result and pipeline_result.output_path:
             self._finish_stages()
-            stats = self.last_statistics or {}
-            message = (
-                f"<b>Dáta boli úspešne exportované!</b><br><br>"
-                f"<b>Súbor:</b> {pipeline_result.output_path}<br>"
-                f"<b>Produktov:</b> {pipeline_result.product_count}<br>"
-                f"<b>Čas spracovania:</b> {pipeline_result.duration_seconds:.1f}s"
-            )
+            self.last_output_path = pipeline_result.output_path
+            self.open_export_button.setVisible(True)
+            self.open_folder_button.setVisible(True)
+
             warnings = getattr(pipeline_result, "warnings", [])
             if warnings:
-                message += "<br><br><b>Upozornenia:</b><br>" + "<br>".join(warnings)
-            msg_box = QMessageBox()
-            msg_box.setIcon(
-                QMessageBox.Warning if warnings else QMessageBox.Information
+                self.stats_note.setText("⚠️ " + "\n⚠️ ".join(warnings))
+                set_variant(self.stats_note, "warning")
+                for warning in warnings:
+                    self._log(warning, error=True)
+                self.toasts.show(
+                    f"Export hotový s {len(warnings)} upozorneniami — detaily vo Výsledkoch.",
+                    "warning",
+                    action=("Otvoriť", self._open_export_file),
+                )
+            else:
+                self.toasts.show(
+                    f"Export hotový • {pipeline_result.product_count} produktov "
+                    f"za {pipeline_result.duration_seconds:.0f}s",
+                    "success",
+                    action=("Otvoriť", self._open_export_file),
+                )
+        elif pipeline_result:
+            # AI resume run: no export file, just enrichment
+            enrichment = getattr(pipeline_result, "enrichment_stats", None)
+            processed = getattr(enrichment, "processed", 0) if enrichment else 0
+            self.toasts.show(
+                f"AI spracovanie ukončené • {processed} produktov vylepšených",
+                "success",
             )
-            msg_box.setText(message)
-            msg_box.setWindowTitle("Export úspešný")
-            msg_box.setTextFormat(Qt.RichText)
-            msg_box.exec_()
 
     def _extract_and_display_categories(self, df: pd.DataFrame):
         """Extract categories from DataFrame and display in list."""
@@ -937,8 +1058,9 @@ class MainWindow(QMainWindow):
             self.worker.set_category_mapping_result(original_category)
 
     def show_error_message(self, message: str):
-        """Show error message."""
-        QMessageBox.critical(self, "Chyba", message)
+        """Non-blocking error toast (sticky until clicked) + activity log entry."""
+        self._log(message, error=True)
+        self.toasts.show(f"Spracovanie zlyhalo: {message}", "error")
 
     def handle_price_mapping_request(self, product_data, prices_df):
         """

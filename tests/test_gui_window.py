@@ -56,3 +56,29 @@ def test_kpi_tiles_render_worker_schema(window):
 
     window.handle_statistics({"total_products": 1, "duration": 5})
     assert window.kpi_grid.count() == 2  # old tiles cleared, no stale rows
+
+
+def test_toast_stack_and_dismiss(window):
+    toast = window.toasts.show("Hotovo", "success")
+    assert window.toasts._toasts == [toast]
+    assert toast.property("toast") == "success"
+    window.toasts._remove(toast)
+    assert window.toasts._toasts == []
+
+
+def test_ai_progress_switches_bar_to_determinate(window):
+    window._on_ai_progress(450, 9657, "Beh 3: davka 1/20...")
+    assert window.progress_bar.maximum() == 9657
+    assert window.progress_bar.value() == 450
+    assert "davka" in window.status_label.text()
+    # any non-AI stage flips the bar back to indeterminate
+    window._set_stage("export")
+    assert window.progress_bar.maximum() == 0
+
+
+def test_activity_log_collects_messages(window):
+    before = window.activity_log.toPlainText()
+    window.update_progress("Merging product data...")
+    text = window.activity_log.toPlainText()
+    assert "Merging product data..." in text
+    assert len(text) > len(before)

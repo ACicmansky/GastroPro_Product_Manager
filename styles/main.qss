@@ -98,7 +98,7 @@ QPushButton[danger="true"]:hover {
 }
 
 /* --- Inputs --- */
-QLineEdit, QTextEdit {
+QLineEdit, QTextEdit, QPlainTextEdit {
     background-color: $surface;
     color: $text;
     border: 1px solid $border;
@@ -108,13 +108,19 @@ QLineEdit, QTextEdit {
     selection-color: #ffffff;
 }
 
-QLineEdit:focus, QTextEdit:focus {
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
     border: 1px solid $accent;
 }
 
-QLineEdit:disabled, QTextEdit:disabled {
+QLineEdit:disabled, QTextEdit:disabled, QPlainTextEdit:disabled {
     color: $muted;
     background-color: $surfaceAlt;
+}
+
+QPlainTextEdit#activityLog {
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    font-size: 9pt;
+    color: $muted;
 }
 
 /* --- Checkboxes (incl. checkable list items) --- */
@@ -321,6 +327,57 @@ QLabel#emptyState {
     border: 2px dashed $border;
     border-radius: 10px;
     padding: 24px;
+}
+
+/* --- Toasts --- */
+QFrame[toast="info"], QFrame[toast="success"], QFrame[toast="warning"], QFrame[toast="error"] {
+    background-color: $surface;
+    border: 1px solid $border;
+    border-radius: 8px;
+}
+
+QFrame[toast="info"] {
+    border-left: 4px solid $accent;
+}
+
+QFrame[toast="success"] {
+    border-left: 4px solid $success;
+}
+
+QFrame[toast="warning"] {
+    border-left: 4px solid $warning;
+}
+
+QFrame[toast="error"] {
+    border-left: 4px solid $danger;
+}
+
+QPushButton[toastAction="true"] {
+    background: transparent;
+    border: none;
+    color: $accent;
+    font-weight: 600;
+    min-width: 0;
+    padding: 4px 8px;
+}
+
+QPushButton[toastAction="true"]:hover {
+    color: $accentHover;
+}
+
+/* --- Flat link-style buttons (results card actions, log toggle) --- */
+QPushButton[flat="true"] {
+    background: transparent;
+    border: none;
+    color: $accent;
+    min-width: 0;
+    padding: 4px 8px;
+}
+
+QPushButton[flat="true"]:hover {
+    color: $accentHover;
+    background-color: $surfaceAlt;
+    border-radius: 4px;
 }
 
 /* --- Highlight cards used in dialogs --- */
