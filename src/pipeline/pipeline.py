@@ -60,6 +60,7 @@ class Pipeline:
         on_progress: Optional[Callable] = None,
         on_unknown_category: Optional[Callable] = None,
         on_unmapped_price: Optional[Callable] = None,
+        ai_control=None,
     ) -> PipelineResult:
         """Execute the full pipeline.
 
@@ -68,6 +69,7 @@ class Pipeline:
             on_progress: Progress callback (message: str)
             on_unknown_category: Callback for unmapped categories
             on_unmapped_price: Callback for unmapped prices
+            ai_control: Optional RunControl to pause/cancel the AI stage
 
         Returns:
             PipelineResult with stats and output path
@@ -173,6 +175,8 @@ class Pipeline:
                 progress_callback=lambda *args: progress(
                     args[-1] if args else "AI processing..."
                 ),
+                control=ai_control,
+                on_chunk_applied=self.db.upsert,
             )
             merged_df = enrichment.products
             result.enrichment_stats = enrichment
@@ -200,6 +204,37 @@ class Pipeline:
 
         progress(
             f"Pipeline complete. {result.product_count} products processed in {result.duration_seconds:.1f}s"
+        )
+        return result
+
+    def get_resumable_ai_run(self) -> Optional[dict]:
+        """Latest paused/interrupted AI run, or None. Cheap DB-only check for the GUI."""
+        return self.enricher.get_resumable_run()
+
+    def run_ai_resume(
+        self, on_progress: Optional[Callable] = None, ai_control=None
+    ) -> PipelineResult:
+        """Continue an interrupted AI run against current DB data — no feeds/merge/file load."""
+        start_time = time.time()
+        result = PipelineResult()
+
+        def progress(msg: str):
+            if on_progress:
+                on_progress(msg)
+            logger.info(msg)
+
+        df = self.db.get_all()
+        enrichment = self.enricher.resume(
+            df,
+            progress_callback=lambda *args: progress(args[-1] if args else "AI resume..."),
+            control=ai_control,
+            on_chunk_applied=self.db.upsert,
+        )
+        result.enrichment_stats = enrichment
+        result.product_count = len(enrichment.products)
+        result.duration_seconds = time.time() - start_time
+        progress(
+            f"AI resume complete. {enrichment.processed} produktov spracovanych v {result.duration_seconds:.1f}s"
         )
         return result
 

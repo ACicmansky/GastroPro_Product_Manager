@@ -7,6 +7,7 @@ from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop
 
 from src.pipeline.pipeline import Pipeline
 from src.domain.models import PipelineOptions, PipelineResult
+from src.ai.run_control import RunControl
 
 logger = logging.getLogger(__name__)
 
@@ -22,11 +23,12 @@ class PipelineWorker(QObject):
     category_mapping_request = pyqtSignal(str, str)  # original_category, product_name
     price_mapping_request = pyqtSignal(dict, object)  # product_data, prices_df
 
-    def __init__(self, config: Dict, options: PipelineOptions):
+    def __init__(self, config: Dict, options: PipelineOptions, ai_control: Optional[RunControl] = None):
         super().__init__()
         self.config = config
         self.options = options
         self.pipeline = Pipeline(config)
+        self.ai_control = ai_control or RunControl()
 
         # For blocking on GUI interactions
         self._category_result: Optional[str] = None
@@ -42,6 +44,7 @@ class PipelineWorker(QObject):
                 on_progress=self._on_progress,
                 on_unknown_category=self._on_unknown_category,
                 on_unmapped_price=self._on_unmapped_price,
+                ai_control=self.ai_control,
             )
 
             # Emit statistics
@@ -99,3 +102,31 @@ class PipelineWorker(QObject):
         self._price_result = price
         if self._price_loop:
             self._price_loop.quit()
+
+
+class AIResumeWorker(QObject):
+    """Continues an interrupted AI run — no feeds/merge/file load, just DB in -> DB out."""
+
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+    progress = pyqtSignal(str)
+    result = pyqtSignal(object)  # PipelineResult
+
+    def __init__(self, config: Dict, ai_control: Optional[RunControl] = None):
+        super().__init__()
+        self.pipeline = Pipeline(config)
+        self.ai_control = ai_control or RunControl()
+
+    def run(self):
+        """Called from QThread."""
+        try:
+            pipeline_result = self.pipeline.run_ai_resume(
+                on_progress=lambda msg: self.progress.emit(msg),
+                ai_control=self.ai_control,
+            )
+            self.result.emit(pipeline_result)
+        except Exception as e:
+            logger.error(f"AI resume error: {e}", exc_info=True)
+            self.error.emit(str(e))
+        finally:
+            self.finished.emit()

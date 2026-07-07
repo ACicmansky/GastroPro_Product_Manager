@@ -29,13 +29,15 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QThread, QStandardPaths
 
-from .worker import PipelineWorker
+from .worker import PipelineWorker, AIResumeWorker
 from .widgets import CategoryMappingDialog, PriceMappingDialog
 from src.config.config_loader import load_config
 from src.domain.categories.category_service import CategoryService
 from src.data.loaders.xlsx_loader import load_xlsx
 from src.domain.categories.category_filter import CategoryFilter
 from src.domain.models import PipelineOptions
+from src.data.database.run_db import RunDB
+from src.ai.run_control import RunControl
 
 
 class MainWindow(QMainWindow):
@@ -53,6 +55,7 @@ class MainWindow(QMainWindow):
         self.category_service = CategoryService()
         self.all_categories = []
         self.main_data_df = None
+        self.ai_control = RunControl()
 
         if not self.config:
             QMessageBox.critical(
@@ -65,6 +68,7 @@ class MainWindow(QMainWindow):
         self.init_ui()
         self.center_window()
         self.load_stylesheet()
+        self._check_resumable_ai_run()
 
     def load_stylesheet(self):
         """Load stylesheet if available."""
@@ -103,6 +107,7 @@ class MainWindow(QMainWindow):
 
         # Processing options
         self._create_processing_options()
+        self._create_ai_run_controls()
 
         # Progress bar
         self._create_progress_bar()
@@ -259,6 +264,98 @@ class MainWindow(QMainWindow):
 
         self.layout.addWidget(group)
 
+    def _create_ai_run_controls(self):
+        """AI run tracking: resume banner + pause/cancel while an AI stage is active."""
+        group = QGroupBox("AI spracovanie")
+        layout = QVBoxLayout(group)
+
+        self.ai_resume_banner = QLabel("")
+        self.ai_resume_banner.setWordWrap(True)
+        self.ai_resume_banner.setStyleSheet("color: darkorange; font-weight: bold;")
+        self.ai_resume_banner.setVisible(False)
+
+        self.ai_resume_button = QPushButton("Pokračovať v AI spracovaní")
+        self.ai_resume_button.setVisible(False)
+        self.ai_resume_button.clicked.connect(self._start_ai_resume)
+
+        buttons_row = QHBoxLayout()
+        self.ai_pause_button = QPushButton("Pozastaviť AI")
+        self.ai_pause_button.setEnabled(False)
+        self.ai_pause_button.clicked.connect(self._pause_ai)
+        self.ai_cancel_button = QPushButton("Zrušiť AI")
+        self.ai_cancel_button.setEnabled(False)
+        self.ai_cancel_button.clicked.connect(self._cancel_ai)
+        buttons_row.addWidget(self.ai_pause_button)
+        buttons_row.addWidget(self.ai_cancel_button)
+
+        layout.addWidget(self.ai_resume_banner)
+        layout.addWidget(self.ai_resume_button)
+        layout.addLayout(buttons_row)
+        self.layout.addWidget(group)
+        self.ai_run_group = group
+
+    def _check_resumable_ai_run(self):
+        """DB-only check (no API key needed) — shows the resume banner if a run was interrupted."""
+        db_path = self.config.get("db_path", "data/products.db") if self.config else "data/products.db"
+        resumable = RunDB(db_path).get_resumable_run()
+        if resumable and resumable["status"] in ("paused", "interrupted"):
+            self.ai_resume_banner.setText(
+                f"Prerušené AI spracovanie ({resumable['status']}): "
+                f"{resumable['processed_products']}/{resumable['total_products']} produktov hotových."
+                + (f" [{resumable['detail']}]" if resumable["detail"] else "")
+            )
+            self.ai_resume_banner.setVisible(True)
+            self.ai_resume_button.setVisible(True)
+        else:
+            self.ai_resume_banner.setVisible(False)
+            self.ai_resume_button.setVisible(False)
+
+    def _pause_ai(self):
+        self.ai_control.pause()
+        self.ai_pause_button.setEnabled(False)
+        self.update_progress("Pozastavovanie AI spracovania (dokončí sa po aktuálnej dávke)...")
+
+    def _cancel_ai(self):
+        confirm = QMessageBox.question(
+            self, "Zrušiť AI spracovanie",
+            "Naozaj chcete zrušiť prebiehajúcu AI dávku? Doteraz spracované produkty zostanú uložené.",
+            QMessageBox.Yes | QMessageBox.No,
+        )
+        if confirm == QMessageBox.Yes:
+            self.ai_control.cancel()
+            self.ai_pause_button.setEnabled(False)
+            self.ai_cancel_button.setEnabled(False)
+
+    def _start_ai_resume(self):
+        """Continue an interrupted AI run — DB in, DB out, no feeds/merge/file dialogs."""
+        self.ai_resume_button.setEnabled(False)
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setRange(0, 0)
+        self._set_ui_enabled(False)
+        self.ai_pause_button.setEnabled(True)
+        self.ai_cancel_button.setEnabled(True)
+
+        self.ai_control = RunControl()
+        self.ai_thread = QThread()
+        self.ai_worker = AIResumeWorker(self.config, ai_control=self.ai_control)
+        self.ai_worker.moveToThread(self.ai_thread)
+
+        self.ai_thread.started.connect(self.ai_worker.run)
+        self.ai_worker.finished.connect(self.ai_thread.quit)
+        self.ai_worker.finished.connect(self.ai_worker.deleteLater)
+        self.ai_thread.finished.connect(self.ai_thread.deleteLater)
+        self.ai_worker.result.connect(self.handle_result)
+        self.ai_worker.error.connect(self.show_error_message)
+        self.ai_worker.progress.connect(self.update_progress)
+
+        self.ai_thread.finished.connect(lambda: self._set_ui_enabled(True))
+        self.ai_thread.finished.connect(lambda: self.progress_bar.setVisible(False))
+        self.ai_thread.finished.connect(lambda: self.ai_pause_button.setEnabled(False))
+        self.ai_thread.finished.connect(lambda: self.ai_cancel_button.setEnabled(False))
+        self.ai_thread.finished.connect(self._check_resumable_ai_run)
+
+        self.ai_thread.start()
+
     def _create_progress_bar(self):
         """Create progress bar."""
         self.progress_bar = QProgressBar()
@@ -414,8 +511,12 @@ class MainWindow(QMainWindow):
         self.stats_group.setVisible(False)
 
         # Create worker thread
+        self.ai_control = RunControl()
+        if options.enable_ai_enhancement:
+            self.ai_pause_button.setEnabled(True)
+            self.ai_cancel_button.setEnabled(True)
         self.thread = QThread()
-        self.worker = PipelineWorker(self.config, options)
+        self.worker = PipelineWorker(self.config, options, ai_control=self.ai_control)
         self.worker.moveToThread(self.thread)
 
         # Connect signals
@@ -435,6 +536,9 @@ class MainWindow(QMainWindow):
         # Cleanup
         self.thread.finished.connect(lambda: self._set_ui_enabled(True))
         self.thread.finished.connect(lambda: self.progress_bar.setVisible(False))
+        self.thread.finished.connect(lambda: self.ai_pause_button.setEnabled(False))
+        self.thread.finished.connect(lambda: self.ai_cancel_button.setEnabled(False))
+        self.thread.finished.connect(self._check_resumable_ai_run)
 
         # Start processing
         self.thread.start()
@@ -442,6 +546,7 @@ class MainWindow(QMainWindow):
     def _set_ui_enabled(self, enabled: bool):
         """Enable or disable all UI inputs during processing."""
         self.process_button.setEnabled(enabled)
+        self.ai_resume_button.setEnabled(enabled and self.ai_resume_button.isVisible())
         self.select_main_button.setEnabled(enabled)
         # Only enable clear if there is a main file loaded
         self.clear_main_button.setEnabled(enabled and self.main_data_file is not None)

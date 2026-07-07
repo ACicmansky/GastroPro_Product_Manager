@@ -94,7 +94,36 @@ def cmd_transform(args, config):
 
 def cmd_ai(args, config):
     from src.ai.product_enricher import ProductEnricher  # imports AI stack — keep lazy
+    from src.data.database.batch_job_db import BatchJobDB
+    from src.data.database.run_db import RunDB
     import pandas as pd
+
+    db_path = config.get("db_path", "data/products.db")
+
+    if getattr(args, "status", False):
+        run = RunDB(db_path).get_resumable_run()
+        if not run:
+            logger.info("No resumable AI run.")
+        else:
+            logger.info(
+                "Run %s: status=%s %d/%d products, detail=%s",
+                run["id"], run["status"], run["processed_products"], run["total_products"], run["detail"],
+            )
+        return
+
+    if getattr(args, "resume", False):
+        enricher = ProductEnricher(config, batch_job_db=BatchJobDB(db_path))
+        if not enricher.get_resumable_run():
+            logger.info("No resumable AI run.")
+            return
+        df = load_xlsx(args.input)
+        progress = lambda *a: logger.info("%s", a[-1] if a else "")
+        result = enricher.resume(df, progress_callback=progress)
+        out_df = apply_feed_specs(result.products)
+        write_xlsx(out_df, args.out)
+        logger.info("AI resume: processed=%d -> %s", result.processed, args.out)
+        _write_review_files(enricher, out_df, Path(args.out))
+        return
 
     if getattr(args, "model", None):
         config.setdefault("ai_enhancement", {})["model"] = args.model
@@ -120,8 +149,9 @@ def cmd_ai(args, config):
     if args.dry_run or pending.empty:
         return int(done.sum()), len(pending)
 
-    # ponytail: no batch_job_db — isolated test runs never resume/persist jobs
-    enricher = ProductEnricher(config)
+    # --limit micro-tests stay untracked (one-off, no chunking); unlimited runs get
+    # run/chunk tracking so an interruption can be continued with `ai --resume`.
+    enricher = ProductEnricher(config, batch_job_db=BatchJobDB(db_path) if not args.limit else None)
     progress = lambda *a: logger.info("%s", a[-1] if a else "")
     if fill_missing:
         result = enricher.fill_missing_params(
@@ -267,6 +297,8 @@ def main():
     p.add_argument("--fill-missing", action="store_true",
                    help="second pass: web-grounded re-ask ONLY for missing filter params (ignores aiProcessed)")
     p.add_argument("--fill-model", help="stronger model for --fill-missing (tiered enhancement)")
+    p.add_argument("--resume", action="store_true", help="continue the latest paused/interrupted run")
+    p.add_argument("--status", action="store_true", help="print the latest resumable run's progress and exit")
     p.set_defaults(func=cmd_ai)
 
     p = sub.add_parser("classify", help="AI-suggest categories for products without one (review column)")

@@ -150,7 +150,9 @@
     "temperature": 0,
     "retry_attempts": 3,
     "retry_delay": 60,
-    "max_parallel_calls": 10
+    "max_parallel_calls": 10,
+    "chunk_size": 500,
+    "poll_failure_limit": 20
   },
   "db_path": "data/products.db"
 }

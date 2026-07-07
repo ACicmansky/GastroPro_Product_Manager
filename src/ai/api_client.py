@@ -150,6 +150,10 @@ class GeminiClient:
         """Poll batch job status."""
         return self.client.batches.get(name=job_name)
 
+    def cancel_batch_job(self, job_name: str):
+        """Cancel an in-flight batch job."""
+        self.client.batches.cancel(name=job_name)
+
     def download_file(self, file_name: str) -> str:
         """Download a file and return its content as string."""
         content_bytes = self.client.files.download(file=file_name)

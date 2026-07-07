@@ -195,9 +195,12 @@ class ResultParser:
         return df, updated_count
 
     def parse_batch_results(
-        self, df: pd.DataFrame, file_content: str, progress_callback=None
+        self, df: pd.DataFrame, file_content: str, progress_callback=None, valid_indices=None
     ) -> Tuple[pd.DataFrame, Dict]:
         """Parse JSONL batch results and apply to DataFrame.
+
+        valid_indices scopes matching to one chunk, so a code collision in another
+        chunk's rows can't steal a write.
 
         Returns:
             Tuple of (updated DataFrame, stats dict)
@@ -235,7 +238,7 @@ class ResultParser:
                 logger.error(f"Error parsing batch line: {e}")
 
         if enhanced_all:
-            updated_df, count = self.update_dataframe(df, enhanced_all)
+            updated_df, count = self.update_dataframe(df, enhanced_all, valid_indices=valid_indices)
             return updated_df, {"ai_should_process": len(enhanced_all), "ai_processed": count}
 
         return df, {"ai_should_process": 0, "ai_processed": 0}

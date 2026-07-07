@@ -1,4 +1,11 @@
-"""Batch processing orchestration for AI enhancement."""
+"""Batch processing orchestration for AI enhancement.
+
+A run is split into chunks (~chunk_size products each). Each chunk is its own
+batch job, processed sequentially: build JSONL -> upload -> create job -> poll
+-> download -> apply -> mark chunk applied. Interruption at any point loses at
+most one chunk's cloud time; run/chunk state lives in RunDB so `process()`
+picks up a resumable run automatically, and `resume()` continues explicitly.
+"""
 
 import json
 import os
@@ -11,6 +18,7 @@ import pandas as pd
 
 from .api_client import GeminiClient
 from .result_parser import ResultParser
+from .run_control import RunControl
 from .prompts import (
     build_response_schema,
     create_params_only_prompt,
@@ -19,6 +27,7 @@ from .prompts import (
     load_category_parameters,
 )
 from src.data.database.batch_job_db import BatchJobDB
+from src.data.database.run_db import RunDB
 
 logger = logging.getLogger(__name__)
 
@@ -36,19 +45,27 @@ class BatchOrchestrator:
         client: GeminiClient,
         result_parser: ResultParser,
         batch_job_db: Optional[BatchJobDB] = None,
+        run_db: Optional[RunDB] = None,
         config: Optional[Dict] = None,
     ):
         self.client = client
         self.parser = result_parser
         self.batch_job_db = batch_job_db
+        self.run_db = run_db
 
         ai_config = (config or {}).get("ai_enhancement", {})
         self.batch_size = ai_config.get("batch_size", 45)
         self.temperature = ai_config.get("temperature", 0.1)
         self.tmp_dir = ai_config.get("tmp_dir", os.path.join("out", "batch_requests"))
+        self.chunk_size = ai_config.get("chunk_size", 500)
+        self.poll_failure_limit = ai_config.get("poll_failure_limit", 20)
         os.makedirs(self.tmp_dir, exist_ok=True)
 
         self.category_parameters = load_category_parameters()
+
+    # ------------------------------------------------------------------
+    # Public entry points
+    # ------------------------------------------------------------------
 
     def process(
         self,
@@ -56,35 +73,23 @@ class BatchOrchestrator:
         group1_indices: set,
         progress_callback: Optional[Callable] = None,
         force_reprocess: bool = False,
+        control: Optional[RunControl] = None,
+        on_chunk_applied: Optional[Callable[[pd.DataFrame], None]] = None,
     ) -> Tuple[pd.DataFrame, Dict]:
-        """Run batch processing for products needing AI enhancement.
-
-        Args:
-            df: Full product DataFrame
-            group1_indices: Indices of variant products (no-dimensions prompt)
-            progress_callback: Optional progress callback
-            force_reprocess: If True, reprocess all products
-
-        Returns:
-            Tuple of (updated DataFrame, stats dict)
-        """
+        """Run (or resume) chunked batch processing for products needing AI enhancement."""
         if not self.client.is_available:
             logger.warning("No API key, skipping AI enhancement")
             return df, {"ai_should_process": 0, "ai_processed": 0}
 
-        # Check for active job to resume
-        if self.batch_job_db:
-            active_job = self.batch_job_db.get_active_job()
-            if active_job:
-                logger.info(f"Resuming active batch job: {active_job['job_name']}")
-                if progress_callback:
-                    progress_callback(0, 0, f"Obnovovanie existujucej ulohy (Job ID: {active_job['job_name'][-10:]})...")
-                return self._monitor_and_apply(
-                    df, active_job["job_name"], active_job["uploaded_file_name"],
-                    progress_callback,
+        if self.run_db:
+            resumable = self.run_db.get_resumable_run()
+            if resumable:
+                logger.info(
+                    "Resuming run %s: %d/%d products done",
+                    resumable["id"], resumable["processed_products"], resumable["total_products"],
                 )
+                return self._run_chunks(df, resumable["id"], group1_indices, progress_callback, control, on_chunk_applied)
 
-        # Determine which products need processing
         if "aiProcessed" not in df.columns:
             df["aiProcessed"] = ""
         if "aiProcessedDate" not in df.columns:
@@ -107,20 +112,26 @@ class BatchOrchestrator:
 
         logger.info(f"Processing {total} products with Batch API")
 
-        # Build JSONL requests
-        if progress_callback:
-            progress_callback(0, total, "Priprava davok (Batch Requests)...")
+        if not self.run_db:
+            # No run tracking (isolated CLI micro-tests): legacy single-job, non-resumable path.
+            return self._process_untracked(df, needs_processing, group1_indices, progress_callback, total)
 
-        jsonl_requests = []
-        self._build_category_requests(needs_processing, group1_indices, jsonl_requests, is_group1=True)
-        group2_indices = [idx for idx in needs_processing.index if idx not in group1_indices]
-        self._build_category_requests(needs_processing, set(group2_indices), jsonl_requests, is_group1=False)
+        codes = [str(df.at[idx, "code"]).strip() for idx in needs_processing.index]
+        chunks = [codes[i:i + self.chunk_size] for i in range(0, len(codes), self.chunk_size)]
+        run_id = self.run_db.create_run(force_reprocess, chunks)
+        return self._run_chunks(df, run_id, group1_indices, progress_callback, control, on_chunk_applied)
 
-        if not jsonl_requests:
-            logger.info("No valid batch requests generated.")
-            return df, {"ai_should_process": total, "ai_processed": 0}
-
-        return self._submit_and_monitor(df, jsonl_requests, progress_callback, total)
+    def resume(
+        self,
+        df: pd.DataFrame,
+        run_id: int,
+        group1_indices: set,
+        progress_callback: Optional[Callable] = None,
+        control: Optional[RunControl] = None,
+        on_chunk_applied: Optional[Callable[[pd.DataFrame], None]] = None,
+    ) -> Tuple[pd.DataFrame, Dict]:
+        """Continue a specific run by id (used when the caller already resolved it)."""
+        return self._run_chunks(df, run_id, group1_indices, progress_callback, control, on_chunk_applied)
 
     def process_missing_params(
         self,
@@ -131,7 +142,8 @@ class BatchOrchestrator:
         """Second pass: grounded re-ask for filter params still missing after enhancement.
 
         Params-only responses can't clobber descriptions — the parser writes
-        text fields only when present in the response.
+        text fields only when present in the response. Single job, not chunked:
+        this pass is optional and re-runnable in full if interrupted.
         """
         if not self.client.is_available:
             logger.warning("No API key, skipping missing-params pass")
@@ -146,9 +158,247 @@ class BatchOrchestrator:
             "Missing-params pass: %d products in %d requests (model=%s)",
             product_count, len(jsonl_requests), model or self.client.model_name,
         )
-        return self._submit_and_monitor(
-            df, jsonl_requests, progress_callback, product_count, model=model
+        try:
+            job_name, uploaded_name = self._submit_chunk(jsonl_requests, model=model)
+        except Exception as e:
+            logger.error(f"Failed to create Batch Job: {e}")
+            return df, {"ai_should_process": product_count, "ai_processed": 0}
+
+        outcome, batch_job = self._wait_for_job(job_name, progress_callback, product_count, None)
+        if outcome != "succeeded":
+            logger.error(f"Missing-params batch job did not succeed: {outcome}")
+            return df, {"ai_should_process": product_count, "ai_processed": 0}
+
+        return self._download_and_apply(df, batch_job, uploaded_name, progress_callback, product_count)
+
+    # ------------------------------------------------------------------
+    # Chunked run execution
+    # ------------------------------------------------------------------
+
+    def _run_chunks(
+        self,
+        df: pd.DataFrame,
+        run_id: int,
+        group1_indices: set,
+        progress_callback: Optional[Callable],
+        control: Optional[RunControl],
+        on_chunk_applied: Optional[Callable[[pd.DataFrame], None]],
+    ) -> Tuple[pd.DataFrame, Dict]:
+        run = self.run_db.get_run(run_id)
+        total = run["total_products"]
+        stats = {"ai_should_process": total, "ai_processed": run["processed_products"]}
+        chunks = self.run_db.chunks_for(run_id)
+
+        for chunk in chunks:
+            if chunk["status"] == "applied":
+                continue
+
+            if control and control.is_cancel_requested:
+                self.run_db.update_run(run_id, status="cancelled")
+                return df, stats
+
+            chunk_codes = set(chunk["codes"])
+            valid_indices = df.index[df["code"].astype(str).str.strip().isin(chunk_codes)]
+            if len(valid_indices) == 0:
+                self.run_db.mark_chunk(chunk["id"], "applied", detail="no matching rows")
+                continue
+
+            if chunk["status"] == "submitted" and chunk["job_name"]:
+                # ponytail: uploaded_file_name isn't persisted per chunk, so a resumed chunk skips
+                # remote-file cleanup after download (Google auto-expires uploaded files anyway).
+                job_name, uploaded_name = chunk["job_name"], ""
+            else:
+                jsonl_requests = self._build_chunk_requests(df, valid_indices, group1_indices)
+                if not jsonl_requests:
+                    self.run_db.mark_chunk(chunk["id"], "applied", detail="no requests generated")
+                    continue
+                if progress_callback:
+                    progress_callback(
+                        stats["ai_processed"], total,
+                        f"Beh {run_id}: davka {chunk['chunk_index'] + 1}/{len(chunks)}, "
+                        f"priprava a odosielanie...",
+                    )
+                try:
+                    job_name, uploaded_name = self._submit_chunk(jsonl_requests)
+                except Exception as e:
+                    logger.error(f"Chunk {chunk['chunk_index']} submit failed: {e}")
+                    self.run_db.mark_chunk(chunk["id"], "failed", detail=str(e))
+                    self.run_db.update_run(run_id, status="interrupted", detail=str(e))
+                    return df, stats
+                self.run_db.mark_chunk(chunk["id"], "submitted", job_name=job_name)
+
+            def chunk_progress(_current, _total, message, _chunk=chunk, _chunks=chunks, _stats=stats):
+                if progress_callback:
+                    progress_callback(
+                        _stats["ai_processed"], total,
+                        f"Beh {run_id}: davka {_chunk['chunk_index'] + 1}/{len(_chunks)}, "
+                        f"{_stats['ai_processed']}/{total} produktov, {message}",
+                    )
+
+            outcome, batch_job = self._wait_for_job(job_name, chunk_progress, total, control)
+
+            if outcome == "paused":
+                self.run_db.update_run(run_id, status="paused")
+                return df, stats
+            if outcome == "cancelled":
+                self.run_db.update_run(run_id, status="cancelled")
+                return df, stats
+            if outcome == "interrupted":
+                self.run_db.update_run(run_id, status="interrupted", detail="network/API unreachable")
+                return df, stats
+            if outcome == "failed":
+                state = batch_job.state.name if batch_job else "unknown"
+                self.run_db.mark_chunk(chunk["id"], "failed", detail=f"job state {state}")
+                continue
+
+            df, applied = self._download_and_apply(
+                df, batch_job, uploaded_name, chunk_progress, total, valid_indices=valid_indices,
+            )
+            if applied.get("error"):
+                # Job succeeded in the cloud; keep chunk "submitted" so resume re-downloads it.
+                self.run_db.update_run(run_id, status="interrupted", detail=applied["error"])
+                return df, stats
+            applied_count = applied.get("ai_processed", 0)
+            stats["ai_processed"] += applied_count
+            self.run_db.mark_chunk(chunk["id"], "applied")
+            self.run_db.update_run(run_id, processed_delta=applied_count)
+            if on_chunk_applied:
+                on_chunk_applied(df.loc[valid_indices])
+
+        final_chunks = self.run_db.chunks_for(run_id)
+        failed = [c for c in final_chunks if c["status"] == "failed"]
+        self.run_db.update_run(
+            run_id, status="completed",
+            detail=f"{len(failed)} chunks failed" if failed else "",
         )
+        return df, stats
+
+    def _build_chunk_requests(self, df: pd.DataFrame, valid_indices, group1_indices: set) -> list:
+        chunk_df = df.loc[valid_indices]
+        jsonl_requests = []
+        g1 = set(valid_indices) & group1_indices
+        self._build_category_requests(chunk_df, g1, jsonl_requests, is_group1=True)
+        g2 = set(i for i in valid_indices if i not in group1_indices)
+        self._build_category_requests(chunk_df, g2, jsonl_requests, is_group1=False)
+        return jsonl_requests
+
+    def _submit_chunk(self, jsonl_requests: list, model: Optional[str] = None) -> Tuple[str, str]:
+        """Write JSONL, upload, create batch job. Returns (job_name, uploaded_file_name)."""
+        jsonl_path = os.path.join(
+            self.tmp_dir, f"batch_requests_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jsonl"
+        )
+        with open(jsonl_path, "w", encoding="utf-8") as f:
+            for req in jsonl_requests:
+                f.write(json.dumps(req, ensure_ascii=False) + "\n")
+
+        uploaded_name = self.client.upload_file(jsonl_path)
+        batch_job = self.client.create_batch_job(uploaded_name, model=model)
+        logger.info(f"Batch Job Created: {batch_job.name}")
+
+        if self.batch_job_db:
+            self.batch_job_db.add_job(batch_job.name, batch_job.state.name, jsonl_path, uploaded_name)
+
+        return batch_job.name, uploaded_name
+
+    def _wait_for_job(
+        self, job_name: str, progress_callback: Optional[Callable], original_total: int,
+        control: Optional[RunControl],
+    ) -> Tuple[str, Optional[object]]:
+        """Poll until the job completes or control/failure ceiling interrupts.
+
+        Returns (outcome, batch_job) where outcome is one of:
+        succeeded | failed | paused | cancelled | interrupted.
+        """
+        start_time = time.time()
+        consecutive_errors = 0
+
+        while True:
+            if control and control.is_cancel_requested:
+                try:
+                    self.client.cancel_batch_job(job_name)
+                except Exception as e:
+                    logger.warning(f"Could not cancel job {job_name}: {e}")
+                return "cancelled", None
+            if control and control.is_pause_requested:
+                return "paused", None
+
+            try:
+                batch_job = self.client.get_batch_job(job_name)
+                state = batch_job.state.name
+                consecutive_errors = 0
+            except Exception as e:
+                consecutive_errors += 1
+                logger.error(f"Error polling job {job_name}: {e} ({consecutive_errors}/{self.poll_failure_limit})")
+                # ponytail: fixed ceiling, not exponential backoff — batch jobs are long-running anyway
+                if consecutive_errors >= self.poll_failure_limit:
+                    return "interrupted", None
+                time.sleep(30)
+                continue
+
+            if self.batch_job_db:
+                self.batch_job_db.update_status(job_name, state)
+
+            logger.info(f"Batch Job {job_name} Status: {state}")
+            if progress_callback:
+                elapsed = int((time.time() - start_time) / 60)
+                progress_callback(0, original_total or 100, f"stav v cloude: {state} ({elapsed}m)")
+
+            if state in self.COMPLETED_STATES:
+                return ("succeeded" if state == "JOB_STATE_SUCCEEDED" else "failed"), batch_job
+
+            time.sleep(30)
+
+    def _download_and_apply(
+        self, df: pd.DataFrame, batch_job, uploaded_file_name: str,
+        progress_callback: Optional[Callable], original_total: int, valid_indices=None,
+    ) -> Tuple[pd.DataFrame, Dict]:
+        if not batch_job.dest or not batch_job.dest.file_name:
+            logger.error("No destination file in batch job response.")
+            return df, {"ai_should_process": original_total, "ai_processed": 0,
+                        "error": "no destination file in batch job"}
+
+        try:
+            file_content = self.client.download_file(batch_job.dest.file_name)
+        except Exception as e:
+            logger.error(f"Failed to download results: {e}")
+            return df, {"ai_should_process": original_total, "ai_processed": 0,
+                        "error": f"download failed: {e}"}
+
+        if uploaded_file_name:
+            self.client.delete_file(uploaded_file_name)
+
+        return self.parser.parse_batch_results(df, file_content, progress_callback, valid_indices=valid_indices)
+
+    def _process_untracked(
+        self, df: pd.DataFrame, needs_processing: pd.DataFrame, group1_indices: set,
+        progress_callback: Optional[Callable], total: int,
+    ) -> Tuple[pd.DataFrame, Dict]:
+        """Legacy single-job path for callers without a RunDB (isolated CLI micro-tests)."""
+        jsonl_requests = []
+        self._build_category_requests(needs_processing, group1_indices, jsonl_requests, is_group1=True)
+        group2_indices = set(idx for idx in needs_processing.index if idx not in group1_indices)
+        self._build_category_requests(needs_processing, group2_indices, jsonl_requests, is_group1=False)
+
+        if not jsonl_requests:
+            logger.info("No valid batch requests generated.")
+            return df, {"ai_should_process": total, "ai_processed": 0}
+
+        try:
+            job_name, uploaded_name = self._submit_chunk(jsonl_requests)
+        except Exception as e:
+            logger.error(f"Failed to create Batch Job: {e}")
+            return df, {"ai_should_process": total, "ai_processed": 0}
+
+        outcome, batch_job = self._wait_for_job(job_name, progress_callback, total, None)
+        if outcome != "succeeded":
+            logger.error(f"Batch Job did not succeed: {outcome}")
+            return df, {"ai_should_process": total, "ai_processed": 0}
+
+        return self._download_and_apply(df, batch_job, uploaded_name, progress_callback, total)
+
+    # ------------------------------------------------------------------
+    # Request building (unchanged shape, scoped by the caller's indices)
+    # ------------------------------------------------------------------
 
     def _build_missing_param_requests(self, df: pd.DataFrame) -> Tuple[list, int]:
         """Group products by category and list each one's unfilled expected params."""
@@ -189,45 +439,6 @@ class BatchOrchestrator:
                     },
                 })
         return jsonl_requests, product_count
-
-    def _submit_and_monitor(
-        self,
-        df: pd.DataFrame,
-        jsonl_requests: list,
-        progress_callback: Optional[Callable],
-        total: int,
-        model: Optional[str] = None,
-    ) -> Tuple[pd.DataFrame, Dict]:
-        """Write JSONL, upload, create batch job, and monitor to completion."""
-        jsonl_path = os.path.join(
-            self.tmp_dir, f"batch_requests_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jsonl"
-        )
-        with open(jsonl_path, "w", encoding="utf-8") as f:
-            for req in jsonl_requests:
-                f.write(json.dumps(req, ensure_ascii=False) + "\n")
-
-        if progress_callback:
-            progress_callback(0, total, "Nahravanie suboru na Google Cloud...")
-
-        try:
-            uploaded_name = self.client.upload_file(jsonl_path)
-
-            if progress_callback:
-                progress_callback(0, total, "Vytvaranie davkovej ulohy (Batch Job)...")
-
-            batch_job = self.client.create_batch_job(uploaded_name, model=model)
-            logger.info(f"Batch Job Created: {batch_job.name}")
-
-            if self.batch_job_db:
-                self.batch_job_db.add_job(
-                    batch_job.name, batch_job.state.name, jsonl_path, uploaded_name
-                )
-
-            return self._monitor_and_apply(df, batch_job.name, uploaded_name, progress_callback, total)
-
-        except Exception as e:
-            logger.error(f"Failed to create Batch Job: {e}")
-            return df, {"ai_should_process": total, "ai_processed": 0}
 
     @staticmethod
     def _category_of(row) -> str:
@@ -299,56 +510,3 @@ class BatchOrchestrator:
                             },
                         },
                     })
-
-    def _monitor_and_apply(
-        self, df: pd.DataFrame, job_name: str, uploaded_file_name: str,
-        progress_callback=None, original_total: int = 0,
-    ) -> Tuple[pd.DataFrame, Dict]:
-        """Poll batch job until completion and apply results."""
-        start_time = time.time()
-
-        while True:
-            try:
-                batch_job = self.client.get_batch_job(job_name)
-                state = batch_job.state.name
-            except Exception as e:
-                logger.error(f"Error polling job {job_name}: {e}")
-                time.sleep(30)
-                continue
-
-            if self.batch_job_db:
-                self.batch_job_db.update_status(job_name, state)
-
-            logger.info(f"Batch Job {job_name} Status: {state}")
-            if progress_callback:
-                elapsed = int((time.time() - start_time) / 60)
-                progress_callback(0, original_total or 100, f"Spracovava sa v cloude (Cas: {elapsed}m, Stav: {state})...")
-
-            if state in self.COMPLETED_STATES:
-                break
-
-            time.sleep(30)
-
-        if state != "JOB_STATE_SUCCEEDED":
-            logger.error(f"Batch Job failed. Final state: {state}")
-            return df, {"ai_should_process": original_total, "ai_processed": 0}
-
-        # Download results
-        if progress_callback:
-            progress_callback(90, 100, "Stahovanie vysledkov...")
-
-        if not batch_job.dest or not batch_job.dest.file_name:
-            logger.error("No destination file in batch job response.")
-            return df, {"ai_should_process": original_total, "ai_processed": 0}
-
-        try:
-            file_content = self.client.download_file(batch_job.dest.file_name)
-        except Exception as e:
-            logger.error(f"Failed to download results: {e}")
-            return df, {"ai_should_process": original_total, "ai_processed": 0}
-
-        # Clean up uploaded file
-        if uploaded_file_name:
-            self.client.delete_file(uploaded_file_name)
-
-        return self.parser.parse_batch_results(df, file_content, progress_callback)
