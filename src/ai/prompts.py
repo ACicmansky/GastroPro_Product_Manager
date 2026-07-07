@@ -48,7 +48,7 @@ def create_system_prompt(category_name: str = "", expected_parameters: list = No
 
     1. **vylepšiť alebo doplniť produktové popisy** (krátky + dlhý popis) pre B2B cieľovku (reštaurácie, hotely, kantíny, výrobné kuchyne),
     2. **vygenerovať profesionálne SEO meta údaje** – SEO titulku, SEO popis.
-    3. **ak je produkt nejasný, použi webové vyhľadávanie** na zistenie funkcie a parametrov (simuluj odborné overenie informácií)
+    3. **vychádzaj výlučne z dodaných údajov** (názov, popisy, existingParameters) – ak informáciu nevieš z nich spoľahlivo odvodiť, radšej ju vynechaj; nič si nedomýšľaj ani nevymýšľaj
     
     {cat_str}
     {params_str}
@@ -121,13 +121,13 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 
 #### 🔹 5. Parametre pre parametrické filtrovanie (parameters)
 
-* Ak boli v inštrukciách zadané očakávané parametre, tvojou úlohou je vyextrahovať tieto konkrétne technické parametre z názvu, popisov produktu alebo webového vyhľadávania.
+* Ak boli v inštrukciách zadané očakávané parametre, tvojou úlohou je vyextrahovať tieto konkrétne technické parametre z názvu a popisov produktu (vrátane `existingParameters`).
 * Vytvor nový JSON objekt `"parameters"` a ulož do neho nájdené kľúče z očakávaných parametrov a ich zistené hodnoty.
 * Hodnoty by mali byť stručné a štandardizované (napr. iba "230" pre Napätie (V), alebo "Nerez" pre Materiál). Nevpisuj tam celé vety!
 * **Jednotka je už uvedená v názve parametra** (napr. "Šírka (mm)", "Príkon (W)") – hodnota musí byť **iba čisté číslo bez jednotky** (napr. "800", nie "800 mm"). Rozmery uvádzaj v jednotke z názvu parametra.
 * Pre parametre s "(Áno/Nie)" v názve použi presne hodnotu "Áno" alebo "Nie".
 * Používaj presne tie názvy parametrov (kľúče), ktoré boli zadané v inštrukciách – nevymýšľaj vlastné.
-* Ak niektorý parameter nevieš v texte nájsť ani spoľahlivo odhadnúť z webového vyhľadávania, jednoducho tento kľúč do objektu `"parameters"` vôbec nezaraďuj.
+* Ak niektorý parameter nevieš v názve ani popisoch spoľahlivo nájsť, jednoducho tento kľúč do objektu `"parameters"` vôbec nezaraďuj – **žiadne odhady**.
 * Extrahované parametre z tohto objektu už NESPOMÍNAJ v poliach `shortDescription` ani `description` (ak to nie je nevyhnutné pre plynulosť textu), nakoniec ich eshop spracuje ako samostatné tabuľkové vlastnosti.
 
 ---
