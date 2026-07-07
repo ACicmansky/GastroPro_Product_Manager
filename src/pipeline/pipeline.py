@@ -61,6 +61,7 @@ class Pipeline:
         on_unknown_category: Optional[Callable] = None,
         on_unmapped_price: Optional[Callable] = None,
         ai_control=None,
+        on_stage: Optional[Callable] = None,
     ) -> PipelineResult:
         """Execute the full pipeline.
 
@@ -83,7 +84,12 @@ class Pipeline:
                 on_progress(msg)
             logger.info(msg)
 
+        def stage(key: str):
+            if on_stage:
+                on_stage(key)
+
         # 1. Load existing data from DB
+        stage("load")
         progress("Loading existing data from database...")
         db_df = self.db.get_all()
 
@@ -98,6 +104,7 @@ class Pipeline:
             main_df = db_df
 
         # 3. Parse XML feeds
+        stage("feeds")
         feed_dfs = {}
         xml_feeds = self.config.get("xml_feeds", {})
         for feed_name, feed_config in xml_feeds.items():
@@ -121,6 +128,7 @@ class Pipeline:
 
         # 4. Scrape (if enabled)
         if options.enable_scraping:
+            stage("scrape")
             progress("Starting web scraping...")
             scraped = self.scraping.scrape(
                 scrape_mebella=options.scrape_mebella,
@@ -138,6 +146,7 @@ class Pipeline:
                 )
 
         # 5. Merge all sources
+        stage("merge")
         progress("Merging product data...")
         merge_result = self.merger.merge(
             main_df=main_df,
@@ -156,6 +165,7 @@ class Pipeline:
         # 6. Map categories
         if on_unknown_category:
             self.category_service.set_interactive_callback(on_unknown_category)
+        stage("categories")
         progress("Mapping categories...")
         for idx, row in merged_df.iterrows():
             old_cat = str(row.get("defaultCategory", ""))
@@ -168,6 +178,7 @@ class Pipeline:
 
         # 8. AI enhancement
         if options.enable_ai_enhancement:
+            stage("ai")
             progress("Starting AI enhancement...")
             enrichment = self.enricher.enrich(
                 merged_df,
@@ -185,6 +196,7 @@ class Pipeline:
         merged_df = apply_feed_specs(merged_df)
 
         # 9. Transform to output format
+        stage("export")
         progress("Transforming to output format...")
         output_df = self.transformer.transform(merged_df)
 

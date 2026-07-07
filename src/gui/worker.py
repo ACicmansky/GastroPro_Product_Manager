@@ -18,6 +18,7 @@ class PipelineWorker(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
     progress = pyqtSignal(str)
+    stage = pyqtSignal(str)  # pipeline stage key (load/feeds/scrape/merge/categories/ai/export)
     result = pyqtSignal(object)  # PipelineResult
     statistics = pyqtSignal(dict)
     category_mapping_request = pyqtSignal(str, str)  # original_category, product_name
@@ -45,6 +46,7 @@ class PipelineWorker(QObject):
                 on_unknown_category=self._on_unknown_category,
                 on_unmapped_price=self._on_unmapped_price,
                 ai_control=self.ai_control,
+                on_stage=self.stage.emit,
             )
 
             # Emit statistics

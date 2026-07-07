@@ -3,6 +3,7 @@
 from pathlib import Path
 from string import Template
 
+from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QColor, QFont, QPalette
 
 _STYLES_DIR = Path(__file__).resolve().parents[2] / "styles"
@@ -38,6 +39,20 @@ DARK = {
     "warning": "#fbbf24",
     "danger": "#f87171",
 }
+
+
+def _settings() -> QSettings:
+    return QSettings("GastroPro", "ProductManager")
+
+
+def current_theme_mode() -> str:
+    """Persisted preference: 'auto' (follow Windows), 'light' or 'dark'."""
+    mode = _settings().value("theme", "auto")
+    return mode if mode in ("auto", "light", "dark") else "auto"
+
+
+def save_theme_mode(mode: str) -> None:
+    _settings().setValue("theme", mode)
 
 
 def windows_dark_mode() -> bool:
@@ -78,8 +93,14 @@ def _palette(tokens: dict) -> QPalette:
 
 
 def apply_theme(app) -> None:
-    """Fusion style + palette + stylesheet on the whole application (dialogs inherit)."""
-    tokens = dict(DARK if windows_dark_mode() else LIGHT)
+    """Fusion style + palette + stylesheet on the whole application (dialogs inherit).
+
+    Respects the persisted theme preference; 'auto' follows the Windows app theme.
+    Safe to call again at runtime to re-theme live.
+    """
+    mode = current_theme_mode()
+    dark = windows_dark_mode() if mode == "auto" else mode == "dark"
+    tokens = dict(DARK if dark else LIGHT)
     tokens["check"] = (_STYLES_DIR / "check.svg").as_posix()
 
     app.setStyle("Fusion")

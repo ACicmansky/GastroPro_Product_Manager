@@ -116,12 +116,16 @@ class TestCategoryMappingWithMappingFile:
         # Should return original
         assert result == "Unknown Category"
 
-    def test_map_returns_existing_target_category(self, config):
-        """Test that map_or_ask returns a target category as-is without calling callback."""
+    def test_map_returns_existing_target_category(self, tmp_path):
+        """Test that map_or_ask returns a target category as-is without calling callback.
+
+        Uses an isolated mappings file: add_mapping persists, and pointing it at the
+        real categories.json would rewrite production data on every test run.
+        """
         from src.domain.categories.category_service import CategoryService
         from unittest.mock import MagicMock
 
-        mapper = CategoryService(config)
+        mapper = CategoryService(str(tmp_path / "categories.json"))
 
         # Seed one mapping so the TARGET category is known
         target_category = "Gastro Prevádzky a Profesionáli > Nerezový nábytok"
@@ -142,8 +146,11 @@ class TestCategoryMappingWithMappingFile:
 class TestCategoryMappingIntegration:
     """Test category mapping integration with pipeline."""
 
-    def test_map_after_xml_parsing(self, config, sample_xml_gastromarket):
-        """Test category mapping after XML parsing."""
+    def test_map_after_xml_parsing(self, config, sample_xml_gastromarket, tmp_path):
+        """Mapping must not transform categories itself (no export prefix, no separator
+        rewrite) — that is OutputTransformer's job. Isolated empty mappings file, so the
+        test doesn't depend on whatever the production categories.json currently maps to.
+        """
         from src.data.parsers.xml_parser import XMLParser
         from src.domain.categories.category_service import CategoryService
 
@@ -151,15 +158,11 @@ class TestCategoryMappingIntegration:
         parser = XMLParser(config)
         parsed_df = parser.parse_gastromarket(sample_xml_gastromarket)
 
-        # Map categories
-        mapper = CategoryService(config)
+        # Map with no mappings: everything must pass through unchanged
+        mapper = CategoryService(str(tmp_path / "categories.json"))
         result = mapper.map_dataframe(parsed_df)
 
-        # Categories should NOT be transformed automatically
-        if "defaultCategory" in result.columns:
-            for cat in result["defaultCategory"]:
-                if cat and cat != "":
-                    assert not cat.startswith("Tovary a kategórie > ")
+        assert list(result["defaultCategory"]) == list(parsed_df["defaultCategory"])
 
     def test_map_preserves_feed_name(self, config):
         """Test that category mapping preserves source."""

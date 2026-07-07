@@ -8,10 +8,12 @@ import pandas as pd
 from pathlib import Path
 from datetime import datetime
 from PyQt5.QtWidgets import (
+    QApplication,
     QMainWindow,
     QWidget,
     QVBoxLayout,
     QHBoxLayout,
+    QGridLayout,
     QPushButton,
     QFileDialog,
     QMessageBox,
@@ -20,14 +22,16 @@ from PyQt5.QtWidgets import (
     QCheckBox,
     QGroupBox,
     QLabel,
-    QTextEdit,
+    QFrame,
     QLineEdit,
     QListWidget,
     QListWidgetItem,
     QAbstractItemView,
     QListView,
+    QShortcut,
 )
 from PyQt5.QtCore import Qt, QThread, QStandardPaths
+from PyQt5.QtGui import QKeySequence
 
 from .worker import PipelineWorker, AIResumeWorker
 from .widgets import CategoryMappingDialog, PriceMappingDialog
@@ -38,7 +42,19 @@ from src.domain.categories.category_filter import CategoryFilter
 from src.domain.models import PipelineOptions
 from src.data.database.run_db import RunDB
 from src.ai.run_control import RunControl
-from .theme import set_variant
+from .theme import apply_theme, current_theme_mode, save_theme_mode, set_variant
+
+PIPELINE_STAGES = [
+    ("load", "Načítanie"),
+    ("feeds", "Feedy"),
+    ("scrape", "Scraping"),
+    ("merge", "Zlúčenie"),
+    ("categories", "Kategórie"),
+    ("ai", "AI"),
+    ("export", "Export"),
+]
+
+THEME_MODE_LABELS = {"auto": "🌓 Auto", "light": "☀️ Svetlá", "dark": "🌙 Tmavá"}
 
 
 class MainWindow(QMainWindow):
@@ -47,8 +63,9 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("GastroPro Product Manager")
-        self.resize(760, 820)
-        self.setMinimumSize(640, 560)
+        self.resize(1080, 720)
+        self.setMinimumSize(940, 620)
+        self.setAcceptDrops(True)
         self.main_data_file = None
         self.config = load_config()
         self.last_statistics = None
@@ -83,38 +100,68 @@ class MainWindow(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
-        self.layout.setContentsMargins(16, 12, 16, 16)
+        self.layout.setContentsMargins(16, 12, 16, 12)
         self.layout.setSpacing(10)
 
-        # Title
+        # Header: title left, theme toggle right
+        header = QHBoxLayout()
         title = QLabel("GastroPro Product Manager")
         title.setObjectName("appTitle")
-        title.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(title)
+        header.addWidget(title)
+        header.addStretch()
+        self.theme_button = QPushButton(THEME_MODE_LABELS[current_theme_mode()])
+        self.theme_button.setObjectName("themeToggle")
+        self.theme_button.setToolTip("Prepnúť tému (Auto / Svetlá / Tmavá)")
+        self.theme_button.setCursor(Qt.PointingHandCursor)
+        self.theme_button.clicked.connect(self._cycle_theme)
+        header.addWidget(self.theme_button)
+        self.layout.addLayout(header)
 
-        # Main data section
-        self._create_main_data_section()
+        # Two-pane content: sources & options left, categories + results right
+        content = QHBoxLayout()
+        content.setSpacing(10)
 
-        # Category filter section (hidden by default)
-        self._create_category_filter_section()
+        left = QVBoxLayout()
+        left.setSpacing(10)
+        self._create_main_data_section(left)
+        self._create_xml_feeds_section(left)
+        self._create_processing_options(left)
+        self._create_ai_run_controls(left)
+        left.addStretch()
 
-        # XML feeds section
-        self._create_xml_feeds_section()
+        right = QVBoxLayout()
+        right.setSpacing(10)
+        self._create_category_filter_section(right)
+        self.empty_state = QLabel(
+            "📄\n\nNačítajte XLSX súbor (Ctrl+O)\nalebo ho presuňte sem\n\n"
+            "Zobrazí sa filter kategórií a výsledky spracovania"
+        )
+        self.empty_state.setObjectName("emptyState")
+        self.empty_state.setAlignment(Qt.AlignCenter)
+        right.addWidget(self.empty_state, 1)
+        self._create_statistics_display(right)
 
-        # Processing options
-        self._create_processing_options()
-        self._create_ai_run_controls()
+        content.addLayout(left, 2)
+        content.addLayout(right, 3)
+        self.layout.addLayout(content, 1)
 
-        # Progress bar
-        self._create_progress_bar()
+        # Footer: stage tracker, progress, primary action
+        self._create_stage_tracker(self.layout)
+        self._create_progress_bar(self.layout)
+        self._create_process_button(self.layout)
 
-        # Process button
-        self._create_process_button()
+        # Shortcuts
+        QShortcut(QKeySequence("Ctrl+O"), self, activated=self.select_main_data_file)
+        QShortcut(QKeySequence("Ctrl+R"), self, activated=self.process_and_export)
 
-        # Statistics display
-        self._create_statistics_display()
+    def _cycle_theme(self):
+        order = ["auto", "light", "dark"]
+        mode = order[(order.index(current_theme_mode()) + 1) % len(order)]
+        save_theme_mode(mode)
+        apply_theme(QApplication.instance())
+        self.theme_button.setText(THEME_MODE_LABELS[mode])
 
-    def _create_main_data_section(self):
+    def _create_main_data_section(self, parent):
         """Create main data file selection section."""
         group = QGroupBox("Hlavné dáta (voliteľné)")
         layout = QVBoxLayout(group)
@@ -136,9 +183,9 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.main_data_label)
         layout.addLayout(button_layout)
 
-        self.layout.addWidget(group)
+        parent.addWidget(group)
 
-    def _create_category_filter_section(self):
+    def _create_category_filter_section(self, parent):
         """Create category filtering section."""
         self.category_filter_group = QGroupBox("Filter kategórií")
         layout = QVBoxLayout(self.category_filter_group)
@@ -172,19 +219,19 @@ class MainWindow(QMainWindow):
         self.category_list = QListWidget()
         self.category_list.setSelectionMode(QAbstractItemView.NoSelection)
         self.category_list.setResizeMode(QListView.Adjust)
-        layout.addWidget(self.category_list)
+        layout.addWidget(self.category_list, 1)
 
         # Info label
         self.category_info_label = QLabel("")
         self.category_info_label.setProperty("variant", "hint")
         layout.addWidget(self.category_info_label)
 
-        self.layout.addWidget(self.category_filter_group)
+        parent.addWidget(self.category_filter_group, 1)
 
         # Hide by default (show when main data loaded)
         self.category_filter_group.setVisible(False)
 
-    def _create_xml_feeds_section(self):
+    def _create_xml_feeds_section(self, parent):
         """Create XML feeds selection section."""
         group = QGroupBox("XML Feedy")
         layout = QVBoxLayout(group)
@@ -210,9 +257,9 @@ class MainWindow(QMainWindow):
         info_label.setWordWrap(True)
         layout.addWidget(info_label)
 
-        self.layout.addWidget(group)
+        parent.addWidget(group)
 
-    def _create_processing_options(self):
+    def _create_processing_options(self, parent):
         """Create processing options section."""
         group = QGroupBox("Možnosti spracovania")
         layout = QVBoxLayout(group)
@@ -258,9 +305,9 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.update_categories_checkbox)
         layout.addWidget(self.preserve_edits_checkbox)
 
-        self.layout.addWidget(group)
+        parent.addWidget(group)
 
-    def _create_ai_run_controls(self):
+    def _create_ai_run_controls(self, parent):
         """AI run tracking: resume banner + pause/cancel while an AI stage is active."""
         group = QGroupBox("AI spracovanie")
         layout = QVBoxLayout(group)
@@ -289,7 +336,7 @@ class MainWindow(QMainWindow):
         layout.addWidget(self.ai_resume_banner)
         layout.addWidget(self.ai_resume_button)
         layout.addLayout(buttons_row)
-        self.layout.addWidget(group)
+        parent.addWidget(group)
         self.ai_run_group = group
 
     def _check_resumable_ai_run(self):
@@ -329,6 +376,8 @@ class MainWindow(QMainWindow):
         self.ai_resume_button.setEnabled(False)
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0)
+        self.status_label.setText("Pokračujem v AI spracovaní...")
+        self.status_label.setVisible(True)
         self._set_ui_enabled(False)
         self.ai_pause_button.setEnabled(True)
         self.ai_cancel_button.setEnabled(True)
@@ -348,43 +397,132 @@ class MainWindow(QMainWindow):
 
         self.ai_thread.finished.connect(lambda: self._set_ui_enabled(True))
         self.ai_thread.finished.connect(lambda: self.progress_bar.setVisible(False))
+        self.ai_thread.finished.connect(lambda: self.status_label.setVisible(False))
         self.ai_thread.finished.connect(lambda: self.ai_pause_button.setEnabled(False))
         self.ai_thread.finished.connect(lambda: self.ai_cancel_button.setEnabled(False))
         self.ai_thread.finished.connect(self._check_resumable_ai_run)
 
         self.ai_thread.start()
 
-    def _create_progress_bar(self):
-        """Create progress bar."""
+    def _create_stage_tracker(self, parent):
+        """Horizontal pipeline step indicator (driven by the worker's stage signal)."""
+        self.stage_row = QWidget()
+        row = QHBoxLayout(self.stage_row)
+        row.setContentsMargins(2, 0, 2, 0)
+        row.setSpacing(8)
+        self.stage_labels = {}
+        for i, (key, name) in enumerate(PIPELINE_STAGES):
+            if i:
+                sep = QLabel("›")
+                sep.setProperty("variant", "hint")
+                row.addWidget(sep)
+            label = QLabel(name)
+            label.setProperty("stage", "pending")
+            row.addWidget(label)
+            self.stage_labels[key] = label
+        row.addStretch()
+        parent.addWidget(self.stage_row)
+        self.stage_row.setVisible(False)
+
+    def _set_stage(self, active_key):
+        """Mark stages before active_key done, active_key active, the rest pending."""
+        seen = False
+        for key, name in PIPELINE_STAGES:
+            if key == active_key:
+                state, seen = "active", True
+            elif not seen:
+                state = "done"
+            else:
+                state = "pending"
+            label = self.stage_labels[key]
+            label.setText(f"✓ {name}" if state == "done" else name)
+            label.setProperty("stage", state)
+            label.style().unpolish(label)
+            label.style().polish(label)
+
+    def _finish_stages(self):
+        self._set_stage(None)  # no active key -> everything done
+
+    def _reset_stages(self):
+        for key, name in PIPELINE_STAGES:
+            label = self.stage_labels[key]
+            label.setText(name)
+            label.setProperty("stage", "pending")
+            label.style().unpolish(label)
+            label.style().polish(label)
+
+    def _create_progress_bar(self, parent):
+        """Create progress bar with a status line (indeterminate bars can't show text)."""
         self.progress_bar = QProgressBar()
-        self.progress_bar.setFormat("%p% - %v")
-        self.layout.addWidget(self.progress_bar)
+        parent.addWidget(self.progress_bar)
         self.progress_bar.setVisible(False)
 
-    def _create_process_button(self):
+        self.status_label = QLabel("")
+        self.status_label.setProperty("variant", "hint")
+        parent.addWidget(self.status_label)
+        self.status_label.setVisible(False)
+
+    def _create_process_button(self, parent):
         """Create process button."""
         self.process_button = QPushButton("Spracovať a exportovať")
         self.process_button.setProperty("primary", True)
         self.process_button.setMinimumHeight(46)
+        self.process_button.setCursor(Qt.PointingHandCursor)
+        self.process_button.setToolTip("Spustiť spracovanie (Ctrl+R)")
         self.process_button.clicked.connect(self.process_and_export)
-        self.layout.addWidget(self.process_button)
+        parent.addWidget(self.process_button)
 
-    def _create_statistics_display(self):
-        """Create statistics display area."""
-        group = QGroupBox("Štatistiky")
+    def _create_statistics_display(self, parent):
+        """Create results panel (KPI tiles + note)."""
+        group = QGroupBox("Výsledky")
         layout = QVBoxLayout(group)
 
-        self.stats_display = QTextEdit()
-        self.stats_display.setObjectName("statsDisplay")
-        self.stats_display.setReadOnly(True)
-        self.stats_display.setMaximumHeight(150)
-        self.stats_display.setPlainText("Štatistiky sa zobrazia po spracovaní...")
+        self.kpi_grid = QGridLayout()
+        self.kpi_grid.setSpacing(8)
+        layout.addLayout(self.kpi_grid)
 
-        layout.addWidget(self.stats_display)
+        self.stats_note = QLabel("")
+        self.stats_note.setProperty("variant", "hint")
+        self.stats_note.setWordWrap(True)
+        layout.addWidget(self.stats_note)
 
-        self.layout.addWidget(group)
+        parent.addWidget(group)
         group.setVisible(False)
         self.stats_group = group
+
+    def _kpi_tile(self, value, caption):
+        tile = QFrame()
+        tile.setProperty("kpi", True)
+        v = QVBoxLayout(tile)
+        v.setContentsMargins(12, 8, 12, 8)
+        v.setSpacing(2)
+        value_label = QLabel(str(value))
+        value_label.setProperty("kpiValue", True)
+        caption_label = QLabel(caption)
+        caption_label.setProperty("kpiCaption", True)
+        v.addWidget(value_label)
+        v.addWidget(caption_label)
+        return tile
+
+    def _update_right_pane(self):
+        """Empty-state placeholder shows only when there is nothing else to show."""
+        self.empty_state.setVisible(
+            not self.category_filter_group.isVisible() and not self.stats_group.isVisible()
+        )
+
+    def dragEnterEvent(self, event):
+        """Accept XLSX files dragged anywhere onto the window."""
+        if event.mimeData().hasUrls() and any(
+            url.toLocalFile().lower().endswith(".xlsx") for url in event.mimeData().urls()
+        ):
+            event.acceptProposedAction()
+
+    def dropEvent(self, event):
+        for url in event.mimeData().urls():
+            path = url.toLocalFile()
+            if path.lower().endswith(".xlsx"):
+                self.load_main_data_file(path)
+                break
 
     def select_main_data_file(self):
         """Select main data file (XLSX or CSV)."""
@@ -441,6 +579,7 @@ class MainWindow(QMainWindow):
 
         # Hide category filter section
         self.category_filter_group.setVisible(False)
+        self._update_right_pane()
         self.all_categories = []
         self.category_list.clear()
         self.preserve_edits_checkbox.setEnabled(False)
@@ -507,8 +646,13 @@ class MainWindow(QMainWindow):
         # Show progress and disable UI
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0)  # Indeterminate
+        self.status_label.setText("Spúšťam spracovanie...")
+        self.status_label.setVisible(True)
+        self._reset_stages()
+        self.stage_row.setVisible(True)
         self._set_ui_enabled(False)
         self.stats_group.setVisible(False)
+        self._update_right_pane()
 
         # Create worker thread
         self.ai_control = RunControl()
@@ -532,10 +676,12 @@ class MainWindow(QMainWindow):
         self.worker.price_mapping_request.connect(self.handle_price_mapping_request)
         self.worker.error.connect(self.show_error_message)
         self.worker.progress.connect(self.update_progress)
+        self.worker.stage.connect(self._set_stage)
 
         # Cleanup
         self.thread.finished.connect(lambda: self._set_ui_enabled(True))
         self.thread.finished.connect(lambda: self.progress_bar.setVisible(False))
+        self.thread.finished.connect(lambda: self.status_label.setVisible(False))
         self.thread.finished.connect(lambda: self.ai_pause_button.setEnabled(False))
         self.thread.finished.connect(lambda: self.ai_cancel_button.setEnabled(False))
         self.thread.finished.connect(self._check_resumable_ai_run)
@@ -580,63 +726,48 @@ class MainWindow(QMainWindow):
         self.category_list.setEnabled(enabled)
 
     def update_progress(self, message: str):
-        """Update progress bar with message."""
-        self.progress_bar.setFormat(message)
+        """Show the current pipeline message in the status line."""
+        self.status_label.setText(message)
 
     def handle_statistics(self, stats: dict):
-        """Handle statistics from worker."""
+        """Render worker statistics as KPI tiles."""
         self.last_statistics = stats
 
-        # Display statistics
-        stats_text = []
-        stats_text.append("=== ŠTATISTIKY SPRACOVANIA ===\n")
-        stats_text.append(f"Celkový počet produktov: {stats.get('total_products', 0)}")
+        while self.kpi_grid.count():
+            item = self.kpi_grid.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
 
-        # Show detailed merge statistics if available
-        if "total_created" in stats or "total_updated" in stats:
-            stats_text.append(f"\n--- Zmeny produktov ---")
-            stats_text.append(f"Vytvorených: {stats.get('total_created', 0)}")
-            stats_text.append(f"Aktualizovaných: {stats.get('total_updated', 0)}")
-            stats_text.append(f"Zachovaných: {stats.get('total_kept', 0)}")
-            stats_text.append(f"Odstránených: {stats.get('removed', 0)}")
-            if stats.get("discontinued", 0) > 0:
-                stats_text.append(f"Vyradených z feedu: {stats.get('discontinued', 0)}")
+        tiles = [(stats.get("total_products", 0), "Produktov celkom")]
+        merge = stats.get("merge")
+        if merge:
+            tiles += [
+                (merge.get("created", 0), "Vytvorených"),
+                (merge.get("updated", 0), "Aktualizovaných"),
+                (merge.get("kept", 0), "Zachovaných"),
+                (merge.get("removed", 0), "Odstránených"),
+            ]
+        ai = stats.get("ai")
+        if ai:
+            tiles.append((ai.get("processed", 0), "AI spracovaných"))
+            if ai.get("failed"):
+                tiles.append((ai["failed"], "AI zlyhaných"))
+        duration = stats.get("duration")
+        if duration is not None:
+            minutes, seconds = divmod(int(duration), 60)
+            tiles.append((f"{minutes}m {seconds}s" if minutes else f"{seconds}s", "Trvanie"))
 
-            # Show breakdown by source
-            if "created" in stats and stats["created"]:
-                stats_text.append(f"\n--- Vytvorené podľa zdroja ---")
-                for source, count in stats["created"].items():
-                    if count > 0:
-                        stats_text.append(f"  {source}: {count}")
+        for i, (value, caption) in enumerate(tiles):
+            self.kpi_grid.addWidget(self._kpi_tile(value, caption), i // 3, i % 3)
 
-            if "updated" in stats and stats["updated"]:
-                stats_text.append(f"\n--- Aktualizované podľa zdroja ---")
-                for source, count in stats["updated"].items():
-                    if count > 0:
-                        stats_text.append(f"  {source}: {count}")
-
-        stats_text.append(f"\n--- Ostatné ---")
-        stats_text.append(f"Spracovaných feedov: {stats.get('feeds_processed', 0)}")
-        stats_text.append(
-            f"Kategórií transformovaných: {stats.get('categories_mapped', 0)}"
-        )
-
-        if stats.get("filtered_categories"):
-            stats_text.append(
-                f"Filtrovaných kategórií: {stats.get('filtered_categories', 0)}"
-            )
-
-        if "ai_processed" in stats:
-            stats_text.append(f"\n--- AI vylepšenie ---")
-            stats_text.append(f"Novo spracovaných: {stats.get('ai_processed', 0)}")
-            stats_text.append(f"Celkom spracovaných: {stats.get('ai_total', 0)}")
-
-        self.stats_display.setPlainText("\n".join(stats_text))
+        self.stats_note.setText("")
         self.stats_group.setVisible(True)
+        self._update_right_pane()
 
     def handle_result(self, pipeline_result):
         """Handle PipelineResult from worker."""
         if pipeline_result and pipeline_result.output_path:
+            self._finish_stages()
             stats = self.last_statistics or {}
             message = (
                 f"<b>Dáta boli úspešne exportované!</b><br><br>"
@@ -664,6 +795,7 @@ class MainWindow(QMainWindow):
         if not self.all_categories:
             # No categories found
             self.category_filter_group.setVisible(False)
+            self._update_right_pane()
             return
 
         # Populate category list
@@ -671,6 +803,7 @@ class MainWindow(QMainWindow):
 
         # Show category filter section
         self.category_filter_group.setVisible(True)
+        self._update_right_pane()
 
         # Update info label
         self._update_category_info()

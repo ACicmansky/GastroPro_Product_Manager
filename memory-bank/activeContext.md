@@ -42,8 +42,11 @@ Implemented `plan_resumable_ai_runs.md` in full (details in `journal/2026_07_07_
 - `runbook_full_reenhancement.md` updated: the old `--limit`-slicing interruption workaround is now optional (kept for micro-testing), resuming is automatic/native.
 - Suite: 212 passed (206 + `test_run_db.py` + `test_batch_resume.py`, the latter using a fake Gemini client to cover interrupt→resume-without-resubmit, pause, and cancel).
 
-## Recent Changes (2026-07-07 — UI/UX modernization)
-GUI brought to a modern look (details in `journal/2026_07_07_ui_modernization.md`): new `src/gui/theme.py` (Fusion + Segoe UI + QPalette + token-substituted QSS applied app-wide, auto light/dark from Windows registry, `set_variant` helper), `styles/main.qss` fully rewritten as a $token template (the old one was broken — `PUSHButton` typo, unsupported CSS), card group boxes / accent primary buttons / custom check indicators (`styles/check.svg`) / label variants / dialog cards. Dead `DropArea` classes deleted from `widgets.py`; all hardcoded dialog colors replaced with theme properties. Suite: 213 passed.
+## Recent Changes (2026-07-07 — UI/UX modernization, Level 1 + 2)
+GUI modernized in two passes (details in `journal/2026_07_07_ui_modernization.md`):
+- **Level 1** (committed by user as 858136d): `src/gui/theme.py` (Fusion + Segoe UI + QPalette + token-substituted QSS applied app-wide, auto light/dark from Windows registry, `set_variant`), `styles/main.qss` rewritten as a $token template (old one was broken — `PUSHButton` typo, unsupported CSS), card group boxes / accent primary buttons / check indicators (`styles/check.svg`) / dialog cards; dead `DropArea` classes deleted.
+- **Level 2**: two-pane landscape layout (1080×720) with header + theme toggle (Auto/Light/Dark, QSettings-persisted, live re-apply), pipeline stage tracker (`Pipeline.run(on_stage=...)` → worker `stage` signal → QSS `[stage=...]`), status line under the indeterminate progress bar (its `setFormat` text was never visible), KPI result tiles (old stats panel read keys the worker never emitted — showed zeros), drag&drop XLSX, Ctrl+O/Ctrl+R. `tests/test_gui_window.py` added.
+- **Test-pollution fix**: `test_category_mapper_new_format.py` used to WRITE to production `categories.json` each run and depended on its content (broken by user's `update_categories.py` prefix migration) — now isolated to tmp files. Suite: 215 passed, categories.json untouched by tests.
 
 ## Earlier Changes (July 2026 — post-refactor audit)
 - **Regressions from the refactor found and fixed:**

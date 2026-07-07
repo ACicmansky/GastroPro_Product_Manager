@@ -14,5 +14,14 @@ The GUI looked dated: `styles/main.qss` was broken legacy (`PUSHButton` typo mea
 Offscreen smoke test (QSS parses clean, dark mode detected True on this machine) + rendered screenshots of main window and CategoryMappingDialog in both themes (offscreen platform has no fonts, so text is invisible in shots — layout/colors verified, fonts fine on desktop). Suite: 213 passed.
 
 ## Skipped (ponytail)
-- No in-app theme toggle — follows Windows setting; add only if requested.
 - Theme is read once at startup; live OS theme switching would need a registry watcher.
+
+## Level 2 (same day, second pass)
+- **Two-pane landscape layout** (1080×720): header (title + theme toggle), left column = sources/feeds/options/AI cards, right column = category filter (stretch) + KPI results card, footer = stage tracker + progress + status line + primary CTA. Empty-state placeholder (dashed card) in the right pane until a file is loaded (`_update_right_pane`).
+- **Pipeline stage tracker**: `Pipeline.run` got an optional `on_stage` callback (keys: load/feeds/scrape/merge/categories/ai/export); `PipelineWorker` re-emits as a `stage` signal; `MainWindow._set_stage` marks earlier stages ✓ done / active / pending via QSS `[stage=...]` states. On error the tracker freezes at the failing stage.
+- **Status line under the progress bar** — the old `progress_bar.setFormat(msg)` was invisible (indeterminate bars render no text), so pipeline messages were never seen.
+- **KPI tiles** replace the monospace stats dump, which read keys the worker never emitted (`total_created`, `created` per-source dicts…) and so showed zeros; tiles consume the real schema (`merge{created,updated,kept,removed}`, `ai{processed,failed}`, `total_products`, `duration`).
+- **Theme toggle** Auto/Light/Dark persisted via `QSettings("GastroPro","ProductManager")`, applies live (`apply_theme` re-callable); auto = Windows registry.
+- **Drag & drop** XLSX anywhere on the window; **Ctrl+O** open, **Ctrl+R** run.
+- Tests: `tests/test_gui_window.py` (offscreen; stage transitions + KPI tiles against the exact worker schema; NB: QApplication must be held by a fixture or PyQt GC destroys the widget tree between tests).
+- **Test pollution fix (unrelated bug found)**: `test_category_mapper_new_format.py` wrote to the production `categories.json` on every run (`add_mapping` on a CategoryService pointed at the real file) and asserted against production mapping data (broken by the user's `update_categories.py` prefixing `Tovary a kategórie > `). Both tests now use isolated tmp mapping files; polluted line restored via git checkout. OutputTransformer verified to not double-prefix. Suite: 215 passed.
