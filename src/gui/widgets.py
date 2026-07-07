@@ -24,77 +24,6 @@ from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
 from PyQt5.QtGui import QFont, QPixmap
 
 
-class DropArea(QFrame):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setFrameShape(QFrame.StyledPanel)
-        self.label = QLabel(
-            "Presuňte CSV súbor sem alebo kliknite sem pre výber súboru"
-        )
-        self.label.setAlignment(Qt.AlignCenter)
-        layout = QVBoxLayout()
-        layout.addWidget(self.label)
-        self.setLayout(layout)
-        self.setAcceptDrops(True)
-        self.setCursor(Qt.PointingHandCursor)
-
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.acceptProposedAction()
-
-    def dropEvent(self, event):
-        for url in event.mimeData().urls():
-            file_path = url.toLocalFile()
-            if file_path.endswith(".csv"):
-                self.parent().load_csv_file(file_path)  # type: ignore
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            # The parent of DropArea is the central widget, its parent is the MainWindow
-            self.parent().parent().select_csv_file()  # type: ignore
-        super().mousePressEvent(event)
-
-
-class TopchladenieCsvDropArea(QFrame):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setFrameShape(QFrame.StyledPanel)
-        self.label = QLabel(
-            "Presuňte Topchladenie.sk CSV súbor sem alebo kliknite sem pre výber súboru"
-        )
-        self.label.setAlignment(Qt.AlignCenter)
-        self.label.setStyleSheet("QLabel { color: #666; font-size: 12px; }")
-        layout = QVBoxLayout()
-        layout.addWidget(self.label)
-        self.setLayout(layout)
-        self.setAcceptDrops(True)
-        self.setCursor(Qt.PointingHandCursor)
-        self.setMaximumHeight(60)
-        self.topchladenie_df = None
-
-    def dragEnterEvent(self, event):
-        if event.mimeData().hasUrls():
-            event.acceptProposedAction()
-
-    def dropEvent(self, event):
-        for url in event.mimeData().urls():
-            file_path = url.toLocalFile()
-            if file_path.endswith(".csv"):
-                self.parent().load_topchladenie_csv_file(file_path)  # type: ignore
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.LeftButton:
-            self.parent().parent().parent().select_topchladenie_csv_file()  # type: ignore
-        super().mousePressEvent(event)
-
-    def clear_file(self):
-        self.topchladenie_df = None
-        self.label.setText(
-            "Presuňte Topchladenie.sk CSV súbor sem alebo kliknite sem pre výber súboru"
-        )
-        self.label.setStyleSheet("QLabel { color: #666; font-size: 12px; }")
-
-
 class CategoryMappingDialog(QDialog):
     """Dialog for interactive category mapping when no mapping is found."""
 
@@ -122,9 +51,7 @@ class CategoryMappingDialog(QDialog):
             layout.addWidget(product_label_header)
 
             product_label = QLabel(self.product_name)
-            product_label.setStyleSheet(
-                "padding: 8px; background-color: #e3f2fd; border-left: 4px solid #2196F3; margin-bottom: 15px;"
-            )
+            product_label.setProperty("card", "info")
             product_label.setWordWrap(True)
             layout.addWidget(product_label)
 
@@ -134,9 +61,7 @@ class CategoryMappingDialog(QDialog):
         layout.addWidget(info_label)
 
         original_label = QLabel(self.original_category)
-        original_label.setStyleSheet(
-            "padding: 10px; background-color: #f0f0f0; border-radius: 5px; margin-bottom: 15px;"
-        )
+        original_label.setProperty("card", "neutral")
         original_label.setWordWrap(True)
         layout.addWidget(original_label)
 
@@ -152,27 +77,6 @@ class CategoryMappingDialog(QDialog):
 
             self.suggestions_list = QListWidget()
             self.suggestions_list.setMaximumHeight(200)
-            self.suggestions_list.setStyleSheet(
-                """
-                QListWidget {
-                    border: 1px solid #ccc;
-                    border-radius: 5px;
-                    background-color: #fafafa;
-                }
-                QListWidget::item {
-                    padding: 8px;
-                    border-bottom: 1px solid #eee;
-                }
-                QListWidget::item:hover {
-                    background-color: #e3f2fd;
-                    cursor: pointer;
-                }
-                QListWidget::item:selected {
-                    background-color: #2196F3;
-                    color: white;
-                }
-            """
-            )
 
             for category, score in self.suggestions:
                 item = QListWidgetItem(f"{category}  ({score:.0f}%)")
@@ -256,9 +160,8 @@ class PriceMappingDialog(QDialog):
         # Header with remaining count
         remaining = self.product_data.get("remaining_count", "?")
         header_label = QLabel(f"Ostáva priradiť: {remaining} produktov")
-        header_label.setStyleSheet(
-            "font-weight: bold; color: #666; margin-bottom: 10px;"
-        )
+        header_label.setProperty("variant", "hint")
+        header_label.setStyleSheet("font-weight: bold;")
         header_label.setAlignment(Qt.AlignRight)
         layout.addWidget(header_label)
 
@@ -268,9 +171,7 @@ class PriceMappingDialog(QDialog):
         # Image Label
         self.image_label = QLabel()
         self.image_label.setFixedSize(150, 150)
-        self.image_label.setStyleSheet(
-            "border: 1px solid #ccc; background-color: #f0f0f0;"
-        )
+        self.image_label.setProperty("card", "neutral")
         self.image_label.setAlignment(Qt.AlignCenter)
         self.image_label.setText("Načítavam obrázok...")
         info_layout.addWidget(self.image_label)
@@ -283,9 +184,8 @@ class PriceMappingDialog(QDialog):
         details_layout.addWidget(info_label)
 
         code_label = QLabel(self.product_code)
-        code_label.setStyleSheet(
-            "padding: 15px; background-color: #e3f2fd; border-left: 5px solid #2196F3; font-size: 14pt; font-weight: bold; margin-bottom: 5px;"
-        )
+        code_label.setProperty("card", "info")
+        code_label.setStyleSheet("font-size: 14pt; font-weight: bold;")
         code_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
         details_layout.addWidget(code_label)
 
@@ -300,9 +200,7 @@ class PriceMappingDialog(QDialog):
 
         if dims:
             dims_label = QLabel(" | ".join(dims))
-            dims_label.setStyleSheet(
-                "color: #666; font-size: 10pt; margin-bottom: 15px;"
-            )
+            dims_label.setProperty("variant", "hint")
             details_layout.addWidget(dims_label)
 
         details_layout.addStretch()
@@ -382,7 +280,6 @@ class PriceMappingDialog(QDialog):
 
         # Manual Input
         input_group = QFrame()
-        input_group.setStyleSheet("border-top: 1px solid #ccc;")
         input_layout = QVBoxLayout(input_group)
         input_layout.setContentsMargins(
             0, 15, 0, 0

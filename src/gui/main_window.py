@@ -38,6 +38,7 @@ from src.domain.categories.category_filter import CategoryFilter
 from src.domain.models import PipelineOptions
 from src.data.database.run_db import RunDB
 from src.ai.run_control import RunControl
+from .theme import set_variant
 
 
 class MainWindow(QMainWindow):
@@ -45,8 +46,9 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("GASTROPRO Product Manager - New Format")
-        self.setGeometry(100, 100, 700, 600)
+        self.setWindowTitle("GastroPro Product Manager")
+        self.resize(760, 820)
+        self.setMinimumSize(640, 560)
         self.main_data_file = None
         self.config = load_config()
         self.last_statistics = None
@@ -67,16 +69,7 @@ class MainWindow(QMainWindow):
 
         self.init_ui()
         self.center_window()
-        self.load_stylesheet()
         self._check_resumable_ai_run()
-
-    def load_stylesheet(self):
-        """Load stylesheet if available."""
-        try:
-            with open("styles/main.qss", "r") as f:
-                self.setStyleSheet(f.read())
-        except FileNotFoundError:
-            pass  # Use default styling
 
     def center_window(self):
         """Center window on screen."""
@@ -90,9 +83,12 @@ class MainWindow(QMainWindow):
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout(self.central_widget)
+        self.layout.setContentsMargins(16, 12, 16, 16)
+        self.layout.setSpacing(10)
 
         # Title
-        title = QLabel("<h2>GASTROPRO Product Manager</h2>")
+        title = QLabel("GastroPro Product Manager")
+        title.setObjectName("appTitle")
         title.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(title)
 
@@ -124,7 +120,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(group)
 
         self.main_data_label = QLabel("Žiadny súbor nie je načítaný")
-        self.main_data_label.setStyleSheet("color: gray;")
+        self.main_data_label.setProperty("variant", "hint")
 
         button_layout = QHBoxLayout()
         self.select_main_button = QPushButton("Vybrať XLSX súbor")
@@ -180,7 +176,7 @@ class MainWindow(QMainWindow):
 
         # Info label
         self.category_info_label = QLabel("")
-        self.category_info_label.setStyleSheet("color: gray; font-size: 10pt;")
+        self.category_info_label.setProperty("variant", "hint")
         layout.addWidget(self.category_info_label)
 
         self.layout.addWidget(self.category_filter_group)
@@ -271,10 +267,11 @@ class MainWindow(QMainWindow):
 
         self.ai_resume_banner = QLabel("")
         self.ai_resume_banner.setWordWrap(True)
-        self.ai_resume_banner.setStyleSheet("color: darkorange; font-weight: bold;")
+        self.ai_resume_banner.setProperty("variant", "warning")
         self.ai_resume_banner.setVisible(False)
 
         self.ai_resume_button = QPushButton("Pokračovať v AI spracovaní")
+        self.ai_resume_button.setProperty("primary", True)
         self.ai_resume_button.setVisible(False)
         self.ai_resume_button.clicked.connect(self._start_ai_resume)
 
@@ -283,6 +280,7 @@ class MainWindow(QMainWindow):
         self.ai_pause_button.setEnabled(False)
         self.ai_pause_button.clicked.connect(self._pause_ai)
         self.ai_cancel_button = QPushButton("Zrušiť AI")
+        self.ai_cancel_button.setProperty("danger", True)
         self.ai_cancel_button.setEnabled(False)
         self.ai_cancel_button.clicked.connect(self._cancel_ai)
         buttons_row.addWidget(self.ai_pause_button)
@@ -365,8 +363,9 @@ class MainWindow(QMainWindow):
 
     def _create_process_button(self):
         """Create process button."""
-        self.process_button = QPushButton("Spracovať a Exportovať")
-        self.process_button.setMinimumHeight(50)
+        self.process_button = QPushButton("Spracovať a exportovať")
+        self.process_button.setProperty("primary", True)
+        self.process_button.setMinimumHeight(46)
         self.process_button.clicked.connect(self.process_and_export)
         self.layout.addWidget(self.process_button)
 
@@ -376,6 +375,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(group)
 
         self.stats_display = QTextEdit()
+        self.stats_display.setObjectName("statsDisplay")
         self.stats_display.setReadOnly(True)
         self.stats_display.setMaximumHeight(150)
         self.stats_display.setPlainText("Štatistiky sa zobrazia po spracovaní...")
@@ -419,7 +419,7 @@ class MainWindow(QMainWindow):
                 f"<b>{filename}</b><br>"
                 f"<small>{len(df)} produktov, {len(df.columns)} stĺpcov</small>"
             )
-            self.main_data_label.setStyleSheet("color: green;")
+            set_variant(self.main_data_label, "success")
             self.clear_main_button.setEnabled(True)
             self.preserve_edits_checkbox.setEnabled(True)
 
@@ -436,7 +436,7 @@ class MainWindow(QMainWindow):
         self.main_data_file = None
         self.main_data_df = None
         self.main_data_label.setText("Žiadny súbor nie je načítaný")
-        self.main_data_label.setStyleSheet("color: gray;")
+        set_variant(self.main_data_label, "hint")
         self.clear_main_button.setEnabled(False)
 
         # Hide category filter section

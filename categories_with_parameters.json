@@ -1,6 +1,6 @@
 [
     {
-        "kategoria": "Domácnosť a Kulinári > Bar a kaviareň > Vínotéky a humidory",
+        "kategoria": "Tovary a kategórie > Domácnosť a Kulinári > Bar a kaviareň > Vínotéky a humidory",
         "filtre": [
             "Počet zón",
             "Kapacita fliaš",
@@ -13,7 +13,7 @@
         ]
     },
     {
-        "kategoria": "Domácnosť a Kulinári > Chladenie a mrazenie > Americké chladničky",
+        "kategoria": "Tovary a kategórie > Domácnosť a Kulinári > Chladenie a mrazenie > Americké chladničky",
         "filtre": [
             "Objem (l)",
             "No Frost technológia",
@@ -26,7 +26,7 @@
         ]
     },
     {
-        "kategoria": "Domácnosť a Kulinári > Chladenie a mrazenie > Kombinované chladničky",
+        "kategoria": "Tovary a kategórie > Domácnosť a Kulinári > Chladenie a mrazenie > Kombinované chladničky",
         "filtre": [
             "Objem (l)",
             "Umiestnenie mrazničky",
@@ -39,7 +39,7 @@
         ]
     },
     {
-        "kategoria": "Domácnosť a Kulinári > Chladenie a mrazenie > Mrazničky > Skriňové mrazničky",
+        "kategoria": "Tovary a kategórie > Domácnosť a Kulinári > Chladenie a mrazenie > Mrazničky > Skriňové mrazničky",
         "filtre": [
             "Objem (l)",
             "Počet zásuviek",
@@ -52,7 +52,7 @@
         ]
     },
     {
-        "kategoria": "Domácnosť a Kulinári > Chladenie a mrazenie > Mrazničky > Truhlicové mrazničky",
+        "kategoria": "Tovary a kategórie > Domácnosť a Kulinári > Chladenie a mrazenie > Mrazničky > Truhlicové mrazničky",
         "filtre": [
             "Objem (l)",
             "Mraziaci výkon (kg/24h)",
@@ -65,7 +65,7 @@
         ]
     },
     {
-        "kategoria": "Domácnosť a Kulinári > Chladenie a mrazenie > Mrazničky > Vstavané mrazničky",
+        "kategoria": "Tovary a kategórie > Domácnosť a Kulinári > Chladenie a mrazenie > Mrazničky > Vstavané mrazničky",
         "filtre": [
             "Objem (l)",
             "Systém uchytenia dverí",
@@ -78,7 +78,7 @@
         ]
     },
     {
-        "kategoria": "Domácnosť a Kulinári > Chladenie a mrazenie > Skriňové chladničky",
+        "kategoria": "Tovary a kategórie > Domácnosť a Kulinári > Chladenie a mrazenie > Skriňové chladničky",
         "filtre": [
             "Objem (l)",
             "Energetická trieda",
@@ -91,7 +91,7 @@
         ]
     },
     {
-        "kategoria": "Domácnosť a Kulinári > Chladenie a mrazenie > Vstavané chladničky",
+        "kategoria": "Tovary a kategórie > Domácnosť a Kulinári > Chladenie a mrazenie > Vstavané chladničky",
         "filtre": [
             "Objem (l)",
             "Systém uchytenia dverí",
@@ -104,7 +104,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Baristické a kaviarenské doplnky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Baristické a kaviarenské doplnky",
         "filtre": [
             "Typ príslušenstva",
             "Materiál",
@@ -115,7 +115,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Barové mixéry a shakery",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Barové mixéry a shakery",
         "filtre": [
             "Objem (l)",
             "Otáčky za minútu (RPM)",
@@ -128,7 +128,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Barové náradie a doplnky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Barové náradie a doplnky",
         "filtre": [
             "Typ náradia",
             "Materiál",
@@ -139,7 +139,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Chladenie pre bary",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Chladenie pre bary",
         "filtre": [
             "Objem (l)",
             "Počet dverí",
@@ -152,7 +152,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Dávkovače nápojov",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Dávkovače nápojov",
         "filtre": [
             "Objem (l)",
             "Počet nádob",
@@ -165,7 +165,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Kávovary a príprava kávy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Kávovary a príprava kávy",
         "filtre": [
             "Typ kávovaru",
             "Počet pák",
@@ -178,7 +178,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Mlynčeky na kávu",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Mlynčeky na kávu",
         "filtre": [
             "Kapacita zásobníka (kg)",
             "Priemer mlecích kameňov (mm)",
@@ -190,7 +190,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Odšťavovače a lisy na citrusy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Odšťavovače a lisy na citrusy",
         "filtre": [
             "Výkon (l/h)",
             "Otáčky za minútu (RPM)",
@@ -203,7 +203,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Príslušenstvo ku kávovarom",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Príslušenstvo ku kávovarom",
         "filtre": [
             "Typ príslušenstva",
             "Kompatibilita so značkou",
@@ -211,7 +211,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Varné kanvice a ohrievače vody",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Varné kanvice a ohrievače vody",
         "filtre": [
             "Objem (l)",
             "Materiál",
@@ -224,7 +224,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Vínotéky a humidory",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Vínotéky a humidory",
         "filtre": [
             "Počet zón",
             "Kapacita fliaš",
@@ -237,7 +237,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Výrobníky a drviče ľadu",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Výrobníky a drviče ľadu",
         "filtre": [
             "Produkcia (kg/24h)",
             "Kapacita zásobníka (kg)",
@@ -251,7 +251,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Výrobníky sódy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Výrobníky sódy",
         "filtre": [
             "Výkon (l/h)",
             "Pripojenie na vodu",
@@ -263,7 +263,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Bar a kaviareň > Výrobníky ľadovej drte a granitory",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Bar a kaviareň > Výrobníky ľadovej drte a granitory",
         "filtre": [
             "Objem (l)",
             "Počet nádob",
@@ -276,7 +276,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Chladiace a mraziace boxy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Chladiace a mraziace boxy",
         "filtre": [
             "Objem (l)",
             "Teplotný rozsah (°C)",
@@ -289,7 +289,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Chladiace a mraziace stoly",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Chladiace a mraziace stoly",
         "filtre": [
             "Kapacita (GN)",
             "Počet dverí",
@@ -302,7 +302,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Chladiace stoly na pizzu",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Chladiace stoly na pizzu",
         "filtre": [
             "Kapacita (GN)",
             "Počet dverí",
@@ -315,7 +315,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Mrazničky > Truhlicové mrazničky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Mrazničky > Truhlicové mrazničky",
         "filtre": [
             "Objem (l)",
             "Teplotný rozsah (°C)",
@@ -328,7 +328,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Pekárenské chladenie a mrazenie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Pekárenské chladenie a mrazenie",
         "filtre": [
             "Rozmer plechov (EN)",
             "Počet zásuvov",
@@ -341,7 +341,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Presklené chladničky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Presklené chladničky",
         "filtre": [
             "Objem (l)",
             "Teplotný rozsah (°C)",
@@ -354,7 +354,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Profesionálne chladenie a mrazenie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Profesionálne chladenie a mrazenie",
         "filtre": [
             "Kapacita (GN)",
             "Objem (l)",
@@ -367,7 +367,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Rošty a príslušenstvo pre chladničky a mrazničky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Rošty a príslušenstvo pre chladničky a mrazničky",
         "filtre": [
             "Kapacita (GN)",
             "Materiál",
@@ -377,7 +377,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Skrine na zrenie mäsa",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Skrine na zrenie mäsa",
         "filtre": [
             "Objem (l)",
             "Kapacita (kg mäsa)",
@@ -390,7 +390,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Skriňové chladničky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Skriňové chladničky",
         "filtre": [
             "Kapacita (GN)",
             "Objem (l)",
@@ -403,7 +403,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Šokové schladzovače a zmrazovače (šokery)",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Šokové schladzovače a zmrazovače (šokery)",
         "filtre": [
             "Kapacita (GN)",
             "Výkon schladzovania (kg/cyklus)",
@@ -416,7 +416,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Dávkovače a ohrievače",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Dávkovače a ohrievače",
         "filtre": [
             "Objem (l)",
             "Teplotný rozsah (°C)",
@@ -429,7 +429,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Náradie a doplnky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Náradie a doplnky",
         "filtre": [
             "Typ náradia",
             "Materiál",
@@ -437,7 +437,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Náradie a formy na pečenie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Náradie a formy na pečenie",
         "filtre": [
             "Tvar formy",
             "Materiál",
@@ -448,7 +448,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Pečenie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Pečenie",
         "filtre": [
             "Počet zásuvov",
             "Rozmer plechov",
@@ -461,7 +461,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Servírovanie zmrzliny",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Servírovanie zmrzliny",
         "filtre": [
             "Objem (l)",
             "Kapacita nádob",
@@ -474,7 +474,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Výrobníky zmrzliny",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Výrobníky zmrzliny",
         "filtre": [
             "Produkcia (l/h)",
             "Objem valca (l)",
@@ -487,7 +487,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Výrobníky šľahačky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Výrobníky šľahačky",
         "filtre": [
             "Produkcia (l/h)",
             "Objem nádoby (l)",
@@ -500,7 +500,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Zariadenia na čokoládu",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Cukrárska a zmrzlinárska technika > Zariadenia na čokoládu",
         "filtre": [
             "Objem (l)",
             "Teplotný rozsah (°C)",
@@ -513,7 +513,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Batérie a sprchy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Batérie a sprchy",
         "filtre": [
             "Typ montáže (Stojanková/Nástenná)",
             "Dĺžka ramena (mm)",
@@ -522,7 +522,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Lapače hmyzu",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Lapače hmyzu",
         "filtre": [
             "Dosah (m2)",
             "Typ (Lepiaca doska/Elektrická mriežka)",
@@ -535,7 +535,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Ochranné pomôcky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Ochranné pomôcky",
         "filtre": [
             "Typ pomôcky",
             "Materiál",
@@ -544,7 +544,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Odpadkové koše",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Odpadkové koše",
         "filtre": [
             "Objem (l)",
             "Materiál",
@@ -555,7 +555,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Popolníky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Popolníky",
         "filtre": [
             "Umiestnenie (Stolový/Stojanový)",
             "Materiál",
@@ -565,7 +565,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Príslušenstvo k drezom",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Príslušenstvo k drezom",
         "filtre": [
             "Typ príslušenstva",
             "Materiál",
@@ -573,7 +573,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Sterilizátory nožov",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Sterilizátory nožov",
         "filtre": [
             "Kapacita nožov",
             "Spôsob sterilizácie (UV/Voda)",
@@ -585,7 +585,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Vedrá a nádoby",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Vedrá a nádoby",
         "filtre": [
             "Objem (l)",
             "Materiál",
@@ -594,7 +594,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Čistiaca a umývacia chémia",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Hygiena a sanitácia > Čistiaca a umývacia chémia",
         "filtre": [
             "Objem (l)",
             "Určenie chémie",
@@ -602,7 +602,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Cedníky, sitá a lieviky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Cedníky, sitá a lieviky",
         "filtre": [
             "Priemer (mm)",
             "Materiál",
@@ -611,7 +611,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Dosky na krájanie a kláty",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Dosky na krájanie a kláty",
         "filtre": [
             "Materiál",
             "HACCP farba",
@@ -622,7 +622,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Dávkovače a dávkovacie fľaše",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Dávkovače a dávkovacie fľaše",
         "filtre": [
             "Objem (l)",
             "Materiál",
@@ -630,7 +630,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Kliešte, pinzety a obracačky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Kliešte, pinzety a obracačky",
         "filtre": [
             "Dĺžka (mm)",
             "Materiál",
@@ -639,7 +639,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Lisy a pretláčače",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Lisy a pretláčače",
         "filtre": [
             "Určenie",
             "Materiál",
@@ -648,7 +648,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Metly a varechy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Metly a varechy",
         "filtre": [
             "Dĺžka (mm)",
             "Materiál",
@@ -657,7 +657,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Naberačky, varechy a šumovky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Naberačky, varechy a šumovky",
         "filtre": [
             "Objem (l)",
             "Dĺžka (mm)",
@@ -666,7 +666,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Naklepávače a zmäkčovače mäsa",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Naklepávače a zmäkčovače mäsa",
         "filtre": [
             "Typ (Ručný/Prístroj)",
             "Materiál",
@@ -674,7 +674,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Nože a ocieľky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Nože a ocieľky",
         "filtre": [
             "Typ noža",
             "Dĺžka čepele (mm)",
@@ -683,7 +683,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Nožnice",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Nožnice",
         "filtre": [
             "Dĺžka (mm)",
             "Určenie (Univerzálne/Na hydinu)",
@@ -691,7 +691,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Ostatné náradie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Ostatné náradie",
         "filtre": [
             "Typ náradia",
             "Materiál",
@@ -699,7 +699,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Otvárače a vývrtky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Otvárače a vývrtky",
         "filtre": [
             "Typ otvárača",
             "Upevnenie (Ručný/Stolový)",
@@ -707,7 +707,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Stojany a magnetické lišty",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Stojany a magnetické lišty",
         "filtre": [
             "Kapacita nožov",
             "Dĺžka (mm)",
@@ -716,7 +716,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Strúhadlá, krájače a mandolíny",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Strúhadlá, krájače a mandolíny",
         "filtre": [
             "Typ ostria",
             "Nastaviteľná hrúbka rezu",
@@ -725,7 +725,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Tašky a puzdrá na nože",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Tašky a puzdrá na nože",
         "filtre": [
             "Kapacita nožov",
             "Materiál",
@@ -733,7 +733,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Škrabky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Škrabky",
         "filtre": [
             "Typ čepele (Pevná/Výkyvná)",
             "Materiál",
@@ -741,7 +741,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynské náradie > Špachtle a stierky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynské náradie > Špachtle a stierky",
         "filtre": [
             "Dĺžka (mm)",
             "Materiál pracovnej časti",
@@ -750,7 +750,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynský riad > Formy a plechy na pečenie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynský riad > Formy a plechy na pečenie",
         "filtre": [
             "Rozmer plechu (GN/EN)",
             "Materiál",
@@ -761,7 +761,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynský riad > Gastronádoby (GN)",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynský riad > Gastronádoby (GN)",
         "filtre": [
             "Kapacita (GN)",
             "Objem (l)",
@@ -771,7 +771,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynský riad > Hrnce, kastróly a pokrievky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynský riad > Hrnce, kastróly a pokrievky",
         "filtre": [
             "Objem (l)",
             "Priemer (mm)",
@@ -781,7 +781,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynský riad > Misy a misky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynský riad > Misy a misky",
         "filtre": [
             "Objem (l)",
             "Priemer (mm)",
@@ -790,7 +790,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynský riad > Panvice",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynský riad > Panvice",
         "filtre": [
             "Priemer (mm)",
             "Materiál tela",
@@ -799,7 +799,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Kuchynský riad > Pekáče a rošty",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Kuchynský riad > Pekáče a rošty",
         "filtre": [
             "Kapacita (GN)",
             "Materiál",
@@ -810,7 +810,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nerezový nábytok > Neutrálne a podstavné moduly",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nerezový nábytok > Neutrálne a podstavné moduly",
         "filtre": [
             "Prevedenie (Otvorené/S dvierkami)",
             "Materiál",
@@ -821,7 +821,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nerezový nábytok > Nástenné police a skrinky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nerezový nábytok > Nástenné police a skrinky",
         "filtre": [
             "Počet políc",
             "Prevedenie (Otvorené/Posuvné dvierka)",
@@ -832,7 +832,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nerezový nábytok > Pracovné stoly",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nerezový nábytok > Pracovné stoly",
         "filtre": [
             "Zadný lem (Áno/Nie)",
             "Počet políc",
@@ -844,7 +844,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nerezový nábytok > Príslušenstvo a doplnky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nerezový nábytok > Príslušenstvo a doplnky",
         "filtre": [
             "Typ doplnku",
             "Materiál",
@@ -852,7 +852,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nerezový nábytok > Sanitárne vybavenie (umývadlá, výlevky)",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nerezový nábytok > Sanitárne vybavenie (umývadlá, výlevky)",
         "filtre": [
             "Ovládanie (Kolenné/Senzorové/Ručné)",
             "Spôsob montáže",
@@ -863,7 +863,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nerezový nábytok > Skrine a regály",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nerezový nábytok > Skrine a regály",
         "filtre": [
             "Počet políc",
             "Nosnosť políc (kg)",
@@ -874,7 +874,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nerezový nábytok > Umývacie stoly a drezy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nerezový nábytok > Umývacie stoly a drezy",
         "filtre": [
             "Počet vaničiek",
             "Priestor pre umývačku (Áno/Nie)",
@@ -886,7 +886,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Neznáma kategória",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Neznáma kategória",
         "filtre": [
             "Materiál",
             "Príkon (W)",
@@ -897,7 +897,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -908,7 +908,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Bea",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Bea",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -919,7 +919,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Bistro",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Bistro",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -930,7 +930,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Bow",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Bow",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -941,7 +941,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Brass",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Brass",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -952,7 +952,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Conti",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Conti",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -963,7 +963,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Coral",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Coral",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -974,7 +974,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Flat",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Flat",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -985,7 +985,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Gerro",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Gerro",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -996,7 +996,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Inox",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Inox",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1007,7 +1007,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Kombinované podnože",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Kombinované podnože",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1018,7 +1018,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Mosadzné podnože",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Mosadzné podnože",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1029,7 +1029,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Nerezové podnože",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Nerezové podnože",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1040,7 +1040,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Oceľové a liatinové podnože",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Oceľové a liatinové podnože",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1051,7 +1051,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Oval",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Oval",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1062,7 +1062,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Plus",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Plus",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1073,7 +1073,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Pod",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Pod",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1084,7 +1084,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Podnože s plochou základňou",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Podnože s plochou základňou",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1095,7 +1095,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Unique",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Unique",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1106,7 +1106,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Yeti",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stolové podnože > Yeti",
         "filtre": [
             "Max. rozmer stolovej dosky",
             "Materiál",
@@ -1117,7 +1117,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stoly a stolové dosky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Nábytok a interiér > Stoly a stolové dosky",
         "filtre": [
             "Materiál dosky",
             "Vhodné do exteriéru (Áno/Nie)",
@@ -1127,7 +1127,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Lopaty a náradie na pizzu",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Lopaty a náradie na pizzu",
         "filtre": [
             "Typ náradia",
             "Dĺžka rukoväte (mm)",
@@ -1136,7 +1136,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Miesiče cesta",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Miesiče cesta",
         "filtre": [
             "Objem (l)",
             "Kapacita cesta (kg)",
@@ -1149,7 +1149,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Pece na pizzu",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Pece na pizzu",
         "filtre": [
             "Kapacita pízz",
             "Priemer pizze (cm)",
@@ -1163,7 +1163,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Plechy a rošty na pizzu",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Plechy a rošty na pizzu",
         "filtre": [
             "Priemer/Rozmer",
             "Tvar",
@@ -1172,7 +1172,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Príslušenstvo pre kebab",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Príslušenstvo pre kebab",
         "filtre": [
             "Typ príslušenstva",
             "Materiál",
@@ -1180,7 +1180,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Servírovanie pizze",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Servírovanie pizze",
         "filtre": [
             "Priemer (mm)",
             "Materiál",
@@ -1188,7 +1188,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Stroje na cestoviny",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Stroje na cestoviny",
         "filtre": [
             "Produkcia (kg/h)",
             "Typ stroja (Ručný/Elektrický)",
@@ -1201,7 +1201,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Tvarovače a lisy na cesto",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Pizza a cestoviny > Tvarovače a lisy na cesto",
         "filtre": [
             "Priemer pizze (cm)",
             "Hmotnosť cesta (g)",
@@ -1214,7 +1214,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Krájače na chlieb",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Krájače na chlieb",
         "filtre": [
             "Hrúbka rezu (mm)",
             "Max. dĺžka chleba (mm)",
@@ -1227,7 +1227,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Krájače zeleniny",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Krájače zeleniny",
         "filtre": [
             "Výkon (kg/h)",
             "Počet diskov v balení",
@@ -1240,7 +1240,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Lisy a formovače",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Lisy a formovače",
         "filtre": [
             "Priemer formy (hamburger)",
             "Ovládanie (Ručné/Elektrické)",
@@ -1251,7 +1251,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Mlynčeky na mäso",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Mlynčeky na mäso",
         "filtre": [
             "Výkon (kg/h)",
             "Systém mletia (Enterprise/Unger)",
@@ -1264,7 +1264,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Mäsiarske a mäsové zariadenia",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Mäsiarske a mäsové zariadenia",
         "filtre": [
             "Typ zariadenia (Píla/Rezačka)",
             "Výkon rezania",
@@ -1277,7 +1277,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Naklepávače a zmäkčovače mäsa",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Naklepávače a zmäkčovače mäsa",
         "filtre": [
             "Výkon (ks/h)",
             "Max. šírka mäsa (mm)",
@@ -1290,7 +1290,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Nárezové stroje",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Nárezové stroje",
         "filtre": [
             "Priemer noža (mm)",
             "Max. hrúbka rezu (mm)",
@@ -1303,7 +1303,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Odstredivky na šalát",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Odstredivky na šalát",
         "filtre": [
             "Objem (l)",
             "Ovládanie (Ručné/Elektrické)",
@@ -1314,7 +1314,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Pasírovače a mlynčeky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Pasírovače a mlynčeky",
         "filtre": [
             "Výkon (kg/h)",
             "Otvor sita (mm)",
@@ -1326,7 +1326,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Plničky klobás",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Plničky klobás",
         "filtre": [
             "Objem (l)",
             "Typ (Vertikálna/Horizontálna)",
@@ -1338,7 +1338,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Ponorné mixéry",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Ponorné mixéry",
         "filtre": [
             "Dĺžka ramena (mm)",
             "Objem nádoby mixovania (l)",
@@ -1351,7 +1351,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Príslušenstvo a náhradné diely",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Príslušenstvo a náhradné diely",
         "filtre": [
             "Typ príslušenstva",
             "Kompatibilita so zariadením",
@@ -1359,7 +1359,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Strúhače a krájače na syr",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Strúhače a krájače na syr",
         "filtre": [
             "Výkon (kg/h)",
             "Typ strúhania",
@@ -1371,7 +1371,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Univerzálne roboty a kutre",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Univerzálne roboty a kutre",
         "filtre": [
             "Objem (l)",
             "Počet rýchlostí",
@@ -1384,7 +1384,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Varné kutre",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Varné kutre",
         "filtre": [
             "Objem (l)",
             "Maximálna teplota (°C)",
@@ -1397,7 +1397,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Váhy a meranie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Váhy a meranie",
         "filtre": [
             "Maximálna nosnosť (kg)",
             "Presnosť váženia (g)",
@@ -1410,7 +1410,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Príprava surovín > Škrabky zemiakov",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Príprava surovín > Škrabky zemiakov",
         "filtre": [
             "Kapacita náplne (kg)",
             "Výkon (kg/h)",
@@ -1423,7 +1423,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Baliace stroje",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Baliace stroje",
         "filtre": [
             "Šírka zvaru (mm)",
             "Typ balenia (Miska/Fólia)",
@@ -1436,7 +1436,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Skladovacie nádoby",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Skladovacie nádoby",
         "filtre": [
             "Objem (l)",
             "Materiál",
@@ -1448,7 +1448,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Skladovacie regály",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Skladovacie regály",
         "filtre": [
             "Počet políc",
             "Nosnosť políc (kg)",
@@ -1459,7 +1459,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Vákuovacie vrecká a fólie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Vákuovacie vrecká a fólie",
         "filtre": [
             "Rozmer (Š x D)",
             "Hrúbka fólie (mikróny)",
@@ -1468,7 +1468,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Vákuové baličky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Skladovanie a balenie > Vákuové baličky",
         "filtre": [
             "Dĺžka zváracej lišty (mm)",
             "Kapacita vývevy (m3/h)",
@@ -1481,7 +1481,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Fritézy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Fritézy",
         "filtre": [
             "Objem (l)",
             "Počet vaní",
@@ -1495,7 +1495,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Kontaktné grily, Hriankovače a Salamandre",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Kontaktné grily, Hriankovače a Salamandre",
         "filtre": [
             "Povrch dosky (Hladký/Ryhovaný)",
             "Materiál dosky",
@@ -1508,7 +1508,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Palacinkovače a vaflovače",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Palacinkovače a vaflovače",
         "filtre": [
             "Priemer/Tvar plochy",
             "Počet platní",
@@ -1521,7 +1521,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Ryžovary",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Ryžovary",
         "filtre": [
             "Objem (l)",
             "Kapacita ryže (počet porcií)",
@@ -1534,7 +1534,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Stolné indukčné variče",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Stolné indukčné variče",
         "filtre": [
             "Počet zón",
             "Max. hmotnosť zaťaženia (kg)",
@@ -1547,7 +1547,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Stolové grilovacie platne",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Stolové grilovacie platne",
         "filtre": [
             "Povrch (Hladký/Ryhovaný/Kombi)",
             "Materiál dosky",
@@ -1560,7 +1560,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Zariadenia na hot-dog",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Zariadenia na hot-dog",
         "filtre": [
             "Počet tŕňov",
             "Materiál nádoby",
@@ -1573,7 +1573,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Špeciálne varné zariadenia",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolné varné zariadenia > Špeciálne varné zariadenia",
         "filtre": [
             "Typ zariadenia",
             "Materiál",
@@ -1585,7 +1585,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Bufetové a servírovacie stojany",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Bufetové a servírovacie stojany",
         "filtre": [
             "Počet poschodí",
             "Kapacita (GN)",
@@ -1597,7 +1597,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Dochucovacie súpravy a mlynčeky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Dochucovacie súpravy a mlynčeky",
         "filtre": [
             "Zloženie sady (Počet kusov)",
             "Typ mlynčeka (Elektrický/Ručný)",
@@ -1606,7 +1606,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Džbány, karafy a kanvice",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Džbány, karafy a kanvice",
         "filtre": [
             "Objem (l)",
             "Materiál",
@@ -1615,7 +1615,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Informačné stojany a tabuľky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Informačné stojany a tabuľky",
         "filtre": [
             "Veľkosť popiskovej plochy",
             "Typ (Stolový/Podlahový)",
@@ -1626,7 +1626,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Košíky na pečivo a ovocie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Košíky na pečivo a ovocie",
         "filtre": [
             "Tvar",
             "Materiál",
@@ -1637,7 +1637,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Organizačné a informačné pomôcky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Organizačné a informačné pomôcky",
         "filtre": [
             "Typ pomôcky",
             "Materiál",
@@ -1645,7 +1645,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Organizačné a informačné systémy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Organizačné a informačné systémy",
         "filtre": [
             "Typ systému",
             "Rozmery",
@@ -1653,7 +1653,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Podnosy a tácky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Podnosy a tácky",
         "filtre": [
             "Kapacita (GN) / Rozmer",
             "Tvar",
@@ -1664,7 +1664,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Príbory a príborníky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Príbory a príborníky",
         "filtre": [
             "Typ príboru",
             "Materiál",
@@ -1673,7 +1673,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Príslušenstvo na flambovanie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Príslušenstvo na flambovanie",
         "filtre": [
             "Typ príslušenstva",
             "Pohon na plyn",
@@ -1681,7 +1681,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Riad a porcelán",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Riad a porcelán",
         "filtre": [
             "Typ riadu",
             "Materiál",
@@ -1691,7 +1691,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Servírovacie príbory",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Servírovacie príbory",
         "filtre": [
             "Typ príboru",
             "Dĺžka (mm)",
@@ -1700,7 +1700,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Stolový inventár > Servírovací riad a podnosy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Stolový inventár > Servírovací riad a podnosy",
         "filtre": [
             "Typ produktu",
             "Materiál",
@@ -1711,7 +1711,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Transport a logistika > Cateringový nábytok",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Transport a logistika > Cateringový nábytok",
         "filtre": [
             "Typ nábytku (Stôl/Stolička)",
             "Skladateľnosť (Áno/Nie)",
@@ -1723,7 +1723,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Transport a logistika > Exteriérové ohrievače",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Transport a logistika > Exteriérové ohrievače",
         "filtre": [
             "Zdroj tepla (Plyn/Elektrina)",
             "Výkon vykurovania (W)",
@@ -1736,7 +1736,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Transport a logistika > Manipulačné vozíky a regály",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Transport a logistika > Manipulačné vozíky a regály",
         "filtre": [
             "Nosnosť (kg)",
             "Počet políc/zásuvov",
@@ -1749,7 +1749,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Transport a logistika > Termonádoby",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Transport a logistika > Termonádoby",
         "filtre": [
             "Objem (l)",
             "Kapacita (GN)",
@@ -1761,7 +1761,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Transport a logistika > Termotašky na jedlo a pizzu",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Transport a logistika > Termotašky na jedlo a pizzu",
         "filtre": [
             "Kapacita (počet boxov/pízz)",
             "Max. rozmer krabice",
@@ -1773,7 +1773,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Transport a logistika > Thermoboxy a termoporty",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Transport a logistika > Thermoboxy a termoporty",
         "filtre": [
             "Kapacita (GN)",
             "Objem (l)",
@@ -1787,7 +1787,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Transport a logistika > Transportné vozíky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Transport a logistika > Transportné vozíky",
         "filtre": [
             "Nosnosť (kg)",
             "Kapacita (GN/Plech)",
@@ -1799,7 +1799,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Transport a logistika > Vymedzovacie stĺpiky a laná",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Transport a logistika > Vymedzovacie stĺpiky a laná",
         "filtre": [
             "Dĺžka pásu/lana (m)",
             "Materiál",
@@ -1808,7 +1808,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Umývacia technika > Koše a príslušenstvo k umývačkám",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Umývacia technika > Koše a príslušenstvo k umývačkám",
         "filtre": [
             "Rozmer koša",
             "Určenie (Taniere/Poháre/Príbory)",
@@ -1818,7 +1818,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Umývacia technika > Leštičky príborov a skla",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Umývacia technika > Leštičky príborov a skla",
         "filtre": [
             "Výkon (ks/h)",
             "Počet kief",
@@ -1830,7 +1830,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Umývacia technika > Odkvapkávacie vozíky a regály",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Umývacia technika > Odkvapkávacie vozíky a regály",
         "filtre": [
             "Kapacita košov",
             "Počet políc",
@@ -1842,7 +1842,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Umývacia technika > Stoly k umývačkám",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Umývacia technika > Stoly k umývačkám",
         "filtre": [
             "Umiestnenie (Vstupný/Výstupný)",
             "S drezom (Áno/Nie)",
@@ -1853,7 +1853,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Umývacia technika > Umývačky riadu > Priebežné (korbové) umývačky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Umývacia technika > Umývačky riadu > Priebežné (korbové) umývačky",
         "filtre": [
             "Rozmer koša",
             "Kapacita (košov/h)",
@@ -1868,7 +1868,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Umývacia technika > Umývačky riadu > Umývačky na čierny riad a prepravky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Umývacia technika > Umývačky riadu > Umývačky na čierny riad a prepravky",
         "filtre": [
             "Rozmer koša",
             "Kapacita (košov/h)",
@@ -1883,7 +1883,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Umývacia technika > Umývačky riadu > Umývačky skla a pohárov",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Umývacia technika > Umývačky riadu > Umývačky skla a pohárov",
         "filtre": [
             "Rozmer koša",
             "Kapacita (košov/h)",
@@ -1898,7 +1898,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Umývacia technika > Umývačky riadu > Univerzálne umývačky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Umývacia technika > Umývačky riadu > Univerzálne umývačky",
         "filtre": [
             "Rozmer koša",
             "Kapacita (košov/h)",
@@ -1913,7 +1913,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Umývacia technika > Úprava vody",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Umývacia technika > Úprava vody",
         "filtre": [
             "Prierez (Prietok l/h)",
             "Kapacita zmäkčovania",
@@ -1926,7 +1926,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Fritézy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Fritézy",
         "filtre": [
             "Objem (l)",
             "Počet vaní",
@@ -1941,7 +1941,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grilovacie platne",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grilovacie platne",
         "filtre": [
             "Povrch (Hladký/Ryhovaný/Kombi)",
             "Materiál dosky",
@@ -1955,7 +1955,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grily na drevené uhlie",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grily na drevené uhlie",
         "filtre": [
             "Rozmer roštu",
             "Počet roštov",
@@ -1967,7 +1967,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grily na gyros a kebab",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grily na gyros a kebab",
         "filtre": [
             "Zdroj ohrevu (Plyn/Elektrika)",
             "Kapacita mäsa (kg)",
@@ -1981,7 +1981,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grily na kurčatá",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grily na kurčatá",
         "filtre": [
             "Zdroj ohrevu (Plyn/Elektrika)",
             "Kapacita (počet kurčiat)",
@@ -1994,7 +1994,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Grily > Lávové a vodné grily",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Grily > Lávové a vodné grily",
         "filtre": [
             "Typ grilu (Lávový/Vodný)",
             "Zdroj ohrevu (Plyn/Elektrika)",
@@ -2007,7 +2007,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Grily > Príslušenstvo ku grilom",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Grily > Príslušenstvo ku grilom",
         "filtre": [
             "Typ príslušenstva",
             "Materiál",
@@ -2015,7 +2015,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Grily > Sklokeramické grily",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Grily > Sklokeramické grily",
         "filtre": [
             "Rozmer dosky",
             "Povrch (Hladký/Ryhovaný)",
@@ -2027,7 +2027,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Konvektomaty",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Konvektomaty",
         "filtre": [
             "Kapacita (GN)",
             "Zdroj ohrevu (Plyn/Elektrika)",
@@ -2041,7 +2041,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Príslušenstvo ku konvektomatom",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Príslušenstvo ku konvektomatom",
         "filtre": [
             "Typ príslušenstva (Podstavec/Filter/Zavážací vozík)",
             "Kapacita (GN)",
@@ -2049,7 +2049,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Rýchloohrevné a mikrovlnné rúry",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Rýchloohrevné a mikrovlnné rúry",
         "filtre": [
             "Objem (l)",
             "Mikrovlnný výkon (W)",
@@ -2063,7 +2063,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Sklápacie panvice",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Sklápacie panvice",
         "filtre": [
             "Objem (l)",
             "Zdroj ohrevu (Plyn/Elektrika)",
@@ -2077,7 +2077,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Sous-vide zariadenia",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Sous-vide zariadenia",
         "filtre": [
             "Objem (l)",
             "Výkon obehového čerpadla (l/h)",
@@ -2090,7 +2090,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Teplovzdušné a pekárske pece",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Teplovzdušné a pekárske pece",
         "filtre": [
             "Rozmer plechov (EN/GN)",
             "Počet zásuvov",
@@ -2104,7 +2104,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Variče cestovín",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Variče cestovín",
         "filtre": [
             "Objem (l)",
             "Zdroj ohrevu (Plyn/Elektrika)",
@@ -2118,7 +2118,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Varné kotly",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Varné kotly",
         "filtre": [
             "Objem (l)",
             "Zdroj ohrevu (Plyn/Elektrika)",
@@ -2132,7 +2132,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Varné linky a sporáky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Varné linky a sporáky",
         "filtre": [
             "Počet horákov/platní",
             "Zdroj ohrevu (Plyn/Elektrika)",
@@ -2146,7 +2146,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Varné stoličky a variče",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Varné stoličky a variče",
         "filtre": [
             "Zdroj ohrevu (Plyn/Elektrika)",
             "Počet horákov/platní",
@@ -2160,7 +2160,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > Vodné kúpele (Bain-Marie)",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > Vodné kúpele (Bain-Marie)",
         "filtre": [
             "Kapacita (GN)",
             "Vypúšťací ventil (Áno/Nie)",
@@ -2173,7 +2173,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Varná technika > WOK panvice a sporáky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Varná technika > WOK panvice a sporáky",
         "filtre": [
             "Zdroj ohrevu (Plyn/Indukcia)",
             "Priemer zóny (mm)",
@@ -2186,7 +2186,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Vitríny > Chladiace vitríny",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Vitríny > Chladiace vitríny",
         "filtre": [
             "Objem (l)",
             "Kapacita (GN)",
@@ -2200,7 +2200,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Vitríny > Neutrálne vitríny",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Vitríny > Neutrálne vitríny",
         "filtre": [
             "Objem (l)",
             "Tvar skla (Rovné/Oblé)",
@@ -2212,7 +2212,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Vitríny > Ohrevné vitríny",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Vitríny > Ohrevné vitríny",
         "filtre": [
             "Objem (l)",
             "Kapacita (GN)",
@@ -2225,7 +2225,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Vitríny > Saladety a šalátové bary",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Vitríny > Saladety a šalátové bary",
         "filtre": [
             "Kapacita (GN)",
             "Počet dverí",
@@ -2239,7 +2239,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Vzduchotechnika > Digestory a odsávače pár",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Vzduchotechnika > Digestory a odsávače pár",
         "filtre": [
             "S motorom (Áno/Nie)",
             "Typ digestora (Prístenný/Priestorový)",
@@ -2251,7 +2251,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Vzduchotechnika > Príslušenstvo k digestorom",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Vzduchotechnika > Príslušenstvo k digestorom",
         "filtre": [
             "Typ príslušenstva (Filter/Motor/Regulátor)",
             "Materiál",
@@ -2259,7 +2259,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Bufetové stoly a systémy",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Bufetové stoly a systémy",
         "filtre": [
             "Kapacita (GN)",
             "Typ ohrevu/chladenia",
@@ -2272,7 +2272,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Chafingy a ohrevné nádoby",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Chafingy a ohrevné nádoby",
         "filtre": [
             "Kapacita (GN)",
             "Objem (l)",
@@ -2286,7 +2286,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Chladené výdajné pulty a vitríny",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Chladené výdajné pulty a vitríny",
         "filtre": [
             "Kapacita (GN)",
             "Teplotný rozsah (°C)",
@@ -2299,7 +2299,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Ohrevné lampy a mosty",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Ohrevné lampy a mosty",
         "filtre": [
             "Kapacita (GN)",
             "Typ montáže (Závesné/Stolové)",
@@ -2312,7 +2312,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Ohrevné výdajné pulty",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Ohrevné výdajné pulty",
         "filtre": [
             "Kapacita (GN)",
             "Spôsob ohrevu (Vodný kúpeľ/Suchý)",
@@ -2325,7 +2325,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Ohrievače tanierov a šálok",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Ohrievače tanierov a šálok",
         "filtre": [
             "Kapacita (počet tanierov/šálok)",
             "Maximálny priemer taniera (mm)",
@@ -2338,7 +2338,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Pokladničné pulty",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Pokladničné pulty",
         "filtre": [
             "So zásuvkou (Áno/Nie)",
             "Materiál",
@@ -2349,7 +2349,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Polievkové kotlíky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Polievkové kotlíky",
         "filtre": [
             "Objem (l)",
             "Termostat",
@@ -2362,7 +2362,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Príslušenstvo k chafingom",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Príslušenstvo k chafingom",
         "filtre": [
             "Typ príslušenstva (Horák/Vložka/Pasta)",
             "Kapacita (GN)",
@@ -2370,7 +2370,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Príslušenstvo k výdajným linkám",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Príslušenstvo k výdajným linkám",
         "filtre": [
             "Typ príslušenstva (Vanička/Sklo/Koľajnica)",
             "Rozmer",
@@ -2378,7 +2378,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Udržiavacie a regeneračné skrine (holdomaty)",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Udržiavacie a regeneračné skrine (holdomaty)",
         "filtre": [
             "Kapacita (GN)",
             "Teplotný rozsah (°C)",
@@ -2391,7 +2391,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Udržiavače hranoliek",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Udržiavače hranoliek",
         "filtre": [
             "Kapacita (GN)",
             "Typ ohrevu (Keramický/Infralampa)",
@@ -2404,7 +2404,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Vozíky na podnosy a príbory",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Vozíky na podnosy a príbory",
         "filtre": [
             "Kapacita podnosov",
             "Počet zásobníkov na príbory",
@@ -2416,7 +2416,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Výdajné pulty a nadstavby",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Výdajné pulty a nadstavby",
         "filtre": [
             "Kapacita (GN)",
             "Typ ochranného skla",
@@ -2429,7 +2429,7 @@
         ]
     },
     {
-        "kategoria": "Gastro Prevádzky a Profesionáli > Výdaj jedál > Výdajné stoly a linky",
+        "kategoria": "Tovary a kategórie > Gastro Prevádzky a Profesionáli > Výdaj jedál > Výdajné stoly a linky",
         "filtre": [
             "Kapacita (GN)",
             "Modulárne zostavenie (Áno/Nie)",

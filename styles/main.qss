@@ -1,123 +1,298 @@
-/* styles/main.qss */
+/* styles/main.qss — template rendered by src/gui/theme.py; dollar-prefixed names are palette tokens */
 
-/* General Window Styling */
-QMainWindow {
-    background-color: #f0f0f0; /* Light gray background */
+QMainWindow, QDialog {
+    background-color: $bg;
 }
 
-QWidget#central_widget {
-    background-color: rgba(255, 255, 255, 0.8);
+QWidget {
+    color: $text;
+}
+
+QToolTip {
+    background-color: $surface;
+    color: $text;
+    border: 1px solid $border;
+    padding: 5px 8px;
+    border-radius: 4px;
+}
+
+/* --- App title --- */
+QLabel#appTitle {
+    font-size: 17px;
+    font-weight: 700;
+    color: $text;
+    padding: 2px 0 6px 0;
+}
+
+/* --- Cards (group boxes) --- */
+QGroupBox {
+    background-color: $surface;
+    border: 1px solid $border;
     border-radius: 10px;
+    margin-top: 14px;
+    padding: 16px 12px 10px 12px;
 }
 
-/* --- Glassmorphism Effect --- */
-.glass {
-    background: rgba(255, 255, 255, 0.7);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-/* --- Dark Mode --- */
-QMainWindow.dark {
-    background-color: #121212;
-}
-
-QWidget#central_widget.dark {
-    background-color: rgba(28, 28, 28, 0.8);
-}
-
-.glass.dark {
-    background: rgba(10, 10, 10, 0.7);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-QLabel.dark {
-    color: #e0e0e0;
-}
-
-PUSHButton.dark {
-    background-color: #222;
-    color: #e0e0e0;
-}
-
-PUSHButton.dark:hover {
-    background-color: #333;
-}
-
-PUSHButton.dark:pressed {
-    background-color: #444;
-}
-
-QCheckBox.dark {
-    color: #e0e0e0;
-}
-
-QListWidget.dark {
-    background-color: #1e1e1e;
-    color: #e0e0e0;
-    border: 1px solid #333;
-}
-
-QProgressBar.dark {
-    border: 1px solid #333;
-}
-
-QProgressBar::chunk.dark {
-    background-color: #0099ff;
-}
-
-/* --- Labels --- */
-QLabel {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    font-size: 14px;
-    color: #333;
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 12px;
+    top: 4px;
+    padding: 0 5px;
+    color: $muted;
+    font-weight: 600;
 }
 
 /* --- Buttons --- */
-PUSHButton {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    font-size: 14px;
-    color: #fff;
-    background-color: #007bff; /* Primary blue */
+QPushButton {
+    background-color: $surface;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 6px;
+    padding: 6px 14px;
+    min-width: 90px;
+}
+
+QPushButton:hover {
+    background-color: $surfaceAlt;
+    border-color: $muted;
+}
+
+QPushButton:pressed {
+    background-color: $border;
+}
+
+QPushButton:disabled {
+    color: $muted;
+    background-color: transparent;
+    border-color: $border;
+}
+
+QPushButton[primary="true"] {
+    background-color: $accent;
+    color: #ffffff;
     border: none;
-    border-radius: 5px;
-    padding: 10px 15px;
-    min-width: 100px;
-    transition: background-color 0.3s ease;
+    font-weight: 600;
+    padding: 9px 18px;
 }
 
-PUSHButton:hover {
-    background-color: #0056b3; /* Darker blue on hover */
+QPushButton[primary="true"]:hover {
+    background-color: $accentHover;
 }
 
-PUSHButton:pressed {
-    background-color: #004085; /* Even darker blue when pressed */
+QPushButton[primary="true"]:pressed {
+    background-color: $accentPressed;
 }
 
-/* --- Checkbox --- */
+QPushButton[primary="true"]:disabled {
+    background-color: $border;
+    color: $muted;
+}
+
+QPushButton[danger="true"] {
+    color: $danger;
+}
+
+QPushButton[danger="true"]:hover {
+    border-color: $danger;
+}
+
+/* --- Inputs --- */
+QLineEdit, QTextEdit {
+    background-color: $surface;
+    color: $text;
+    border: 1px solid $border;
+    border-radius: 6px;
+    padding: 6px 8px;
+    selection-background-color: $accent;
+    selection-color: #ffffff;
+}
+
+QLineEdit:focus, QTextEdit:focus {
+    border: 1px solid $accent;
+}
+
+QLineEdit:disabled, QTextEdit:disabled {
+    color: $muted;
+    background-color: $surfaceAlt;
+}
+
+QTextEdit#statsDisplay {
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    font-size: 9pt;
+}
+
+/* --- Checkboxes (incl. checkable list items) --- */
 QCheckBox {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    font-size: 14px;
+    spacing: 8px;
+    padding: 2px 0;
 }
 
-/* --- List Widget --- */
+QCheckBox:disabled {
+    color: $muted;
+}
+
+QCheckBox::indicator, QListView::indicator {
+    width: 16px;
+    height: 16px;
+    border: 1px solid $border;
+    border-radius: 4px;
+    background-color: $surface;
+}
+
+QCheckBox::indicator:hover, QListView::indicator:hover {
+    border-color: $accent;
+}
+
+QCheckBox::indicator:checked, QListView::indicator:checked {
+    background-color: $accent;
+    border-color: $accent;
+    image: url($check);
+}
+
+QCheckBox::indicator:disabled, QListView::indicator:disabled {
+    background-color: $surfaceAlt;
+    border-color: $border;
+}
+
+/* --- Lists --- */
 QListWidget {
-    font-family: 'Segoe UI', Arial, sans-serif;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    background-color: $surface;
+    border: 1px solid $border;
+    border-radius: 6px;
+    padding: 3px;
+    outline: none;
 }
 
-/* --- Progress Bar --- */
+QListWidget::item {
+    padding: 5px 6px;
+    border-radius: 4px;
+}
+
+QListWidget::item:hover {
+    background-color: $surfaceAlt;
+}
+
+QListWidget::item:selected {
+    background-color: $accentSubtle;
+    color: $text;
+}
+
+/* --- Tables --- */
+QTableWidget {
+    background-color: $surface;
+    border: 1px solid $border;
+    border-radius: 6px;
+    gridline-color: $border;
+    outline: none;
+}
+
+QTableWidget::item {
+    padding: 4px 6px;
+}
+
+QTableWidget::item:selected {
+    background-color: $accentSubtle;
+    color: $text;
+}
+
+QHeaderView::section {
+    background-color: $surfaceAlt;
+    color: $muted;
+    font-weight: 600;
+    border: none;
+    border-bottom: 1px solid $border;
+    padding: 6px 8px;
+}
+
+QTableCornerButton::section {
+    background-color: $surfaceAlt;
+    border: none;
+    border-bottom: 1px solid $border;
+}
+
+/* --- Progress bar --- */
 QProgressBar {
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    background-color: $surfaceAlt;
+    border: 1px solid $border;
+    border-radius: 6px;
     text-align: center;
+    color: $text;
+    min-height: 22px;
 }
 
 QProgressBar::chunk {
-    background-color: #007bff;
-    width: 10px; 
-    margin: 0.5px;
+    background-color: $accent;
+    border-radius: 5px;
+}
+
+/* --- Scrollbars --- */
+QScrollBar:vertical {
+    background: transparent;
+    width: 10px;
+    margin: 2px;
+}
+
+QScrollBar::handle:vertical {
+    background: $border;
+    border-radius: 4px;
+    min-height: 30px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: $muted;
+}
+
+QScrollBar:horizontal {
+    background: transparent;
+    height: 10px;
+    margin: 2px;
+}
+
+QScrollBar::handle:horizontal {
+    background: $border;
+    border-radius: 4px;
+    min-width: 30px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: $muted;
+}
+
+QScrollBar::add-line, QScrollBar::sub-line {
+    width: 0;
+    height: 0;
+}
+
+QScrollBar::add-page, QScrollBar::sub-page {
+    background: transparent;
+}
+
+/* --- Label variants (set via theme.set_variant) --- */
+QLabel[variant="hint"] {
+    color: $muted;
+}
+
+QLabel[variant="success"] {
+    color: $success;
+}
+
+QLabel[variant="warning"] {
+    color: $warning;
+    font-weight: 600;
+}
+
+/* --- Highlight cards used in dialogs --- */
+QLabel[card="info"] {
+    background-color: $accentSubtle;
+    border-left: 3px solid $accent;
+    border-radius: 4px;
+    padding: 8px 10px;
+}
+
+QLabel[card="neutral"] {
+    background-color: $surfaceAlt;
+    border: 1px solid $border;
+    border-radius: 4px;
+    padding: 8px 10px;
 }

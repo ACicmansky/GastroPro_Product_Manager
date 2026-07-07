@@ -1,6 +1,6 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-07-07 (resumable AI runs implemented)*
+*Last updated: 2026-07-07 (UI/UX modernization)*
 
 ## Current State
 The **layered architecture refactor is complete and audited**. The codebase moved from the old flat `src` layout (core/services/utils/parsers/mergers/...) to a clean layered structure: `src/pipeline` (orchestration), `src/data` (I/O), `src/domain` (business logic), `src/ai` (Gemini), `src/scrapers`, `src/gui`, `src/config`. Entry point is `main.py`. All 202 tests pass. Zero circular dependencies.
@@ -41,6 +41,9 @@ Implemented `plan_resumable_ai_runs.md` in full (details in `journal/2026_07_07_
 - **GUI**: `MainWindow` shows a resume banner on launch if `RunDB.get_resumable_run()` finds one, plus Pause/Cancel buttons during an AI run (`AIResumeWorker`, `src/gui/worker.py`).
 - `runbook_full_reenhancement.md` updated: the old `--limit`-slicing interruption workaround is now optional (kept for micro-testing), resuming is automatic/native.
 - Suite: 212 passed (206 + `test_run_db.py` + `test_batch_resume.py`, the latter using a fake Gemini client to cover interrupt→resume-without-resubmit, pause, and cancel).
+
+## Recent Changes (2026-07-07 — UI/UX modernization)
+GUI brought to a modern look (details in `journal/2026_07_07_ui_modernization.md`): new `src/gui/theme.py` (Fusion + Segoe UI + QPalette + token-substituted QSS applied app-wide, auto light/dark from Windows registry, `set_variant` helper), `styles/main.qss` fully rewritten as a $token template (the old one was broken — `PUSHButton` typo, unsupported CSS), card group boxes / accent primary buttons / custom check indicators (`styles/check.svg`) / label variants / dialog cards. Dead `DropArea` classes deleted from `widgets.py`; all hardcoded dialog colors replaced with theme properties. Suite: 213 passed.
 
 ## Earlier Changes (July 2026 — post-refactor audit)
 - **Regressions from the refactor found and fixed:**
