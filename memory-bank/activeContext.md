@@ -1,6 +1,6 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-07-06*
+*Last updated: 2026-07-07*
 
 ## Current State
 The **layered architecture refactor is complete and audited**. The codebase moved from the old flat `src` layout (core/services/utils/parsers/mergers/...) to a clean layered structure: `src/pipeline` (orchestration), `src/data` (I/O), `src/domain` (business logic), `src/ai` (Gemini), `src/scrapers`, `src/gui`, `src/config`. Entry point is `main.py`. All 202 tests pass. Zero circular dependencies.
@@ -18,6 +18,20 @@ First real run after the refactor produced 1,935 of 9,642 products. Root causes 
 - `scripts/pipeline_cli.py`: run any stage independently (`feeds` / `merge` / `categories` / `transform` / `ai` / `run`), files in → file out. REST API deliberately skipped (see `journal/2026_07_06_logging_and_stage_cli.md`).
 - `ai` stage supports `--dry-run` (pending counts, no API), `--limit N` (micro-batch test), `--force`. AI state audit (2026-07-06): DB has 5,691 enhanced / 3,967 pending. `pytest -m ai_enhancement` marker was dead (0 collected) — restored via `pytestmark` in `test_ai_enhancer.py`.
 - `tests/fixtures/` (sample main.xlsx + feed XMLs) + `tests/test_integration_pipeline.py`: offline e2e chain guarding the 2026-07-06 production bugs. `Pipeline.run` logs its options. Suite: 202 tests.
+
+## Recent Changes (2026-07-07 — deterministic filters + 9 AI-output enhancements)
+- **Deterministic filtering** (e-shop filters need stable values): units in headers (`Šírka (mm)`), bare numbers in values. 771 renames in `categories_with_parameters.json`; `ResultParser` whitelist + canonicalization + `normalize_param_value`; temperature 0. Verified live. **Open**: 0 of the 5,691 already-enhanced DB products have any filteringProperty values — full re-enhancement is queued; self-serve instructions in `runbook_full_reenhancement.md` (reset `aiProcessed` + chained `--limit` slices, not `--force`).
+- **Model A/B** (`ai --model`): gemini-3.1-flash-lite fills fewer params and made factual errors; **staying on gemini-2.5-flash-lite**.
+- **Nine AI-output enhancements** (details in `journal/2026_07_06_logging_and_stage_cli.md`): grounded `--fill-missing` second pass (+`--fill-model` for tiered escalation), ForGastro structured dims/weight → filter columns via `src/domain/products/feed_specs.py` (feed wins, runs after AI), fuzzy-match audit CSV, `classify` CLI (AI category suggestions → `suggestedCategory` review column), `existingParameters` in prompts for unique copy, seoTitle/metaDescription length+branding enforcement in code, plausibility validation (`src/ai/validation.py` → review CSV), enum-locked responseSchema on the main pass, per-job model override. Suite: 212 passed.
+
+## Recent Changes (2026-07-07 — ponytail audit applied, ~-1,050 lines)
+All 11 findings of the over-engineering audit applied (see `journal/2026_07_07_ponytail_audit.md`):
+- Deleted 11 one-shot/debug scripts in `scripts/` (kept: `pipeline_cli.py`, `scraping_cli.py`, `categories.py`, `cleaning.py`).
+- `DataLoaderFactory` + `XLSXLoader` class collapsed into `load_xlsx()` function (`src/data/loaders/xlsx_loader.py`); all call sites updated.
+- requirements.txt fixed: `google-generativeai` → `google-genai` (code imports `from google import genai` — fresh installs were broken), removed unused `lxml` + `llm_output_parser`, deduped `python-dotenv`.
+- Dead code removed: `XMLParserFactory.get_parser`, `BatchJobDB.get_job`, `EnrichmentResult.skipped`.
+- Batch JSONL tmp dir moved from `src/ai/tmp/` to gitignored `out/batch_requests` (config override `ai_enhancement.tmp_dir` still honored). Stale JSONL debris in `src/ai/tmp/` awaits manual deletion.
+- Suite: 206 passed (2 factory tests removed, `test_xlsx_loader.py` rewritten, `BatchJobDB` tests rewritten against `get_active_job`).
 
 ## Earlier Changes (July 2026 — post-refactor audit)
 - **Regressions from the refactor found and fixed:**

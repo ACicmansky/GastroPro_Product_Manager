@@ -48,5 +48,20 @@ E-shop filters need stable values. Convention chosen: **units in headers, bare n
 - Known ceiling: categorical values can still drift ("Nerez" vs "Nerezová oceľ") — escalation path is enum-constrained response schema per category.
 - **Open**: 5,691 already-enhanced products in DB carry old-style keys (`filteringProperty:Šírka`, values with units) — need key-rename+normalize migration or forced re-enhancement before e-shop import, else filters fragment old vs new.
 
+## Nine AI-output enhancements implemented (2026-07-07)
+All nine brainstormed options landed in one pass ("implement all of them 1 to 9"):
+1. **Grounded second pass** — `BatchOrchestrator.process_missing_params` + `create_params_only_prompt`: per-product `chybajuce_parametre` re-asked with `"tools": [{"google_search": {}}]` at batch-request level; no `responseMimeType` (conflicts with grounding), parser strips fences. Params-only responses can't clobber text fields (parser writes fields only `if field in enhanced`). `ProductEnricher.fill_missing_params`; CLI `ai --fill-missing`.
+2. **Feed structured specs** — config.json forgastro mapping += `product_width/length/height/lwh_uom` → `feedWidth/feedDepth/feedHeight/feedDimUnit`; new `src/domain/products/feed_specs.py` `apply_feed_specs` (CM/M→mm, weight→kg, forgastro-only, zeros/garbage skipped). Runs AFTER AI in `Pipeline.run` and `cmd_ai` so verified feed numbers win. Gastromarket feeds have no structured dims (audited).
+3. **Fuzzy-match audit** — `ResultParser.match_audit` records strategy/ai_code/matched_code on every non-exact match + WARNING log; CLI exports `<out>_match_review.csv`.
+4. **Category classification** — CLI `classify in.xlsx`: products with empty/"Neznáma" category get AI-suggested category from the 211-key tree, written to `suggestedCategory` only (never defaultCategory — human review).
+5. **Duplicate-content mitigation** — main-pass payload includes `existingParameters` (filled filteringProperty values); prompt requires unique copy per product using them.
+6. **Format guarantees** — `ResultParser.enforce_format`: seoTitle ≤60, metaDescription ≤155 + `GastroPro.sk | ` prefix, word-boundary truncation; applied at the single write choke point.
+7. **Plausibility validation** — `src/ai/validation.py` `find_implausible`: Napätie ∈ {12,24,230,400,230/400}, dims 50–6000 mm, weight 0.1–2000 kg, Príkon 5–100000 W; CLI exports `<out>_param_review.csv` (motivating case: ForGastro typo w=3800).
+8. **Response schema** — `build_response_schema` per category: enum-locked Áno/Nie params, required text fields; attached as `responseSchema` in main-pass generationConfig.
+9. **Tiered models** — `create_batch_job(model=...)` override; `--fill-model` runs the second pass on a stronger model.
+Suite: 212 passed. Live micro-tests (both JOB_STATE_SUCCEEDED in ~90 s):
+- **Main pass w/ responseSchema**: 2/2 processed — Gemini accepts property keys with diacritics/parens/spaces; format guarantees held (seoTitle 51/50 chars, metaDescription prefixed + ≤155).
+- **Grounded fill pass**: S721128 went 3→6 params with web-sourced dims (420×210×338, Napätie 230); `Kapacita (GN): 2x GN1/1` preserved. Two live-found fixes: xlsx round-trip floats ("230.0") false-flagged by the voltage enum → strip `.0` in `find_implausible`; one batch response had a candidate without `content.parts` → parser now warns (with finishReason) instead of erroring the line. Re-verified: 0 implausible on live output, suite 212.
+
 ## Verification
 Offline smoke chain on fixtures: `merge` (created=1 updated=1 kept=1 removed=0 → 3 rows) → `categories` → `transform` (329 cols); `logs/gastropro.log` written with timestamped entries. Full suite: 199 passed.
