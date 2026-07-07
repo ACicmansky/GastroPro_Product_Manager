@@ -37,6 +37,133 @@ def test_param_normalization_and_whitelist():
     assert "filteringProperty:Typ matrice" not in df.columns  # unrequested key dropped
 
 
+def test_feed_specs_override_ai_dims():
+    """ForGastro structured dims/weight overwrite filter columns; other sources untouched."""
+    from src.domain.products.feed_specs import apply_feed_specs
+
+    df = pd.DataFrame({
+        "code": ["F1", "F2", "G1"],
+        "source": ["forgastro", "forgastro", "gastromarket"],
+        "feedWidth": ["38", "800", "999"],
+        "feedDepth": ["51", "", "999"],
+        "feedHeight": ["79.5", "bad", "999"],
+        "feedDimUnit": ["CM", "MM", "CM"],
+        "weight": ["12,5", "0", "50"],
+        "filteringProperty:Šírka (mm)": ["370", "", ""],  # AI value gets overwritten
+    })
+    df = apply_feed_specs(df)
+    assert df.at[0, "filteringProperty:Šírka (mm)"] == "380"     # CM -> mm, feed wins
+    assert df.at[0, "filteringProperty:Hĺbka (mm)"] == "510"
+    assert df.at[0, "filteringProperty:Výška (mm)"] == "795"
+    assert df.at[0, "filteringProperty:Hmotnosť (kg)"] == "12.5"
+    assert df.at[1, "filteringProperty:Šírka (mm)"] == "800"        # MM passthrough
+    assert pd.isna(df.at[1, "filteringProperty:Hĺbka (mm)"])        # empty skipped
+    assert pd.isna(df.at[1, "filteringProperty:Výška (mm)"])        # garbage skipped
+    assert pd.isna(df.at[1, "filteringProperty:Hmotnosť (kg)"])     # zero skipped
+    assert df.at[2, "filteringProperty:Šírka (mm)"] == ""           # non-forgastro untouched
+
+
+def test_enforce_format_seo_fields():
+    """seoTitle <=60, metaDescription <=155 + branding prefix, enforced in code."""
+    from src.ai.result_parser import ResultParser
+
+    fmt = ResultParser.enforce_format
+    long_title = "Profesionálny konvektomat s bojlerovým vyvíjačom pary a automatickým umývaním"
+    out = fmt("seoTitle", long_title)
+    assert len(out) <= 60 and not out.endswith((" ", ","))
+    assert fmt("seoTitle", "Krátky titulok") == "Krátky titulok"
+
+    meta = fmt("metaDescription", "Robustný nerezový stôl pre gastro prevádzky.")
+    assert meta.startswith("GastroPro.sk | ")
+    already = fmt("metaDescription", "GastroPro.sk | Už s prefixom.")
+    assert already.count("GastroPro.sk") == 1
+    assert len(fmt("metaDescription", "x" * 300)) <= 155
+
+
+def test_find_implausible_values():
+    """Voltage enum + dimension ranges flag outliers (feed typo w=3800 cm case)."""
+    from src.ai.validation import find_implausible
+
+    df = pd.DataFrame({
+        "code": ["A", "B", "C"],
+        "name": ["a", "b", "c"],
+        "filteringProperty:Napätie (V)": ["230", "999", ""],
+        "filteringProperty:Šírka (mm)": ["800", "38000", "abc"],
+    })
+    issues = find_implausible(df)
+    flagged = set(zip(issues["code"], issues["parameter"]))
+    assert ("B", "Napätie (V)") in flagged
+    assert ("B", "Šírka (mm)") in flagged      # 38000 mm out of range
+    assert ("C", "Šírka (mm)") in flagged      # non-numeric
+    assert ("A", "Napätie (V)") not in flagged
+    assert ("A", "Šírka (mm)") not in flagged
+
+
+def test_missing_param_requests_are_grounded():
+    """Second pass: only unfilled expected params re-asked, with google_search tool."""
+    from src.ai.batch_orchestrator import BatchOrchestrator
+
+    orch = BatchOrchestrator(client=None, result_parser=None, config={})
+    cat = next(iter(orch.category_parameters))
+    expected = orch.category_parameters[cat]
+    filled, missing = expected[0], expected[1:]
+
+    df = pd.DataFrame({
+        "code": ["X1"], "name": ["Produkt X1"], "shortDescription": ["popis"],
+        "newCategory": [cat],
+        f"filteringProperty:{filled}": ["230"],
+    })
+    requests, count = orch._build_missing_param_requests(df)
+    assert count == 1 and len(requests) == 1
+    req = requests[0]["request"]
+    assert req["tools"] == [{"google_search": {}}]
+    assert "responseMimeType" not in req["generationConfig"]  # conflicts with grounding
+    import json
+    payload = json.loads(req["contents"][0]["parts"][0]["text"])
+    assert payload[0]["chybajuce_parametre"] == missing  # filled param not re-asked
+
+
+def test_main_pass_has_schema_and_existing_params():
+    """Main batch requests carry enum-locked responseSchema + existingParameters."""
+    from src.ai.batch_orchestrator import BatchOrchestrator
+    from src.ai.prompts import build_response_schema
+
+    schema = build_response_schema(["Šírka (mm)", "So zásuvkou (Áno/Nie)"])
+    props = schema["items"]["properties"]["parameters"]["properties"]
+    assert props["So zásuvkou (Áno/Nie)"]["enum"] == ["Áno", "Nie"]
+    assert props["Šírka (mm)"] == {"type": "STRING"}
+
+    orch = BatchOrchestrator(client=None, result_parser=None, config={})
+    cat = next(iter(orch.category_parameters))
+    df = pd.DataFrame({
+        "code": ["X1"], "name": ["Produkt X1"],
+        "shortDescription": ["p"], "description": ["d"],
+        "newCategory": [cat],
+        "filteringProperty:Objem (l)": ["12"],
+    })
+    requests = []
+    orch._build_category_requests(df, {0}, requests, is_group1=False)
+    assert len(requests) == 1
+    req = requests[0]["request"]
+    assert "responseSchema" in req["generationConfig"]
+    import json
+    payload = json.loads(req["contents"][0]["parts"][0]["text"])
+    assert payload[0]["existingParameters"] == {"Objem (l)": "12"}
+
+
+def test_fuzzy_match_populates_audit():
+    """Non-exact matches land in match_audit for review export."""
+    from src.ai.result_parser import ResultParser
+
+    parser = ResultParser()
+    df = pd.DataFrame({"code": ["ABC-123"], "name": ["Chladnička X"], "aiProcessed": [""]})
+    df, count = parser.update_dataframe(df, [{"code": "ABC123", "name": "Chladnička X"}])
+    assert count == 1
+    assert len(parser.match_audit) == 1
+    assert parser.match_audit[0]["strategy"] in ("fuzzy_code", "fuzzy_name")
+    assert parser.match_audit[0]["matched_code"] == "ABC-123"
+
+
 def test_category_falls_back_when_newcategory_column_empty():
     """Empty newCategory column (e.g. DB export) must fall back to defaultCategory."""
     from src.ai.batch_orchestrator import BatchOrchestrator

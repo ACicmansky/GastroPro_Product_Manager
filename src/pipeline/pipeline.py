@@ -9,13 +9,14 @@ import pandas as pd
 from src.ai.product_enricher import ProductEnricher
 from src.data.database.batch_job_db import BatchJobDB
 from src.data.database.product_db import ProductDB
-from src.data.loaders.loader_factory import DataLoaderFactory
+from src.data.loaders.xlsx_loader import load_xlsx
 from src.data.parsers.xml_parser_factory import XMLParserFactory
 from src.data.writers.xlsx_writer import write_xlsx
 from src.domain.categories.category_filter import CategoryFilter
 from src.domain.categories.category_service import CategoryService
 from src.domain.models import MergeStats, PipelineOptions, PipelineResult
 from src.domain.pricing.pricing_service import PricingService
+from src.domain.products.feed_specs import apply_feed_specs
 from src.domain.products.merger import ProductMerger
 from src.domain.transform.output_transformer import OutputTransformer
 
@@ -88,7 +89,7 @@ class Pipeline:
         main_df = pd.DataFrame()
         if options.main_file_path:
             progress(f"Loading main data file: {options.main_file_path}")
-            main_df = DataLoaderFactory.load(options.main_file_path)
+            main_df = load_xlsx(options.main_file_path)
 
         # If we have DB data but no main file, use DB as main
         if main_df.empty and not db_df.empty:
@@ -176,6 +177,9 @@ class Pipeline:
             merged_df = enrichment.products
             result.enrichment_stats = enrichment
 
+        # 8b. Structured feed specs override AI-extracted dims/weight
+        merged_df = apply_feed_specs(merged_df)
+
         # 9. Transform to output format
         progress("Transforming to output format...")
         output_df = self.transformer.transform(merged_df)
@@ -248,7 +252,7 @@ class Pipeline:
 
     def load_main_data(self, file_path: str) -> pd.DataFrame:
         """Load main data file. Convenience method."""
-        return DataLoaderFactory.load(file_path)
+        return load_xlsx(file_path)
 
     def parse_xml(self, feed_name: str, xml_content: str) -> pd.DataFrame:
         """Parse an XML feed. Convenience method for testing."""

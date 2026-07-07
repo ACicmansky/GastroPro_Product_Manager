@@ -139,10 +139,10 @@ class GeminiClient:
         )
         return uploaded.name
 
-    def create_batch_job(self, uploaded_file_name: str):
+    def create_batch_job(self, uploaded_file_name: str, model: Optional[str] = None):
         """Create a batch processing job. Returns the batch job object."""
         return self.client.batches.create(
-            model=self.model_name,
+            model=model or self.model_name,
             src=uploaded_file_name,
         )
 

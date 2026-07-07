@@ -79,6 +79,28 @@ class ProductEnricher:
         return EnrichmentResult(
             products=updated_df,
             processed=stats.get("ai_processed", 0),
-            skipped=0,
+            failed=stats.get("ai_should_process", 0) - stats.get("ai_processed", 0),
+        )
+
+    def fill_missing_params(
+        self,
+        df: pd.DataFrame,
+        progress_callback: Optional[Callable] = None,
+        model: Optional[str] = None,
+    ) -> EnrichmentResult:
+        """Second pass: web-grounded re-ask for filter params still missing.
+
+        `model` escalates the pass to a stronger model (tiered enhancement).
+        """
+        if not self.client.is_available:
+            logger.warning("AI client not available, skipping missing-params pass")
+            return EnrichmentResult(products=df)
+
+        updated_df, stats = self.orchestrator.process_missing_params(
+            df, progress_callback=progress_callback, model=model
+        )
+        return EnrichmentResult(
+            products=updated_df,
+            processed=stats.get("ai_processed", 0),
             failed=stats.get("ai_should_process", 0) - stats.get("ai_processed", 0),
         )

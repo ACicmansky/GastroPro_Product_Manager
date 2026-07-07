@@ -11,7 +11,13 @@ import pandas as pd
 
 from .api_client import GeminiClient
 from .result_parser import ResultParser
-from .prompts import create_system_prompt, create_system_prompt_no_dimensions, load_category_parameters
+from .prompts import (
+    build_response_schema,
+    create_params_only_prompt,
+    create_system_prompt,
+    create_system_prompt_no_dimensions,
+    load_category_parameters,
+)
 from src.data.database.batch_job_db import BatchJobDB
 
 logger = logging.getLogger(__name__)
@@ -39,9 +45,7 @@ class BatchOrchestrator:
         ai_config = (config or {}).get("ai_enhancement", {})
         self.batch_size = ai_config.get("batch_size", 45)
         self.temperature = ai_config.get("temperature", 0.1)
-        self.tmp_dir = ai_config.get(
-            "tmp_dir", os.path.join(os.path.dirname(__file__), "tmp")
-        )
+        self.tmp_dir = ai_config.get("tmp_dir", os.path.join("out", "batch_requests"))
         os.makedirs(self.tmp_dir, exist_ok=True)
 
         self.category_parameters = load_category_parameters()
@@ -116,9 +120,87 @@ class BatchOrchestrator:
             logger.info("No valid batch requests generated.")
             return df, {"ai_should_process": total, "ai_processed": 0}
 
-        # Write JSONL and submit
+        return self._submit_and_monitor(df, jsonl_requests, progress_callback, total)
+
+    def process_missing_params(
+        self,
+        df: pd.DataFrame,
+        progress_callback: Optional[Callable] = None,
+        model: Optional[str] = None,
+    ) -> Tuple[pd.DataFrame, Dict]:
+        """Second pass: grounded re-ask for filter params still missing after enhancement.
+
+        Params-only responses can't clobber descriptions — the parser writes
+        text fields only when present in the response.
+        """
+        if not self.client.is_available:
+            logger.warning("No API key, skipping missing-params pass")
+            return df, {"ai_should_process": 0, "ai_processed": 0}
+
+        jsonl_requests, product_count = self._build_missing_param_requests(df)
+        if not jsonl_requests:
+            logger.info("No products with missing parameters")
+            return df, {"ai_should_process": 0, "ai_processed": 0}
+
+        logger.info(
+            "Missing-params pass: %d products in %d requests (model=%s)",
+            product_count, len(jsonl_requests), model or self.client.model_name,
+        )
+        return self._submit_and_monitor(
+            df, jsonl_requests, progress_callback, product_count, model=model
+        )
+
+    def _build_missing_param_requests(self, df: pd.DataFrame) -> Tuple[list, int]:
+        """Group products by category and list each one's unfilled expected params."""
+        by_cat: Dict[str, list] = {}
+        for _, row in df.iterrows():
+            cat = self._category_of(row)
+            expected = self.category_parameters.get(cat)
+            if not expected:
+                continue
+            missing = [
+                p for p in expected
+                if str(row.get(f"filteringProperty:{p}", "") or "").strip().lower() in ("", "nan")
+            ]
+            if not missing:
+                continue
+            by_cat.setdefault(cat, []).append({
+                "code": str(row.get("code", "")),
+                "name": str(row.get("name", "")),
+                "shortDescription": str(row.get("shortDescription", "")),
+                "chybajuce_parametre": missing,
+            })
+
+        jsonl_requests = []
+        product_count = 0
+        for cat_name, products in by_cat.items():
+            sys_prompt = create_params_only_prompt(cat_name)
+            for i in range(0, len(products), self.batch_size):
+                chunk = products[i:i + self.batch_size]
+                product_count += len(chunk)
+                jsonl_requests.append({
+                    "key": f"fill_{hash(cat_name)}_{i}",
+                    "request": {
+                        "systemInstruction": {"parts": [{"text": sys_prompt}]},
+                        "contents": [{"role": "user", "parts": [{"text": json.dumps(chunk, ensure_ascii=False)}]}],
+                        # ponytail: no responseMimeType — google_search + JSON mime conflict; parser strips fences
+                        "tools": [{"google_search": {}}],
+                        "generationConfig": {"temperature": self.temperature},
+                    },
+                })
+        return jsonl_requests, product_count
+
+    def _submit_and_monitor(
+        self,
+        df: pd.DataFrame,
+        jsonl_requests: list,
+        progress_callback: Optional[Callable],
+        total: int,
+        model: Optional[str] = None,
+    ) -> Tuple[pd.DataFrame, Dict]:
+        """Write JSONL, upload, create batch job, and monitor to completion."""
         jsonl_path = os.path.join(
-            self.tmp_dir, f"batch_requests_{datetime.now().strftime('%Y%m%d_%H%M%S')}.jsonl"
+            self.tmp_dir, f"batch_requests_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jsonl"
         )
         with open(jsonl_path, "w", encoding="utf-8") as f:
             for req in jsonl_requests:
@@ -133,7 +215,7 @@ class BatchOrchestrator:
             if progress_callback:
                 progress_callback(0, total, "Vytvaranie davkovej ulohy (Batch Job)...")
 
-            batch_job = self.client.create_batch_job(uploaded_name)
+            batch_job = self.client.create_batch_job(uploaded_name, model=model)
             logger.info(f"Batch Job Created: {batch_job.name}")
 
             if self.batch_job_db:
@@ -179,18 +261,29 @@ class BatchOrchestrator:
             else:
                 sys_prompt = create_system_prompt(cat_name, expected_params)
 
+            param_cols = [c for c in cat_subset.columns if c.startswith("filteringProperty:")]
+
             for i in range(0, len(cat_subset), self.batch_size):
                 batch_end = min(i + self.batch_size, len(cat_subset))
                 batch_df = cat_subset.iloc[i:batch_end]
 
                 products = []
                 for _, row in batch_df.iterrows():
-                    products.append({
+                    product = {
                         "code": str(row.get("code", "")),
                         "name": str(row.get("name", "")),
                         "shortDescription": str(row.get("shortDescription", "")),
                         "description": str(row.get("description", "")),
-                    })
+                    }
+                    # Known params differentiate copy for near-identical variants
+                    existing = {
+                        c.split(":", 1)[1]: str(row[c]).strip()
+                        for c in param_cols
+                        if str(row.get(c, "") or "").strip().lower() not in ("", "nan")
+                    }
+                    if existing:
+                        product["existingParameters"] = existing
+                    products.append(product)
 
                 if products:
                     req_key = f"req_{'g1' if is_group1 else 'g2'}_{hash(cat_name)}_{i}"
@@ -199,7 +292,11 @@ class BatchOrchestrator:
                         "request": {
                             "systemInstruction": {"parts": [{"text": sys_prompt}]},
                             "contents": [{"role": "user", "parts": [{"text": json.dumps(products, ensure_ascii=False)}]}],
-                            "generationConfig": {"temperature": self.temperature, "responseMimeType": "application/json"},
+                            "generationConfig": {
+                                "temperature": self.temperature,
+                                "responseMimeType": "application/json",
+                                "responseSchema": build_response_schema(expected_params),
+                            },
                         },
                     })
 

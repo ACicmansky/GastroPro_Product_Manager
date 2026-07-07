@@ -41,7 +41,11 @@
         "product_s_desc": "shortDescription",
         "product_desc": "description",
         "images/item/url": "IMAGES",
-        "product_weight": "weight"
+        "product_weight": "weight",
+        "product_width": "feedWidth",
+        "product_length": "feedDepth",
+        "product_height": "feedHeight",
+        "product_lwh_uom": "feedDimUnit"
       }
     }
   },
@@ -142,7 +146,7 @@
   "ai_enhancement": {
     "enabled": true,
     "model": "gemini-2.5-flash-lite",
-    "batch_size": 30,
+    "batch_size": 15,
     "temperature": 0,
     "retry_attempts": 3,
     "retry_delay": 60,

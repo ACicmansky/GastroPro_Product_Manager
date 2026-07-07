@@ -65,10 +65,13 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
     "code": "Katalógové číslo produktu",
     "name": "Názov produktu",
     "shortDescription": "Stručný existujúci popis",
-    "description": "Detailný popis alebo prázdne pole"
+    "description": "Detailný popis alebo prázdne pole",
+    "existingParameters": {{"...": "už známe technické parametre (nepovinné pole)"}}
 }}
 ]
 ```
+
+* Ak produkt obsahuje `existingParameters`, využi tieto hodnoty na **odlíšenie textov od podobných produktov** – každý `shortDescription`, `description` aj `seoTitle` musí byť jedinečný, nie kópia textu susedného produktu s podobným názvom.
 
 ---
 
@@ -173,6 +176,69 @@ Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
 * [ ] metaDescription má 120-160 znakov
 * [ ] Objekt `"parameters"` obsahuje iba vyžiadané parametre so zmysluplnými číselnými/textovými hodnotami
 * [ ] Výstup je čistý JSON bez akýchkoľvek iných prvkov
+"""
+
+
+def build_response_schema(expected_parameters: list = None) -> Dict:
+    """Structured-output schema: enum-locked Áno/Nie params, string everything else."""
+    param_props = {}
+    for p in expected_parameters or []:
+        if "Áno/Nie" in p:
+            param_props[p] = {"type": "STRING", "enum": ["Áno", "Nie"]}
+        else:
+            param_props[p] = {"type": "STRING"}
+
+    item = {
+        "type": "OBJECT",
+        "properties": {
+            "code": {"type": "STRING"},
+            "name": {"type": "STRING"},
+            "shortDescription": {"type": "STRING"},
+            "description": {"type": "STRING"},
+            "seoTitle": {"type": "STRING"},
+            "metaDescription": {"type": "STRING"},
+        },
+        "required": ["code", "shortDescription", "description", "seoTitle", "metaDescription"],
+    }
+    if param_props:
+        item["properties"]["parameters"] = {"type": "OBJECT", "properties": param_props}
+    return {"type": "ARRAY", "items": item}
+
+
+def create_params_only_prompt(category_name: str = "") -> str:
+    """Second-pass prompt: fill ONLY missing filter parameters, with web search."""
+    cat_str = f"Produkty patria do kategórie: **{category_name}**." if category_name else ""
+    return f"""Si technický expert na profesionálne gastro vybavenie. {cat_str}
+
+Dostaneš JSON pole produktov. Každý produkt má pole `"chybajuce_parametre"` – zoznam technických parametrov, ktoré sa nepodarilo zistiť z popisu.
+
+Tvoja úloha: pre každý produkt **dohľadaj hodnoty chýbajúcich parametrov pomocou webového vyhľadávania** (katalógové číslo + názov sú spoľahlivé vyhľadávacie kľúče).
+
+Pravidlá hodnôt:
+* Jednotka je už v názve parametra (napr. "Šírka (mm)", "Príkon (W)") – hodnota je **iba čisté číslo** (napr. "800").
+* Pre parametre s "(Áno/Nie)" použi presne "Áno" alebo "Nie".
+* Používaj presne zadané názvy parametrov ako kľúče – nevymýšľaj vlastné.
+* Ak hodnotu nenájdeš spoľahlivo, kľúč **vôbec nezaraď** – žiadne odhady.
+
+Výstup: **IBA čisté JSON pole** bez akéhokoľvek iného textu, bez ```json:
+[{{"code": "katalógové číslo", "parameters": {{"Šírka (mm)": "800"}}}}]
+Produkty, pre ktoré si nič nenašiel, vynechaj úplne.
+"""
+
+
+def create_category_classification_prompt(categories: List[str]) -> str:
+    """Classify uncategorized products into the known category tree."""
+    cats = "\n".join(f"- {c}" for c in categories)
+    return f"""Si expert na kategorizáciu profesionálneho gastro vybavenia.
+
+Dostaneš JSON pole produktov (code, name, shortDescription). Pre každý produkt vyber **presne jednu kategóriu** z tohto zoznamu a skopíruj ju **doslovne** (vrátane diakritiky a oddeľovačov " > "):
+
+{cats}
+
+Ak si nie si istý ani na 80 %, použi prázdny reťazec "".
+
+Výstup: **IBA čisté JSON pole** bez akéhokoľvek iného textu, bez ```json:
+[{{"code": "katalógové číslo", "category": "vybraná kategória alebo \\"\\""}}]
 """
 
 

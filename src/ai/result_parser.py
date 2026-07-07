@@ -22,12 +22,26 @@ _NUMBER = re.compile(r"-?\d+(?:[.,]\d+)?")
 _YES = {"áno", "ano", "yes", "true", "1"}
 _NO = {"nie", "no", "false", "0"}
 
+_BRAND_PREFIX = "GastroPro.sk | "
+_MAX_LEN = {"seoTitle": 60, "metaDescription": 155}
+
+
+def _truncate(text: str, limit: int) -> str:
+    if len(text) <= limit:
+        return text
+    cut = text[:limit + 1]
+    if " " in cut:
+        cut = cut[:cut.rfind(" ")]
+    return cut[:limit].rstrip(" ,;.–-")
+
 
 class ResultParser:
     """Parses AI batch results and matches them back to source products."""
 
     def __init__(self, similarity_threshold: int = 85, allowed_params: Optional[Set[str]] = None):
         self.similarity_threshold = similarity_threshold
+        # Non-exact matches carry wrong-product write risk — kept for review export
+        self.match_audit: List[Dict] = []
         # Canonical map: exact name -> itself, plus unit-less base -> full name,
         # so a model echoing "Šírka" still lands in "Šírka (mm)".
         self.param_map: Dict[str, str] = {}
@@ -50,6 +64,15 @@ class ResultParser:
             if num:
                 return num.group(0).replace(",", ".")
         return value
+
+    @staticmethod
+    def enforce_format(field: str, value) -> str:
+        """SEO length caps and branding enforced in code, not prompt-begged."""
+        value = str(value).strip()
+        if field == "metaDescription" and not value.lower().startswith("gastropro.sk"):
+            value = _BRAND_PREFIX + value
+        limit = _MAX_LEN.get(field)
+        return _truncate(value, limit) if limit else value
 
     def find_best_match(
         self, enhanced_name: str, column_name: str, df: pd.DataFrame
@@ -103,6 +126,7 @@ class ResultParser:
 
         for enhanced in enhanced_products:
             best_match_idx = None
+            strategy = None
 
             code = str(enhanced.get("code", "")).strip()
             if code:
@@ -110,22 +134,41 @@ class ResultParser:
                 exact = search_df[search_df["code"].astype(str).str.strip() == code]
                 if len(exact) == 1:
                     best_match_idx = exact.index[0]
+                    strategy = "exact"
                 elif len(exact) > 1:
                     best_match_idx = exact.index[0]
+                    strategy = "exact"
                     logger.warning(f"Multiple exact matches for {code}, using first")
                 else:
                     # Strategy 2: Fuzzy match on code
                     best_match_idx = self.find_best_match(code, "code", search_df)
+                    strategy = "fuzzy_code"
                     if best_match_idx is None:
                         # Strategy 3: Fuzzy match on name
                         name = enhanced.get("name", "")
                         if name:
                             best_match_idx = self.find_best_match(name, "name", search_df)
+                            strategy = "fuzzy_name"
 
             if best_match_idx is not None:
+                if strategy != "exact":
+                    matched_code = str(df.at[best_match_idx, "code"]) if "code" in df.columns else ""
+                    matched_name = str(df.at[best_match_idx, "name"]) if "name" in df.columns else ""
+                    logger.warning(
+                        "Non-exact match (%s): AI code='%s' name='%s' -> row code='%s' name='%s'",
+                        strategy, code, enhanced.get("name", ""), matched_code, matched_name,
+                    )
+                    self.match_audit.append({
+                        "strategy": strategy,
+                        "ai_code": code,
+                        "ai_name": str(enhanced.get("name", "")),
+                        "matched_code": matched_code,
+                        "matched_name": matched_name,
+                    })
+
                 for field in ("shortDescription", "description", "seoTitle", "metaDescription"):
                     if field in enhanced:
-                        df.at[best_match_idx, field] = enhanced[field]
+                        df.at[best_match_idx, field] = self.enforce_format(field, enhanced[field])
 
                 if "parameters" in enhanced and isinstance(enhanced["parameters"], dict):
                     for param_key, param_val in enhanced["parameters"].items():
@@ -170,7 +213,14 @@ class ResultParser:
             try:
                 parsed = json.loads(line)
                 if "response" in parsed and parsed["response"]:
-                    for part in parsed["response"]["candidates"][0]["content"]["parts"]:
+                    candidates = parsed["response"].get("candidates") or [{}]
+                    parts = (candidates[0].get("content") or {}).get("parts") or []
+                    if not parts:
+                        logger.warning(
+                            "Batch line without content parts (finishReason=%s)",
+                            candidates[0].get("finishReason", "n/a"),
+                        )
+                    for part in parts:
                         if "text" in part:
                             text = part["text"].strip().replace("```json", "").replace("```", "")
                             try:
