@@ -77,15 +77,15 @@ class TestProductDB:
 
 @pytest.mark.unit
 class TestBatchJobDB:
-    def test_add_and_get_job(self, job_db):
+    def test_add_job_becomes_active(self, job_db):
         job_db.add_job("jobs/123", "JOB_STATE_PENDING", "in.jsonl", "files/abc")
-        job = job_db.get_job("jobs/123")
+        job = job_db.get_active_job()
         assert job is not None
         assert job["status"] == "JOB_STATE_PENDING"
         assert job["uploaded_file_name"] == "files/abc"
 
-    def test_get_job_missing_returns_none(self, job_db):
-        assert job_db.get_job("nope") is None
+    def test_get_active_job_empty_returns_none(self, job_db):
+        assert job_db.get_active_job() is None
 
     def test_get_active_job_ignores_completed(self, job_db):
         job_db.add_job("jobs/done", "JOB_STATE_SUCCEEDED", "a.jsonl", "f1")
@@ -100,7 +100,3 @@ class TestBatchJobDB:
         job_db.add_job("jobs/run", "JOB_STATE_RUNNING", "a.jsonl", "f1")
         job_db.update_status("jobs/run", "JOB_STATE_SUCCEEDED", details="ok")
         assert job_db.get_active_job() is None
-        job = job_db.get_job("jobs/run")
-        assert job is not None
-        assert job["status"] == "JOB_STATE_SUCCEEDED"
-        assert job["details"] == "ok"

@@ -92,25 +92,7 @@ class TestXMLParserNewFormat:
 
 
 class TestXMLParserFactory:
-    """Test XML parser factory for feed detection."""
-
-    def test_factory_detects_gastromarket(self, config):
-        """Test factory detects Gastromarket feed."""
-        from src.data.parsers.xml_parser_factory import XMLParserFactory
-
-        parser = XMLParserFactory.get_parser("gastromarket", config)
-
-        assert parser is not None
-        assert hasattr(parser, "parse_gastromarket")
-
-    def test_factory_detects_forgastro(self, config):
-        """Test factory detects ForGastro feed."""
-        from src.data.parsers.xml_parser_factory import XMLParserFactory
-
-        parser = XMLParserFactory.get_parser("forgastro", config)
-
-        assert parser is not None
-        assert hasattr(parser, "parse_forgastro")
+    """Test XML parser factory feed routing."""
 
     def test_factory_parse_method(self, sample_xml_gastromarket, config):
         """Test factory parse method."""

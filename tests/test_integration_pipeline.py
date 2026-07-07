@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from src.config.config_loader import load_config
-from src.data.loaders.loader_factory import DataLoaderFactory
+from src.data.loaders.xlsx_loader import load_xlsx
 from src.data.parsers.xml_parser_factory import XMLParserFactory
 from src.domain.products.merger import ProductMerger
 from src.domain.transform.output_transformer import OutputTransformer
@@ -42,7 +42,7 @@ class TestPipelineChain:
         assert (fg["defaultCategory"] != "").all()
 
     def test_merge_preserve_edits(self, feed_dfs):
-        main_df = DataLoaderFactory.load(FIXTURES / "main.xlsx")
+        main_df = load_xlsx(FIXTURES / "main.xlsx")
         result = ProductMerger().merge(main_df, feed_dfs, preserve_edits=True)
         codes = set(result.products["code"])
         # G2 gone from its fetched feed -> discontinued
@@ -52,7 +52,7 @@ class TestPipelineChain:
         assert {"C1", "C2", "F1", "W1", "V1", "V2", "G1", "G3"} == codes
 
     def test_transform_keeps_categories(self, feed_dfs, config):
-        main_df = DataLoaderFactory.load(FIXTURES / "main.xlsx")
+        main_df = load_xlsx(FIXTURES / "main.xlsx")
         merged = ProductMerger().merge(main_df, feed_dfs, preserve_edits=True).products
         output = OutputTransformer(config).transform(merged)
 

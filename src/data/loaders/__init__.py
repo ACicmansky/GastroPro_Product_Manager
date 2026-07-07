@@ -1,2 +1,1 @@
-from .xlsx_loader import XLSXLoader
-from .loader_factory import DataLoaderFactory
+from .xlsx_loader import load_xlsx

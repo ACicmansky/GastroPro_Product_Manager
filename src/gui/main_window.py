@@ -33,7 +33,7 @@ from .worker import PipelineWorker
 from .widgets import CategoryMappingDialog, PriceMappingDialog
 from src.config.config_loader import load_config
 from src.domain.categories.category_service import CategoryService
-from src.data.loaders.loader_factory import DataLoaderFactory
+from src.data.loaders.xlsx_loader import load_xlsx
 from src.domain.categories.category_filter import CategoryFilter
 from src.domain.models import PipelineOptions
 
@@ -309,8 +309,7 @@ class MainWindow(QMainWindow):
             file_path: Path to data file
         """
         try:
-            # Load using factory
-            df = DataLoaderFactory.load(file_path)
+            df = load_xlsx(file_path)
 
             if df is None or df.empty:
                 QMessageBox.warning(self, "Prázdny súbor", "Vybraný súbor je prázdny.")

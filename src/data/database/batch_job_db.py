@@ -79,12 +79,3 @@ class BatchJobDB:
         finally:
             conn.close()
 
-    def get_job(self, job_name: str) -> Optional[dict]:
-        conn = self._get_connection()
-        try:
-            cursor = conn.cursor()
-            cursor.execute("SELECT * FROM batch_jobs WHERE job_name = ?", (job_name,))
-            row = cursor.fetchone()
-            return dict(row) if row else None
-        finally:
-            conn.close()

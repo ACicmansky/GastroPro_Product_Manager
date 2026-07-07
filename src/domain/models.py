@@ -24,7 +24,6 @@ class EnrichmentResult:
     """Result of AI enhancement processing."""
     products: pd.DataFrame
     processed: int = 0
-    skipped: int = 0
     failed: int = 0
 
 

@@ -18,20 +18,6 @@ class XMLParserFactory:
     """Factory for creating appropriate XML parsers based on feed type."""
 
     @staticmethod
-    def get_parser(feed_name: str, config: Dict):
-        """
-        Get appropriate parser based on feed name.
-
-        Args:
-            feed_name: Name of the feed (e.g., 'gastromarket', 'forgastro')
-            config: Configuration dictionary
-
-        Returns:
-            XMLParser instance
-        """
-        return XMLParser(config)
-
-    @staticmethod
     def fetch_and_parse(
         feed_name: str, url: str, config: Dict, retries: int = 3
     ) -> pd.DataFrame:
@@ -82,7 +68,7 @@ class XMLParserFactory:
         Returns:
             DataFrame with parsed data in new format
         """
-        parser = XMLParserFactory.get_parser(feed_name, config)
+        parser = XMLParser(config)
 
         # Route to appropriate parsing method
         if feed_name.lower() == "gastromarket":
