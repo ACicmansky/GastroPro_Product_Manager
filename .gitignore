@@ -11,3 +11,5 @@ cache/
 graphify-out/
 
 out/
+tmp
+logs/
