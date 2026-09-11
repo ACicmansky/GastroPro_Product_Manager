@@ -1,5 +1,6 @@
 import re
 from PyQt5.QtWidgets import (
+    QApplication,
     QFrame,
     QLabel,
     QVBoxLayout,
@@ -35,6 +36,7 @@ class CategoryMappingDialog(QDialog):
         self.suggestions = suggestions or []
         self.product_name = product_name
         self.new_category = None
+        self.cancel_pipeline = False
         self.init_ui()
 
     def init_ui(self):
@@ -60,10 +62,21 @@ class CategoryMappingDialog(QDialog):
         info_label.setStyleSheet("font-weight: bold; margin-bottom: 5px;")
         layout.addWidget(info_label)
 
+        original_layout = QHBoxLayout()
         original_label = QLabel(self.original_category)
         original_label.setProperty("card", "neutral")
         original_label.setWordWrap(True)
-        layout.addWidget(original_label)
+        original_label.setTextInteractionFlags(Qt.TextSelectableByMouse)
+        original_layout.addWidget(original_label, stretch=1)
+
+        copy_button = QPushButton("📋 Kopírovať")
+        copy_button.setProperty("flat", "true")
+        copy_button.setToolTip("Skopírovať kategóriu do schránky")
+        copy_button.clicked.connect(
+            lambda: QApplication.clipboard().setText(self.original_category)
+        )
+        original_layout.addWidget(copy_button, alignment=Qt.AlignTop)
+        layout.addLayout(original_layout)
 
         # Suggestions list (if available)
         if self.suggestions:
@@ -101,15 +114,25 @@ class CategoryMappingDialog(QDialog):
 
         self.category_input = QLineEdit()
         self.category_input.setPlaceholderText("Napr.: Nerezový nábytok/Pracovné stoly")
+        self.category_input.setText(self.original_category)
+        self.category_input.selectAll()
         self.category_input.returnPressed.connect(self.accept)
         layout.addWidget(self.category_input)
 
-        # OK button
+        # Buttons
         button_layout = QHBoxLayout()
+
+        cancel_button = QPushButton("⛔ Zrušiť celý proces")
+        cancel_button.setProperty("danger", "true")
+        cancel_button.setToolTip("Zastaví celé spracovanie, nielen toto mapovanie")
+        cancel_button.clicked.connect(self.on_cancel_pipeline)
+        button_layout.addWidget(cancel_button)
+
         button_layout.addStretch()
 
         ok_button = QPushButton("OK")
         ok_button.setDefault(True)
+        ok_button.setProperty("primary", "true")
         ok_button.clicked.connect(self.accept)
         ok_button.setMinimumWidth(100)
         button_layout.addWidget(ok_button)
@@ -119,6 +142,10 @@ class CategoryMappingDialog(QDialog):
 
         # Set focus to input
         self.category_input.setFocus()
+
+    def on_cancel_pipeline(self):
+        self.cancel_pipeline = True
+        self.reject()
 
     def on_suggestion_clicked(self, item):
         """Populate input field when a suggestion is clicked."""

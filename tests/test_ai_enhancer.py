@@ -165,13 +165,17 @@ def test_fuzzy_match_populates_audit():
 
 
 def test_category_falls_back_when_newcategory_column_empty():
-    """Empty newCategory column (e.g. DB export) must fall back to defaultCategory."""
+    """Empty newCategory falls back to defaultCategory; pre-migration values
+    (no 'Tovary a kategórie > ' prefix) are normalized so they match
+    categories_with_parameters.json keys."""
     from src.ai.batch_orchestrator import BatchOrchestrator
 
     row = pd.Series({"newCategory": "", "defaultCategory": "Gastro > Pulty"})
-    assert BatchOrchestrator._category_of(row) == "Gastro > Pulty"
+    assert BatchOrchestrator._category_of(row) == "Tovary a kategórie > Gastro > Pulty"
     row_nan = pd.Series({"newCategory": float("nan"), "defaultCategory": "Gastro > Pulty"})
-    assert BatchOrchestrator._category_of(row_nan) == "Gastro > Pulty"
+    assert BatchOrchestrator._category_of(row_nan) == "Tovary a kategórie > Gastro > Pulty"
+    prefixed = pd.Series({"newCategory": "Tovary a kategórie > Gastro > Pulty"})
+    assert BatchOrchestrator._category_of(prefixed) == "Tovary a kategórie > Gastro > Pulty"
     assert BatchOrchestrator._category_of(pd.Series({"code": "X"})) == ""
 
 

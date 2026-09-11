@@ -284,7 +284,7 @@ QLabel[variant="warning"] {
 }
 
 /* --- Header --- */
-QPushButton#themeToggle {
+QPushButton#themeToggle, QPushButton#settingsButton {
     min-width: 0;
     padding: 5px 12px;
 }

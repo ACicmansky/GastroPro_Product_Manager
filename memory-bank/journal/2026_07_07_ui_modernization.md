@@ -35,3 +35,8 @@ Offscreen smoke test (QSS parses clean, dark mode detected True on this machine)
 - **CTA busy state**: "⏳ Spracovávam..." during a run, restored on thread finish.
 - Gotcha: toast fade-in needs a running event loop — in static `grab()` screenshots opacity is still 0; freeze `_effect.setOpacity(1.0)` to capture.
 - Tests extended in `tests/test_gui_window.py` (toast stack/dismiss, AI determinate progress + indeterminate flip, activity log). Suite: 218 passed.
+
+## Follow-up (2026-07-08): CategoryMappingDialog UX
+- Unmapped-category label selectable + "📋 Kopírovať" clipboard button; input prefilled with the unmapped value (selected, so typing replaces).
+- "⛔ Zrušiť celý proces" danger button aborts the whole run: `dialog.cancel_pipeline` → `PipelineWorker.cancel_pipeline()` → `PipelineCancelled` raised out of `_on_unknown_category` → error toast "Spracovanie zrušené používateľom." Closing via X still keeps the original category (skip, not abort). Suite: 219 passed.
+- `CategoryService.is_target_category`: dead pre-migration prefixes ("Gastro Prevádzky a Profesionáli > ", "Domácnosť a Kulinári > ") replaced by "Tovary a kategórie > " — categories already in final format skip the mapping dialog again.

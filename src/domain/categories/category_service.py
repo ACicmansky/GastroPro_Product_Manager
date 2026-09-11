@@ -158,13 +158,11 @@ class CategoryService:
 
         Recognized if either:
         - It appears as a value in existing mappings, or
-        - It uses the new-format prefix "Gastro Prevádzky a Profesionáli > " or "Domácnosť a Kulinári > ".
+        - It uses the new-format prefix "Tovary a kategórie > ".
         """
         if not category:
             return False
-        if category.startswith(
-            "Gastro Prevádzky a Profesionáli > "
-        ) or category.startswith("Domácnosť a Kulinári > "):
+        if category.startswith("Tovary a kategórie > "):
             return True
         return category in set(self._mappings.values())
 

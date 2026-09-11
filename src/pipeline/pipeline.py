@@ -256,6 +256,47 @@ class Pipeline:
         )
         return result
 
+    def run_ai_for_categories(
+        self,
+        categories: list,
+        on_progress: Optional[Callable] = None,
+        ai_control=None,
+        on_ai_progress: Optional[Callable] = None,
+    ) -> PipelineResult:
+        """Re-run AI enhancement for products of the given categories only (DB in -> DB out).
+
+        Used after a category's filter parameters changed.
+        """
+        if self.get_resumable_ai_run():
+            raise RuntimeError(
+                "Najprv dokončite alebo zrušte prerušené AI spracovanie."
+            )
+
+        start_time = time.time()
+        result = PipelineResult()
+
+        def progress(msg: str):
+            if on_progress:
+                on_progress(msg)
+            logger.info(msg)
+
+        df = self.db.get_all()
+        enrichment = self.enricher.enrich(
+            df,
+            only_categories=set(categories),
+            progress_callback=on_ai_progress
+            or (lambda *args: progress(args[-1] if args else "AI processing...")),
+            control=ai_control,
+            on_chunk_applied=self.db.upsert,
+        )
+        result.enrichment_stats = enrichment
+        result.product_count = len(enrichment.products)
+        result.duration_seconds = time.time() - start_time
+        progress(
+            f"AI pre kategórie hotové. {enrichment.processed} produktov spracovaných v {result.duration_seconds:.1f}s"
+        )
+        return result
+
     def _map_prices(
         self,
         df: pd.DataFrame,

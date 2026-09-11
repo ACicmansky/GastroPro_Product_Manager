@@ -62,6 +62,7 @@ class ProductEnricher:
         progress_callback: Optional[Callable] = None,
         control: Optional[RunControl] = None,
         on_chunk_applied: Optional[Callable] = None,
+        only_categories: Optional[set] = None,
     ) -> EnrichmentResult:
         """Enrich product DataFrame with AI-generated content.
 
@@ -71,6 +72,7 @@ class ProductEnricher:
             progress_callback: Optional progress callback
             control: Optional RunControl for pause/cancel
             on_chunk_applied: Optional callback(rows_df) fired after each chunk is applied
+            only_categories: Re-process only products of these categories
 
         Returns:
             EnrichmentResult with updated DataFrame and stats
@@ -87,6 +89,7 @@ class ProductEnricher:
             force_reprocess=force_reprocess,
             control=control,
             on_chunk_applied=on_chunk_applied,
+            only_categories=only_categories,
         )
 
         return EnrichmentResult(

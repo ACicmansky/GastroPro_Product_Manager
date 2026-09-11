@@ -75,13 +75,18 @@ class BatchOrchestrator:
         force_reprocess: bool = False,
         control: Optional[RunControl] = None,
         on_chunk_applied: Optional[Callable[[pd.DataFrame], None]] = None,
+        only_categories: Optional[set] = None,
     ) -> Tuple[pd.DataFrame, Dict]:
-        """Run (or resume) chunked batch processing for products needing AI enhancement."""
+        """Run (or resume) chunked batch processing for products needing AI enhancement.
+
+        only_categories: re-process ONLY products of these categories (ignores
+        aiProcessed) — used when a category's filter parameters changed.
+        """
         if not self.client.is_available:
             logger.warning("No API key, skipping AI enhancement")
             return df, {"ai_should_process": 0, "ai_processed": 0}
 
-        if self.run_db:
+        if self.run_db and not only_categories:
             resumable = self.run_db.get_resumable_run()
             if resumable:
                 logger.info(
@@ -101,7 +106,7 @@ class BatchOrchestrator:
             else x
         )
 
-        needs_processing = df if force_reprocess else df[df["aiProcessed"] != "1"]
+        needs_processing = self._select(df, force_reprocess, only_categories)
         total = len(needs_processing)
 
         if total == 0:
@@ -440,12 +445,25 @@ class BatchOrchestrator:
                 })
         return jsonl_requests, product_count
 
+    def _select(
+        self, df: pd.DataFrame, force_reprocess: bool, only_categories: Optional[set]
+    ) -> pd.DataFrame:
+        """Rows to process: a category-scoped re-run beats the aiProcessed filter."""
+        if only_categories:
+            return df[df.apply(self._category_of, axis=1).isin(only_categories)]
+        return df if force_reprocess else df[df["aiProcessed"] != "1"]
+
     @staticmethod
     def _category_of(row) -> str:
-        """First non-empty of newCategory/defaultCategory (empty column != missing column)."""
+        """First non-empty of newCategory/defaultCategory (empty column != missing column),
+        normalized to the "Tovary a kategórie > " target prefix — DB rows saved before
+        the category migration lack it, but categories_with_parameters.json keys have it.
+        """
         for col in ("newCategory", "defaultCategory"):
             val = str(row.get(col) or "").strip()
             if val and val.lower() != "nan":
+                if not val.startswith("Tovary a kategórie > "):
+                    val = "Tovary a kategórie > " + val
                 return val
         return ""
 

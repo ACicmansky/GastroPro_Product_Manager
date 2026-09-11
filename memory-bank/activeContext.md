@@ -1,6 +1,6 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-07-07 (UI/UX modernization)*
+*Last updated: 2026-07-08 (settings UI + category-scoped AI re-runs)*
 
 ## Current State
 The **layered architecture refactor is complete and audited**. The codebase moved from the old flat `src` layout (core/services/utils/parsers/mergers/...) to a clean layered structure: `src/pipeline` (orchestration), `src/data` (I/O), `src/domain` (business logic), `src/ai` (Gemini), `src/scrapers`, `src/gui`, `src/config`. Entry point is `main.py`. All 202 tests pass. Zero circular dependencies.
@@ -48,6 +48,10 @@ GUI modernized in two passes (details in `journal/2026_07_07_ui_modernization.md
 - **Level 2**: two-pane landscape layout (1080×720) with header + theme toggle (Auto/Light/Dark, QSettings-persisted, live re-apply), pipeline stage tracker (`Pipeline.run(on_stage=...)` → worker `stage` signal → QSS `[stage=...]`), status line under the indeterminate progress bar (its `setFormat` text was never visible), KPI result tiles (old stats panel read keys the worker never emitted — showed zeros), drag&drop XLSX, Ctrl+O/Ctrl+R. `tests/test_gui_window.py` added.
 - **Test-pollution fix**: `test_category_mapper_new_format.py` used to WRITE to production `categories.json` each run and depended on its content (broken by user's `update_categories.py` prefix migration) — now isolated to tmp files. categories.json untouched by tests.
 - **Level 3 (SOTA interaction)**: toast notifications (`src/gui/toast.py`, replaced all runtime QMessageBoxes), export completion flow (open file/folder actions in results card, warnings inline + logged), determinate AI progress (`on_ai_progress(current,total,msg)` through Pipeline→worker→GUI, N/M produktov on the bar), collapsible timestamped activity log, session persistence via QSettings (geometry, source checkboxes — AI ones deliberately not persisted, last export dir), busy CTA. Suite: 218 passed.
+
+## Recent Changes (2026-07-08 — mapping-dialog UX, settings UI, category-scoped AI)
+- **CategoryMappingDialog UX**: selectable label + copy button, prefilled input, "⛔ Zrušiť celý proces" (→ `PipelineCancelled` abort path); `is_target_category` now accepts the "Tovary a kategórie > " prefix so final-format categories skip the dialog (journal `2026_07_07_ui_modernization.md` follow-up).
+- **Settings UI + scoped AI runs** (journal `2026_07_08_settings_and_category_scoped_ai.md`): `src/gui/settings_dialog.py` — ⚙️ header button opens tabs for API key (per-user `.env` via `config_loader.save_api_key`, test button), AI values + feed URLs (config.json), and category AI parameters (searchable editor over `categories_with_parameters.json`; removing a param clears its `filteringProperty:` values in DB; "🤖 Spustiť AI pre kategóriu" triggers a scoped re-run with cost confirm). Engine: `BatchOrchestrator.process(only_categories=...)` → `Pipeline.run_ai_for_categories` → `AIResumeWorker(categories=...)`. **`_category_of` now normalizes the missing "Tovary a kategórie > " prefix on stale pre-migration DB rows** — this also fixed param lookup silently missing for all 9,692 DB products. First-run toast when no API key. Suite: 221 passed.
 
 ## Earlier Changes (July 2026 — post-refactor audit)
 - **Regressions from the refactor found and fixed:**

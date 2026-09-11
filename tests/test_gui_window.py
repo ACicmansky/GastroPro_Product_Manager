@@ -76,6 +76,83 @@ def test_ai_progress_switches_bar_to_determinate(window):
     assert window.progress_bar.maximum() == 0
 
 
+def test_mapping_dialog_prefill_and_cancel(app):
+    from PyQt5.QtWidgets import QDialog
+    from src.gui.widgets import CategoryMappingDialog
+
+    dialog = CategoryMappingDialog(
+        "Chladenie/Vitríny", suggestions=[("Chladenie/Chladničky", 88.0)]
+    )
+    # input prefilled with the unmapped value, selected so typing replaces it
+    assert dialog.category_input.text() == "Chladenie/Vitríny"
+    assert dialog.category_input.selectedText() == "Chladenie/Vitríny"
+
+    dialog.on_cancel_pipeline()
+    assert dialog.cancel_pipeline is True
+    assert dialog.result() == QDialog.Rejected
+
+
+def test_settings_dialog_saves_config_key_and_params(app, tmp_path, monkeypatch):
+    import json
+
+    import pandas as pd
+
+    from src.data.database.product_db import ProductDB
+    from src.gui.settings_dialog import SettingsDialog
+
+    category = "Tovary a kategórie > Chladenie"
+    db_path = str(tmp_path / "products.db")
+    ProductDB(db_path).upsert(pd.DataFrame([{
+        "code": "P1",
+        "defaultCategory": category,
+        "filteringProperty:Príkon (W)": "2000",
+        "filteringProperty:Šírka (mm)": "800",
+        "aiProcessed": "1",
+    }]))
+
+    config = {
+        "ai_enhancement": {"model": "gemini-2.5-flash-lite", "batch_size": 15},
+        "xml_feeds": {"forgastro": {"url": "http://old"}},
+        "db_path": db_path,
+    }
+    config_path = str(tmp_path / "config.json")
+    params_path = str(tmp_path / "params.json")
+    env_path = str(tmp_path / ".env")
+    with open(params_path, "w", encoding="utf-8") as f:
+        json.dump([{"kategoria": category, "filtre": ["Šírka (mm)", "Príkon (W)"]}], f)
+
+    # monkeypatch records + restores GOOGLE_API_KEY (save_api_key sets os.environ)
+    monkeypatch.setenv("GOOGLE_API_KEY", "sentinel")
+
+    dialog = SettingsDialog(
+        config, config_path=config_path, params_path=params_path, env_path=env_path
+    )
+
+    # params tab: removing a param persists the file AND clears the DB values
+    dialog.select_category(category)
+    assert dialog.params_tree.currentItem().text(0) == "Chladenie"  # leaf shown, not full path
+    assert "Produktov v databáze: 1" in dialog.params_count_label.text()
+    dialog.params_edit.setPlainText("Šírka (mm)")
+    dialog._save_params()
+    with open(params_path, encoding="utf-8") as f:
+        assert json.load(f) == [{"kategoria": category, "filtre": ["Šírka (mm)"]}]
+    df = ProductDB(db_path).get_all()
+    assert df.at[0, "filteringProperty:Príkon (W)"] == ""
+    assert df.at[0, "filteringProperty:Šírka (mm)"] == "800"  # kept param untouched
+
+    # save: key -> .env, values -> config.json
+    dialog.api_key_input.setText("test-key")
+    dialog.batch_size_spin.setValue(33)
+    dialog.feed_url_inputs["forgastro"].setText("http://new")
+    dialog.save_and_close()
+    with open(env_path, encoding="utf-8") as f:
+        assert "GOOGLE_API_KEY=test-key" in f.read()
+    with open(config_path, encoding="utf-8") as f:
+        saved_config = json.load(f)
+    assert saved_config["ai_enhancement"]["batch_size"] == 33
+    assert saved_config["xml_feeds"]["forgastro"]["url"] == "http://new"
+
+
 def test_activity_log_collects_messages(window):
     before = window.activity_log.toPlainText()
     window.update_progress("Merging product data...")

@@ -4,6 +4,8 @@ Simplified interface focused on XML feed processing and AI enhancement.
 """
 
 import sys
+from typing import Optional
+
 import pandas as pd
 from pathlib import Path
 from datetime import datetime
@@ -37,7 +39,8 @@ from PyQt5.QtGui import QKeySequence, QDesktopServices
 from .worker import PipelineWorker, AIResumeWorker
 from .widgets import CategoryMappingDialog, PriceMappingDialog
 from .toast import ToastHost
-from src.config.config_loader import load_config
+from .settings_dialog import SettingsDialog
+from src.config.config_loader import load_config, read_api_key
 from src.domain.categories.category_service import CategoryService
 from src.data.loaders.xlsx_loader import load_xlsx
 from src.domain.categories.category_filter import CategoryFilter
@@ -91,6 +94,7 @@ class MainWindow(QMainWindow):
         self.toasts = ToastHost(self)
         self._restore_session()
         self._check_resumable_ai_run()
+        self._check_api_key()
 
     def _settings(self) -> QSettings:
         return QSettings("GastroPro", "ProductManager")
@@ -147,6 +151,12 @@ class MainWindow(QMainWindow):
         title.setObjectName("appTitle")
         header.addWidget(title)
         header.addStretch()
+        self.settings_button = QPushButton("⚙️ Nastavenia")
+        self.settings_button.setObjectName("settingsButton")
+        self.settings_button.setToolTip("API kľúč, AI nastavenia, parametre kategórií")
+        self.settings_button.setCursor(Qt.PointingHandCursor)
+        self.settings_button.clicked.connect(self._open_settings)
+        header.addWidget(self.settings_button)
         self.theme_button = QPushButton(THEME_MODE_LABELS[current_theme_mode()])
         self.theme_button.setObjectName("themeToggle")
         self.theme_button.setToolTip("Prepnúť tému (Auto / Svetlá / Tmavá)")
@@ -191,6 +201,21 @@ class MainWindow(QMainWindow):
         # Shortcuts
         QShortcut(QKeySequence("Ctrl+O"), self, activated=self.select_main_data_file)
         QShortcut(QKeySequence("Ctrl+R"), self, activated=self.process_and_export)
+
+    def _open_settings(self):
+        dialog = SettingsDialog(self.config, parent=self)
+        dialog.run_ai_for_categories.connect(self._start_ai_for_categories)
+        if dialog.exec_() == SettingsDialog.Accepted:
+            self.toasts.show("Nastavenia uložené.", "success")
+
+    def _check_api_key(self):
+        """First-run nudge: no Gemini key anywhere -> point to settings."""
+        if not read_api_key() and not self.config.get("ai_enhancement", {}).get("api_key"):
+            self.toasts.show(
+                "Gemini API kľúč nie je nastavený — AI vylepšenie nebude fungovať.",
+                "warning",
+                action=("Otvoriť nastavenia", self._open_settings),
+            )
 
     def _cycle_theme(self):
         order = ["auto", "light", "dark"]
@@ -411,10 +436,20 @@ class MainWindow(QMainWindow):
 
     def _start_ai_resume(self):
         """Continue an interrupted AI run — DB in, DB out, no feeds/merge/file dialogs."""
+        self._launch_ai_worker("Pokračujem v AI spracovaní...")
+
+    def _start_ai_for_categories(self, categories: list):
+        """Re-run AI for products of the given categories (params changed)."""
+        self._launch_ai_worker(
+            f"AI spracovanie kategórie: {categories[0]}...", categories=categories
+        )
+
+    def _launch_ai_worker(self, status_text: str, categories: Optional[list] = None):
+        """Shared thread wiring for AI-only runs (resume or category-scoped)."""
         self.ai_resume_button.setEnabled(False)
         self.progress_bar.setVisible(True)
         self.progress_bar.setRange(0, 0)
-        self.status_label.setText("Pokračujem v AI spracovaní...")
+        self.status_label.setText(status_text)
         self.status_label.setVisible(True)
         self._set_ui_enabled(False)
         self.ai_pause_button.setEnabled(True)
@@ -422,7 +457,9 @@ class MainWindow(QMainWindow):
 
         self.ai_control = RunControl()
         self.ai_thread = QThread()
-        self.ai_worker = AIResumeWorker(self.config, ai_control=self.ai_control)
+        self.ai_worker = AIResumeWorker(
+            self.config, ai_control=self.ai_control, categories=categories
+        )
         self.ai_worker.moveToThread(self.ai_thread)
 
         self.ai_thread.started.connect(self.ai_worker.run)
@@ -799,6 +836,8 @@ class MainWindow(QMainWindow):
     def _set_ui_enabled(self, enabled: bool):
         """Enable or disable all UI inputs during processing."""
         self.process_button.setEnabled(enabled)
+        # no settings edits (or a second AI run from the params tab) mid-run
+        self.settings_button.setEnabled(enabled)
         self.ai_resume_button.setEnabled(enabled and self.ai_resume_button.isVisible())
         self.select_main_button.setEnabled(enabled)
         # Only enable clear if there is a main file loaded
@@ -1053,8 +1092,11 @@ class MainWindow(QMainWindow):
 
             # Send result back to worker
             self.worker.set_category_mapping_result(new_category)
+        elif dialog.cancel_pipeline:
+            # Abort the whole run — worker raises PipelineCancelled
+            self.worker.cancel_pipeline()
         else:
-            # User cancelled - return original category
+            # Dialog closed - keep original category
             self.worker.set_category_mapping_result(original_category)
 
     def show_error_message(self, message: str):

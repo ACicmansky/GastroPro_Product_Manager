@@ -12,6 +12,10 @@ from src.ai.run_control import RunControl
 logger = logging.getLogger(__name__)
 
 
+class PipelineCancelled(Exception):
+    """User aborted the run from an interactive dialog."""
+
+
 class PipelineWorker(QObject):
     """Executes pipeline in a background thread, emitting Qt signals for UI updates."""
 
@@ -35,6 +39,7 @@ class PipelineWorker(QObject):
         # For blocking on GUI interactions
         self._category_result: Optional[str] = None
         self._category_loop: Optional[QEventLoop] = None
+        self._cancelled = False
         self._price_result: Optional[str] = None
         self._price_loop: Optional[QEventLoop] = None
 
@@ -72,6 +77,9 @@ class PipelineWorker(QObject):
             self.statistics.emit(stats)
 
             self.result.emit(pipeline_result)
+        except PipelineCancelled:
+            logger.info("Pipeline cancelled by user from mapping dialog")
+            self.error.emit("Spracovanie zrušené používateľom.")
         except Exception as e:
             logger.error(f"Pipeline error: {e}", exc_info=True)
             self.error.emit(str(e))
@@ -87,11 +95,19 @@ class PipelineWorker(QObject):
         self._category_loop = QEventLoop()
         self.category_mapping_request.emit(original_category, product_name or "")
         self._category_loop.exec_()
+        if self._cancelled:
+            raise PipelineCancelled()
         return self._category_result or original_category
 
     def set_category_mapping_result(self, new_category: str):
         """Called by GUI when user provides category mapping."""
         self._category_result = new_category
+        if self._category_loop:
+            self._category_loop.quit()
+
+    def cancel_pipeline(self):
+        """Called by GUI when user aborts the whole run from the mapping dialog."""
+        self._cancelled = True
         if self._category_loop:
             self._category_loop.quit()
 
@@ -111,7 +127,11 @@ class PipelineWorker(QObject):
 
 
 class AIResumeWorker(QObject):
-    """Continues an interrupted AI run — no feeds/merge/file load, just DB in -> DB out."""
+    """AI-only run — no feeds/merge/file load, just DB in -> DB out.
+
+    Without `categories` it resumes an interrupted run; with `categories`
+    it re-processes only products of those categories (params changed).
+    """
 
     finished = pyqtSignal()
     error = pyqtSignal(str)
@@ -119,21 +139,33 @@ class AIResumeWorker(QObject):
     ai_progress = pyqtSignal(int, int, str)  # current, total, message
     result = pyqtSignal(object)  # PipelineResult
 
-    def __init__(self, config: Dict, ai_control: Optional[RunControl] = None):
+    def __init__(
+        self,
+        config: Dict,
+        ai_control: Optional[RunControl] = None,
+        categories: Optional[list] = None,
+    ):
         super().__init__()
         self.pipeline = Pipeline(config)
         self.ai_control = ai_control or RunControl()
+        self.categories = categories
 
     def run(self):
         """Called from QThread."""
+        callbacks = dict(
+            on_progress=lambda msg: self.progress.emit(msg),
+            ai_control=self.ai_control,
+            on_ai_progress=lambda current, total, message: self.ai_progress.emit(
+                int(current), int(total), str(message)
+            ),
+        )
         try:
-            pipeline_result = self.pipeline.run_ai_resume(
-                on_progress=lambda msg: self.progress.emit(msg),
-                ai_control=self.ai_control,
-                on_ai_progress=lambda current, total, message: self.ai_progress.emit(
-                    int(current), int(total), str(message)
-                ),
-            )
+            if self.categories:
+                pipeline_result = self.pipeline.run_ai_for_categories(
+                    self.categories, **callbacks
+                )
+            else:
+                pipeline_result = self.pipeline.run_ai_resume(**callbacks)
             self.result.emit(pipeline_result)
         except Exception as e:
             logger.error(f"AI resume error: {e}", exc_info=True)
