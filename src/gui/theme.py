@@ -1,12 +1,17 @@
 """Application theme: Fusion base + token-substituted QSS, follows Windows light/dark."""
 
+import sys
 from pathlib import Path
 from string import Template
 
 from PyQt5.QtCore import QSettings
 from PyQt5.QtGui import QColor, QFont, QPalette
 
-_STYLES_DIR = Path(__file__).resolve().parents[2] / "styles"
+_STYLES_DIR = (
+    Path(sys._MEIPASS) / "styles"
+    if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS")
+    else Path(__file__).resolve().parents[2] / "styles"
+)
 
 LIGHT = {
     "bg": "#f3f4f6",

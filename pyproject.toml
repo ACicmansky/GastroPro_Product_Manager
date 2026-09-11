@@ -20,6 +20,7 @@ dependencies = [
 dev = [
     "poethepoet>=0.48.0",
     "pre-commit>=4.6.2",
+    "pyinstaller>=6.22.2",
     "pyqt5-stubs>=5.15.6.0",
     "pytest>=8.0.0",
     "pytest-cov>=7.1.0",
@@ -91,6 +92,7 @@ format = "ruff format"
 "format:check" = "ruff format --check"
 check = ["lint", "format:check", "test:fast"]
 run = "python main.py"
+build = "python scripts/build_exe.py"
 
 [tool.coverage.run]
 source = ["src"]
