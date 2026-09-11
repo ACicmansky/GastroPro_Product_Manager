@@ -2,6 +2,7 @@
 
 import sys
 from PyQt5.QtWidgets import QApplication
+from src.gui.crash_handler import install_crash_handler
 from src.gui.main_window import MainWindow
 from src.gui.theme import apply_theme
 from src.logging_setup import setup_logging
@@ -9,6 +10,7 @@ from src.logging_setup import setup_logging
 
 def main():
     setup_logging()
+    install_crash_handler()
     app = QApplication(sys.argv)
     apply_theme(app)
     window = MainWindow()
