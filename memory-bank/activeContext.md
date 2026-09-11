@@ -1,9 +1,17 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-07-08 (settings UI + category-scoped AI re-runs)*
+*Last updated: 2026-09-12 (uv package manager upgrade)*
 
 ## Current State
-The **layered architecture refactor is complete and audited**. The codebase moved from the old flat `src` layout (core/services/utils/parsers/mergers/...) to a clean layered structure: `src/pipeline` (orchestration), `src/data` (I/O), `src/domain` (business logic), `src/ai` (Gemini), `src/scrapers`, `src/gui`, `src/config`. Entry point is `main.py`. All 202 tests pass. Zero circular dependencies.
+The project has been upgraded to the **`uv` package manager** with PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `.python-version` pinned to 3.13. All 221 tests pass in under 8 seconds. The layered architecture (`src/pipeline`, `src/data`, `src/domain`, `src/ai`, `src/scrapers`, `src/gui`, `src/config`) and entry point (`main.py`) remain completely intact with zero circular dependencies.
+
+## Recent Changes (2026-09-12 — uv package manager migration)
+- **`uv` integration**: Added `pyproject.toml` managing dependencies, dev dependency group, and `[tool.uv]` with `package = false` and `required-environments = ["sys_platform == 'win32' and platform_machine == 'AMD64'"]`.
+- **Lockfile & venv**: Generated deterministic `uv.lock` and local `.venv` (`C:\Source\Python\GastroPro_Product_Manager\.venv`).
+- **Dependencies synchronized**: Pinned `pandas>=2.0.0,<3.0.0` for full ecosystem stability, added `playwright>=1.40.0` (required for Mebella scraper), updated `google-genai` and Qt 5.15.2 wheels for Windows AMD64.
+- **Tooling & IDE**: Updated `.gitignore` (ignoring `.venv/`, tracking `uv.lock`), updated `.vscode/settings.json` (`python.defaultInterpreterPath` pointing to `.venv`), updated `pytest.ini` (`pythonpath = .`), updated `CLAUDE.md` with `uv run` commands.
+- **Suite**: 221 passed in 7.96s via `uv run pytest`.
+
 
 ## Recent Changes (2026-07-06 — first production run failures fixed)
 First real run after the refactor produced 1,935 of 9,642 products. Root causes found via DB forensics and fixed (see `journal/2026_07_06_production_run_data_loss.md`):

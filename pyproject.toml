@@ -1,0 +1,78 @@
+[project]
+name = "gastropro-product-manager"
+version = "0.1.0"
+description = "Desktop application for e-commerce catalog manipulation, XML feed merging, and AI enrichment."
+readme = "CLAUDE.md"
+requires-python = ">=3.13"
+dependencies = [
+    "beautifulsoup4>=4.12.0",
+    "google-genai>=0.1.1",
+    "openpyxl>=3.1.0",
+    "pandas>=2.0.0,<3.0.0",
+    "playwright>=1.40.0",
+    "pyqt5>=5.15.0",
+    "python-dotenv>=1.0.0",
+    "rapidfuzz>=3.0.0",
+    "requests>=2.31.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-mock>=3.14.0",
+    "ruff>=0.16.7",
+]
+
+[tool.uv]
+package = false
+required-environments = [
+    "sys_platform == 'win32' and platform_machine == 'AMD64'",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = [
+    "-v",
+    "--strict-markers",
+    "--tb=short",
+    "--disable-warnings",
+]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Slow running tests",
+    "requires_api: Tests that require API access",
+    "requires_network: Tests that require network access",
+    "scraper: Web scraper tests (Phase 11)",
+    "category_filter: Category filtering tests (Phase 12)",
+    "ai_enhancement: AI enhancement tests (Phase 13)",
+]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+exclude = [
+    ".git",
+    ".venv",
+    "cache",
+    "data",
+    "logs",
+    "out",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501", # line too long (handled by formatter)
+]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+

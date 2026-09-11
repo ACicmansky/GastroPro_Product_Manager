@@ -13,3 +13,5 @@ graphify-out/
 out/
 tmp
 logs/
+.venv/
+.uv/

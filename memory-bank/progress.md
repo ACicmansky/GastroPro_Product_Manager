@@ -53,6 +53,17 @@
 - ✅ Standalone transformation script (`scripts/transform_to_new_format.py`)
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
+## Recently Completed (September 2026)
+- ✅ **Migration to `uv` Package Manager**
+  - Replaced legacy global/pip workflow with `uv` (0.9+), PEP 621 `pyproject.toml`, deterministic lockfile `uv.lock`, and local `.venv`.
+  - Pinned Python version to 3.13 in `.python-version`.
+  - Configured Windows AMD64 wheel platform compatibility for PyQt5 (`pyqt5-qt5==5.15.2`).
+  - Added `playwright>=1.40.0` to primary dependencies (required for Mebella scraper) and pinned `pandas>=2.0.0,<3.0.0` for full ecosystem stability.
+  - Made scraper test assertions forward-compatible with Pandas `pd.StringDtype`.
+  - Configured `.vscode/settings.json` to point directly to `${workspaceFolder}\.venv\Scripts\python.exe`.
+  - Updated `CLAUDE.md`, `requirements.txt`, and memory bank.
+  - All 221 tests passing via `uv run pytest`.
+
 ## Recently Completed (July 2026)
 - ✅ **Layered Architecture Refactor + Audit**
   - Restructured `src/` into layers: `pipeline` / `data` / `domain` / `ai` / `scrapers` / `gui` / `config`; deleted the old core/services/utils/mergers/mappers/parsers/transformers packages and `*_new_format` file names. Entry point is `main.py`.

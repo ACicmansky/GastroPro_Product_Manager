@@ -1,9 +1,15 @@
+# Dependencies are managed via pyproject.toml and uv (https://github.com/astral-sh/uv)
+# To install/sync: uv sync
+# To add a package: uv add <package>
+
 PyQt5>=5.15.0
-pandas>=2.0.0
+pandas>=2.0.0,<3.0.0
 requests>=2.31.0
 beautifulsoup4>=4.12.0
 python-dotenv>=1.0.0
-google-genai
+google-genai>=0.1.1
 rapidfuzz>=3.0.0
-openpyxl
-pytest
+openpyxl>=3.1.0
+playwright>=1.40.0
+pytest>=8.0.0
+pytest-mock>=3.14.0

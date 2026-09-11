@@ -9,19 +9,32 @@ GastroPro Product Manager is a Python desktop application for merging product da
 ## Commands
 
 ```bash
+# Install / sync dependencies into .venv
+uv sync
+
+# Add / remove dependencies
+uv add <package>
+uv add --dev <package>
+uv remove <package>
+
 # Run the application
-python main.py
+uv run python main.py
 
 # Run all tests
-pytest
+uv run pytest
 
 # Run tests by marker
-pytest -m ai_enhancement
-pytest -m scraper
-pytest -m category_filter
+uv run pytest -m ai_enhancement
+uv run pytest -m scraper
+uv run pytest -m category_filter
 
 # Run specific test file
-pytest tests/test_ai_enhancer.py -v
+uv run pytest tests/test_ai_enhancer.py -v
+
+# Lint and format with Ruff
+uv run ruff check
+uv run ruff check --fix
+uv run ruff format
 ```
 
 ## Architecture

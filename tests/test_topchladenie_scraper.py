@@ -292,7 +292,7 @@ class TestScraperOutput:
 
         # All columns should be string type
         for col in data.columns:
-            assert data[col].dtype == "object"
+            assert data[col].dtype == "object" or isinstance(data[col].dtype, pd.StringDtype)
             assert isinstance(data.loc[0, col], str)
 
 

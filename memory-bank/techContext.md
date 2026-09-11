@@ -18,15 +18,24 @@
 - **regex**: Advanced pattern matching for product difference extraction
 - **python-dotenv**: For managing environment variables (API keys)
 - **threading**: For thread-safe quota management
-- **pytest**: Testing framework (196 tests)
+- **threading**: For thread-safe quota management
+- **pytest**: Testing framework (221 tests)
+- **uv**: Modern, fast Python package and project manager
 
 ## Development Setup
-- **Environment**: Windows operating system
+- **Package Manager**: `uv` with `pyproject.toml`, `uv.lock`, and `.venv`
+- **Commands**:
+  - `uv sync`: Install and sync dependencies into `.venv`
+  - `uv add <pkg>`: Add dependency
+  - `uv run python main.py`: Run desktop app
+  - `uv run pytest`: Run test suite
+  - `uv run ruff check` / `uv run ruff format`: Lint and format code
+- **Environment**: Windows operating system (AMD64)
 - **Line Endings**: Requires Windows standard CRLF.
 - **Path Standard**: Windows-compatible paths (`\\` or raw paths) must be used.
 - **Methodology**: TDD (Test-Driven Development) is enforced.
-- **IDE**: Compatible with standard Python IDEs
-- **Version Control**: Git repository
+- **IDE**: Compatible with standard Python IDEs (`.vscode/settings.json` configured for `.venv`)
+- **Version Control**: Git repository (`uv.lock` tracked, `.venv` ignored)
 - **Environment Variables**:
   - `GOOGLE_API_KEY`: Required for Gemini API access
 
@@ -43,20 +52,19 @@
   - Automatic retry with exponential backoff
 
 ## Dependencies
-- Python 3.13
+- Python 3.13 (`.python-version` pinned to 3.13)
 - sqlite3 (Standard Library)
-- PyQt5
-- pandas
+- PyQt5 (Qt 5.15.2 LTS on Windows AMD64)
+- pandas (>=2.0.0, <3.0.0)
 - openpyxl (XLSX support)
-- requests
-- beautifulsoup4
-- tqdm (for progress reporting)
-- regex (for advanced pattern matching)
-- google-generativeai>=0.5.0
-- python-dotenv>=1.0.0
-- pytest (testing framework)
-- rapidfuzz (category matching)
-- playwright (dynamic web scraping)
+- requests (HTTP requests)
+- beautifulsoup4 (HTML parsing)
+- google-genai (Gemini Batch & Content API)
+- python-dotenv (environment variable management)
+- rapidfuzz (category and product matching)
+- playwright (dynamic web scraping for Mebella)
+- pytest & pytest-mock (dev/test suite)
+- ruff (linter and code formatter)
 
 ## Data Structures
 1. **Configuration (JSON)**:
