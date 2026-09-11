@@ -12,9 +12,8 @@ from src.data.database.product_db import ProductDB
 from src.data.loaders.xlsx_loader import load_xlsx
 from src.data.parsers.xml_parser_factory import XMLParserFactory
 from src.data.writers.xlsx_writer import write_xlsx
-from src.domain.categories.category_filter import CategoryFilter
 from src.domain.categories.category_service import CategoryService
-from src.domain.models import MergeStats, PipelineOptions, PipelineResult
+from src.domain.models import PipelineOptions, PipelineResult
 from src.domain.pricing.pricing_service import PricingService
 from src.domain.products.feed_specs import apply_feed_specs
 from src.domain.products.merger import ProductMerger
@@ -142,9 +141,7 @@ class Pipeline:
             # Mebella table bases carry no price — map from known prices,
             # asking the user (via callback) for unknown ones.
             if options.enable_price_mapping and "mebella" in feed_dfs:
-                feed_dfs["mebella"] = self._map_prices(
-                    feed_dfs["mebella"], progress, on_unmapped_price
-                )
+                feed_dfs["mebella"] = self._map_prices(feed_dfs["mebella"], progress, on_unmapped_price)
 
         # 5. Merge all sources
         stage("merge")
@@ -171,9 +168,7 @@ class Pipeline:
         for idx, row in merged_df.iterrows():
             old_cat = str(row.get("defaultCategory", ""))
             if old_cat:
-                new_cat = self.category_service.map_or_ask(
-                    old_cat, str(row.get("name", ""))
-                )
+                new_cat = self.category_service.map_or_ask(old_cat, str(row.get("name", "")))
                 merged_df.at[idx, "defaultCategory"] = new_cat
                 merged_df.at[idx, "categoryText"] = new_cat
 
@@ -186,8 +181,7 @@ class Pipeline:
                 force_reprocess=options.force_ai_reprocess,
                 # orchestrator emits (current, total, message); numeric consumers
                 # (GUI determinate progress) take it raw, others get the message
-                progress_callback=on_ai_progress
-                or (lambda *args: progress(args[-1] if args else "AI processing...")),
+                progress_callback=on_ai_progress or (lambda *args: progress(args[-1] if args else "AI processing...")),
                 control=ai_control,
                 on_chunk_applied=self.db.upsert,
             )
@@ -216,9 +210,7 @@ class Pipeline:
         result.product_count = len(output_df)
         result.duration_seconds = time.time() - start_time
 
-        progress(
-            f"Pipeline complete. {result.product_count} products processed in {result.duration_seconds:.1f}s"
-        )
+        progress(f"Pipeline complete. {result.product_count} products processed in {result.duration_seconds:.1f}s")
         return result
 
     def get_resumable_ai_run(self) -> Optional[dict]:
@@ -243,17 +235,14 @@ class Pipeline:
         df = self.db.get_all()
         enrichment = self.enricher.resume(
             df,
-            progress_callback=on_ai_progress
-            or (lambda *args: progress(args[-1] if args else "AI resume...")),
+            progress_callback=on_ai_progress or (lambda *args: progress(args[-1] if args else "AI resume...")),
             control=ai_control,
             on_chunk_applied=self.db.upsert,
         )
         result.enrichment_stats = enrichment
         result.product_count = len(enrichment.products)
         result.duration_seconds = time.time() - start_time
-        progress(
-            f"AI resume complete. {enrichment.processed} produktov spracovanych v {result.duration_seconds:.1f}s"
-        )
+        progress(f"AI resume complete. {enrichment.processed} produktov spracovanych v {result.duration_seconds:.1f}s")
         return result
 
     def run_ai_for_categories(
@@ -268,9 +257,7 @@ class Pipeline:
         Used after a category's filter parameters changed.
         """
         if self.get_resumable_ai_run():
-            raise RuntimeError(
-                "Najprv dokončite alebo zrušte prerušené AI spracovanie."
-            )
+            raise RuntimeError("Najprv dokončite alebo zrušte prerušené AI spracovanie.")
 
         start_time = time.time()
         result = PipelineResult()
@@ -284,8 +271,7 @@ class Pipeline:
         enrichment = self.enricher.enrich(
             df,
             only_categories=set(categories),
-            progress_callback=on_ai_progress
-            or (lambda *args: progress(args[-1] if args else "AI processing...")),
+            progress_callback=on_ai_progress or (lambda *args: progress(args[-1] if args else "AI processing...")),
             control=ai_control,
             on_chunk_applied=self.db.upsert,
         )
@@ -316,16 +302,13 @@ class Pipeline:
         unmapped = [
             idx
             for idx, row in df.iterrows()
-            if str(row.get("code", "")).strip()
-            and str(row.get("price", "")).strip() in ("", "0", "nan", "None")
+            if str(row.get("code", "")).strip() and str(row.get("price", "")).strip() in ("", "0", "nan", "None")
         ]
         for done, idx in enumerate(unmapped):
             row = df.loc[idx]
             code = str(row.get("code", "")).strip()
             remaining = len(unmapped) - done
-            progress(
-                f"Cena nenájdená pre: {code}, vyžaduje sa vstup (ostáva {remaining})..."
-            )
+            progress(f"Cena nenájdená pre: {code}, vyžaduje sa vstup (ostáva {remaining})...")
             product_data = {
                 "code": code,
                 "width": row.get("width"),
@@ -334,9 +317,7 @@ class Pipeline:
                 "image_url": row.get("image"),
                 "remaining_count": remaining,
             }
-            new_price = on_unmapped_price(
-                product_data, self.pricing_service.as_dataframe()
-            )
+            new_price = on_unmapped_price(product_data, self.pricing_service.as_dataframe())
             if new_price:
                 df.at[idx, "price"] = new_price
                 dimension = f"{row.get('width')}x{row.get('depth')}x{row.get('height')}"
@@ -353,9 +334,7 @@ class Pipeline:
         result = XMLParserFactory.parse(feed_name, xml_content, self.config)
         return result if result is not None else pd.DataFrame()
 
-    def map_categories(
-        self, df: pd.DataFrame, ask_interactive: bool = False
-    ) -> pd.DataFrame:
+    def map_categories(self, df: pd.DataFrame, ask_interactive: bool = False) -> pd.DataFrame:
         """Map category fields in-place. Convenience method for testing."""
         df = df.copy()
         for idx, row in df.iterrows():

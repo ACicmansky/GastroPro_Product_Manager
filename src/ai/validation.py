@@ -23,13 +23,15 @@ def find_implausible(df: pd.DataFrame) -> pd.DataFrame:
     issues = []
 
     def _add(idx, param, value, reason):
-        issues.append({
-            "code": str(df.at[idx, "code"]) if "code" in df.columns else "",
-            "name": str(df.at[idx, "name"]) if "name" in df.columns else "",
-            "parameter": param,
-            "value": value,
-            "reason": reason,
-        })
+        issues.append(
+            {
+                "code": str(df.at[idx, "code"]) if "code" in df.columns else "",
+                "name": str(df.at[idx, "name"]) if "name" in df.columns else "",
+                "parameter": param,
+                "value": value,
+                "reason": reason,
+            }
+        )
 
     for param, allowed in PLAUSIBLE_ENUM.items():
         col = f"filteringProperty:{param}"

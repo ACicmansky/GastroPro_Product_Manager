@@ -30,15 +30,9 @@ class PricingService:
             with open(self.prices_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
             if isinstance(data, list):
-                self._records = [
-                    item for item in data
-                    if isinstance(item, dict) and "code" in item and "price" in item
-                ]
+                self._records = [item for item in data if isinstance(item, dict) and "code" in item and "price" in item]
             elif isinstance(data, dict):
-                self._records = [
-                    {"code": code, "dimension": "", "price": str(price)}
-                    for code, price in data.items()
-                ]
+                self._records = [{"code": code, "dimension": "", "price": str(price)} for code, price in data.items()]
             self._prices = {r["code"]: str(r["price"]) for r in self._records}
 
     def _save(self):

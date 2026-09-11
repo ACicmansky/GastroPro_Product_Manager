@@ -1,7 +1,7 @@
 """High-level AI product enrichment coordinator."""
 
 import logging
-from typing import Dict, Optional, Callable, Tuple
+from typing import Dict, Optional, Callable
 
 import pandas as pd
 
@@ -11,7 +11,6 @@ from .prompts import load_category_parameters
 from .result_parser import ResultParser
 from .run_control import RunControl
 from src.domain.models import EnrichmentResult
-from src.domain.products.variant_service import get_pair_code
 from src.data.database.batch_job_db import BatchJobDB
 from src.data.database.run_db import RunDB
 
@@ -114,8 +113,12 @@ class ProductEnricher:
 
         group1_indices = self._group1_indices(df)
         updated_df, stats = self.orchestrator.resume(
-            df, resumable["id"], group1_indices,
-            progress_callback=progress_callback, control=control, on_chunk_applied=on_chunk_applied,
+            df,
+            resumable["id"],
+            group1_indices,
+            progress_callback=progress_callback,
+            control=control,
+            on_chunk_applied=on_chunk_applied,
         )
         return EnrichmentResult(
             products=updated_df,

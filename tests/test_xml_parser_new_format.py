@@ -145,6 +145,7 @@ class TestXMLToNewFormatMapping:
 
         # All columns should be from new format
         from src.config.schema import get_output_columns
+
         new_columns = get_output_columns()
 
         for col in result.columns:
@@ -176,9 +177,7 @@ class TestXMLParserImageHandling:
         parser = XMLParserNewFormat(config)
 
         # Create test data with multiple images (pipe-separated)
-        test_data = pd.DataFrame(
-            {"IMAGE": ["http://img1.jpg|http://img2.jpg|http://img3.jpg"]}
-        )
+        test_data = pd.DataFrame({"IMAGE": ["http://img1.jpg|http://img2.jpg|http://img3.jpg"]})
 
         result = parser._split_images(test_data, "IMAGE")
 
@@ -238,9 +237,7 @@ class TestXMLParserIntegration:
         assert "name" in result.columns
         assert "price" in result.columns
 
-    def test_multiple_feeds_same_format(
-        self, sample_xml_gastromarket, sample_xml_forgastro, config
-    ):
+    def test_multiple_feeds_same_format(self, sample_xml_gastromarket, sample_xml_forgastro, config):
         """Test that multiple feeds output same format."""
         from src.data.parsers.xml_parser import XMLParser as XMLParserNewFormat
 
@@ -424,8 +421,6 @@ def test_fetch_and_parse_retries_transient_failure(monkeypatch):
     monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
     monkeypatch.setattr("time.sleep", lambda s: None)
 
-    df = XMLParserFactory.fetch_and_parse(
-        "forgastro", "https://example.com/feed.xml", {}
-    )
+    df = XMLParserFactory.fetch_and_parse("forgastro", "https://example.com/feed.xml", {})
     assert calls["n"] == 3
     assert len(df) == 1

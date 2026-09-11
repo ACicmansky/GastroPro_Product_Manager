@@ -35,12 +35,15 @@ def load_category_parameters(path: str = "categories_with_parameters.json") -> D
         return {}
 
 
-
 def create_system_prompt(category_name: str = "", expected_parameters: list = None) -> str:
     """Create system prompt for AI enhancement with English column names."""
-    
+
     cat_str = f"Tieto produkty patria do kategórie: **{category_name}**" if category_name else ""
-    params_str = f"Od Teba sa očakáva extrakcia týchto parametrov zo všetkých produktov: **{', '.join(expected_parameters)}**" if expected_parameters else ""
+    params_str = (
+        f"Od Teba sa očakáva extrakcia týchto parametrov zo všetkých produktov: **{', '.join(expected_parameters)}**"
+        if expected_parameters
+        else ""
+    )
 
     return f"""Si špecializovaný AI expert copywriter, SEO konzultant a technický poradca pre e-shopy s profesionálnym gastro vybavením, náradím a zariadeniami.
 
@@ -269,10 +272,6 @@ def create_system_prompt_no_dimensions(category_name: str = "", expected_paramet
     # Insert before OUTPUT section
     insert_point = base_prompt.find("### 📤 **VÝSTUP**")
     if insert_point != -1:
-        return (
-            base_prompt[:insert_point]
-            + negative_constraints
-            + base_prompt[insert_point:]
-        )
+        return base_prompt[:insert_point] + negative_constraints + base_prompt[insert_point:]
     else:
         return base_prompt + negative_constraints

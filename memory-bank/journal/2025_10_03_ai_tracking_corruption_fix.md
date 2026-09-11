@@ -20,12 +20,25 @@ The `Spracovane AI` tracking column was being corrupted, causing previously proc
 **Issue:**
 ```python
 # BEFORE (BUGGY CODE)
-df.loc[best_match_idx, [
-    'Krátky popis', 'Dlhý popis', 'SEO titulka', 'SEO popis', 'SEO kľúčové slová',
-    'Spracovane AI', 'AI_Processed_Date'
-]] = [
-    enhanced_product['Krátky popis'], enhanced_product['Dlhý popis'], enhanced_product['SEO titulka'],
-    enhanced_product['SEO popis'], enhanced_product['SEO kľúčové slová'], True, datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+df.loc[
+    best_match_idx,
+    [
+        "Krátky popis",
+        "Dlhý popis",
+        "SEO titulka",
+        "SEO popis",
+        "SEO kľúčové slová",
+        "Spracovane AI",
+        "AI_Processed_Date",
+    ],
+] = [
+    enhanced_product["Krátky popis"],
+    enhanced_product["Dlhý popis"],
+    enhanced_product["SEO titulka"],
+    enhanced_product["SEO popis"],
+    enhanced_product["SEO kľúčové slová"],
+    True,
+    datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
 ]
 ```
 
@@ -62,11 +75,11 @@ df.loc[best_match_idx, [
 ```python
 # BEFORE (BUGGY CODE)
 for col in df.columns:  # ❌ Modifying original df
-    if df[col].dtype == 'object':
+    if df[col].dtype == "object":
         df[col] = df[col].astype(str)
         df[col] = df[col].apply(lambda x: ...)
 
-df.to_csv(tmp_file, index=False, encoding='cp1250', sep=';')
+df.to_csv(tmp_file, index=False, encoding="cp1250", sep=";")
 ```
 
 **What happened:**
@@ -90,9 +103,9 @@ df.to_csv(tmp_file, index=False, encoding='cp1250', sep=';')
 def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, str]]):
     for enhanced_product in enhanced_products:
         # Searches the ENTIRE df, including already-processed products!
-        best_match_idx = self.find_best_match(enhanced_product['Kat. číslo'], 'Kat. číslo', df)
+        best_match_idx = self.find_best_match(enhanced_product["Kat. číslo"], "Kat. číslo", df)
         if best_match_idx is None:
-            best_match_idx = self.find_best_match(enhanced_product['Názov tovaru'], 'Názov tovaru', df)
+            best_match_idx = self.find_best_match(enhanced_product["Názov tovaru"], "Názov tovaru", df)
 ```
 
 **What happened:**
@@ -119,7 +132,7 @@ def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, s
 ```python
 # BEFORE (BUGGY CODE)
 for col in final_df.columns:  # ❌ Cleaning ALL columns including tracking
-    if final_df[col].dtype == 'object':
+    if final_df[col].dtype == "object":
         final_df[col] = final_df[col].fillna("").astype(str).replace("nan", "").str.strip()
 ```
 
@@ -141,25 +154,25 @@ def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, s
     """Update dataframe with enhanced descriptions using fuzzy matching."""
     # DO NOT copy - work on the original dataframe to ensure updates persist
     updated_count = 0
-    
+
     for enhanced_product in enhanced_products:
         # Find the best matching by Kat. číslo
-        best_match_idx = self.find_best_match(enhanced_product['Kat. číslo'], 'Kat. číslo', df)
+        best_match_idx = self.find_best_match(enhanced_product["Kat. číslo"], "Kat. číslo", df)
         if best_match_idx is None:
-            best_match_idx = self.find_best_match(enhanced_product['Názov tovaru'], 'Názov tovaru', df)
-        
+            best_match_idx = self.find_best_match(enhanced_product["Názov tovaru"], "Názov tovaru", df)
+
         if best_match_idx is not None:
             # Update columns INDIVIDUALLY to preserve dtypes and ensure proper assignment
-            df.at[best_match_idx, 'Krátky popis'] = enhanced_product['Krátky popis']
-            df.at[best_match_idx, 'Dlhý popis'] = enhanced_product['Dlhý popis']
-            df.at[best_match_idx, 'SEO titulka'] = enhanced_product['SEO titulka']
-            df.at[best_match_idx, 'SEO popis'] = enhanced_product['SEO popis']
-            df.at[best_match_idx, 'SEO kľúčové slová'] = enhanced_product['SEO kľúčové slová']
+            df.at[best_match_idx, "Krátky popis"] = enhanced_product["Krátky popis"]
+            df.at[best_match_idx, "Dlhý popis"] = enhanced_product["Dlhý popis"]
+            df.at[best_match_idx, "SEO titulka"] = enhanced_product["SEO titulka"]
+            df.at[best_match_idx, "SEO popis"] = enhanced_product["SEO popis"]
+            df.at[best_match_idx, "SEO kľúčové slová"] = enhanced_product["SEO kľúčové slová"]
             # CRITICAL: Set tracking columns separately to preserve boolean type
-            df.at[best_match_idx, 'Spracovane AI'] = True
-            df.at[best_match_idx, 'AI_Processed_Date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            df.at[best_match_idx, "Spracovane AI"] = True
+            df.at[best_match_idx, "AI_Processed_Date"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             updated_count += 1
-    
+
     return df, updated_count
 ```
 
@@ -181,12 +194,12 @@ Implemented 3-tier matching strategy with scope limitation:
 def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, str]], valid_indices: pd.Index = None):
     # Create a subset view for searching if valid_indices provided
     search_df = df.loc[valid_indices] if valid_indices is not None else df
-    
+
     for enhanced_product in enhanced_products:
         # Strategy 1: Exact match on 'Kat. číslo' (most reliable)
-        cat_num = str(enhanced_product['Kat. číslo']).strip()
-        exact_matches = search_df[search_df['Kat. číslo'].astype(str).str.strip() == cat_num]
-        
+        cat_num = str(enhanced_product["Kat. číslo"]).strip()
+        exact_matches = search_df[search_df["Kat. číslo"].astype(str).str.strip() == cat_num]
+
         if len(exact_matches) == 1:
             best_match_idx = exact_matches.index[0]
         elif len(exact_matches) > 1:
@@ -194,11 +207,11 @@ def update_dataframe(self, df: pd.DataFrame, enhanced_products: List[Dict[str, s
             logger.warning(f"Multiple exact matches for {cat_num}")
         else:
             # Strategy 2: Fuzzy match on catalog number (handles minor variations)
-            best_match_idx = self.find_best_match(enhanced_product['Kat. číslo'], 'Kat. číslo', search_df)
+            best_match_idx = self.find_best_match(enhanced_product["Kat. číslo"], "Kat. číslo", search_df)
             if best_match_idx is None:
                 # Strategy 3: Fuzzy match on product name (last resort)
-                best_match_idx = self.find_best_match(enhanced_product['Názov tovaru'], 'Názov tovaru', search_df)
-        
+                best_match_idx = self.find_best_match(enhanced_product["Názov tovaru"], "Názov tovaru", search_df)
+
         # Update using .at[] for each column individually...
 ```
 
@@ -222,11 +235,11 @@ Created copies before CSV encoding operations to prevent mutation:
 df_copy = df.copy()
 
 for col in df_copy.columns:  # ✅ Only modifying the copy
-    if df_copy[col].dtype == 'object':
+    if df_copy[col].dtype == "object":
         df_copy[col] = df_copy[col].astype(str)
         df_copy[col] = df_copy[col].apply(lambda x: ...)
 
-df_copy.to_csv(tmp_file, index=False, encoding='cp1250', sep=';')
+df_copy.to_csv(tmp_file, index=False, encoding="cp1250", sep=";")
 ```
 
 **Impact:** Original dataframe tracking columns remain intact across all batch processing.
@@ -236,9 +249,9 @@ df_copy.to_csv(tmp_file, index=False, encoding='cp1250', sep=';')
 
 ```python
 # AFTER (FIXED CODE)
-ai_tracking_columns = {'Spracovane AI', 'AI_Processed_Date'}
+ai_tracking_columns = {"Spracovane AI", "AI_Processed_Date"}
 for col in final_df.columns:
-    if col not in ai_tracking_columns and final_df[col].dtype == 'object':  # ✅ Skip tracking
+    if col not in ai_tracking_columns and final_df[col].dtype == "object":  # ✅ Skip tracking
         final_df[col] = final_df[col].fillna("").astype(str).replace("nan", "").str.strip()
 ```
 
@@ -252,13 +265,18 @@ Added robust type handling at the start of `process_dataframe()`:
 ```python
 # Normalize 'Spracovane AI' column to handle various data types
 # Convert string representations of True/False to actual booleans
-df['Spracovane AI'] = df['Spracovane AI'].apply(
-    lambda x: True if str(x).strip().upper() in ['TRUE', '1', 'YES'] else 
-             False if str(x).strip().upper() in ['FALSE', '0', 'NO', ''] else x
+df["Spracovane AI"] = df["Spracovane AI"].apply(
+    lambda x: (
+        True
+        if str(x).strip().upper() in ["TRUE", "1", "YES"]
+        else False
+        if str(x).strip().upper() in ["FALSE", "0", "NO", ""]
+        else x
+    )
 )
 
 # Filter products needing processing (only False or empty values)
-needs_processing = df[df['Spracovane AI'].isin([False, ''])]
+needs_processing = df[df["Spracovane AI"].isin([False, ""])]
 ```
 
 **Impact:** Handles corrupted data from previous runs and normalizes to consistent boolean values.

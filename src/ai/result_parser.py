@@ -13,8 +13,27 @@ logger = logging.getLogger(__name__)
 
 # Scalar units whose values are stored as bare numbers (unit lives in the header)
 _SCALAR_UNITS = {
-    "mm", "cm", "m", "m2", "g", "kg", "l", "ml", "w", "kw", "v", "°c", "rpm",
-    "mikróny", "kg/h", "l/h", "ks/h", "kg/24h", "m3/h", "košov/h", "kg/cyklus",
+    "mm",
+    "cm",
+    "m",
+    "m2",
+    "g",
+    "kg",
+    "l",
+    "ml",
+    "w",
+    "kw",
+    "v",
+    "°c",
+    "rpm",
+    "mikróny",
+    "kg/h",
+    "l/h",
+    "ks/h",
+    "kg/24h",
+    "m3/h",
+    "košov/h",
+    "kg/cyklus",
     "°c/h",
 }
 _UNIT_SUFFIX = re.compile(r"\s*\(([^)]*)\)\s*$")
@@ -29,9 +48,9 @@ _MAX_LEN = {"seoTitle": 60, "metaDescription": 155}
 def _truncate(text: str, limit: int) -> str:
     if len(text) <= limit:
         return text
-    cut = text[:limit + 1]
+    cut = text[: limit + 1]
     if " " in cut:
-        cut = cut[:cut.rfind(" ")]
+        cut = cut[: cut.rfind(" ")]
     return cut[:limit].rstrip(" ,;.–-")
 
 
@@ -74,9 +93,7 @@ class ResultParser:
         limit = _MAX_LEN.get(field)
         return _truncate(value, limit) if limit else value
 
-    def find_best_match(
-        self, enhanced_name: str, column_name: str, df: pd.DataFrame
-    ) -> Optional[int]:
+    def find_best_match(self, enhanced_name: str, column_name: str, df: pd.DataFrame) -> Optional[int]:
         """Find best matching product using fuzzy matching.
 
         Args:
@@ -156,15 +173,21 @@ class ResultParser:
                     matched_name = str(df.at[best_match_idx, "name"]) if "name" in df.columns else ""
                     logger.warning(
                         "Non-exact match (%s): AI code='%s' name='%s' -> row code='%s' name='%s'",
-                        strategy, code, enhanced.get("name", ""), matched_code, matched_name,
+                        strategy,
+                        code,
+                        enhanced.get("name", ""),
+                        matched_code,
+                        matched_name,
                     )
-                    self.match_audit.append({
-                        "strategy": strategy,
-                        "ai_code": code,
-                        "ai_name": str(enhanced.get("name", "")),
-                        "matched_code": matched_code,
-                        "matched_name": matched_name,
-                    })
+                    self.match_audit.append(
+                        {
+                            "strategy": strategy,
+                            "ai_code": code,
+                            "ai_name": str(enhanced.get("name", "")),
+                            "matched_code": matched_code,
+                            "matched_name": matched_name,
+                        }
+                    )
 
                 for field in ("shortDescription", "description", "seoTitle", "metaDescription"):
                     if field in enhanced:
@@ -180,14 +203,12 @@ class ResultParser:
                                 logger.debug(f"Dropping unrequested parameter '{param_key}'")
                                 continue
                             param_key = canonical
-                        df.at[best_match_idx, f"filteringProperty:{param_key}"] = (
-                            self.normalize_param_value(param_key, param_val)
+                        df.at[best_match_idx, f"filteringProperty:{param_key}"] = self.normalize_param_value(
+                            param_key, param_val
                         )
 
                 df.at[best_match_idx, "aiProcessed"] = "1"
-                df.at[best_match_idx, "aiProcessedDate"] = datetime.now().strftime(
-                    "%Y-%m-%d %H:%M:%S"
-                )
+                df.at[best_match_idx, "aiProcessedDate"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 updated_count += 1
             else:
                 logger.error(f"No match for product {enhanced.get('code', 'UNKNOWN')}")

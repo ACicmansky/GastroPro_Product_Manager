@@ -55,15 +55,9 @@ def process_gastromarket(root, output_file):
     for product in products:
         category_element = product.find("KATEGORIA_KOMPLET")
 
-        category = (
-            category_element.text.strip()
-            if category_element is not None and category_element.text
-            else ""
-        )
+        category = category_element.text.strip() if category_element is not None and category_element.text else ""
 
-        if category and not any(
-            item.get("category") == category for item in cleaned_data
-        ):
+        if category and not any(item.get("category") == category for item in cleaned_data):
             cleaned_data.append({"category": category})
 
     # Convert to DataFrame and save as CSV
@@ -88,15 +82,9 @@ def process_forgastro(root, output_file):
     for product in products:
         category_element = product.find("category")
 
-        category = (
-            category_element.text.strip()
-            if category_element is not None and category_element.text
-            else ""
-        )
+        category = category_element.text.strip() if category_element is not None and category_element.text else ""
 
-        if category and not any(
-            item.get("category") == category for item in cleaned_data
-        ):
+        if category and not any(item.get("category") == category for item in cleaned_data):
             cleaned_data.append({"category": category})
 
     # Convert to DataFrame and save as CSV
@@ -109,9 +97,7 @@ def process_csv_file(input_file, output_file):
     """Process main CSV file and extract name and category columns"""
     try:
         print(f"Processing CSV file: {input_file}")
-        df = pd.read_csv(
-            input_file, encoding="cp1250", sep=";", dtype=str, keep_default_na=False
-        )
+        df = pd.read_csv(input_file, encoding="cp1250", sep=";", dtype=str, keep_default_na=False)
 
         # Check if required columns exist
         if "Názov tovaru" not in df.columns or "Hlavna kategória" not in df.columns:
@@ -152,11 +138,7 @@ def main():
         return
 
     # Check if feeds are configured
-    if (
-        "xml_feeds" not in config
-        or "gastromarket" not in config["xml_feeds"]
-        or "forgastro" not in config["xml_feeds"]
-    ):
+    if "xml_feeds" not in config or "gastromarket" not in config["xml_feeds"] or "forgastro" not in config["xml_feeds"]:
         print("Required feed configurations not found")
         return
 

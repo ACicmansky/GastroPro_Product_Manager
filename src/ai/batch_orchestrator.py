@@ -12,7 +12,7 @@ import os
 import time
 import logging
 from datetime import datetime
-from typing import Dict, List, Optional, Tuple, Callable
+from typing import Dict, Optional, Tuple, Callable
 
 import pandas as pd
 
@@ -36,8 +36,10 @@ class BatchOrchestrator:
     """Manages batch AI processing: job creation, monitoring, result application."""
 
     COMPLETED_STATES = {
-        "JOB_STATE_SUCCEEDED", "JOB_STATE_FAILED",
-        "JOB_STATE_CANCELLED", "JOB_STATE_EXPIRED",
+        "JOB_STATE_SUCCEEDED",
+        "JOB_STATE_FAILED",
+        "JOB_STATE_CANCELLED",
+        "JOB_STATE_EXPIRED",
     }
 
     def __init__(
@@ -91,9 +93,13 @@ class BatchOrchestrator:
             if resumable:
                 logger.info(
                     "Resuming run %s: %d/%d products done",
-                    resumable["id"], resumable["processed_products"], resumable["total_products"],
+                    resumable["id"],
+                    resumable["processed_products"],
+                    resumable["total_products"],
                 )
-                return self._run_chunks(df, resumable["id"], group1_indices, progress_callback, control, on_chunk_applied)
+                return self._run_chunks(
+                    df, resumable["id"], group1_indices, progress_callback, control, on_chunk_applied
+                )
 
         if "aiProcessed" not in df.columns:
             df["aiProcessed"] = ""
@@ -101,9 +107,13 @@ class BatchOrchestrator:
             df["aiProcessedDate"] = ""
 
         df["aiProcessed"] = df["aiProcessed"].apply(
-            lambda x: "1" if str(x).strip().upper() in ("TRUE", "1", "YES", "1.0")
-            else "0" if str(x).strip().upper() in ("FALSE", "0", "NO", "", "0.0")
-            else x
+            lambda x: (
+                "1"
+                if str(x).strip().upper() in ("TRUE", "1", "YES", "1.0")
+                else "0"
+                if str(x).strip().upper() in ("FALSE", "0", "NO", "", "0.0")
+                else x
+            )
         )
 
         needs_processing = self._select(df, force_reprocess, only_categories)
@@ -122,7 +132,7 @@ class BatchOrchestrator:
             return self._process_untracked(df, needs_processing, group1_indices, progress_callback, total)
 
         codes = [str(df.at[idx, "code"]).strip() for idx in needs_processing.index]
-        chunks = [codes[i:i + self.chunk_size] for i in range(0, len(codes), self.chunk_size)]
+        chunks = [codes[i : i + self.chunk_size] for i in range(0, len(codes), self.chunk_size)]
         run_id = self.run_db.create_run(force_reprocess, chunks)
         return self._run_chunks(df, run_id, group1_indices, progress_callback, control, on_chunk_applied)
 
@@ -161,7 +171,9 @@ class BatchOrchestrator:
 
         logger.info(
             "Missing-params pass: %d products in %d requests (model=%s)",
-            product_count, len(jsonl_requests), model or self.client.model_name,
+            product_count,
+            len(jsonl_requests),
+            model or self.client.model_name,
         )
         try:
             job_name, uploaded_name = self._submit_chunk(jsonl_requests, model=model)
@@ -219,9 +231,9 @@ class BatchOrchestrator:
                     continue
                 if progress_callback:
                     progress_callback(
-                        stats["ai_processed"], total,
-                        f"Beh {run_id}: davka {chunk['chunk_index'] + 1}/{len(chunks)}, "
-                        f"priprava a odosielanie...",
+                        stats["ai_processed"],
+                        total,
+                        f"Beh {run_id}: davka {chunk['chunk_index'] + 1}/{len(chunks)}, priprava a odosielanie...",
                     )
                 try:
                     job_name, uploaded_name = self._submit_chunk(jsonl_requests)
@@ -235,7 +247,8 @@ class BatchOrchestrator:
             def chunk_progress(_current, _total, message, _chunk=chunk, _chunks=chunks, _stats=stats):
                 if progress_callback:
                     progress_callback(
-                        _stats["ai_processed"], total,
+                        _stats["ai_processed"],
+                        total,
                         f"Beh {run_id}: davka {_chunk['chunk_index'] + 1}/{len(_chunks)}, "
                         f"{_stats['ai_processed']}/{total} produktov, {message}",
                     )
@@ -257,7 +270,12 @@ class BatchOrchestrator:
                 continue
 
             df, applied = self._download_and_apply(
-                df, batch_job, uploaded_name, chunk_progress, total, valid_indices=valid_indices,
+                df,
+                batch_job,
+                uploaded_name,
+                chunk_progress,
+                total,
+                valid_indices=valid_indices,
             )
             if applied.get("error"):
                 # Job succeeded in the cloud; keep chunk "submitted" so resume re-downloads it.
@@ -273,7 +291,8 @@ class BatchOrchestrator:
         final_chunks = self.run_db.chunks_for(run_id)
         failed = [c for c in final_chunks if c["status"] == "failed"]
         self.run_db.update_run(
-            run_id, status="completed",
+            run_id,
+            status="completed",
             detail=f"{len(failed)} chunks failed" if failed else "",
         )
         return df, stats
@@ -289,9 +308,7 @@ class BatchOrchestrator:
 
     def _submit_chunk(self, jsonl_requests: list, model: Optional[str] = None) -> Tuple[str, str]:
         """Write JSONL, upload, create batch job. Returns (job_name, uploaded_file_name)."""
-        jsonl_path = os.path.join(
-            self.tmp_dir, f"batch_requests_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jsonl"
-        )
+        jsonl_path = os.path.join(self.tmp_dir, f"batch_requests_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.jsonl")
         with open(jsonl_path, "w", encoding="utf-8") as f:
             for req in jsonl_requests:
                 f.write(json.dumps(req, ensure_ascii=False) + "\n")
@@ -306,7 +323,10 @@ class BatchOrchestrator:
         return batch_job.name, uploaded_name
 
     def _wait_for_job(
-        self, job_name: str, progress_callback: Optional[Callable], original_total: int,
+        self,
+        job_name: str,
+        progress_callback: Optional[Callable],
+        original_total: int,
         control: Optional[RunControl],
     ) -> Tuple[str, Optional[object]]:
         """Poll until the job completes or control/failure ceiling interrupts.
@@ -354,20 +374,27 @@ class BatchOrchestrator:
             time.sleep(30)
 
     def _download_and_apply(
-        self, df: pd.DataFrame, batch_job, uploaded_file_name: str,
-        progress_callback: Optional[Callable], original_total: int, valid_indices=None,
+        self,
+        df: pd.DataFrame,
+        batch_job,
+        uploaded_file_name: str,
+        progress_callback: Optional[Callable],
+        original_total: int,
+        valid_indices=None,
     ) -> Tuple[pd.DataFrame, Dict]:
         if not batch_job.dest or not batch_job.dest.file_name:
             logger.error("No destination file in batch job response.")
-            return df, {"ai_should_process": original_total, "ai_processed": 0,
-                        "error": "no destination file in batch job"}
+            return df, {
+                "ai_should_process": original_total,
+                "ai_processed": 0,
+                "error": "no destination file in batch job",
+            }
 
         try:
             file_content = self.client.download_file(batch_job.dest.file_name)
         except Exception as e:
             logger.error(f"Failed to download results: {e}")
-            return df, {"ai_should_process": original_total, "ai_processed": 0,
-                        "error": f"download failed: {e}"}
+            return df, {"ai_should_process": original_total, "ai_processed": 0, "error": f"download failed: {e}"}
 
         if uploaded_file_name:
             self.client.delete_file(uploaded_file_name)
@@ -375,8 +402,12 @@ class BatchOrchestrator:
         return self.parser.parse_batch_results(df, file_content, progress_callback, valid_indices=valid_indices)
 
     def _process_untracked(
-        self, df: pd.DataFrame, needs_processing: pd.DataFrame, group1_indices: set,
-        progress_callback: Optional[Callable], total: int,
+        self,
+        df: pd.DataFrame,
+        needs_processing: pd.DataFrame,
+        group1_indices: set,
+        progress_callback: Optional[Callable],
+        total: int,
     ) -> Tuple[pd.DataFrame, Dict]:
         """Legacy single-job path for callers without a RunDB (isolated CLI micro-tests)."""
         jsonl_requests = []
@@ -414,40 +445,41 @@ class BatchOrchestrator:
             if not expected:
                 continue
             missing = [
-                p for p in expected
-                if str(row.get(f"filteringProperty:{p}", "") or "").strip().lower() in ("", "nan")
+                p for p in expected if str(row.get(f"filteringProperty:{p}", "") or "").strip().lower() in ("", "nan")
             ]
             if not missing:
                 continue
-            by_cat.setdefault(cat, []).append({
-                "code": str(row.get("code", "")),
-                "name": str(row.get("name", "")),
-                "shortDescription": str(row.get("shortDescription", "")),
-                "chybajuce_parametre": missing,
-            })
+            by_cat.setdefault(cat, []).append(
+                {
+                    "code": str(row.get("code", "")),
+                    "name": str(row.get("name", "")),
+                    "shortDescription": str(row.get("shortDescription", "")),
+                    "chybajuce_parametre": missing,
+                }
+            )
 
         jsonl_requests = []
         product_count = 0
         for cat_name, products in by_cat.items():
             sys_prompt = create_params_only_prompt(cat_name)
             for i in range(0, len(products), self.batch_size):
-                chunk = products[i:i + self.batch_size]
+                chunk = products[i : i + self.batch_size]
                 product_count += len(chunk)
-                jsonl_requests.append({
-                    "key": f"fill_{hash(cat_name)}_{i}",
-                    "request": {
-                        "systemInstruction": {"parts": [{"text": sys_prompt}]},
-                        "contents": [{"role": "user", "parts": [{"text": json.dumps(chunk, ensure_ascii=False)}]}],
-                        # ponytail: no responseMimeType — google_search + JSON mime conflict; parser strips fences
-                        "tools": [{"google_search": {}}],
-                        "generationConfig": {"temperature": self.temperature},
-                    },
-                })
+                jsonl_requests.append(
+                    {
+                        "key": f"fill_{hash(cat_name)}_{i}",
+                        "request": {
+                            "systemInstruction": {"parts": [{"text": sys_prompt}]},
+                            "contents": [{"role": "user", "parts": [{"text": json.dumps(chunk, ensure_ascii=False)}]}],
+                            # ponytail: no responseMimeType — google_search + JSON mime conflict; parser strips fences
+                            "tools": [{"google_search": {}}],
+                            "generationConfig": {"temperature": self.temperature},
+                        },
+                    }
+                )
         return jsonl_requests, product_count
 
-    def _select(
-        self, df: pd.DataFrame, force_reprocess: bool, only_categories: Optional[set]
-    ) -> pd.DataFrame:
+    def _select(self, df: pd.DataFrame, force_reprocess: bool, only_categories: Optional[set]) -> pd.DataFrame:
         """Rows to process: a category-scoped re-run beats the aiProcessed filter."""
         if only_categories:
             return df[df.apply(self._category_of, axis=1).isin(only_categories)]
@@ -468,8 +500,7 @@ class BatchOrchestrator:
         return ""
 
     def _build_category_requests(
-        self, needs_processing: pd.DataFrame, indices: set,
-        jsonl_requests: list, is_group1: bool
+        self, needs_processing: pd.DataFrame, indices: set, jsonl_requests: list, is_group1: bool
     ):
         """Build JSONL requests grouped by category."""
         if not indices:
@@ -516,15 +547,19 @@ class BatchOrchestrator:
 
                 if products:
                     req_key = f"req_{'g1' if is_group1 else 'g2'}_{hash(cat_name)}_{i}"
-                    jsonl_requests.append({
-                        "key": req_key,
-                        "request": {
-                            "systemInstruction": {"parts": [{"text": sys_prompt}]},
-                            "contents": [{"role": "user", "parts": [{"text": json.dumps(products, ensure_ascii=False)}]}],
-                            "generationConfig": {
-                                "temperature": self.temperature,
-                                "responseMimeType": "application/json",
-                                "responseSchema": build_response_schema(expected_params),
+                    jsonl_requests.append(
+                        {
+                            "key": req_key,
+                            "request": {
+                                "systemInstruction": {"parts": [{"text": sys_prompt}]},
+                                "contents": [
+                                    {"role": "user", "parts": [{"text": json.dumps(products, ensure_ascii=False)}]}
+                                ],
+                                "generationConfig": {
+                                    "temperature": self.temperature,
+                                    "responseMimeType": "application/json",
+                                    "responseSchema": build_response_schema(expected_params),
+                                },
                             },
-                        },
-                    })
+                        }
+                    )

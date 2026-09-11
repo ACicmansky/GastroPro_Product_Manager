@@ -35,9 +35,7 @@ def test_stage_tracker_transitions(window):
     assert states["categories"] == states["ai"] == states["export"] == "pending"
 
     window._finish_stages()
-    assert all(
-        label.property("stage") == "done" for label in window.stage_labels.values()
-    )
+    assert all(label.property("stage") == "done" for label in window.stage_labels.values())
 
 
 def test_kpi_tiles_render_worker_schema(window):
@@ -80,9 +78,7 @@ def test_mapping_dialog_prefill_and_cancel(app):
     from PyQt5.QtWidgets import QDialog
     from src.gui.widgets import CategoryMappingDialog
 
-    dialog = CategoryMappingDialog(
-        "Chladenie/Vitríny", suggestions=[("Chladenie/Chladničky", 88.0)]
-    )
+    dialog = CategoryMappingDialog("Chladenie/Vitríny", suggestions=[("Chladenie/Chladničky", 88.0)])
     # input prefilled with the unmapped value, selected so typing replaces it
     assert dialog.category_input.text() == "Chladenie/Vitríny"
     assert dialog.category_input.selectedText() == "Chladenie/Vitríny"
@@ -102,13 +98,19 @@ def test_settings_dialog_saves_config_key_and_params(app, tmp_path, monkeypatch)
 
     category = "Tovary a kategórie > Chladenie"
     db_path = str(tmp_path / "products.db")
-    ProductDB(db_path).upsert(pd.DataFrame([{
-        "code": "P1",
-        "defaultCategory": category,
-        "filteringProperty:Príkon (W)": "2000",
-        "filteringProperty:Šírka (mm)": "800",
-        "aiProcessed": "1",
-    }]))
+    ProductDB(db_path).upsert(
+        pd.DataFrame(
+            [
+                {
+                    "code": "P1",
+                    "defaultCategory": category,
+                    "filteringProperty:Príkon (W)": "2000",
+                    "filteringProperty:Šírka (mm)": "800",
+                    "aiProcessed": "1",
+                }
+            ]
+        )
+    )
 
     config = {
         "ai_enhancement": {"model": "gemini-2.5-flash-lite", "batch_size": 15},
@@ -124,9 +126,7 @@ def test_settings_dialog_saves_config_key_and_params(app, tmp_path, monkeypatch)
     # monkeypatch records + restores GOOGLE_API_KEY (save_api_key sets os.environ)
     monkeypatch.setenv("GOOGLE_API_KEY", "sentinel")
 
-    dialog = SettingsDialog(
-        config, config_path=config_path, params_path=params_path, env_path=env_path
-    )
+    dialog = SettingsDialog(config, config_path=config_path, params_path=params_path, env_path=env_path)
 
     # params tab: removing a param persists the file AND clears the DB values
     dialog.select_category(category)

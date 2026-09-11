@@ -53,9 +53,7 @@ class TestCategoryMappingDataFrame:
         result = mapper.map_dataframe(df)
 
         # Should NOT have transformed categories (no prefix added automatically)
-        assert not any(
-            result["defaultCategory"].str.startswith("Tovary a kategórie > ")
-        )
+        assert not any(result["defaultCategory"].str.startswith("Tovary a kategórie > "))
         # Should preserve original if no mapping
         assert result.loc[0, "defaultCategory"] == "Vitríny/Chladiace"
 

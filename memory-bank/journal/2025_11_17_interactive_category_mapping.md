@@ -195,12 +195,14 @@ def handle_category_mapping_request(self, original_category, product_name):
 mapper = CategoryMapperNewFormat(config)
 mapper.set_interactive_callback(callback_function)
 
+
 # In Worker
 def _request_category_mapping(self, original_category, product_name):
     # Emit signal, block, wait for response
     self.category_mapping_request.emit(original_category, product_name)
     self.category_mapping_event_loop.exec_()
     return self.category_mapping_result
+
 
 # In GUI
 def handle_category_mapping_request(self, original_category, product_name):
@@ -248,6 +250,7 @@ def _request_category_mapping(self, original_category, product_name):
     self.category_mapping_event_loop = QEventLoop()
     self.category_mapping_event_loop.exec_()  # Block here
     return self.category_mapping_result
+
 
 # Main thread (GUI)
 def handle_category_mapping_request(self, original_category, product_name):

@@ -25,9 +25,7 @@ def config():
 @pytest.fixture(scope="module")
 def feed_dfs(config):
     return {
-        name: XMLParserFactory.parse(
-            name, (FIXTURES / f"{name}.xml").read_text(encoding="utf-8"), config
-        )
+        name: XMLParserFactory.parse(name, (FIXTURES / f"{name}.xml").read_text(encoding="utf-8"), config)
         for name in ("gastromarket", "forgastro")
     }
 
@@ -61,6 +59,4 @@ class TestPipelineChain:
         for _, row in merged.iterrows():
             if str(row["defaultCategory"]).strip():
                 out_cat = out_by_code[row["code"]]
-                assert out_cat.startswith("Tovary a kategórie > "), (
-                    f"category wiped for {row['code']}: {out_cat!r}"
-                )
+                assert out_cat.startswith("Tovary a kategórie > "), f"category wiped for {row['code']}: {out_cat!r}"

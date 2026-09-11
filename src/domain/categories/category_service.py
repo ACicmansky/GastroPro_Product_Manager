@@ -20,9 +20,7 @@ class CategoryService:
     def __init__(self, mappings_path_or_config: Union[str, Dict, None] = None):
         if isinstance(mappings_path_or_config, dict):
             self.config = mappings_path_or_config
-            self.mappings_path = mappings_path_or_config.get(
-                "categories_path", "categories.json"
-            )
+            self.mappings_path = mappings_path_or_config.get("categories_path", "categories.json")
         elif isinstance(mappings_path_or_config, str):
             self.config = None
             self.mappings_path = mappings_path_or_config
@@ -45,19 +43,12 @@ class CategoryService:
 
         self._mappings = {}
         for item in data:
-            if (
-                isinstance(item, dict)
-                and "oldCategory" in item
-                and "newCategory" in item
-            ):
+            if isinstance(item, dict) and "oldCategory" in item and "newCategory" in item:
                 self._mappings[item["oldCategory"]] = item["newCategory"]
 
     def _save(self):
         """Persist mappings back to JSON file."""
-        data = [
-            {"oldCategory": old, "newCategory": new}
-            for old, new in self._mappings.items()
-        ]
+        data = [{"oldCategory": old, "newCategory": new} for old, new in self._mappings.items()]
         with open(self.mappings_path, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
@@ -113,9 +104,7 @@ class CategoryService:
 
         return old_category
 
-    def suggest(
-        self, unmapped_category: str, top_n: int = 5
-    ) -> List[Tuple[str, float]]:
+    def suggest(self, unmapped_category: str, top_n: int = 5) -> List[Tuple[str, float]]:
         """Suggest similar target categories using fuzzy matching.
 
         Returns list of (category, score) tuples sorted by score descending.
@@ -128,9 +117,7 @@ class CategoryService:
         for target in existing:
             # Hybrid scoring: combine multiple similarity methods
             partial = fuzz.partial_ratio(unmapped_category.lower(), target.lower())
-            token_sort = fuzz.token_sort_ratio(
-                unmapped_category.lower(), target.lower()
-            )
+            token_sort = fuzz.token_sort_ratio(unmapped_category.lower(), target.lower())
             ratio = fuzz.ratio(unmapped_category.lower(), target.lower())
 
             # Weighted combination
@@ -166,9 +153,7 @@ class CategoryService:
             return True
         return category in set(self._mappings.values())
 
-    def set_interactive_callback(
-        self, callback: Optional[Callable[[str, Optional[str]], str]]
-    ):
+    def set_interactive_callback(self, callback: Optional[Callable[[str, Optional[str]], str]]):
         """Set callback for interactive category mapping.
 
         Callback signature: (original_category, product_name) -> new_category

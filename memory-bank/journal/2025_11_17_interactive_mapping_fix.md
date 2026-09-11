@@ -99,7 +99,7 @@ result_df, stats = self.pipeline.run_with_stats(
     main_data_file=main_data_file,
     scraped_data=scraped_data,
     selected_categories=selected_categories,
-    enable_interactive_mapping=True  # ✅ Enable interactive dialogs
+    enable_interactive_mapping=True,  # ✅ Enable interactive dialogs
 )
 ```
 

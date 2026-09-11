@@ -257,9 +257,7 @@ class MainWindow(QMainWindow):
         search_layout = QHBoxLayout()
         search_label = QLabel("Hľadať:")
         self.category_search = QLineEdit()
-        self.category_search.setPlaceholderText(
-            "Zadajte text pre filtrovanie kategórií..."
-        )
+        self.category_search.setPlaceholderText("Zadajte text pre filtrovanie kategórií...")
         self.category_search.textChanged.connect(self._filter_category_list)
         search_layout.addWidget(search_label)
         search_layout.addWidget(self.category_search)
@@ -300,9 +298,7 @@ class MainWindow(QMainWindow):
         layout = QVBoxLayout(group)
 
         self.gastromarket_checkbox = QCheckBox("Načítať z GastroMarket XML")
-        self.gastromarket_stalgast_checkbox = QCheckBox(
-            "Načítať z GastroMarket STALGAST XML"
-        )
+        self.gastromarket_stalgast_checkbox = QCheckBox("Načítať z GastroMarket STALGAST XML")
         self.forgastro_checkbox = QCheckBox("Načítať z ForGastro XML")
 
         self.gastromarket_checkbox.setChecked(False)
@@ -348,13 +344,9 @@ class MainWindow(QMainWindow):
             "Ak je zaškrtnuté, kategórie produktov budú prepísané hodnotami z XML feedov/scrapingu."
         )
 
-        self.preserve_edits_checkbox = QCheckBox(
-            "Zachovať úpravy e-shopu (iba ceny a sklad z feedu)"
-        )
+        self.preserve_edits_checkbox = QCheckBox("Zachovať úpravy e-shopu (iba ceny a sklad z feedu)")
         self.preserve_edits_checkbox.setChecked(False)
-        self.preserve_edits_checkbox.setEnabled(
-            False
-        )  # enabled only when main data is loaded
+        self.preserve_edits_checkbox.setEnabled(False)  # enabled only when main data is loaded
         self.preserve_edits_checkbox.setToolTip(
             "Zachová opisy, obrázky, kategórie a ceny z e-shopu. "
             "Z feedu sa aktualizuje len standardPrice a sklad. "
@@ -425,7 +417,8 @@ class MainWindow(QMainWindow):
 
     def _cancel_ai(self):
         confirm = QMessageBox.question(
-            self, "Zrušiť AI spracovanie",
+            self,
+            "Zrušiť AI spracovanie",
             "Naozaj chcete zrušiť prebiehajúcu AI dávku? Doteraz spracované produkty zostanú uložené.",
             QMessageBox.Yes | QMessageBox.No,
         )
@@ -440,9 +433,7 @@ class MainWindow(QMainWindow):
 
     def _start_ai_for_categories(self, categories: list):
         """Re-run AI for products of the given categories (params changed)."""
-        self._launch_ai_worker(
-            f"AI spracovanie kategórie: {categories[0]}...", categories=categories
-        )
+        self._launch_ai_worker(f"AI spracovanie kategórie: {categories[0]}...", categories=categories)
 
     def _launch_ai_worker(self, status_text: str, categories: Optional[list] = None):
         """Shared thread wiring for AI-only runs (resume or category-scoped)."""
@@ -457,9 +448,7 @@ class MainWindow(QMainWindow):
 
         self.ai_control = RunControl()
         self.ai_thread = QThread()
-        self.ai_worker = AIResumeWorker(
-            self.config, ai_control=self.ai_control, categories=categories
-        )
+        self.ai_worker = AIResumeWorker(self.config, ai_control=self.ai_control, categories=categories)
         self.ai_worker.moveToThread(self.ai_thread)
 
         self.ai_thread.started.connect(self.ai_worker.run)
@@ -555,9 +544,7 @@ class MainWindow(QMainWindow):
 
     def _log(self, message: str, error: bool = False):
         prefix = "CHYBA: " if error else ""
-        self.activity_log.appendPlainText(
-            f"[{datetime.now().strftime('%H:%M:%S')}] {prefix}{message}"
-        )
+        self.activity_log.appendPlainText(f"[{datetime.now().strftime('%H:%M:%S')}] {prefix}{message}")
         scrollbar = self.activity_log.verticalScrollBar()
         scrollbar.setValue(scrollbar.maximum())
 
@@ -619,9 +606,7 @@ class MainWindow(QMainWindow):
 
     def _open_export_folder(self):
         if self.last_output_path:
-            QDesktopServices.openUrl(
-                QUrl.fromLocalFile(str(Path(self.last_output_path).parent))
-            )
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(Path(self.last_output_path).parent)))
 
     def _kpi_tile(self, value, caption):
         tile = QFrame()
@@ -639,9 +624,7 @@ class MainWindow(QMainWindow):
 
     def _update_right_pane(self):
         """Empty-state placeholder shows only when there is nothing else to show."""
-        self.empty_state.setVisible(
-            not self.category_filter_group.isVisible() and not self.stats_group.isVisible()
-        )
+        self.empty_state.setVisible(not self.category_filter_group.isVisible() and not self.stats_group.isVisible())
 
     def dragEnterEvent(self, event):
         """Accept XLSX files dragged anywhere onto the window."""
@@ -687,8 +670,7 @@ class MainWindow(QMainWindow):
             self.main_data_df = df
             filename = Path(file_path).name
             self.main_data_label.setText(
-                f"<b>{filename}</b><br>"
-                f"<small>{len(df)} produktov, {len(df.columns)} stĺpcov</small>"
+                f"<b>{filename}</b><br><small>{len(df)} produktov, {len(df.columns)} stĺpcov</small>"
             )
             set_variant(self.main_data_label, "success")
             self.clear_main_button.setEnabled(True)
@@ -696,9 +678,7 @@ class MainWindow(QMainWindow):
 
             # Extract and display categories
             self._extract_and_display_categories(df)
-            self.toasts.show(
-                f"Načítané: {filename} • {len(df)} produktov", "success", duration=3500
-            )
+            self.toasts.show(f"Načítané: {filename} • {len(df)} produktov", "success", duration=3500)
 
         except Exception as e:
             self.toasts.show(f"Nepodarilo sa načítať súbor: {e}", "error")
@@ -755,9 +735,7 @@ class MainWindow(QMainWindow):
         options = PipelineOptions(
             main_file_path=self.main_data_file or "",
             output_path=output_path,
-            selected_categories=(
-                self.get_selected_categories() if self.main_data_file else []
-            ),
+            selected_categories=(self.get_selected_categories() if self.main_data_file else []),
             enabled_feeds=[
                 name
                 for name, checkbox in (
@@ -767,10 +745,7 @@ class MainWindow(QMainWindow):
                 )
                 if checkbox.isChecked()
             ],
-            enable_scraping=(
-                self.web_scraping_checkbox.isChecked()
-                or self.mebella_scraping_checkbox.isChecked()
-            ),
+            enable_scraping=(self.web_scraping_checkbox.isChecked() or self.mebella_scraping_checkbox.isChecked()),
             enable_ai_enhancement=self.ai_enhancement_checkbox.isChecked(),
             preserve_client_edits=self.preserve_edits_checkbox.isChecked(),
             force_ai_reprocess=self.force_reprocess_checkbox.isChecked(),
@@ -810,9 +785,7 @@ class MainWindow(QMainWindow):
         self.thread.finished.connect(self.thread.deleteLater)
         self.worker.result.connect(self.handle_result)
         self.worker.statistics.connect(self.handle_statistics)
-        self.worker.category_mapping_request.connect(
-            self.handle_category_mapping_request
-        )
+        self.worker.category_mapping_request.connect(self.handle_category_mapping_request)
         self.worker.price_mapping_request.connect(self.handle_price_mapping_request)
         self.worker.error.connect(self.show_error_message)
         self.worker.progress.connect(self.update_progress)
@@ -823,9 +796,7 @@ class MainWindow(QMainWindow):
         self.thread.finished.connect(lambda: self._set_ui_enabled(True))
         self.thread.finished.connect(lambda: self.progress_bar.setVisible(False))
         self.thread.finished.connect(lambda: self.status_label.setVisible(False))
-        self.thread.finished.connect(
-            lambda: self.process_button.setText("Spracovať a exportovať")
-        )
+        self.thread.finished.connect(lambda: self.process_button.setText("Spracovať a exportovať"))
         self.thread.finished.connect(lambda: self.ai_pause_button.setEnabled(False))
         self.thread.finished.connect(lambda: self.ai_cancel_button.setEnabled(False))
         self.thread.finished.connect(self._check_resumable_ai_run)
@@ -842,18 +813,18 @@ class MainWindow(QMainWindow):
         self.select_main_button.setEnabled(enabled)
         # Only enable clear if there is a main file loaded
         self.clear_main_button.setEnabled(enabled and self.main_data_file is not None)
-        
+
         # XML Feeds
         self.gastromarket_checkbox.setEnabled(enabled)
         self.gastromarket_stalgast_checkbox.setEnabled(enabled)
         self.forgastro_checkbox.setEnabled(enabled)
-        
+
         # Options
         self.ai_enhancement_checkbox.setEnabled(enabled)
         self.web_scraping_checkbox.setEnabled(enabled)
         self.mebella_scraping_checkbox.setEnabled(enabled)
         self.update_categories_checkbox.setEnabled(enabled)
-        
+
         # We only enable these conditionally so rely on their specific state checks
         if enabled:
             # Re-check ai force enabled state
@@ -863,7 +834,7 @@ class MainWindow(QMainWindow):
         else:
             self.force_reprocess_checkbox.setEnabled(False)
             self.preserve_edits_checkbox.setEnabled(False)
-            
+
         # Filter section
         self.category_search.setEnabled(enabled)
         self.toggle_categories_button.setEnabled(enabled)
@@ -987,9 +958,7 @@ class MainWindow(QMainWindow):
             filtered_categories = self.all_categories
         else:
             # Filter categories
-            filtered_categories = self.category_filter.search_categories(
-                self.all_categories, search_text
-            )
+            filtered_categories = self.category_filter.search_categories(self.all_categories, search_text)
 
         # Repopulate list with filtered categories
         self._populate_category_list(filtered_categories)
@@ -1040,13 +1009,10 @@ class MainWindow(QMainWindow):
 
         if visible_count < total_count:
             self.category_info_label.setText(
-                f"Zobrazené: {visible_count} z {total_count} kategórií | "
-                f"Vybrané: {selected_count}"
+                f"Zobrazené: {visible_count} z {total_count} kategórií | Vybrané: {selected_count}"
             )
         else:
-            self.category_info_label.setText(
-                f"Celkom: {total_count} kategórií | Vybrané: {selected_count}"
-            )
+            self.category_info_label.setText(f"Celkom: {total_count} kategórií | Vybrané: {selected_count}")
 
     def _get_selected_categories_count(self) -> int:
         """Get count of selected categories."""
@@ -1078,9 +1044,7 @@ class MainWindow(QMainWindow):
         suggestions = self.category_service.suggest(original_category, top_n=5)
 
         # Show dialog with suggestions
-        dialog = CategoryMappingDialog(
-            original_category, suggestions, product_name, self
-        )
+        dialog = CategoryMappingDialog(original_category, suggestions, product_name, self)
         if dialog.exec_():
             new_category = dialog.get_new_category()
 

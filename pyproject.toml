@@ -72,12 +72,19 @@ select = [
     "E",   # pycodestyle errors
     "W",   # pycodestyle warnings
     "F",   # pyflakes
-    "I",   # isort
-    "UP",  # pyupgrade
 ]
 ignore = [
     "E501", # line too long (handled by formatter)
+    "W291", # trailing whitespace
+    "W293", # blank line whitespace
+    "E722", # bare except (legacy scrapers)
+    "E731", # lambda assignment (scripts)
 ]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F401", "F841", "E731", "E401", "I001"]
+"scripts/*" = ["F841", "E731"]
+"*__init__.py" = ["F401"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]

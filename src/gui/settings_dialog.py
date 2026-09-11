@@ -39,7 +39,7 @@ TARGET_PREFIX = "Tovary a kategórie > "
 
 def _short_path(category: str) -> str:
     """Category path without the shared root prefix (pure noise on screen)."""
-    return category[len(TARGET_PREFIX):] if category.startswith(TARGET_PREFIX) else category
+    return category[len(TARGET_PREFIX) :] if category.startswith(TARGET_PREFIX) else category
 
 
 class SettingsDialog(QDialog):
@@ -59,11 +59,7 @@ class SettingsDialog(QDialog):
         super().__init__(parent)
         self.setWindowTitle("Nastavenia")
         # resizable dialog with min/maximize buttons (Windows dialogs hide them by default)
-        self.setWindowFlags(
-            self.windowFlags()
-            | Qt.WindowMaximizeButtonHint
-            | Qt.WindowMinimizeButtonHint
-        )
+        self.setWindowFlags(self.windowFlags() | Qt.WindowMaximizeButtonHint | Qt.WindowMinimizeButtonHint)
         self.setSizeGripEnabled(True)
         self.resize(980, 640)
         self.config = config
@@ -119,9 +115,7 @@ class SettingsDialog(QDialog):
         show_button.setProperty("flat", "true")
         show_button.setToolTip("Zobraziť/skryť kľúč")
         show_button.toggled.connect(
-            lambda checked: self.api_key_input.setEchoMode(
-                QLineEdit.Normal if checked else QLineEdit.Password
-            )
+            lambda checked: self.api_key_input.setEchoMode(QLineEdit.Normal if checked else QLineEdit.Password)
         )
         row.addWidget(show_button)
         layout.addLayout(row)
@@ -243,9 +237,7 @@ class SettingsDialog(QDialog):
         right.addWidget(self.params_cat_label)
 
         self.params_edit = QPlainTextEdit()
-        self.params_edit.setPlaceholderText(
-            "Jeden parameter na riadok, napr.:\nŠírka (mm)\nPríkon (W)"
-        )
+        self.params_edit.setPlaceholderText("Jeden parameter na riadok, napr.:\nŠírka (mm)\nPríkon (W)")
         self.params_edit.setEnabled(False)
         right.addWidget(self.params_edit, 1)
 
@@ -343,8 +335,7 @@ class SettingsDialog(QDialog):
         parts = _short_path(category).split(" > ")
         breadcrumb = " › ".join(parts[:-1])
         self.params_cat_label.setText(
-            f"<span style='font-size:8pt; opacity:0.7;'>{breadcrumb}</span><br>"
-            f"<b>{parts[-1]}</b>"
+            f"<span style='font-size:8pt; opacity:0.7;'>{breadcrumb}</span><br><b>{parts[-1]}</b>"
         )
         self.params_cat_label.setToolTip(category)
         self.params_edit.setPlainText("\n".join(self.params.get(category, [])))
@@ -394,10 +385,7 @@ class SettingsDialog(QDialog):
         """Blank filteringProperty columns of removed params for this category's products."""
         df = self._db_df()
         mask = self._category_mask(category)
-        cols = [
-            f"filteringProperty:{p}" for p in removed
-            if f"filteringProperty:{p}" in df.columns
-        ]
+        cols = [f"filteringProperty:{p}" for p in removed if f"filteringProperty:{p}" in df.columns]
         if df.empty or not cols or not mask.any():
             return 0
         df.loc[mask, cols] = ""
@@ -408,10 +396,7 @@ class SettingsDialog(QDialog):
         category = self._current_category()
         if not category:
             return
-        new_params = [
-            line.strip() for line in self.params_edit.toPlainText().splitlines()
-            if line.strip()
-        ]
+        new_params = [line.strip() for line in self.params_edit.toPlainText().splitlines() if line.strip()]
         removed = [p for p in self.params.get(category, []) if p not in new_params]
         self.params[category] = new_params
         self._save_params_file()
@@ -429,12 +414,14 @@ class SettingsDialog(QDialog):
         count = self._product_count(category)
         if count == 0:
             QMessageBox.information(
-                self, "Žiadne produkty",
+                self,
+                "Žiadne produkty",
                 "V databáze nie sú žiadne produkty tejto kategórie.",
             )
             return
         confirm = QMessageBox.question(
-            self, "Spustiť AI spracovanie",
+            self,
+            "Spustiť AI spracovanie",
             f"Znova spracovať {count} produktov kategórie:\n\n{category}\n\n"
             "Použije sa API kvóta (platené volania). Pokračovať?",
             QMessageBox.Yes | QMessageBox.No,

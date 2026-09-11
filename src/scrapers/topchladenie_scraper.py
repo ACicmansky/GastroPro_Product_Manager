@@ -78,7 +78,7 @@ class TopchladenieScraper(BaseScraper):
         Returns:
             List of product URLs
         """
-        print(f"  Discovering products...")
+        print("  Discovering products...")
         product_urls = []
         page = 1
         max_pages = 20  # Safety limit
@@ -92,9 +92,7 @@ class TopchladenieScraper(BaseScraper):
                 soup = BeautifulSoup(response.content, "html.parser")
 
                 # Find product links
-                page_products = soup.select(
-                    'a[href*="/e-shop/"]:not([href*="category"])'
-                )
+                page_products = soup.select('a[href*="/e-shop/"]:not([href*="category"])')
 
                 if not page_products:
                     print("no products, stopping")
@@ -113,9 +111,7 @@ class TopchladenieScraper(BaseScraper):
                     print("no new products, stopping")
                     break
 
-                print(
-                    f"found {len([p for p in page_products if p.get('href')])} products"
-                )
+                print(f"found {len([p for p in page_products if p.get('href')])} products")
 
                 # Check for next page link
                 next_page_link = soup.select_one("a.next")
@@ -148,9 +144,7 @@ class TopchladenieScraper(BaseScraper):
 
             # Product name
             product_name = (
-                soup.select_one('h1[itemprop="name"]').text.strip()
-                if soup.select_one('h1[itemprop="name"]')
-                else ""
+                soup.select_one('h1[itemprop="name"]').text.strip() if soup.select_one('h1[itemprop="name"]') else ""
             )
 
             if not product_name:
@@ -163,11 +157,7 @@ class TopchladenieScraper(BaseScraper):
 
             # Price
             price_elem = soup.find("p", class_=["big", "red"])
-            price = (
-                float(price_elem["content"])
-                if price_elem and price_elem.get("content")
-                else 0.0
-            )
+            price = float(price_elem["content"]) if price_elem and price_elem.get("content") else 0.0
             price = price * 0.77
             product_data["price"] = str(price)
 
@@ -180,16 +170,12 @@ class TopchladenieScraper(BaseScraper):
             if params_heading:
                 params_list = params_heading.find_next("ul")
                 if params_list:
-                    short_desc = "\\n".join(
-                        [li.get_text(strip=True) for li in params_list.find_all("li")]
-                    )
+                    short_desc = "\\n".join([li.get_text(strip=True) for li in params_list.find_all("li")])
             product_data["shortDescription"] = short_desc
 
             # Long description from article sections
             long_desc_parts = []
-            article_section = soup.find(
-                "section", class_=lambda x: x and "article_module" in x
-            )
+            article_section = soup.find("section", class_=lambda x: x and "article_module" in x)
             if article_section:
                 for section in article_section.find_all("section"):
                     inner_section = section.findChild("section")
@@ -197,15 +183,9 @@ class TopchladenieScraper(BaseScraper):
                         # Get h3 text
                         h3_text = inner_section.h3.get_text(strip=True)
                         # Get the rest of the text (excluding h3)
-                        section_text = (
-                            inner_section.get_text(strip=True)
-                            .replace(h3_text, "", 1)
-                            .strip()
-                        )
+                        section_text = inner_section.get_text(strip=True).replace(h3_text, "", 1).strip()
                         # Clean up whitespace characters
-                        section_text = section_text.replace("\\xa0", " ").replace(
-                            "&nbsp;", " "
-                        )
+                        section_text = section_text.replace("\\xa0", " ").replace("&nbsp;", " ")
                         if section_text:
                             long_desc_parts.append(section_text)
 
@@ -224,9 +204,7 @@ class TopchladenieScraper(BaseScraper):
                         image_urls.append(urljoin(self.base_url, href))
 
             # Split images into 8 columns
-            unique_images = list(dict.fromkeys(image_urls))[
-                :8
-            ]  # Max 8 images, preserve order
+            unique_images = list(dict.fromkeys(image_urls))[:8]  # Max 8 images, preserve order
             image_columns = [
                 "image",
                 "image2",
@@ -238,9 +216,7 @@ class TopchladenieScraper(BaseScraper):
                 "image8",
             ]
             for i, col_name in enumerate(image_columns):
-                product_data[col_name] = (
-                    unique_images[i] if i < len(unique_images) else ""
-                )
+                product_data[col_name] = unique_images[i] if i < len(unique_images) else ""
 
             # Category - with transformation
             category_div = soup.find("div", class_="category")

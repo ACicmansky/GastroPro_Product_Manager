@@ -13,7 +13,7 @@ This module handles:
 import logging
 
 import pandas as pd
-from typing import Dict, List
+from typing import Dict
 
 logger = logging.getLogger(__name__)
 
@@ -67,9 +67,7 @@ class OutputTransformer:
         # 6. Apply default values
         output_df = self.apply_default_values(output_df)
 
-        logger.info(
-            f"Transformation complete: {len(output_df.columns)} columns, {len(output_df)} rows"
-        )
+        logger.info(f"Transformation complete: {len(output_df.columns)} columns, {len(output_df)} rows")
 
         return output_df
 
@@ -111,9 +109,7 @@ class OutputTransformer:
         logger.debug(f"  Mapped {len(output_df.columns)} columns")
         return output_df
 
-    def split_images(
-        self, df: pd.DataFrame, output_df: pd.DataFrame = None
-    ) -> pd.DataFrame:
+    def split_images(self, df: pd.DataFrame, output_df: pd.DataFrame = None) -> pd.DataFrame:
         """
         Split comma-separated image URLs into 8 separate columns.
 
@@ -176,9 +172,7 @@ class OutputTransformer:
         logger.debug(f"  Split images into {len(image_columns)} columns")
         return output_df
 
-    def transform_category(
-        self, df: pd.DataFrame, output_df: pd.DataFrame = None
-    ) -> pd.DataFrame:
+    def transform_category(self, df: pd.DataFrame, output_df: pd.DataFrame = None) -> pd.DataFrame:
         """
         Transform category: add prefix and replace separator.
 
@@ -207,11 +201,7 @@ class OutputTransformer:
         # Transform each category
         transformed_categories = []
         for idx, row in df.iterrows():
-            category = (
-                str(row["defaultCategory"])
-                if pd.notna(row["defaultCategory"])
-                else ""
-            )
+            category = str(row["defaultCategory"]) if pd.notna(row["defaultCategory"]) else ""
 
             if category and category != "nan":
                 # Replace "/" with " > "
@@ -275,18 +265,10 @@ class OutputTransformer:
         return df
 
     def _change_GastroMarket_string(self, df: pd.DataFrame) -> pd.DataFrame:
-        df["shortDescription"] = df["shortDescription"].str.replace(
-            "GastroMarket", "Gastro", case=False, regex=False
-        )
-        df["description"] = df["description"].str.replace(
-            "GastroMarket", "Gastro", case=False, regex=False
-        )
-        df["metaDescription"] = df["metaDescription"].str.replace(
-            "GastroMarket", "Gastro", case=False, regex=False
-        )
-        df["seoTitle"] = df["seoTitle"].str.replace(
-            "GastroMarket", "Gastro", case=False, regex=False
-        )
+        df["shortDescription"] = df["shortDescription"].str.replace("GastroMarket", "Gastro", case=False, regex=False)
+        df["description"] = df["description"].str.replace("GastroMarket", "Gastro", case=False, regex=False)
+        df["metaDescription"] = df["metaDescription"].str.replace("GastroMarket", "Gastro", case=False, regex=False)
+        df["seoTitle"] = df["seoTitle"].str.replace("GastroMarket", "Gastro", case=False, regex=False)
         return df
 
     def _update_variantVisibility(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -321,18 +303,15 @@ class OutputTransformer:
 
         # Keep important tracking columns that might not be in the config output list
         internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
-        
+
         # Keep dynamic filtering properties extracted by AI
         dynamic_cols = [col for col in df.columns if col.startswith("filteringProperty:") and col not in required_cols]
 
-        extra_cols = dynamic_cols + [
-            col for col in internal_tracking
-            if col in df.columns and col not in required_cols
-        ]
+        extra_cols = dynamic_cols + [col for col in internal_tracking if col in df.columns and col not in required_cols]
 
         # Reorder: schema+config columns first, then extra tracking/dynamic columns
         ordered_cols = required_cols + extra_cols
-        # Ensure we only select columns that actually exist in the dataframe 
+        # Ensure we only select columns that actually exist in the dataframe
         # (in case self.new_output_columns has extra config values or non-column names)
         final_cols = [c for c in ordered_cols if c in df.columns]
         df = df[final_cols]

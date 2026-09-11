@@ -69,19 +69,20 @@ class FakeClient:
 
 
 def _make_df(cat):
-    return pd.DataFrame({
-        "code": ["P1", "P2", "P3", "P4"],
-        "name": ["N1", "N2", "N3", "N4"],
-        "shortDescription": [""] * 4,
-        "description": [""] * 4,
-        "newCategory": [cat] * 4,
-        "aiProcessed": [""] * 4,
-    })
+    return pd.DataFrame(
+        {
+            "code": ["P1", "P2", "P3", "P4"],
+            "name": ["N1", "N2", "N3", "N4"],
+            "shortDescription": [""] * 4,
+            "description": [""] * 4,
+            "newCategory": [cat] * 4,
+            "aiProcessed": [""] * 4,
+        }
+    )
 
 
 def _config(tmp_path, **overrides):
-    ai_config = {"chunk_size": 2, "poll_failure_limit": 1, "batch_size": 45,
-                 "tmp_dir": str(tmp_path / "tmp")}
+    ai_config = {"chunk_size": 2, "poll_failure_limit": 1, "batch_size": 45, "tmp_dir": str(tmp_path / "tmp")}
     ai_config.update(overrides)
     return {"ai_enhancement": ai_config}
 
@@ -102,7 +103,9 @@ def test_interrupted_chunk_resumes_without_resubmitting(tmp_path):
 
     client = FakeClient()
     client.unreachable_jobs.add("job/1")
-    orch = BatchOrchestrator(client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config)
+    orch = BatchOrchestrator(
+        client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config
+    )
 
     updated_df, stats = orch.process(df.copy(), group1_indices=set(), progress_callback=None)
 
@@ -116,7 +119,9 @@ def test_interrupted_chunk_resumes_without_resubmitting(tmp_path):
 
     # "restart": network reachable again, fresh orchestrator instance
     client.unreachable_jobs.discard("job/1")
-    orch2 = BatchOrchestrator(client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config)
+    orch2 = BatchOrchestrator(
+        client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config
+    )
     final_df, stats2 = orch2.process(updated_df, group1_indices=set(), progress_callback=None)
 
     assert client.create_calls == 2  # no new job created for chunk 2
@@ -134,7 +139,9 @@ def test_download_failure_interrupts_instead_of_marking_applied(tmp_path):
     run_db = RunDB(str(tmp_path / "runs.db"))
     client = FakeClient()
     client.fail_downloads = True
-    orch = BatchOrchestrator(client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config)
+    orch = BatchOrchestrator(
+        client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config
+    )
 
     updated_df, stats = orch.process(df.copy(), group1_indices=set(), progress_callback=None)
 
@@ -144,7 +151,9 @@ def test_download_failure_interrupts_instead_of_marking_applied(tmp_path):
     assert run_db.chunks_for(resumable["id"])[0]["status"] == "submitted"
 
     client.fail_downloads = False
-    orch2 = BatchOrchestrator(client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config)
+    orch2 = BatchOrchestrator(
+        client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config
+    )
     final_df, stats2 = orch2.process(updated_df, group1_indices=set(), progress_callback=None)
 
     assert client.create_calls == 1  # same job reused, no resubmission
@@ -159,7 +168,9 @@ def test_pause_leaves_run_resumable(tmp_path):
     config = _config(tmp_path, chunk_size=10)  # single chunk
     run_db = RunDB(str(tmp_path / "runs.db"))
     client = FakeClient()
-    orch = BatchOrchestrator(client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config)
+    orch = BatchOrchestrator(
+        client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config
+    )
 
     control = RunControl()
     control.pause()
@@ -176,7 +187,9 @@ def test_cancel_stops_run(tmp_path):
     config = _config(tmp_path, chunk_size=10)
     run_db = RunDB(str(tmp_path / "runs.db"))
     client = FakeClient()
-    orch = BatchOrchestrator(client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config)
+    orch = BatchOrchestrator(
+        client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config
+    )
 
     control = RunControl()
     control.cancel()

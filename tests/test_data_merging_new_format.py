@@ -103,10 +103,7 @@ class TestNewFormatMerging:
 
         # Name and description should be preserved from main
         assert result[result["code"] == "PROD001"]["name"].values[0] == "Original Name"
-        assert (
-            result[result["code"] == "PROD001"]["shortDescription"].values[0]
-            == "Original description"
-        )
+        assert result[result["code"] == "PROD001"]["shortDescription"].values[0] == "Original description"
 
 
 class TestImagePriorityMerging:
@@ -268,9 +265,7 @@ class TestMultipleFeedMerging:
         )
 
         merger = ProductMerger()
-        merge_result = merger.merge(
-            pd.DataFrame(), {"feed1": feed1, "feed2": feed2, "feed3": feed3}
-        )
+        merge_result = merger.merge(pd.DataFrame(), {"feed1": feed1, "feed2": feed2, "feed3": feed3})
         result = merge_result.products
 
         assert len(result) == 4
@@ -304,9 +299,7 @@ class TestMultipleFeedMerging:
         )
 
         merger = ProductMerger()
-        merge_result = merger.merge(
-            pd.DataFrame(), {"gastromarket": feed1, "forgastro": feed2}
-        )
+        merge_result = merger.merge(pd.DataFrame(), {"gastromarket": feed1, "forgastro": feed2})
         result = merge_result.products
 
         prod1 = result[result["code"] == "PROD001"].iloc[0]
@@ -394,9 +387,7 @@ class TestMergeStatistics:
         )
 
         merger = ProductMerger()
-        merge_result = merger.merge(
-            main_df, {"feed": feed_df}, selected_categories=["Cat A"]
-        )
+        merge_result = merger.merge(main_df, {"feed": feed_df}, selected_categories=["Cat A"])
         result = merge_result.products
         stats = merge_result.stats
 
@@ -501,7 +492,9 @@ class TestDiscontinuationLogic:
 
         assert len(result) == 2, f"Expected 2 products, got {len(result)}"
         assert "PROD_NEW" in result["code"].values, "New product was improperly discontinued"
-        assert result[result["code"] == "PROD_NEW"]["aiProcessed"].values[0] == "0", "New product aiProcessed should be 0"
+        assert result[result["code"] == "PROD_NEW"]["aiProcessed"].values[0] == "0", (
+            "New product aiProcessed should be 0"
+        )
 
     def test_missing_feed_products_are_discontinued(self, config):
         """Test that products missing from the feed ARE discontinued when preserve_edits=True."""

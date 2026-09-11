@@ -133,8 +133,8 @@ Initial implementation had the field mapping **backwards** compared to the old v
 Misread the old version code flow. The old version clearly shows:
 ```python
 long_desc, params_text = process_forgastro_html(product_desc_html)
-row["Dlhý popis"] = long_desc          # popis goes to long description
-row["Krátky popis"] = params_text      # params go to short description
+row["Dlhý popis"] = long_desc  # popis goes to long description
+row["Krátky popis"] = params_text  # params go to short description
 ```
 
 ### Additional Behavior Discovered

@@ -6,7 +6,7 @@ by selected categories.
 """
 
 import pandas as pd
-from typing import List, Optional
+from typing import List
 import logging
 
 logger = logging.getLogger(__name__)
@@ -61,7 +61,5 @@ class CategoryFilter:
         search_text_lower = search_text.lower()
         filtered = [cat for cat in categories if search_text_lower in cat.lower()]
 
-        logger.debug(
-            f"Searched for '{search_text}', found {len(filtered)} matching categories"
-        )
+        logger.debug(f"Searched for '{search_text}', found {len(filtered)} matching categories")
         return filtered

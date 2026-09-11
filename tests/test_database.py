@@ -26,10 +26,18 @@ class TestProductDB:
         assert product_db.get_all().empty
 
     def test_upsert_and_get_all_round_trip(self, product_db):
-        df = pd.DataFrame([{
-            "code": "ABC123", "name": "Stôl", "price": "99,00",
-            "source": "gastromarket", "aiProcessed": "1", "aiProcessedDate": "2026-07-05",
-        }])
+        df = pd.DataFrame(
+            [
+                {
+                    "code": "ABC123",
+                    "name": "Stôl",
+                    "price": "99,00",
+                    "source": "gastromarket",
+                    "aiProcessed": "1",
+                    "aiProcessedDate": "2026-07-05",
+                }
+            ]
+        )
         product_db.upsert(df)
         result = product_db.get_all()
         assert len(result) == 1
@@ -65,6 +73,7 @@ class TestProductDB:
 
     def test_backup_creates_file_and_rotates(self, product_db):
         import glob, os
+
         product_db.upsert(pd.DataFrame([{"code": "A"}]))
         path = product_db.backup(max_backups=2)
         assert path is not None and os.path.exists(path)

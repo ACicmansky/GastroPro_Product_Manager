@@ -78,17 +78,13 @@ def process_feed(feed_name, config, output_lines):
             return Counter()
 
         # Determine the category field name based on feed
-        category_field = (
-            "KATEGORIA_KOMPLET" if feed_name == "gastromarket" else "category"
-        )
+        category_field = "KATEGORIA_KOMPLET" if feed_name == "gastromarket" else "category"
 
         # Extract and count categories
         category_counts = Counter()
         for i, product in enumerate(products):
             if i == 0:  # Print first product's tags for debugging
-                print(
-                    f"First {feed_name} product tags: {[elem.tag for elem in product]}"
-                )
+                print(f"First {feed_name} product tags: {[elem.tag for elem in product]}")
 
             category_element = product.find(category_field)
             if category_element is not None and category_element.text:
@@ -142,9 +138,7 @@ def main():
     # Add summary of all feeds
     total_categories = len(gastromarket_counts) + len(forgastro_counts)
     total_products = sum(gastromarket_counts.values()) + sum(forgastro_counts.values())
-    output_lines.append(
-        f"\nGRAND TOTAL: {total_categories} categories, {total_products} products"
-    )
+    output_lines.append(f"\nGRAND TOTAL: {total_categories} categories, {total_products} products")
 
     # Save to file
     output_file = "scripts/categories.txt"

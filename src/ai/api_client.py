@@ -125,7 +125,7 @@ class GeminiClient:
                 else:
                     logger.error(f"Error in API call: {e}")
                     if attempt < self.retry_attempts - 1:
-                        time.sleep(2 ** attempt)
+                        time.sleep(2**attempt)
                         continue
                     raise
 
@@ -174,7 +174,7 @@ class GeminiClient:
             return json.loads(text)
         except json.JSONDecodeError:
             if "[" in text and "]" in text:
-                json_str = text[text.find("["):text.rfind("]") + 1]
+                json_str = text[text.find("[") : text.rfind("]") + 1]
                 try:
                     return json.loads(json_str)
                 except json.JSONDecodeError:

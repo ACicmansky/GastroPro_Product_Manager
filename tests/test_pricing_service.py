@@ -11,9 +11,14 @@ from src.domain.pricing.pricing_service import PricingService
 @pytest.fixture
 def prices_file(tmp_path):
     path = tmp_path / "prices.json"
-    path.write_text(json.dumps([
-        {"code": "ROCKET DINING", "dimension": "420x420x720", "price": "88,00"},
-    ]), encoding="utf-8")
+    path.write_text(
+        json.dumps(
+            [
+                {"code": "ROCKET DINING", "dimension": "420x420x720", "price": "88,00"},
+            ]
+        ),
+        encoding="utf-8",
+    )
     return str(path)
 
 
@@ -37,11 +42,13 @@ class TestPricingService:
 
     def test_identify_unmapped(self, prices_file):
         svc = PricingService(prices_file)
-        df = pd.DataFrame([
-            {"code": "ROCKET DINING", "price": ""},
-            {"code": "UNKNOWN BAR", "price": ""},
-            {"code": "HAS PRICE", "price": "5,00"},
-        ])
+        df = pd.DataFrame(
+            [
+                {"code": "ROCKET DINING", "price": ""},
+                {"code": "UNKNOWN BAR", "price": ""},
+                {"code": "HAS PRICE", "price": "5,00"},
+            ]
+        )
         assert svc.identify_unmapped(df) == ["UNKNOWN BAR"]
 
     def test_add_mapping_persists_dimension(self, prices_file):

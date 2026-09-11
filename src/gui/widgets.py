@@ -28,9 +28,7 @@ from PyQt5.QtGui import QFont, QPixmap
 class CategoryMappingDialog(QDialog):
     """Dialog for interactive category mapping when no mapping is found."""
 
-    def __init__(
-        self, original_category, suggestions=None, product_name=None, parent=None
-    ):
+    def __init__(self, original_category, suggestions=None, product_name=None, parent=None):
         super().__init__(parent)
         self.original_category = original_category
         self.suggestions = suggestions or []
@@ -72,20 +70,14 @@ class CategoryMappingDialog(QDialog):
         copy_button = QPushButton("📋 Kopírovať")
         copy_button.setProperty("flat", "true")
         copy_button.setToolTip("Skopírovať kategóriu do schránky")
-        copy_button.clicked.connect(
-            lambda: QApplication.clipboard().setText(self.original_category)
-        )
+        copy_button.clicked.connect(lambda: QApplication.clipboard().setText(self.original_category))
         original_layout.addWidget(copy_button, alignment=Qt.AlignTop)
         layout.addLayout(original_layout)
 
         # Suggestions list (if available)
         if self.suggestions:
-            suggestions_label = QLabel(
-                "Návrhy podobných kategórií (kliknite pre výber):"
-            )
-            suggestions_label.setStyleSheet(
-                "font-weight: bold; margin-top: 10px; margin-bottom: 5px;"
-            )
+            suggestions_label = QLabel("Návrhy podobných kategórií (kliknite pre výber):")
+            suggestions_label.setStyleSheet("font-weight: bold; margin-top: 10px; margin-bottom: 5px;")
             layout.addWidget(suggestions_label)
 
             self.suggestions_list = QListWidget()
@@ -249,9 +241,7 @@ class PriceMappingDialog(QDialog):
             suggestions_layout = QVBoxLayout(suggestions_group)
 
             self.suggestions_list = QListWidget()
-            self.suggestions_list.setSizePolicy(
-                QSizePolicy.Expanding, QSizePolicy.Expanding
-            )
+            self.suggestions_list.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
             self.suggestions_list.setMinimumHeight(100)
             self.suggestions_list.itemClicked.connect(self.on_suggestion_selected)
 
@@ -286,15 +276,9 @@ class PriceMappingDialog(QDialog):
         self.prices_table.setMinimumHeight(200)  # Increased height to show ~5 rows
         self.prices_table.setColumnCount(3)
         self.prices_table.setHorizontalHeaderLabels(["Kód produktu", "Cena", "Rozmer"])
-        self.prices_table.horizontalHeader().setSectionResizeMode(
-            0, QHeaderView.Stretch
-        )
-        self.prices_table.horizontalHeader().setSectionResizeMode(
-            1, QHeaderView.ResizeToContents
-        )
-        self.prices_table.horizontalHeader().setSectionResizeMode(
-            2, QHeaderView.ResizeToContents
-        )
+        self.prices_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.prices_table.horizontalHeader().setSectionResizeMode(1, QHeaderView.ResizeToContents)
+        self.prices_table.horizontalHeader().setSectionResizeMode(2, QHeaderView.ResizeToContents)
         self.prices_table.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.prices_table.setSelectionMode(QAbstractItemView.SingleSelection)
         self.prices_table.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -308,9 +292,7 @@ class PriceMappingDialog(QDialog):
         # Manual Input
         input_group = QFrame()
         input_layout = QVBoxLayout(input_group)
-        input_layout.setContentsMargins(
-            0, 15, 0, 0
-        )  # Top margin for spacing from border
+        input_layout.setContentsMargins(0, 15, 0, 0)  # Top margin for spacing from border
 
         input_label = QLabel("Alebo zadajte cenu manuálne:")
         input_label.setStyleSheet("font-weight: bold;")
@@ -347,9 +329,7 @@ class PriceMappingDialog(QDialog):
             pixmap = QPixmap()
             pixmap.loadFromData(data)
             if not pixmap.isNull():
-                self.image_label.setPixmap(
-                    pixmap.scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                )
+                self.image_label.setPixmap(pixmap.scaled(150, 150, Qt.KeepAspectRatio, Qt.SmoothTransformation))
             else:
                 self.image_label.setText("Chybný obrázok")
         reply.deleteLater()
@@ -375,18 +355,9 @@ class PriceMappingDialog(QDialog):
 
         text = text.lower()
         filtered_df = self.prices_df[
-            self.prices_df["code"]
-            .astype(str)
-            .str.lower()
-            .str.contains(text, regex=False)
-            | self.prices_df["price"]
-            .astype(str)
-            .str.lower()
-            .str.contains(text, regex=False)
-            | self.prices_df["dimension"]
-            .astype(str)
-            .str.lower()
-            .str.contains(text, regex=False)
+            self.prices_df["code"].astype(str).str.lower().str.contains(text, regex=False)
+            | self.prices_df["price"].astype(str).str.lower().str.contains(text, regex=False)
+            | self.prices_df["dimension"].astype(str).str.lower().str.contains(text, regex=False)
         ]
         self.populate_table(filtered_df)
 
@@ -431,9 +402,7 @@ class PriceMappingDialog(QDialog):
         target_w = self._parse_dim(self.product_data.get("width"))
         target_d = self._parse_dim(self.product_data.get("depth"))
         target_h = self._parse_dim(self.product_data.get("height"))
-        has_target_dims = (
-            target_w is not None and target_d is not None and target_h is not None
-        )
+        has_target_dims = target_w is not None and target_d is not None and target_h is not None
 
         for _, row in self.prices_df.iterrows():
             code = str(row.get("code", ""))
@@ -505,12 +474,7 @@ class PriceMappingDialog(QDialog):
             # Combined Score
             if target_finish:
                 # Weights: Code (10%), Numbers (40%), Finish (30%), Dimensions (20%)
-                final_score = (
-                    (code_score * 0.1)
-                    + (num_score * 0.4)
-                    + (finish_score * 0.3)
-                    + (dim_score * 0.2)
-                )
+                final_score = (code_score * 0.1) + (num_score * 0.4) + (finish_score * 0.3) + (dim_score * 0.2)
             elif not target_nums:
                 # Weights: Code (60%), Dimensions (40%)
                 final_score = (code_score * 0.6) + (dim_score * 0.4)

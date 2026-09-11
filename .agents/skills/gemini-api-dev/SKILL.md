@@ -57,10 +57,7 @@ The Gemini API provides access to Google's most advanced AI models. Key capabili
 from google import genai
 
 client = genai.Client()
-response = client.models.generate_content(
-    model="gemini-3-flash-preview",
-    contents="Explain quantum computing"
-)
+response = client.models.generate_content(model="gemini-3-flash-preview", contents="Explain quantum computing")
 print(response.text)
 ```
 

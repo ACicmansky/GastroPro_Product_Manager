@@ -28,6 +28,7 @@ Goal: every product gets deterministic filter values (currently 0 of 5,691 "enha
 `--force --limit N` re-selects the same first N every run — it can't be sliced. Blank `aiProcessed` once, then run *without* `--force` so slices progress naturally:
 ```python
 import pandas as pd
+
 df = pd.read_excel("input.xlsx", dtype=str).fillna("")
 df["aiProcessed"] = ""
 df.to_excel("out/reset.xlsx", index=False)

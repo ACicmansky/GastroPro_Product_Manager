@@ -54,14 +54,17 @@ def cmd_feeds(args, config):
 def cmd_merge(args, config):
     main_df = load_xlsx(args.main)
     feed_dfs = {Path(p).stem: load_xlsx(p) for p in args.feeds}
-    result = ProductMerger().merge(
-        main_df, feed_dfs, preserve_edits=args.preserve_edits
-    )
+    result = ProductMerger().merge(main_df, feed_dfs, preserve_edits=args.preserve_edits)
     write_xlsx(result.products, args.out)
     s = result.stats
     logger.info(
         "Merge: created=%d updated=%d kept=%d removed=%d -> %d rows -> %s",
-        s.created, s.updated, s.kept, s.removed, len(result.products), args.out,
+        s.created,
+        s.updated,
+        s.kept,
+        s.removed,
+        len(result.products),
+        args.out,
     )
 
 
@@ -107,7 +110,11 @@ def cmd_ai(args, config):
         else:
             logger.info(
                 "Run %s: status=%s %d/%d products, detail=%s",
-                run["id"], run["status"], run["processed_products"], run["total_products"], run["detail"],
+                run["id"],
+                run["status"],
+                run["processed_products"],
+                run["total_products"],
+                run["detail"],
             )
         return
 
@@ -132,16 +139,15 @@ def cmd_ai(args, config):
     df = load_xlsx(args.input)
     done = pd.Series(False, index=df.index)
     if "aiProcessed" in df.columns:
-        done = (
-            df["aiProcessed"].astype(str).str.strip().str.upper()
-            .isin({"1", "TRUE", "YES", "1.0"})
-        )
+        done = df["aiProcessed"].astype(str).str.strip().str.upper().isin({"1", "TRUE", "YES", "1.0"})
     pending = df if args.force else df[~done]
     if args.limit:
         pending = pending.head(args.limit)
     logger.info(
         "%d already enhanced, %d selected for enhancement (of %d total)",
-        int(done.sum()), len(pending), len(df),
+        int(done.sum()),
+        len(pending),
+        len(df),
     )
     fill_missing = getattr(args, "fill_missing", False)
     if fill_missing:
@@ -155,19 +161,16 @@ def cmd_ai(args, config):
     progress = lambda *a: logger.info("%s", a[-1] if a else "")
     if fill_missing:
         result = enricher.fill_missing_params(
-            pending.copy(), progress_callback=progress,
+            pending.copy(),
+            progress_callback=progress,
             model=getattr(args, "fill_model", None),
         )
     else:
-        result = enricher.enrich(
-            pending.copy(), force_reprocess=args.force, progress_callback=progress
-        )
+        result = enricher.enrich(pending.copy(), force_reprocess=args.force, progress_callback=progress)
 
     out_df = apply_feed_specs(result.products)
     write_xlsx(out_df, args.out)
-    logger.info(
-        "AI: processed=%d failed=%d -> %s", result.processed, result.failed, args.out
-    )
+    logger.info("AI: processed=%d failed=%d -> %s", result.processed, result.failed, args.out)
     _write_review_files(enricher, out_df, Path(args.out))
     return int(done.sum()), len(pending)
 
@@ -219,7 +222,7 @@ def cmd_classify(args, config):
     suggestions = {}
     chunk_size = 25
     for i in range(0, len(targets), chunk_size):
-        chunk = targets.iloc[i:i + chunk_size]
+        chunk = targets.iloc[i : i + chunk_size]
         payload = [
             {
                 "code": str(r.get("code", "")),
@@ -256,7 +259,9 @@ def cmd_run(args, config):
         logger.warning(warning)
     logger.info(
         "Done: %d products in %.1fs -> %s",
-        result.product_count, result.duration_seconds, result.output_path,
+        result.product_count,
+        result.duration_seconds,
+        result.output_path,
     )
 
 
@@ -294,8 +299,11 @@ def main():
     p.add_argument("--force", action="store_true", help="reprocess already-enhanced products too")
     p.add_argument("--dry-run", action="store_true", help="report counts only, no API calls")
     p.add_argument("--model", help="override ai_enhancement.model for this run (A/B testing)")
-    p.add_argument("--fill-missing", action="store_true",
-                   help="second pass: web-grounded re-ask ONLY for missing filter params (ignores aiProcessed)")
+    p.add_argument(
+        "--fill-missing",
+        action="store_true",
+        help="second pass: web-grounded re-ask ONLY for missing filter params (ignores aiProcessed)",
+    )
     p.add_argument("--fill-model", help="stronger model for --fill-missing (tiered enhancement)")
     p.add_argument("--resume", action="store_true", help="continue the latest paused/interrupted run")
     p.add_argument("--status", action="store_true", help="print the latest resumable run's progress and exit")

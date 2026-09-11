@@ -131,11 +131,11 @@ The callback was also integrated into XML feed processing:
 **Flow in DataPipeline**
 ```python
 parse_xml_feed(
-    root, 
-    feed_info['root_element'], 
-    feed_info['mapping'], 
+    root,
+    feed_info["root_element"],
+    feed_info["mapping"],
     feed_name,
-    category_mapping_callback=self.category_mapping_callback
+    category_mapping_callback=self.category_mapping_callback,
 )
 ```
 

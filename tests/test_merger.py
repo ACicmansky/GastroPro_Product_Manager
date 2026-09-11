@@ -8,24 +8,28 @@ from src.domain.models import MergeResult, MergeStats
 
 @pytest.fixture
 def main_df():
-    return pd.DataFrame({
-        "code": ["P001", "P002", "P003"],
-        "name": ["Product 1", "Product 2", "Product 3"],
-        "price": ["100", "200", "300"],
-        "defaultCategory": ["Cat A", "Cat B", "Cat A"],
-        "source": ["core", "core", "core"],
-    })
+    return pd.DataFrame(
+        {
+            "code": ["P001", "P002", "P003"],
+            "name": ["Product 1", "Product 2", "Product 3"],
+            "price": ["100", "200", "300"],
+            "defaultCategory": ["Cat A", "Cat B", "Cat A"],
+            "source": ["core", "core", "core"],
+        }
+    )
 
 
 @pytest.fixture
 def feed_dfs():
-    feed = pd.DataFrame({
-        "code": ["P001", "P004"],
-        "name": ["Product 1 Updated", "Product 4 New"],
-        "price": ["110", "400"],
-        "defaultCategory": ["Cat A", "Cat A"],
-        "source": ["gastromarket", "gastromarket"],
-    })
+    feed = pd.DataFrame(
+        {
+            "code": ["P001", "P004"],
+            "name": ["Product 1 Updated", "Product 4 New"],
+            "price": ["110", "400"],
+            "defaultCategory": ["Cat A", "Cat A"],
+            "source": ["gastromarket", "gastromarket"],
+        }
+    )
     return {"gastromarket": feed}
 
 
@@ -67,11 +71,13 @@ class TestProductMerger:
 
 
 def _feed(codes):
-    return pd.DataFrame({
-        "code": codes,
-        "name": [f"Name {c}" for c in codes],
-        "defaultCategory": ["Cat A"] * len(codes),
-    })
+    return pd.DataFrame(
+        {
+            "code": codes,
+            "name": [f"Name {c}" for c in codes],
+            "defaultCategory": ["Cat A"] * len(codes),
+        }
+    )
 
 
 class TestRemoveDiscontinued:
@@ -79,27 +85,25 @@ class TestRemoveDiscontinued:
 
     @pytest.fixture
     def mixed_main_df(self):
-        return pd.DataFrame({
-            "code": ["C1", "G1", "G2", "W1", "F1"],
-            "name": ["Core", "Gastro 1", "Gastro 2", "Scraped", "ForG"],
-            "defaultCategory": ["Cat A"] * 5,
-            "source": ["core", "gastromarket", "gastromarket", "web_scraping", "forgastro"],
-        })
+        return pd.DataFrame(
+            {
+                "code": ["C1", "G1", "G2", "W1", "F1"],
+                "name": ["Core", "Gastro 1", "Gastro 2", "Scraped", "ForG"],
+                "defaultCategory": ["Cat A"] * 5,
+                "source": ["core", "gastromarket", "gastromarket", "web_scraping", "forgastro"],
+            }
+        )
 
     def test_unfetched_source_products_survive(self, mixed_main_df):
         # gastromarket download failed / disabled — its products must stay
         merger = ProductMerger()
-        result = merger.merge(
-            mixed_main_df, {"forgastro": _feed(["F1"])}, preserve_edits=True
-        )
+        result = merger.merge(mixed_main_df, {"forgastro": _feed(["F1"])}, preserve_edits=True)
         assert {"C1", "G1", "G2", "W1", "F1"} <= set(result.products["code"])
 
     def test_fetched_source_missing_product_removed(self, mixed_main_df):
         # gastromarket fetched, G2 gone from it — G2 removed, other sources untouched
         merger = ProductMerger()
-        result = merger.merge(
-            mixed_main_df, {"gastromarket": _feed(["G1"])}, preserve_edits=True
-        )
+        result = merger.merge(mixed_main_df, {"gastromarket": _feed(["G1"])}, preserve_edits=True)
         codes = set(result.products["code"])
         assert "G2" not in codes
         assert {"C1", "G1", "W1", "F1"} <= codes

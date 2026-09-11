@@ -13,15 +13,18 @@ CAT2 = "Tovary a kategórie > Varenie > Sporáky"
 
 def test_select_scopes_to_category(tmp_path):
     orch = BatchOrchestrator(
-        client=None, result_parser=None,
+        client=None,
+        result_parser=None,
         config={"ai_enhancement": {"tmp_dir": str(tmp_path)}},
     )
-    df = pd.DataFrame([
-        {"code": "A", "defaultCategory": CAT1, "aiProcessed": "1"},
-        {"code": "B", "defaultCategory": CAT2, "aiProcessed": "0"},
-        # stale pre-migration DB row: no prefix, must still match CAT1
-        {"code": "C", "defaultCategory": "Chladenie > Vitríny", "aiProcessed": "0"},
-    ])
+    df = pd.DataFrame(
+        [
+            {"code": "A", "defaultCategory": CAT1, "aiProcessed": "1"},
+            {"code": "B", "defaultCategory": CAT2, "aiProcessed": "0"},
+            # stale pre-migration DB row: no prefix, must still match CAT1
+            {"code": "C", "defaultCategory": "Chladenie > Vitríny", "aiProcessed": "0"},
+        ]
+    )
 
     # scoped run reprocesses the whole category, aiProcessed ignored
     assert list(orch._select(df, False, {CAT1})["code"]) == ["A", "C"]

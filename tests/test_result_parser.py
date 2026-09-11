@@ -12,14 +12,16 @@ def parser():
 
 @pytest.fixture
 def products_df():
-    return pd.DataFrame({
-        "code": ["ABC001", "DEF002", "GHI003"],
-        "name": ["Profesionálna chladnička 700L", "Elektrický gril stolný", "Umývačka riadu priemyselná"],
-        "shortDescription": ["", "", ""],
-        "description": ["", "", ""],
-        "aiProcessed": ["0", "0", "0"],
-        "aiProcessedDate": ["", "", ""],
-    })
+    return pd.DataFrame(
+        {
+            "code": ["ABC001", "DEF002", "GHI003"],
+            "name": ["Profesionálna chladnička 700L", "Elektrický gril stolný", "Umývačka riadu priemyselná"],
+            "shortDescription": ["", "", ""],
+            "description": ["", "", ""],
+            "aiProcessed": ["0", "0", "0"],
+            "aiProcessedDate": ["", "", ""],
+        }
+    )
 
 
 class TestFindBestMatch:

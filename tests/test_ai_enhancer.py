@@ -26,10 +26,12 @@ def test_param_normalization_and_whitelist():
 
     parser = ResultParser(allowed_params={"Šírka (mm)", "Materiál"})
     df = pd.DataFrame({"code": ["A1"], "name": ["N"], "aiProcessed": [""]})
-    enhanced = [{
-        "code": "A1",
-        "parameters": {"Šírka": "800 mm", "Materiál": "Nerez", "Typ matrice": "T12"},
-    }]
+    enhanced = [
+        {
+            "code": "A1",
+            "parameters": {"Šírka": "800 mm", "Materiál": "Nerez", "Typ matrice": "T12"},
+        }
+    ]
     df, count = parser.update_dataframe(df, enhanced)
     assert count == 1
     assert df.at[0, "filteringProperty:Šírka (mm)"] == "800"  # unit-less key canonicalized
@@ -41,26 +43,28 @@ def test_feed_specs_override_ai_dims():
     """ForGastro structured dims/weight overwrite filter columns; other sources untouched."""
     from src.domain.products.feed_specs import apply_feed_specs
 
-    df = pd.DataFrame({
-        "code": ["F1", "F2", "G1"],
-        "source": ["forgastro", "forgastro", "gastromarket"],
-        "feedWidth": ["38", "800", "999"],
-        "feedDepth": ["51", "", "999"],
-        "feedHeight": ["79.5", "bad", "999"],
-        "feedDimUnit": ["CM", "MM", "CM"],
-        "weight": ["12,5", "0", "50"],
-        "filteringProperty:Šírka (mm)": ["370", "", ""],  # AI value gets overwritten
-    })
+    df = pd.DataFrame(
+        {
+            "code": ["F1", "F2", "G1"],
+            "source": ["forgastro", "forgastro", "gastromarket"],
+            "feedWidth": ["38", "800", "999"],
+            "feedDepth": ["51", "", "999"],
+            "feedHeight": ["79.5", "bad", "999"],
+            "feedDimUnit": ["CM", "MM", "CM"],
+            "weight": ["12,5", "0", "50"],
+            "filteringProperty:Šírka (mm)": ["370", "", ""],  # AI value gets overwritten
+        }
+    )
     df = apply_feed_specs(df)
-    assert df.at[0, "filteringProperty:Šírka (mm)"] == "380"     # CM -> mm, feed wins
+    assert df.at[0, "filteringProperty:Šírka (mm)"] == "380"  # CM -> mm, feed wins
     assert df.at[0, "filteringProperty:Hĺbka (mm)"] == "510"
     assert df.at[0, "filteringProperty:Výška (mm)"] == "795"
     assert df.at[0, "filteringProperty:Hmotnosť (kg)"] == "12.5"
-    assert df.at[1, "filteringProperty:Šírka (mm)"] == "800"        # MM passthrough
-    assert pd.isna(df.at[1, "filteringProperty:Hĺbka (mm)"])        # empty skipped
-    assert pd.isna(df.at[1, "filteringProperty:Výška (mm)"])        # garbage skipped
-    assert pd.isna(df.at[1, "filteringProperty:Hmotnosť (kg)"])     # zero skipped
-    assert df.at[2, "filteringProperty:Šírka (mm)"] == ""           # non-forgastro untouched
+    assert df.at[1, "filteringProperty:Šírka (mm)"] == "800"  # MM passthrough
+    assert pd.isna(df.at[1, "filteringProperty:Hĺbka (mm)"])  # empty skipped
+    assert pd.isna(df.at[1, "filteringProperty:Výška (mm)"])  # garbage skipped
+    assert pd.isna(df.at[1, "filteringProperty:Hmotnosť (kg)"])  # zero skipped
+    assert df.at[2, "filteringProperty:Šírka (mm)"] == ""  # non-forgastro untouched
 
 
 def test_enforce_format_seo_fields():
@@ -84,17 +88,19 @@ def test_find_implausible_values():
     """Voltage enum + dimension ranges flag outliers (feed typo w=3800 cm case)."""
     from src.ai.validation import find_implausible
 
-    df = pd.DataFrame({
-        "code": ["A", "B", "C"],
-        "name": ["a", "b", "c"],
-        "filteringProperty:Napätie (V)": ["230", "999", ""],
-        "filteringProperty:Šírka (mm)": ["800", "38000", "abc"],
-    })
+    df = pd.DataFrame(
+        {
+            "code": ["A", "B", "C"],
+            "name": ["a", "b", "c"],
+            "filteringProperty:Napätie (V)": ["230", "999", ""],
+            "filteringProperty:Šírka (mm)": ["800", "38000", "abc"],
+        }
+    )
     issues = find_implausible(df)
     flagged = set(zip(issues["code"], issues["parameter"]))
     assert ("B", "Napätie (V)") in flagged
-    assert ("B", "Šírka (mm)") in flagged      # 38000 mm out of range
-    assert ("C", "Šírka (mm)") in flagged      # non-numeric
+    assert ("B", "Šírka (mm)") in flagged  # 38000 mm out of range
+    assert ("C", "Šírka (mm)") in flagged  # non-numeric
     assert ("A", "Napätie (V)") not in flagged
     assert ("A", "Šírka (mm)") not in flagged
 
@@ -108,17 +114,22 @@ def test_missing_param_requests_are_grounded():
     expected = orch.category_parameters[cat]
     filled, missing = expected[0], expected[1:]
 
-    df = pd.DataFrame({
-        "code": ["X1"], "name": ["Produkt X1"], "shortDescription": ["popis"],
-        "newCategory": [cat],
-        f"filteringProperty:{filled}": ["230"],
-    })
+    df = pd.DataFrame(
+        {
+            "code": ["X1"],
+            "name": ["Produkt X1"],
+            "shortDescription": ["popis"],
+            "newCategory": [cat],
+            f"filteringProperty:{filled}": ["230"],
+        }
+    )
     requests, count = orch._build_missing_param_requests(df)
     assert count == 1 and len(requests) == 1
     req = requests[0]["request"]
     assert req["tools"] == [{"google_search": {}}]
     assert "responseMimeType" not in req["generationConfig"]  # conflicts with grounding
     import json
+
     payload = json.loads(req["contents"][0]["parts"][0]["text"])
     assert payload[0]["chybajuce_parametre"] == missing  # filled param not re-asked
 
@@ -135,18 +146,23 @@ def test_main_pass_has_schema_and_existing_params():
 
     orch = BatchOrchestrator(client=None, result_parser=None, config={})
     cat = next(iter(orch.category_parameters))
-    df = pd.DataFrame({
-        "code": ["X1"], "name": ["Produkt X1"],
-        "shortDescription": ["p"], "description": ["d"],
-        "newCategory": [cat],
-        "filteringProperty:Objem (l)": ["12"],
-    })
+    df = pd.DataFrame(
+        {
+            "code": ["X1"],
+            "name": ["Produkt X1"],
+            "shortDescription": ["p"],
+            "description": ["d"],
+            "newCategory": [cat],
+            "filteringProperty:Objem (l)": ["12"],
+        }
+    )
     requests = []
     orch._build_category_requests(df, {0}, requests, is_group1=False)
     assert len(requests) == 1
     req = requests[0]["request"]
     assert "responseSchema" in req["generationConfig"]
     import json
+
     payload = json.loads(req["contents"][0]["parts"][0]["text"])
     assert payload[0]["existingParameters"] == {"Objem (l)": "12"}
 
@@ -188,26 +204,30 @@ def test_cli_ai_dry_run_selects_only_unprocessed(tmp_path):
     sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
     import pipeline_cli
 
-    df = pd.DataFrame({
-        "code": [f"P{i}" for i in range(6)],
-        "name": [f"Product {i}" for i in range(6)],
-        "aiProcessed": ["1", "TRUE", "0", "", "NO", None],
-    })
+    df = pd.DataFrame(
+        {
+            "code": [f"P{i}" for i in range(6)],
+            "name": [f"Product {i}" for i in range(6)],
+            "aiProcessed": ["1", "TRUE", "0", "", "NO", None],
+        }
+    )
     src = tmp_path / "in.xlsx"
     df.to_excel(src, index=False)
 
     args = argparse.Namespace(
-        input=str(src), out=str(tmp_path / "out.xlsx"),
-        limit=2, force=False, dry_run=True,
+        input=str(src),
+        out=str(tmp_path / "out.xlsx"),
+        limit=2,
+        force=False,
+        dry_run=True,
     )
     already, selected = pipeline_cli.cmd_ai(args, config={})
-    assert already == 2      # "1" and "TRUE"
-    assert selected == 2     # 4 pending, capped by --limit
+    assert already == 2  # "1" and "TRUE"
+    assert selected == 2  # 4 pending, capped by --limit
 
 
 class TestCurrentAIEnhancement:
     """Test current AI enhancement functionality."""
-
 
     def test_ai_tracking_columns_exist(self, sample_old_format_df):
         """Test that AI tracking columns exist in DataFrame."""

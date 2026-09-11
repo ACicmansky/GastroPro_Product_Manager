@@ -6,7 +6,7 @@ from typing import Dict, Optional
 from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop
 
 from src.pipeline.pipeline import Pipeline
-from src.domain.models import PipelineOptions, PipelineResult
+from src.domain.models import PipelineOptions
 from src.ai.run_control import RunControl
 
 logger = logging.getLogger(__name__)
@@ -161,9 +161,7 @@ class AIResumeWorker(QObject):
         )
         try:
             if self.categories:
-                pipeline_result = self.pipeline.run_ai_for_categories(
-                    self.categories, **callbacks
-                )
+                pipeline_result = self.pipeline.run_ai_for_categories(self.categories, **callbacks)
             else:
                 pipeline_result = self.pipeline.run_ai_resume(**callbacks)
             self.result.emit(pipeline_result)

@@ -105,9 +105,7 @@ class TestScraperColumnMapping:
         scraper = TopchladenieScraper(config)
 
         # Minimal scraped data
-        minimal_data = pd.DataFrame(
-            {"code": ["PROD001"], "name": ["Product"], "price": ["100"]}
-        )
+        minimal_data = pd.DataFrame({"code": ["PROD001"], "name": ["Product"], "price": ["100"]})
 
         # Even with minimal data, should have core columns
         assert "code" in minimal_data.columns
@@ -255,9 +253,7 @@ class TestScraperOutput:
         scraper = TopchladenieScraper(config)
 
         # Mock scraped data
-        data = pd.DataFrame(
-            {"code": ["PROD001"], "name": ["Product"], "price": ["100"]}
-        )
+        data = pd.DataFrame({"code": ["PROD001"], "name": ["Product"], "price": ["100"]})
 
         assert isinstance(data, pd.DataFrame)
         assert len(data) > 0
@@ -344,10 +340,7 @@ class TestTopchladenieScraperLogic:
         links = scraper.get_category_links()
 
         assert len(links) > 0
-        assert (
-            "https://www.topchladenie.sk/e-shop/samostatne-chladnicky/bez-mraznicky-vnutri"
-            in links
-        )
+        assert "https://www.topchladenie.sk/e-shop/samostatne-chladnicky/bez-mraznicky-vnutri" in links
 
     def test_get_product_urls(self):
         """Test getting product URLs with pagination."""
@@ -425,9 +418,7 @@ class TestTopchladenieScraperLogic:
                 </div>
             </body>
         </html>
-        """.encode(
-            "utf-8"
-        )
+        """.encode("utf-8")
 
         scraper.session.get.return_value = mock_response
 

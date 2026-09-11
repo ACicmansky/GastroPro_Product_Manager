@@ -28,9 +28,9 @@ The `map_dataframe()` method was using pandas `apply()` which processes rows in 
 result_df["defaultCategory"] = result_df.apply(
     lambda row: self.map_category(
         str(row["defaultCategory"]) if pd.notna(row.get("defaultCategory")) else "",
-        str(row.get("name", "")) if pd.notna(row.get("name")) else None
+        str(row.get("name", "")) if pd.notna(row.get("name")) else None,
     ),
-    axis=1
+    axis=1,
 )
 ```
 

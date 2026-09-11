@@ -64,9 +64,7 @@ class MebellaScraper(BaseScraper):
                 if time.time() - os.path.getmtime(cache_path) < 604800:
                     with open(cache_path, "r", encoding="utf-8") as f:
                         data = json.load(f)
-                        logger.info(
-                            f"Loaded {len(data)} URLs from cache for {category_url}"
-                        )
+                        logger.info(f"Loaded {len(data)} URLs from cache for {category_url}")
                         return data
             except Exception as e:
                 logger.warning(f"Failed to load cache for {category_url}: {e}")
@@ -191,17 +189,13 @@ class MebellaScraper(BaseScraper):
                         no_change_count = 0
                     else:
                         no_change_count += 1
-                        logger.info(
-                            f"No new products found. Attempt {no_change_count}/{max_no_change}"
-                        )
+                        logger.info(f"No new products found. Attempt {no_change_count}/{max_no_change}")
 
                         # Try scrolling up a bit and back down to trigger scroll events
                         if no_change_count < max_no_change:
                             page.evaluate("window.scrollBy(0, -500)")
                             page.wait_for_timeout(500)
-                            page.evaluate(
-                                "window.scrollTo(0, document.body.scrollHeight)"
-                            )
+                            page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
                             page.wait_for_timeout(2000)
 
                     if no_change_count >= max_no_change:
@@ -276,12 +270,7 @@ class MebellaScraper(BaseScraper):
             # Try title tag
             title_tag = soup.find("title")
             if title_tag:
-                name = (
-                    title_tag.get_text(strip=True)
-                    .replace(" – Mebella", "")
-                    .replace(" &#8211; Mebella", "")
-                    .strip()
-                )
+                name = title_tag.get_text(strip=True).replace(" – Mebella", "").replace(" &#8211; Mebella", "").strip()
 
             # Try SKU span if title tag fails: <span class="sku">BEA BIG DINING</span>
             if not name:
@@ -298,9 +287,7 @@ class MebellaScraper(BaseScraper):
 
             # 3. Description
             description = ""
-            desc_div = soup.select_one(
-                "div.elementor-widget-woocommerce-product-content"
-            )
+            desc_div = soup.select_one("div.elementor-widget-woocommerce-product-content")
             if desc_div:
                 description = desc_div.get_text(separator="\n", strip=True)
 

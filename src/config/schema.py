@@ -4,16 +4,36 @@ The e-shop format is conventionally referred to as "138-column" but the
 actual generated count is 329 = 29 base + 150 image + 150 imageDesc.
 """
 
-
 # Base (non-image) columns in the e-shop output format.
 BASE_COLUMNS = [
-    "code", "name", "pairCode", "defaultCategory", "categoryText",
-    "shortDescription", "description", "price", "standardPrice",
-    "availability", "manufacturer", "warranty", "ean",
-    "weight", "unit", "seoTitle", "metaDescription",
-    "internalNote", "visibility", "actionPrice", "actionPriceFrom",
-    "actionPriceTo", "stock", "minimalAmount", "source",
-    "aiProcessed", "aiProcessedDate", "newCategory",
+    "code",
+    "name",
+    "pairCode",
+    "defaultCategory",
+    "categoryText",
+    "shortDescription",
+    "description",
+    "price",
+    "standardPrice",
+    "availability",
+    "manufacturer",
+    "warranty",
+    "ean",
+    "weight",
+    "unit",
+    "seoTitle",
+    "metaDescription",
+    "internalNote",
+    "visibility",
+    "actionPrice",
+    "actionPriceFrom",
+    "actionPriceTo",
+    "stock",
+    "minimalAmount",
+    "source",
+    "aiProcessed",
+    "aiProcessedDate",
+    "newCategory",
     "variantVisibility",
 ]
 

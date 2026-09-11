@@ -23,9 +23,7 @@ class TestPipelineNewFormat:
         assert "code" in result.columns
         assert "source" in result.columns
 
-    def test_pipeline_merges_multiple_feeds(
-        self, config, sample_xml_gastromarket, sample_xml_forgastro
-    ):
+    def test_pipeline_merges_multiple_feeds(self, config, sample_xml_gastromarket, sample_xml_forgastro):
         """Test pipeline merges multiple XML feeds."""
         from src.pipeline.pipeline import Pipeline
 
@@ -64,9 +62,7 @@ class TestPipelineSteps:
 
         pipeline = Pipeline(config)
 
-        feed1 = pd.DataFrame(
-            {"code": ["PROD001"], "price": ["100"], "image": ["img1.jpg"]}
-        )
+        feed1 = pd.DataFrame({"code": ["PROD001"], "price": ["100"], "image": ["img1.jpg"]})
 
         feed2 = pd.DataFrame(
             {
@@ -77,9 +73,7 @@ class TestPipelineSteps:
             }
         )
 
-        merge_result = pipeline.merger.merge(
-            pd.DataFrame(), {"feed1": feed1, "feed2": feed2}
-        )
+        merge_result = pipeline.merger.merge(pd.DataFrame(), {"feed1": feed1, "feed2": feed2})
         result = merge_result.products
 
         assert len(result) == 1
@@ -109,9 +103,7 @@ class TestPipelineSteps:
 
         pipeline = Pipeline(config)
 
-        df = pd.DataFrame(
-            {"code": ["prod001"], "name": ["Product 1"], "price": ["100"]}
-        )
+        df = pd.DataFrame({"code": ["prod001"], "name": ["Product 1"], "price": ["100"]})
 
         result = pipeline.apply_transformation(df)
 
@@ -216,9 +208,7 @@ class TestPipelineOutput:
 
         pipeline = Pipeline(config)
 
-        df = pd.DataFrame(
-            {"code": ["PROD001"], "name": ["Product 1"], "price": ["100"]}
-        )
+        df = pd.DataFrame({"code": ["PROD001"], "name": ["Product 1"], "price": ["100"]})
 
         output_file = test_data_dir / "output.xlsx"
         pipeline.save_output(df, str(output_file))
@@ -239,5 +229,6 @@ class TestPipelineOutput:
         result = pipeline.apply_transformation(df)
 
         from src.config.schema import get_output_columns
+
         for col in get_output_columns():
             assert col in result.columns

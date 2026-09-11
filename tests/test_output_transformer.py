@@ -38,24 +38,25 @@ class TestAIProcessedPreservation:
     def test_ensure_all_columns_preserves_ai_processed(self, config):
         """Test that aiProcessed column is kept and values preserved."""
         from src.domain.transform.output_transformer import OutputTransformer
-        
+
         transformer = OutputTransformer(config)
-        
+
         # DataFrame with aiProcessed
-        df = pd.DataFrame({
-            "code": ["PROD001", "PROD002"],
-            "name": ["Product 1", "Product 2"],
-            "price": ["100.0", "200.0"],
-            "aiProcessed": ["1", "0"]
-        })
-        
+        df = pd.DataFrame(
+            {
+                "code": ["PROD001", "PROD002"],
+                "name": ["Product 1", "Product 2"],
+                "price": ["100.0", "200.0"],
+                "aiProcessed": ["1", "0"],
+            }
+        )
+
         # Apply transformation which normalizes columns up to 138-columns including aiProcessed
         result = transformer.transform(df)
-        
+
         assert "aiProcessed" in result.columns
         assert result.loc[0, "aiProcessed"] == "1"
         assert result.loc[1, "aiProcessed"] == "0"
-
 
 
 class TestDirectMappings:
@@ -133,9 +134,7 @@ class TestImageSplitting:
 
         transformer = OutputTransformer(config)
 
-        df = pd.DataFrame(
-            {"Obrázky": ["http://img1.jpg,http://img2.jpg,http://img3.jpg"]}
-        )
+        df = pd.DataFrame({"Obrázky": ["http://img1.jpg,http://img2.jpg,http://img3.jpg"]})
 
         result = transformer.split_images(df)
 

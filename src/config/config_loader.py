@@ -29,10 +29,7 @@ def save_api_key(key: str, env_path: str = ".env"):
     lines = []
     if os.path.exists(env_path):
         with open(env_path, "r", encoding="utf-8") as f:
-            lines = [
-                line.rstrip("\n") for line in f
-                if not line.strip().startswith("GOOGLE_API_KEY=")
-            ]
+            lines = [line.rstrip("\n") for line in f if not line.strip().startswith("GOOGLE_API_KEY=")]
     lines.append(f"GOOGLE_API_KEY={key}")
     with open(env_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")

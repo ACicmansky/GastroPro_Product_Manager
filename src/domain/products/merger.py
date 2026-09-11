@@ -18,8 +18,15 @@ class ProductMerger:
 
     # Fields that are never overridden by feed data when they exist in main.
     # These are AI-enhanced, manually edited, or tracking fields.
-    PRESERVED_FIELDS = {"name", "shortDescription", "longDescription", "description",
-                        "aiProcessed", "AI_Processed_Date", "Spracovane AI"}
+    PRESERVED_FIELDS = {
+        "name",
+        "shortDescription",
+        "longDescription",
+        "description",
+        "aiProcessed",
+        "AI_Processed_Date",
+        "Spracovane AI",
+    }
 
     # Category fields — only updated when update_categories=True
     CATEGORY_FIELDS = {"defaultCategory", "categoryText"}
@@ -64,17 +71,11 @@ class ProductMerger:
         processed_codes = self._merge_feed_products(
             main_df, feed_dfs, merged_products, stats, preserve_edits, skip_fields
         )
-        self._keep_main_products(
-            main_df, merged_products, processed_codes, selected_categories, stats
-        )
+        self._keep_main_products(main_df, merged_products, processed_codes, selected_categories, stats)
         if preserve_edits and feed_dfs:
             self._remove_discontinued(feed_dfs, merged_products, stats)
 
-        result_df = (
-            pd.DataFrame(list(merged_products.values()))
-            if merged_products
-            else pd.DataFrame()
-        )
+        result_df = pd.DataFrame(list(merged_products.values())) if merged_products else pd.DataFrame()
         return MergeResult(products=result_df, stats=stats)
 
     def _normalize_codes(self, main_df: pd.DataFrame, feed_dfs: Dict[str, pd.DataFrame]):
@@ -109,11 +110,7 @@ class ProductMerger:
                     target["source"] = source_name
                     stats.updated += 1
                 else:
-                    main_match = (
-                        main_df[main_df["code"] == code]
-                        if "code" in main_df.columns
-                        else pd.DataFrame()
-                    )
+                    main_match = main_df[main_df["code"] == code] if "code" in main_df.columns else pd.DataFrame()
                     if not main_match.empty:
                         # Merge feed into existing main data
                         base = main_match.iloc[0].to_dict()
@@ -149,9 +146,7 @@ class ProductMerger:
             return
 
         # Image merge prioritizes the source with more images
-        keep_existing_images = (
-            self._count_images(feed_row) < self._count_images(pd.Series(target))
-        )
+        keep_existing_images = self._count_images(feed_row) < self._count_images(pd.Series(target))
         for col in feed_row.index:
             if col in skip_fields or pd.isna(feed_row[col]):
                 continue

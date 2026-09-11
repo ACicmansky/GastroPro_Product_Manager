@@ -41,14 +41,10 @@ class TestMebellaScraper(unittest.TestCase):
 
         # Mock product links found on the page
         mock_link1 = MagicMock()
-        mock_link1.get_attribute.return_value = (
-            "https://mebella.pl/en/produkt/test-product-1/"
-        )
+        mock_link1.get_attribute.return_value = "https://mebella.pl/en/produkt/test-product-1/"
 
         mock_link2 = MagicMock()
-        mock_link2.get_attribute.return_value = (
-            "https://mebella.pl/en/produkt/test-product-2/"
-        )
+        mock_link2.get_attribute.return_value = "https://mebella.pl/en/produkt/test-product-2/"
 
         mock_page.query_selector_all.return_value = [mock_link1, mock_link2]
 
@@ -90,11 +86,11 @@ class TestMebellaScraper(unittest.TestCase):
         </html>
         """
         self.scraper.session.get.return_value = mock_response
-        self.scraper.session.get.side_effect = None  # Reset side effect from previous test if any (though setUp resets scraper)
-
-        data = self.scraper.scrape_product_detail(
-            "https://mebella.pl/en/produkt/test-product/"
+        self.scraper.session.get.side_effect = (
+            None  # Reset side effect from previous test if any (though setUp resets scraper)
         )
+
+        data = self.scraper.scrape_product_detail("https://mebella.pl/en/produkt/test-product/")
 
         self.assertIsNotNone(data)
         self.assertEqual(data["name"], "Test Product")

@@ -104,18 +104,16 @@ class BaseScraper(ABC):
         # Get all product URLs
         product_urls = []
         for i, category_url in enumerate(category_urls):
-            self._log_progress(
-                f"\\n[Category {i+1}/{len(category_urls)}] {category_url}"
-            )
+            self._log_progress(f"\\n[Category {i + 1}/{len(category_urls)}] {category_url}")
             urls = self.get_product_urls(category_url)
             product_urls.extend(urls)
             self._log_progress(f"  Found {len(urls)} products in this category")
 
         unique_urls = list(set(product_urls))
 
-        self._log_progress(f"\\n{'='*60}")
+        self._log_progress(f"\\n{'=' * 60}")
         self._log_progress(f"Total: {len(unique_urls)} unique product URLs to scrape")
-        self._log_progress(f"{'='*60}\\n")
+        self._log_progress(f"{'=' * 60}\\n")
 
         # Choose scraping method based on max_threads
         if self.max_threads == 1:
@@ -127,7 +125,7 @@ class BaseScraper(ABC):
         result_df = pd.DataFrame(products_data)
 
         # Clean data
-        self._log_progress(f"\\nCleaning scraped data...")
+        self._log_progress("\\nCleaning scraped data...")
         result_df = self._clean_data(result_df)
 
         print("\\n" + "=" * 60)
@@ -147,13 +145,13 @@ class BaseScraper(ABC):
         """
         products_data = []
         for i, url in enumerate(product_urls):
-            self._log_progress(f"[{i+1}/{len(product_urls)}] Scraping: {url}")
+            self._log_progress(f"[{i + 1}/{len(product_urls)}] Scraping: {url}")
             data = self.scrape_product_detail(url)
             if data:
                 products_data.append(data)
                 self._log_progress(f"  ✓ Success: {data.get('name', 'Unknown')}")
             else:
-                self._log_progress(f"  ✗ Skipped (no data)")
+                self._log_progress("  ✗ Skipped (no data)")
             time.sleep(self.scraper_config.REQUEST_DELAY_MIN)
 
         return products_data
@@ -173,10 +171,7 @@ class BaseScraper(ABC):
 
         with ThreadPoolExecutor(max_workers=self.max_threads) as executor:
             # Submit all tasks
-            future_to_url = {
-                executor.submit(self.scrape_product_detail, url): url
-                for url in product_urls
-            }
+            future_to_url = {executor.submit(self.scrape_product_detail, url): url for url in product_urls}
 
             # Process completed tasks
             for future in as_completed(future_to_url):
@@ -192,13 +187,9 @@ class BaseScraper(ABC):
                             f"[{completed_count}/{len(product_urls)}] ✓ Success: {data.get('name', 'Unknown')}"
                         )
                     else:
-                        self._log_progress(
-                            f"[{completed_count}/{len(product_urls)}] ✗ Skipped: {url}"
-                        )
+                        self._log_progress(f"[{completed_count}/{len(product_urls)}] ✗ Skipped: {url}")
                 except Exception as e:
-                    self._log_progress(
-                        f"[{completed_count}/{len(product_urls)}] ✗ Error scraping {url}: {e}"
-                    )
+                    self._log_progress(f"[{completed_count}/{len(product_urls)}] ✗ Error scraping {url}: {e}")
                     logger.error(f"Error scraping {url}: {e}")
 
         return products_data
@@ -222,11 +213,7 @@ class BaseScraper(ABC):
         for col in ["shortDescription", "description"]:
             if col in df.columns:
                 df[col] = df[col].apply(
-                    lambda x: (
-                        x.replace("\\r\\n", "\\n").replace("\\r", "\\n")
-                        if isinstance(x, str)
-                        else x
-                    )
+                    lambda x: x.replace("\\r\\n", "\\n").replace("\\r", "\\n") if isinstance(x, str) else x
                 )
 
         # Handle duplicate catalog numbers

@@ -112,9 +112,7 @@ class TestScraperColumnMapping:
         scraper = TopchladenieScraper(config)
 
         # Minimal scraped data
-        minimal_data = pd.DataFrame(
-            {"code": ["PROD001"], "name": ["Product"], "price": ["100"]}
-        )
+        minimal_data = pd.DataFrame({"code": ["PROD001"], "name": ["Product"], "price": ["100"]})
 
         # Even with minimal data, should have core columns
         assert "code" in minimal_data.columns
@@ -331,9 +329,7 @@ class TestScraperOutput:
         scraper = TopchladenieScraper(config)
 
         # Mock scraped data
-        data = pd.DataFrame(
-            {"code": ["PROD001"], "name": ["Product"], "price": ["100"]}
-        )
+        data = pd.DataFrame({"code": ["PROD001"], "name": ["Product"], "price": ["100"]})
 
         assert isinstance(data, pd.DataFrame)
         assert len(data) > 0

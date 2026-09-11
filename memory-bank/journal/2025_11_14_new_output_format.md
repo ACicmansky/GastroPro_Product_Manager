@@ -167,7 +167,7 @@ class OutputTransformer:
 ```python
 def split_images(image_string):
     # Split by comma, strip whitespace
-    images = [img.strip() for img in str(image_string).split(',') if img.strip()]
+    images = [img.strip() for img in str(image_string).split(",") if img.strip()]
     # Limit to 8 images
     return images[:8]
 ```

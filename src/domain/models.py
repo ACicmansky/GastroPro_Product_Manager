@@ -6,6 +6,7 @@ import pandas as pd
 @dataclass
 class MergeStats:
     """Statistics from the product merge operation."""
+
     created: int = 0
     updated: int = 0
     removed: int = 0
@@ -15,6 +16,7 @@ class MergeStats:
 @dataclass
 class MergeResult:
     """Result of merging product data from multiple sources."""
+
     products: pd.DataFrame
     stats: MergeStats
 
@@ -22,6 +24,7 @@ class MergeResult:
 @dataclass
 class EnrichmentResult:
     """Result of AI enhancement processing."""
+
     products: pd.DataFrame
     processed: int = 0
     failed: int = 0
@@ -30,6 +33,7 @@ class EnrichmentResult:
 @dataclass
 class PipelineOptions:
     """Typed options for pipeline execution."""
+
     main_file_path: str = ""
     output_path: str = ""
     selected_categories: list = field(default_factory=list)
@@ -48,6 +52,7 @@ class PipelineOptions:
 @dataclass
 class PipelineResult:
     """Result of a complete pipeline run."""
+
     output_path: str = ""
     merge_stats: Optional[MergeStats] = None
     enrichment_stats: Optional[EnrichmentResult] = None
