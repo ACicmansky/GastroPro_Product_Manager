@@ -20,6 +20,7 @@ dependencies = [
 dev = [
     "poethepoet>=0.48.0",
     "pre-commit>=4.6.2",
+    "pyqt5-stubs>=5.15.6.0",
     "pytest>=8.0.0",
     "pytest-cov>=7.1.0",
     "pytest-mock>=3.14.0",
