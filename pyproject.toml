@@ -18,6 +18,8 @@ dependencies = [
 
 [dependency-groups]
 dev = [
+    "poethepoet>=0.48.0",
+    "pre-commit>=4.6.2",
     "pytest>=8.0.0",
     "pytest-mock>=3.14.0",
     "ruff>=0.16.7",
@@ -75,4 +77,13 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["src"]
+
+[tool.poe.tasks]
+test = "pytest"
+lint = "ruff check"
+"lint:fix" = "ruff check --fix"
+format = "ruff format"
+"format:check" = "ruff format --check"
+check = ["lint", "format:check", "test"]
+run = "python main.py"
 
