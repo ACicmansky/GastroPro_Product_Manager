@@ -18,24 +18,31 @@
 - **regex**: Advanced pattern matching for product difference extraction
 - **python-dotenv**: For managing environment variables (API keys)
 - **threading**: For thread-safe quota management
-- **threading**: For thread-safe quota management
-- **pytest**: Testing framework (221 tests)
+- **pytest**: Testing framework (225 tests, multi-core with `pytest-xdist`)
 - **uv**: Modern, fast Python package and project manager
+- **ruff**: Blazing fast linter and formatter
+- **poethepoet**: Task runner for developer workflow shortcuts
 
 ## Development Setup
 - **Package Manager**: `uv` with `pyproject.toml`, `uv.lock`, and `.venv`
 - **Commands**:
   - `uv sync`: Install and sync dependencies into `.venv`
   - `uv add <pkg>`: Add dependency
-  - `uv run python main.py`: Run desktop app
-  - `uv run pytest`: Run test suite
-  - `uv run ruff check` / `uv run ruff format`: Lint and format code
+  - `uv run poe run`: Run desktop app
+  - `uv run poe test:fast`: Run 225 tests in parallel (~10s)
+  - `uv run poe test:cov`: Run test suite with branch coverage report
+  - `uv run poe lint` / `uv run poe format`: Lint and format code
+  - `uv run poe check`: Combined lint + format-check + fast test suite
+  - `uv run poe build`: Build standalone Windows executable via PyInstaller
+- **Continuous Integration**: GitHub Actions (`.github/workflows/ci.yml`) with `astral-sh/setup-uv@v5` cache
+- **Pre-commit**: Automated Ruff checks and formatting via `.pre-commit-config.yaml`
+- **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) logging to `logs/gastropro.log` and prompting a Qt recovery dialog
 - **Environment**: Windows operating system (AMD64)
 - **Line Endings**: Requires Windows standard CRLF.
 - **Path Standard**: Windows-compatible paths (`\\` or raw paths) must be used.
 - **Methodology**: TDD (Test-Driven Development) is enforced.
-- **IDE**: Compatible with standard Python IDEs (`.vscode/settings.json` configured for `.venv`)
-- **Version Control**: Git repository (`uv.lock` tracked, `.venv` ignored)
+- **IDE**: Compatible with standard Python IDEs (`.vscode/settings.json` configured for `.venv`, format-on-save via Ruff)
+- **Version Control**: Git repository (`uv.lock` tracked, `.venv` and `dist/` ignored)
 - **Environment Variables**:
   - `GOOGLE_API_KEY`: Required for Gemini API access
 
@@ -64,7 +71,13 @@
 - rapidfuzz (category and product matching)
 - playwright (dynamic web scraping for Mebella)
 - pytest & pytest-mock (dev/test suite)
+- pytest-xdist (parallel test runner)
+- pytest-cov (branch coverage reporting)
 - ruff (linter and code formatter)
+- pre-commit (git hooks runner)
+- poethepoet (task runner)
+- pyinstaller (Windows executable packager)
+- PyQt5-stubs (full IDE and type checking support)
 
 ## Data Structures
 1. **Configuration (JSON)**:

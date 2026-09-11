@@ -1,16 +1,24 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-12 (uv package manager upgrade)*
+*Last updated: 2026-09-12 (SOTA enhancements & tooling upgrade)*
 
 ## Current State
-The project has been upgraded to the **`uv` package manager** with PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `.python-version` pinned to 3.13. All 221 tests pass in under 8 seconds. The layered architecture (`src/pipeline`, `src/data`, `src/domain`, `src/ai`, `src/scrapers`, `src/gui`, `src/config`) and entry point (`main.py`) remain completely intact with zero circular dependencies.
+The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
+- **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
+- **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
+- **Testing & QA**: 225 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Type Safety**: `PyQt5-stubs` installed and `pyrightconfig.json` calibrated with `.venv` and path exclusions.
+- **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching on `windows-latest`.
+- **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
+- **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
 
-## Recent Changes (2026-09-12 — uv package manager migration)
-- **`uv` integration**: Added `pyproject.toml` managing dependencies, dev dependency group, and `[tool.uv]` with `package = false` and `required-environments = ["sys_platform == 'win32' and platform_machine == 'AMD64'"]`.
-- **Lockfile & venv**: Generated deterministic `uv.lock` and local `.venv` (`C:\Source\Python\GastroPro_Product_Manager\.venv`).
-- **Dependencies synchronized**: Pinned `pandas>=2.0.0,<3.0.0` for full ecosystem stability, added `playwright>=1.40.0` (required for Mebella scraper), updated `google-genai` and Qt 5.15.2 wheels for Windows AMD64.
-- **Tooling & IDE**: Updated `.gitignore` (ignoring `.venv/`, tracking `uv.lock`), updated `.vscode/settings.json` (`python.defaultInterpreterPath` pointing to `.venv`), updated `pytest.ini` (`pythonpath = .`), updated `CLAUDE.md` with `uv run` commands.
-- **Suite**: 221 passed in 7.96s via `uv run pytest`.
+## Recent Changes (2026-09-12 — SOTA engineering enhancements)
+- Implemented Pre-commit hooks (`.pre-commit-config.yaml`), VS Code workspace configuration, and `poethepoet` tasks (`test:fast`, `test:cov`, `lint`, `format`, `check`, `build`, `run`).
+- Integrated `pytest-xdist` and `pytest-cov` for multi-core testing and branch coverage reporting.
+- Added `PyQt5-stubs` and updated `pyrightconfig.json`.
+- Created GitHub Actions CI matrix with `astral-sh/setup-uv@v5`.
+- Built standalone desktop distribution spec (`gastropro.spec`) and `scripts/build_exe.py`.
+- Implemented global GUI exception hook (`src/gui/crash_handler.py`) with 4 dedicated unit tests (225 tests total).
 
 
 ## Recent Changes (2026-07-06 — first production run failures fixed)

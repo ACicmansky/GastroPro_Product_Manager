@@ -54,6 +54,13 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **State-Of-The-Art (SOTA) Engineering Infrastructure Upgrade**
+  - **Tooling & Automation**: Pre-commit hooks (`.pre-commit-config.yaml`), VS Code format-on-save + auto-import organize, and `poethepoet` task runner (`test:fast`, `test:cov`, `lint`, `format`, `check`, `build`, `run`).
+  - **High-Performance Testing**: Integrated `pytest-xdist` (multi-core testing in ~10s) and `pytest-cov` (branch coverage reporting). Total suite: 225 tests passing.
+  - **Type Safety**: Integrated `PyQt5-stubs` and calibrated `pyrightconfig.json` with `.venv` and exclusions.
+  - **Continuous Integration**: Added GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching.
+  - **Desktop Packaging**: Created PyInstaller specification (`gastropro.spec`) and build runner (`scripts/build_exe.py` / `uv run poe build`) with frozen asset resolution in `src/gui/theme.py`.
+  - **Crash Resilience**: Built global exception hook (`src/gui/crash_handler.py`) intercepting unhandled errors, logging to file, and presenting user-facing Qt dialogs.
 - ✅ **Migration to `uv` Package Manager**
   - Replaced legacy global/pip workflow with `uv` (0.9+), PEP 621 `pyproject.toml`, deterministic lockfile `uv.lock`, and local `.venv`.
   - Pinned Python version to 3.13 in `.python-version`.
@@ -62,7 +69,6 @@
   - Made scraper test assertions forward-compatible with Pandas `pd.StringDtype`.
   - Configured `.vscode/settings.json` to point directly to `${workspaceFolder}\.venv\Scripts\python.exe`.
   - Updated `CLAUDE.md`, `requirements.txt`, and memory bank.
-  - All 221 tests passing via `uv run pytest`.
 
 ## Recently Completed (July 2026)
 - ✅ **Layered Architecture Refactor + Audit**

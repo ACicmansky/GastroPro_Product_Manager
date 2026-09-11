@@ -17,24 +17,28 @@ uv add <package>
 uv add --dev <package>
 uv remove <package>
 
-# Run the application
-uv run python main.py
+# Run application
+uv run poe run           # or: uv run python main.py
 
-# Run all tests
-uv run pytest
+# Fast multi-core testing (pytest-xdist)
+uv run poe test:fast     # or: uv run pytest -n auto
+
+# Test coverage reporting
+uv run poe test:cov      # or: uv run pytest --cov=src --cov-report=term-missing
 
 # Run tests by marker
 uv run pytest -m ai_enhancement
 uv run pytest -m scraper
 uv run pytest -m category_filter
 
-# Run specific test file
-uv run pytest tests/test_ai_enhancer.py -v
+# Lint and format (Ruff)
+uv run poe lint          # or: uv run ruff check
+uv run poe lint:fix      # or: uv run ruff check --fix
+uv run poe format        # or: uv run ruff format
+uv run poe check         # runs lint + format-check + fast tests
 
-# Lint and format with Ruff
-uv run ruff check
-uv run ruff check --fix
-uv run ruff format
+# Build standalone Windows executable (PyInstaller)
+uv run poe build         # outputs to dist/GastroPro/GastroPro.exe
 ```
 
 ## Architecture
