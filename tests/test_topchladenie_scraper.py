@@ -392,13 +392,13 @@ class TestTopchladenieScraperLogic:
             <body>
                 <h1 itemprop="name">Test Fridge</h1>
                 <p class="big red" content="1234.56">1234.56 EUR</p>
-                
+
                 <h2>Hlavní parametre</h2>
                 <ul>
                     <li>Param 1</li>
                     <li>Param 2</li>
                 </ul>
-                
+
                 <section class="article_module">
                     <section>
                         <section>
@@ -407,12 +407,12 @@ class TestTopchladenieScraperLogic:
                         </section>
                     </section>
                 </section>
-                
+
                 <div id="productGallery">
                     <a href="/data/sharedfiles/obrazky/produkty/pFull/img1.jpg"></a>
                     <a href="/data/sharedfiles/obrazky/pFull/img2.jpg"></a>
                 </div>
-                
+
                 <div class="category">
                     <a href="/e-shop/category">Category</a>
                 </div>

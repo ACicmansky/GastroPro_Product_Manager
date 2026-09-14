@@ -78,4 +78,3 @@ class BatchJobDB:
             return dict(row) if row else None
         finally:
             conn.close()
-

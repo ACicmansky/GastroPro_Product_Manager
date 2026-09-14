@@ -1773,10 +1773,10 @@ ICON51 -M  6xGN 1/1
 
 Group #73 - Parent catalog: AICCT026E
 --------------------------------------------------------------------------------
-1. [PARENT] AICCT026E - Konvektomat ALPHATECH® 
+1. [PARENT] AICCT026E - Konvektomat ALPHATECH®
 ICON51 -T  6xGN 2/3
    Base name: Konvektomat ALPHATECH® ICON -T
-2.          AICCT061E - Konvektomat ALPHATECH® 
+2.          AICCT061E - Konvektomat ALPHATECH®
 ICON51 -T  6xGN 1/1
    Base name: Konvektomat ALPHATECH® ICON -T
 
@@ -9743,4 +9743,3 @@ Group #671 - Parent catalog: VZM1212
    Base name: Blok zásuviek+
 
 ================================================================================
-
