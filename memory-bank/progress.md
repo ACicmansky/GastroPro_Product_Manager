@@ -54,6 +54,12 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Force Category Names from Input File & "Apply to All" Option**
+  - Added option to force original category names from the uploaded input file, bypassing interactive category mapping prompts.
+  - Added "Aplikovať na všetky kategórie zo súboru" checkbox and "📁 Vnútiť názov zo súboru" button in `CategoryMappingDialog`.
+  - Added in-memory session caching in `CategoryService` to eliminate duplicate prompts for identical unmapped categories.
+  - Added "Vnútiť kategórie zo vstupného súboru" checkbox to `MainWindow` processing options.
+  - 6 new automated tests added, total test suite: 231 tests passing in ~8s.
 - ✅ **State-Of-The-Art (SOTA) Engineering Infrastructure Upgrade**
   - **Tooling & Automation**: Pre-commit hooks (`.pre-commit-config.yaml`), VS Code format-on-save + auto-import organize, and `poethepoet` task runner (`test:fast`, `test:cov`, `lint`, `format`, `check`, `build`, `run`).
   - **High-Performance Testing**: Integrated `pytest-xdist` (multi-core testing in ~10s) and `pytest-cov` (branch coverage reporting). Total suite: 225 tests passing.

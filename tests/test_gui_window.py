@@ -88,6 +88,47 @@ def test_mapping_dialog_prefill_and_cancel(app):
     assert dialog.result() == QDialog.Rejected
 
 
+def test_mapping_dialog_force_file_and_apply_to_all(app):
+    from src.gui.widgets import CategoryMappingDialog
+
+    dialog = CategoryMappingDialog(
+        "Kategória Zo Súboru",
+        suggestions=[],
+        product_name="Skriňa chladiaca",
+        is_from_file=True,
+        has_input_file=True,
+    )
+
+    assert not dialog.apply_to_all_from_file_cb.isHidden()
+    assert not dialog.should_apply_to_all_from_file()
+
+    # Check the "Apply to all from file" checkbox
+    dialog.apply_to_all_from_file_cb.setChecked(True)
+
+    # Click the "Force file name" button
+    dialog.on_force_file()
+
+    assert dialog.get_new_category() == "Kategória Zo Súboru"
+    assert dialog.should_apply_to_all_from_file() is True
+
+
+def test_main_window_force_file_categories_toggles(window):
+    # Initially without file loaded, should be disabled and unchecked
+    window.clear_main_data()
+    assert not window.force_file_categories_checkbox.isEnabled()
+    assert not window.force_file_categories_checkbox.isChecked()
+
+    # Simulate loading data
+    window.main_data_file = "fake.xlsx"
+    window._set_ui_enabled(True)
+    assert window.force_file_categories_checkbox.isEnabled()
+
+    # Clear main data should disable and uncheck it
+    window.clear_main_data()
+    assert not window.force_file_categories_checkbox.isEnabled()
+    assert not window.force_file_categories_checkbox.isChecked()
+
+
 def test_settings_dialog_saves_config_key_and_params(app, tmp_path, monkeypatch):
     import json
 

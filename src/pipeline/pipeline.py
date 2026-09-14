@@ -103,6 +103,15 @@ class Pipeline:
         if main_df.empty and not db_df.empty:
             main_df = db_df
 
+        if not main_df.empty and "defaultCategory" in main_df.columns:
+            file_categories = {
+                str(c).strip()
+                for c in main_df["defaultCategory"].dropna().unique()
+                if str(c).strip() and str(c).strip().lower() != "nan"
+            }
+            self.category_service.set_file_categories(file_categories)
+        self.category_service.set_force_file_categories(options.force_file_categories)
+
         # 3. Parse XML feeds
         stage("feeds")
         feed_dfs = {}

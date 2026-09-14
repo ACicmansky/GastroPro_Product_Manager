@@ -29,8 +29,21 @@ class CategoryService:
             self.mappings_path = "categories.json"
 
         self._mappings: dict[str, str] = {}
+        self._session_mappings: dict[str, str] = {}
+        self.file_categories: set[str] = set()
+        self.force_file_categories: bool = False
         self._interactive_callback: Optional[Callable[[str, Optional[str]], str]] = None
         self._load()
+
+    def set_file_categories(self, categories):
+        """Set known unique categories from the input file."""
+        self.file_categories = {
+            str(c).strip() for c in categories if str(c).strip() and str(c).strip().lower() != "nan"
+        }
+
+    def set_force_file_categories(self, enabled: bool):
+        """Enable or disable forcing category names from the input file."""
+        self.force_file_categories = bool(enabled)
 
     def _load(self):
         """Load mappings from JSON file."""
@@ -54,6 +67,8 @@ class CategoryService:
 
     def map(self, old_category: str) -> Optional[str]:
         """Look up a known mapping. Returns None if not found."""
+        if old_category in self._session_mappings:
+            return self._session_mappings[old_category]
         return self._mappings.get(old_category)
 
     def map_category(self, old_category: str) -> str:
@@ -84,23 +99,34 @@ class CategoryService:
     def map_or_ask(self, old_category: str, product_name: Optional[str] = None) -> str:
         """Map a category, using interactive callback if mapping is unknown.
 
-        If the category is already a known target, returns it as-is without
-        invoking the callback.  If no callback is set, returns the original
-        category unchanged.
+        If force_file_categories is enabled and the category comes from the input file,
+        returns it as-is without invoking the callback.
+        If the category is already a known target, returns it as-is.
+        If no callback is set, returns the original category unchanged.
         """
+        # Force names from input file if requested
+        if self.force_file_categories and old_category in self.file_categories:
+            self._session_mappings[old_category] = old_category
+            return old_category
+
         mapped = self.map(old_category)
         if mapped is not None:
             return mapped
 
         # Already a valid target — no need to remap or ask
         if self.is_target_category(old_category):
+            self._session_mappings[old_category] = old_category
             return old_category
 
         if self._interactive_callback:
             new_category = self._interactive_callback(old_category, product_name)
-            if new_category and new_category != old_category:
-                self.add_mapping(old_category, new_category)
+            if new_category:
+                self._session_mappings[old_category] = new_category
+                if new_category != old_category:
+                    self.add_mapping(old_category, new_category)
                 return new_category
+            self._session_mappings[old_category] = old_category
+            return old_category
 
         return old_category
 

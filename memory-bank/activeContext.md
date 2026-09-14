@@ -1,16 +1,23 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-12 (SOTA enhancements & tooling upgrade)*
+*Last updated: 2026-09-14 (Force input file categories & apply to all checkbox)*
 
 ## Current State
 The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
 - **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
-- **Testing & QA**: 225 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Testing & QA**: 231 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
 - **Type Safety**: `PyQt5-stubs` installed and `pyrightconfig.json` calibrated with `.venv` and path exclusions.
 - **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching on `windows-latest`.
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
 - **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
+
+## Recent Changes (2026-09-14 — Force category names from input file & "Apply to All" checkbox)
+- Implemented option to force category names from the input file when mapping categories (see `journal/2026_09_14_force_input_file_categories.md`).
+- `CategoryService`: Added `file_categories` tracking, `force_file_categories` flag, and in-memory `_session_mappings` cache to eliminate repetitive prompts for identical unmapped categories.
+- `CategoryMappingDialog`: Added "Aplikovať na všetky kategórie zo súboru" checkbox and "📁 Vnútiť názov zo súboru" button with input file origin badge.
+- `MainWindow` & `PipelineWorker`: Added "Vnútiť kategórie zo vstupného súboru" checkbox in processing options, wired to `PipelineOptions.force_file_categories`, dynamically activatable from mapping dialog.
+- Suite: 231 tests passing (`test:fast` in ~8s).
 
 ## Recent Changes (2026-09-12 — SOTA engineering enhancements)
 - Implemented Pre-commit hooks (`.pre-commit-config.yaml`), VS Code workspace configuration, and `poethepoet` tasks (`test:fast`, `test:cov`, `lint`, `format`, `check`, `build`, `run`).

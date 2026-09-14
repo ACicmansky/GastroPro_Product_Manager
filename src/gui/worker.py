@@ -99,9 +99,11 @@ class PipelineWorker(QObject):
             raise PipelineCancelled()
         return self._category_result or original_category
 
-    def set_category_mapping_result(self, new_category: str):
+    def set_category_mapping_result(self, new_category: str, apply_to_all_from_file: bool = False):
         """Called by GUI when user provides category mapping."""
         self._category_result = new_category
+        if apply_to_all_from_file and hasattr(self, "pipeline") and hasattr(self.pipeline, "category_service"):
+            self.pipeline.category_service.set_force_file_categories(True)
         if self._category_loop:
             self._category_loop.quit()
 

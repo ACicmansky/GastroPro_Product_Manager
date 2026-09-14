@@ -198,6 +198,41 @@ class TestPipelineWithMainData:
         assert isinstance(result, pd.DataFrame)
         assert len(result) > 0
 
+    def test_pipeline_force_file_categories(self, config, tmp_path):
+        """Test that force_file_categories skips interactive callback for file categories."""
+        from src.pipeline.pipeline import Pipeline
+        from src.domain.models import PipelineOptions
+        from src.data.writers.xlsx_writer import write_xlsx
+
+        pipeline = Pipeline(config)
+
+        main_df = pd.DataFrame(
+            {
+                "code": ["PROD001"],
+                "name": ["Existing Product"],
+                "defaultCategory": ["Vlastná Kategória Zo Súboru"],
+            }
+        )
+        main_path = tmp_path / "main.xlsx"
+        write_xlsx(main_df, str(main_path))
+
+        options = PipelineOptions(
+            main_file_path=str(main_path),
+            force_file_categories=True,
+            enabled_feeds=[],
+        )
+
+        callback_called = False
+
+        def callback(old_cat, product_name):
+            nonlocal callback_called
+            callback_called = True
+            return "Remapped Category"
+
+        res = pipeline.run(options, on_unknown_category=callback)
+        assert not callback_called
+        assert res.product_count == 1
+
 
 class TestPipelineOutput:
     """Test pipeline output and saving."""

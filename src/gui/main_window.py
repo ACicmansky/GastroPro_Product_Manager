@@ -353,12 +353,20 @@ class MainWindow(QMainWindow):
             "Produkty, ktoré vypadli z feedu dodávateľa, budú odstránené."
         )
 
+        self.force_file_categories_checkbox = QCheckBox("Vnútiť kategórie zo vstupného súboru")
+        self.force_file_categories_checkbox.setChecked(False)
+        self.force_file_categories_checkbox.setEnabled(False)  # enabled only when main data is loaded
+        self.force_file_categories_checkbox.setToolTip(
+            "Pri mapovaní kategórií automaticky použije pôvodné kategórie zo vstupného súboru bez nutnosti ich mapovania."
+        )
+
         layout.addWidget(self.ai_enhancement_checkbox)
         layout.addWidget(self.force_reprocess_checkbox)
         layout.addWidget(self.web_scraping_checkbox)
         layout.addWidget(self.mebella_scraping_checkbox)
         layout.addWidget(self.update_categories_checkbox)
         layout.addWidget(self.preserve_edits_checkbox)
+        layout.addWidget(self.force_file_categories_checkbox)
 
         parent.addWidget(group)
 
@@ -675,6 +683,7 @@ class MainWindow(QMainWindow):
             set_variant(self.main_data_label, "success")
             self.clear_main_button.setEnabled(True)
             self.preserve_edits_checkbox.setEnabled(True)
+            self.force_file_categories_checkbox.setEnabled(True)
 
             # Extract and display categories
             self._extract_and_display_categories(df)
@@ -698,6 +707,8 @@ class MainWindow(QMainWindow):
         self.category_list.clear()
         self.preserve_edits_checkbox.setEnabled(False)
         self.preserve_edits_checkbox.setChecked(False)
+        self.force_file_categories_checkbox.setEnabled(False)
+        self.force_file_categories_checkbox.setChecked(False)
 
     def process_and_export(self):
         """Process data and export results."""
@@ -753,6 +764,7 @@ class MainWindow(QMainWindow):
             scrape_topchladenie=self.web_scraping_checkbox.isChecked(),
             topchladenie_csv_path=getattr(self, "topchladenie_csv_path", ""),
             enable_price_mapping=self.mebella_scraping_checkbox.isChecked(),
+            force_file_categories=self.force_file_categories_checkbox.isChecked(),
         )
 
         # Show progress and disable UI
@@ -831,9 +843,11 @@ class MainWindow(QMainWindow):
             self.force_reprocess_checkbox.setEnabled(self.ai_enhancement_checkbox.isChecked())
             # Re-check preserve edits enabled state
             self.preserve_edits_checkbox.setEnabled(self.main_data_file is not None)
+            self.force_file_categories_checkbox.setEnabled(self.main_data_file is not None)
         else:
             self.force_reprocess_checkbox.setEnabled(False)
             self.preserve_edits_checkbox.setEnabled(False)
+            self.force_file_categories_checkbox.setEnabled(False)
 
         # Filter section
         self.category_search.setEnabled(enabled)
@@ -1040,13 +1054,28 @@ class MainWindow(QMainWindow):
             original_category: The unmapped category
             product_name: Product name for context
         """
+        # Check if original_category is from the loaded input file
+        is_from_file = original_category in getattr(self, "all_categories", [])
+        has_input_file = bool(self.main_data_file)
+
         # Get suggestions from CategoryService (uses categories.json mappings)
         suggestions = self.category_service.suggest(original_category, top_n=5)
 
-        # Show dialog with suggestions
-        dialog = CategoryMappingDialog(original_category, suggestions, product_name, self)
+        # Show dialog with suggestions and file context
+        dialog = CategoryMappingDialog(
+            original_category,
+            suggestions,
+            product_name,
+            is_from_file=is_from_file,
+            has_input_file=has_input_file,
+            parent=self,
+        )
         if dialog.exec_():
             new_category = dialog.get_new_category()
+            apply_to_all = dialog.should_apply_to_all_from_file()
+
+            if apply_to_all:
+                self.force_file_categories_checkbox.setChecked(True)
 
             # Update progress bar with mapping info
             if new_category and new_category != original_category:
@@ -1055,7 +1084,7 @@ class MainWindow(QMainWindow):
                 )
 
             # Send result back to worker
-            self.worker.set_category_mapping_result(new_category)
+            self.worker.set_category_mapping_result(new_category, apply_to_all_from_file=apply_to_all)
         elif dialog.cancel_pipeline:
             # Abort the whole run — worker raises PipelineCancelled
             self.worker.cancel_pipeline()

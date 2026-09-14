@@ -47,6 +47,7 @@ class PipelineOptions:
     scrape_topchladenie: bool = False
     topchladenie_csv_path: str = ""
     enable_price_mapping: bool = False
+    force_file_categories: bool = False
 
 
 @dataclass

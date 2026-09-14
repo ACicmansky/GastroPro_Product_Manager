@@ -79,3 +79,62 @@ class TestCategoryServiceGetUniqueTargets:
         assert "Chladiace zariadenia" in targets
         assert "Varné zariadenia" in targets
         assert len(targets) == 3
+
+
+class TestCategoryServiceForceFileCategories:
+    def test_force_file_categories_skips_callback(self, mappings_file):
+        service = CategoryService(mappings_file)
+        service.set_file_categories(["Kategória Zo Súboru", "Iná Kategória"])
+        service.set_force_file_categories(True)
+
+        callback_called = False
+
+        def callback(old_cat, product_name):
+            nonlocal callback_called
+            callback_called = True
+            return "Mapped"
+
+        service.set_interactive_callback(callback)
+        res = service.map_or_ask("Kategória Zo Súboru", "Produkt 1")
+
+        assert res == "Kategória Zo Súboru"
+        assert not callback_called
+
+    def test_force_file_categories_still_calls_callback_for_non_file_categories(self, mappings_file):
+        service = CategoryService(mappings_file)
+        service.set_file_categories(["Kategória Zo Súboru"])
+        service.set_force_file_categories(True)
+
+        callback_called = False
+
+        def callback(old_cat, product_name):
+            nonlocal callback_called
+            callback_called = True
+            return "Nová Cieľová Kategória"
+
+        service.set_interactive_callback(callback)
+        res = service.map_or_ask("Neznáma Feed Kategória", "Produkt 2")
+
+        assert callback_called
+        assert res == "Nová Cieľová Kategória"
+
+    def test_session_mappings_prevents_duplicate_prompts_for_identical_categories(self, mappings_file):
+        service = CategoryService(mappings_file)
+        call_count = 0
+
+        def callback(old_cat, product_name):
+            nonlocal call_count
+            call_count += 1
+            # User chooses to keep the original name
+            return old_cat
+
+        service.set_interactive_callback(callback)
+
+        res1 = service.map_or_ask("Vlastná Kategória", "Produkt 1")
+        assert res1 == "Vlastná Kategória"
+        assert call_count == 1
+
+        # Second product with the same category should NOT trigger the callback
+        res2 = service.map_or_ask("Vlastná Kategória", "Produkt 2")
+        assert res2 == "Vlastná Kategória"
+        assert call_count == 1

@@ -1,6 +1,7 @@
 import re
 from PyQt5.QtWidgets import (
     QApplication,
+    QCheckBox,
     QFrame,
     QLabel,
     QVBoxLayout,
@@ -28,12 +29,23 @@ from PyQt5.QtGui import QFont, QPixmap
 class CategoryMappingDialog(QDialog):
     """Dialog for interactive category mapping when no mapping is found."""
 
-    def __init__(self, original_category, suggestions=None, product_name=None, parent=None):
+    def __init__(
+        self,
+        original_category,
+        suggestions=None,
+        product_name=None,
+        is_from_file=False,
+        has_input_file=False,
+        parent=None,
+    ):
         super().__init__(parent)
         self.original_category = original_category
         self.suggestions = suggestions or []
         self.product_name = product_name
+        self.is_from_file = is_from_file
+        self.has_input_file = has_input_file
         self.new_category = None
+        self.apply_to_all_from_file = False
         self.cancel_pipeline = False
         self.init_ui()
 
@@ -74,6 +86,11 @@ class CategoryMappingDialog(QDialog):
         original_layout.addWidget(copy_button, alignment=Qt.AlignTop)
         layout.addLayout(original_layout)
 
+        if self.is_from_file:
+            file_badge = QLabel("📄 Táto kategória pochádza zo vstupného súboru")
+            file_badge.setStyleSheet("color: #3b82f6; font-size: 12px; margin-top: 2px;")
+            layout.addWidget(file_badge)
+
         # Suggestions list (if available)
         if self.suggestions:
             suggestions_label = QLabel("Návrhy podobných kategórií (kliknite pre výber):")
@@ -111,6 +128,15 @@ class CategoryMappingDialog(QDialog):
         self.category_input.returnPressed.connect(self.accept)
         layout.addWidget(self.category_input)
 
+        # Checkbox to apply to all categories from file
+        self.apply_to_all_from_file_cb = QCheckBox("Aplikovať na všetky kategórie zo súboru")
+        self.apply_to_all_from_file_cb.setToolTip(
+            "Automaticky ponechá pôvodné názvy pre všetky zostávajúce kategórie zo vstupného súboru bez ďalších dialógov."
+        )
+        if not (self.is_from_file or self.has_input_file):
+            self.apply_to_all_from_file_cb.setVisible(False)
+        layout.addWidget(self.apply_to_all_from_file_cb)
+
         # Buttons
         button_layout = QHBoxLayout()
 
@@ -121,6 +147,12 @@ class CategoryMappingDialog(QDialog):
         button_layout.addWidget(cancel_button)
 
         button_layout.addStretch()
+
+        self.force_file_button = QPushButton("📁 Vnútiť názov zo súboru")
+        self.force_file_button.setProperty("flat", "true")
+        self.force_file_button.setToolTip("Použiť pôvodný názov kategórie zo vstupného súboru")
+        self.force_file_button.clicked.connect(self.on_force_file)
+        button_layout.addWidget(self.force_file_button)
 
         ok_button = QPushButton("OK")
         ok_button.setDefault(True)
@@ -139,6 +171,12 @@ class CategoryMappingDialog(QDialog):
         self.cancel_pipeline = True
         self.reject()
 
+    def on_force_file(self):
+        """Force original category name and accept."""
+        self.new_category = self.original_category
+        self.apply_to_all_from_file = self.apply_to_all_from_file_cb.isChecked()
+        super().accept()
+
     def on_suggestion_clicked(self, item):
         """Populate input field when a suggestion is clicked."""
         category = item.data(Qt.UserRole)
@@ -148,11 +186,15 @@ class CategoryMappingDialog(QDialog):
 
     def accept(self):
         self.new_category = self.category_input.text().strip()
+        self.apply_to_all_from_file = self.apply_to_all_from_file_cb.isChecked()
         if self.new_category:
             super().accept()
 
     def get_new_category(self):
         return self.new_category
+
+    def should_apply_to_all_from_file(self) -> bool:
+        return self.apply_to_all_from_file
 
 
 class PriceMappingDialog(QDialog):
