@@ -12,15 +12,19 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
 - **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
 
-## Recent Changes (2026-09-15 — Category Prefix Removal "Tovary a kategórie > ")
-- Removed all enforcement and addition of `"Tovary a kategórie > "` prefix project-wide.
-- `OutputTransformer.transform_category`: Formats categories by replacing `"/"` with `" > "` and strips any legacy `"Tovary a kategórie > "` prefix.
-- `BatchOrchestrator`: `_category_of(row)` and `_get_expected_params(cat)` strip legacy `"Tovary a kategórie > "` prefix so lookups match keys in `categories_with_parameters.json`.
-- `SettingsDialog`: Category tree view and product count masking operate directly on category names without prefix.
-- Deleted obsolete script `update_categories.py`.
-- Cleaned legacy invalid mapping `"" -> "Tovary a kategórie >"` in `categories.json`.
-- Updated test suites across `test_output_transformer.py`, `test_ai_enhancer.py`, `test_category_scoped_ai.py`, `test_gui_window.py`, `test_integration_pipeline.py`, `test_scraper_new_format.py`, `test_topchladenie_scraper.py`, and `test_category_filter.py`.
-- Suite: **244 tests passing** via `uv run poe check`.
+## Recent Changes (2026-09-16 — Autonomous Categorization Subagent)
+- Implemented and executed autonomous classification subagent (`scripts/auto_categorize.py`) using `gemini-3.8-flash` across 4 concurrent worker threads.
+- Classified all 3,319 previously uncategorized products against the 211 authoritative categories from `categories_with_parameters.json`.
+- Achieved >99.9% exact taxonomy match in 190.1 seconds (~3.1 minutes).
+- Automatically updated `data/products.db` and active Excel file `C:/Users/Andrej/Downloads/2026_09_16_GastroPro.xlsx` (with `.bak` safety backup).
+- **Result: 9,712 / 9,712 products (100.0%) in database are now fully categorized.**
+- Detailed report generated in `out/categorization_report.json`.
+
+## Recent Changes (2026-09-16 — BatchJobDB Schema Migration & Resumable Run Recovery)
+- Added `updated_at` column to `batch_jobs` in `data/products.db` to fix `OperationalError: no such column: updated_at`.
+- Updated `BatchJobDB._init_table()` in `src/data/database/batch_job_db.py` to inspect `PRAGMA table_info` and automatically migrate missing columns (`updated_at`, `details`).
+- Updated `MainWindow._check_resumable_ai_run` and `PipelineWorker.run` to ensure interrupted runs cleanly present the resume banner.
+- Verified test suite: **244 tests passing** via `uv run poe check`.
 
 ## Recent Changes (2026-09-15 — Authoritative Live Categories & Ponytail Cleanup)
 - Enforced live website categories (from uploaded input file and DB `source="core"` products) as permanently authoritative: never remapped and never prompted.

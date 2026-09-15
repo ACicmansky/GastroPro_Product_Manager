@@ -398,9 +398,10 @@ class MainWindow(QMainWindow):
         """DB-only check (no API key needed) — shows the resume banner if a run was interrupted."""
         db_path = self.config.get("db_path", "data/products.db") if self.config else "data/products.db"
         resumable = RunDB(db_path).get_resumable_run()
-        if resumable and resumable["status"] in ("paused", "interrupted"):
+        if resumable and resumable["status"] in ("paused", "interrupted", "running"):
+            status_display = "prerušené" if resumable["status"] in ("interrupted", "running") else "pozastavené"
             self.ai_resume_banner.setText(
-                f"Prerušené AI spracovanie ({resumable['status']}): "
+                f"Nedokončené AI spracovanie ({status_display}): "
                 f"{resumable['processed_products']}/{resumable['total_products']} produktov hotových."
                 + (f" [{resumable['detail']}]" if resumable["detail"] else "")
             )

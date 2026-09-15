@@ -35,6 +35,12 @@ class BatchJobDB:
                     details TEXT DEFAULT ''
                 )
             """)
+            cursor.execute("PRAGMA table_info(batch_jobs)")
+            cols = [row[1] for row in cursor.fetchall()]
+            if "updated_at" not in cols:
+                cursor.execute("ALTER TABLE batch_jobs ADD COLUMN updated_at TIMESTAMP")
+            if "details" not in cols:
+                cursor.execute("ALTER TABLE batch_jobs ADD COLUMN details TEXT DEFAULT ''")
             conn.commit()
         finally:
             conn.close()

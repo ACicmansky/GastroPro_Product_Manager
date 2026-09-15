@@ -82,6 +82,16 @@ class PipelineWorker(QObject):
             self.error.emit("Spracovanie zrušené používateľom.")
         except Exception as e:
             logger.error(f"Pipeline error: {e}", exc_info=True)
+            db_path = self.config.get("db_path", "data/products.db") if self.config else "data/products.db"
+            try:
+                from src.data.database.run_db import RunDB
+
+                run_db = RunDB(db_path)
+                active = run_db.get_resumable_run()
+                if active and active.get("status") == "running":
+                    run_db.update_run(active["id"], status="interrupted", detail=str(e)[:150])
+            except Exception:
+                pass
             self.error.emit(str(e))
         finally:
             self.finished.emit()
