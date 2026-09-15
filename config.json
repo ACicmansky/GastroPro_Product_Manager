@@ -146,8 +146,8 @@
   "ai_enhancement": {
     "enabled": true,
     "model": "gemini-3.8-flash",
-    "thinking_level": "low",
-    "batch_size": 35,
+    "thinking_level": "high",
+    "batch_size": 1,
     "temperature": 0,
     "retry_attempts": 3,
     "retry_delay": 60,

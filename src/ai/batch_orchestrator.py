@@ -526,6 +526,10 @@ class BatchOrchestrator:
 
             expected_params = self.category_parameters.get(cat_name, [])
 
+            sort_cols = [c for c in ("pairCode", "code") if c in cat_subset.columns]
+            if sort_cols:
+                cat_subset = cat_subset.sort_values(by=sort_cols)
+
             if is_group1:
                 sys_prompt = create_system_prompt_no_dimensions(cat_name, expected_params)
             else:

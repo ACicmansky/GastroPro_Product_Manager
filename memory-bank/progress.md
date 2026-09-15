@@ -54,14 +54,28 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Single-Product Prompt Optimization (Prompt Engineering Patterns)**
+  - Redesigned `create_system_prompt()` in `src/ai/prompts.py` using expert prompt engineering patterns (Instruction Hierarchy, direct singular focus, quality principles).
+  - Eliminated legacy plural batch phrasing and redundant checklists, streamlining input token payload by ~250–350 tokens per product.
+  - QA verification: **241 passed tests** in ~10s via `uv run poe check`.
+- ✅ **Product Consistency & Batch Size 1 Calibration**
+  - Set `batch_size: 1` in `config.json` for independent, robust per-product generation within Google Gemini Batch API.
+  - Refined prompt in `src/ai/prompts.py` to enforce consistent terminology, section hierarchy, and professional B2B style across product series.
+  - Added deterministic sorting by `pairCode` and `code` in `BatchOrchestrator._build_category_requests`.
+  - Full test suite: **241 tests passing** via `uv run poe check`.
+- ✅ **B2B Product FAQ Generation in AI Prompts**
+  - Configured prompt in `src/ai/prompts.py` to generate 4–5 practical B2B customer FAQs (questions and answers) at the end of `description` (Dlhý popis) using semantic HTML (`<h3>`, `<p>`, `<strong>`).
+  - Extended negative dimension constraints to prevent forbidden dimension text in variant product FAQs.
+  - Adjusted description word count to 300–800 words.
+  - Added prompt test; test suite: **241 tests passing** via `uv run poe check`.
 - ✅ **Input Pruning for Token Optimization**
   - Created `prune_text` utility (`src/ai/pruning.py`) to strip bloated HTML tags, unescape entities, preserve semantic structure, and truncate on word boundaries.
   - Integrated pruning into `BatchOrchestrator` payload generation, capping incoming `description` at 1,200 chars and `shortDescription` at 500 chars.
   - Achieved a **37.8% reduction** in raw description characters across the 9,694-product catalog (saving ~1.8M – 2.2M input tokens).
-  - Added 6 unit tests in `tests/test_pruning.py`, bringing total suite to **240 tests passing**.
+  - Added 6 unit tests in `tests/test_pruning.py`.
 - ✅ **Upgrade AI Model to Gemini 3.8 Flash & Thinking Level Configuration**
   - Upgraded model from `gemini-2.5-flash-lite` to `gemini-3.8-flash` in `config.json` and `GeminiClient`.
-  - Added configurable `thinking_level` setting (`"medium"` user-selected default) across config, BatchOrchestrator, and SettingsDialog.
+  - Added configurable `thinking_level` setting (`"high"` configured for maximum copywriting quality) across config, BatchOrchestrator, and SettingsDialog.
   - Wired `thinkingConfig` serialization into batch JSONL `generationConfig` requests.
   - Calculated precise full-catalog token metrics (9,694 products, ~5.8M input, ~8.1M output tokens, projected cost ~$23.74 USD / ~€22.00 EUR).
   - Added 3 new unit tests, total test suite: 234 tests passing in ~10s.

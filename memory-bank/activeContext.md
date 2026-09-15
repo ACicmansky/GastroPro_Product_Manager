@@ -12,6 +12,24 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
 - **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
 
+## Recent Changes (2026-09-15 — Single-Product Prompt Optimization via Prompt Engineering)
+- Redesigned `create_system_prompt()` in `src/ai/prompts.py` using core prompt engineering patterns (Instruction Hierarchy, singular framing, and redundancy removal).
+- Converted prompt from legacy multi-product batch phrasing to laser-focused single-product generation, eliminating confusion from cross-product references.
+- Removed duplicate 15-line validation checklist since constraints are enforced by `responseSchema`.
+- Suite: **241 tests passing** via `uv run poe check`.
+
+## Recent Changes (2026-09-15 — Batch Size 1 & Product Consistency Optimization)
+- Calibrated `config.json` to `"batch_size": 1`: each product is an independent request in the Gemini Batch API JSONL, eliminating anti-repetition bias, attention decay, and token truncation risks while leveraging full Google cloud parallelism.
+- Updated `src/ai/prompts.py` to instruct model on strict **consistency, standardized terminology, and professional B2B structure** across product lines instead of forced variation.
+- Added deterministic sorting by `pairCode` and `code` in `BatchOrchestrator._build_category_requests`.
+- Suite: **241 tests passing** via `uv run poe check`.
+
+## Recent Changes (2026-09-15 — FAQ Generation in AI Prompts & High Thinking)
+- Added explicit instructions in `create_system_prompt()` (`src/ai/prompts.py`) to generate 4–5 practical B2B FAQs appended to `description` (Dlhý popis) using semantic HTML (`<h3>Často kladené otázky (FAQ)</h3>`, `<p><strong>Otázka: ...?</strong><br>Odpoveď: ...</p>`).
+- Adjusted `description` target word count to 300–800 words to give the FAQ block ample room.
+- Extended negative dimension constraints in `create_system_prompt_no_dimensions()` to cover the FAQ section for product variants.
+- Added automated test in `tests/test_ai_enhancer.py`. Suite: **241 tests passing** via `uv run poe check`.
+
 ## Recent Changes (2026-09-15 — Input Pruning Optimization & Token Savings)
 - Implemented intelligent input pruning utility (`src/ai/pruning.py`, `prune_text`): strips bloated HTML tags, unescapes entities, preserves semantic linebreaks, and truncates text on word boundaries.
 - Integrated input pruning into `BatchOrchestrator._build_category_requests` and `_build_missing_param_requests`, capping incoming `description` to 1,200 chars and `shortDescription` to 500 chars (`max_desc_chars` / `max_short_desc_chars` in `config.json`).
@@ -20,9 +38,8 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 
 ## Recent Changes (2026-09-15 — Upgrade to Gemini 3.8 Flash & Thinking Level Configuration)
 - Upgraded default AI model from `gemini-2.5-flash-lite` to Google's reasoning model `gemini-3.8-flash` in `config.json` and `GeminiClient`.
-- Integrated `thinking_level` setting (`"low"` configured, selectable in GUI) into `config.json`, `BatchOrchestrator`, and `SettingsDialog` GUI.
-- `BatchOrchestrator` serializes `"thinkingConfig": {"thinkingLevel": "LOW"}` into batch JSONL `generationConfig` payloads.
-- Suite: 240 tests passing.
+- Integrated `thinking_level` setting (`"high"` configured for maximum copywriting quality) into `config.json`, `BatchOrchestrator`, and `SettingsDialog` GUI.
+- `BatchOrchestrator` serializes `"thinkingConfig": {"thinkingLevel": "HIGH"}` into batch JSONL `generationConfig` payloads.
 
 ## Recent Changes (2026-09-14 — Force category names from input file & "Apply to All" checkbox)
 - Implemented option to force category names from the input file when mapping categories (see `journal/2026_09_14_force_input_file_categories.md`).

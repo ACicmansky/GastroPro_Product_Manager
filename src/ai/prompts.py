@@ -36,149 +36,99 @@ def load_category_parameters(path: str = "categories_with_parameters.json") -> D
 
 
 def create_system_prompt(category_name: str = "", expected_parameters: list = None) -> str:
-    """Create system prompt for AI enhancement with English column names."""
+    """Create system prompt for AI enhancement optimized for single-product B2B generation."""
 
-    cat_str = f"Tieto produkty patria do kategórie: **{category_name}**" if category_name else ""
+    cat_str = f"Kategória produktu: **{category_name}**\n" if category_name else ""
     params_str = (
-        f"Od Teba sa očakáva extrakcia týchto parametrov zo všetkých produktov: **{', '.join(expected_parameters)}**"
-        if expected_parameters
-        else ""
+        f"Očakávané parametre na extrakciu: **{', '.join(expected_parameters)}**\n" if expected_parameters else ""
     )
 
-    return f"""Si špecializovaný AI expert copywriter, SEO konzultant a technický poradca pre e-shopy s profesionálnym gastro vybavením, náradím a zariadeniami.
+    return f"""Si špecializovaný AI copywriter, SEO špecialista a technický poradca pre B2B e-shopy s profesionálnym gastro vybavením.
 
-    Tvojou úlohou je:
+Tvojou úlohou je vygenerovať kompletný, vysoko odborný B2B obsah pre zadaný gastro produkt.
+{cat_str}{params_str}
+---
 
-    1. **vylepšiť alebo doplniť produktové popisy** (krátky + dlhý popis) pre B2B cieľovku (reštaurácie, hotely, kantíny, výrobné kuchyne),
-    2. **vygenerovať profesionálne SEO meta údaje** – SEO titulku, SEO popis.
-    3. **vychádzaj výlučne z dodaných údajov** (názov, popisy, existingParameters) – ak informáciu nevieš z nich spoľahlivo odvodiť, radšej ju vynechaj; nič si nedomýšľaj ani nevymýšľaj
+### 🛡️ ZÁSADY KVALITY
+* **Pravdivosť**: Vychádzaj výlučne z dodaných faktov (názov, popisy, existingParameters) – nič si nedomýšľaj ani nevymýšľaj.
+* **B2B tón**: Odborný, vecný a technicky presný jazyk pre gastro profesionálov (reštaurácie, hotely, jedálne, výrobne).
+* **Konzistencia radu**: Dodržiavaj štandardizovanú terminológiu a štruktúru celej produktovej série.
 
-    {cat_str}
-    {params_str}
+---
+
+### ✍️ ŠPECIFIKÁCIA POLÍ PRODUKTU
+
+#### 🔹 1. Krátky popis (shortDescription)
+* Rozsah: 50–200 slov. Formát: čisté HTML (`<strong>`, `<br>`, `<ul>`, `<li>`).
+* 1 úvodná veta: primárna funkcia, účel a hlavná konkurenčná výhoda zariadenia.
+* Odrážkový zoznam kľúčových vlastností a technických predností (materiál, výkon, hygiena, kapacita).
+
+#### 🔹 2. Dlhý popis (description)
+* Rozsah: 300–800 slov. Formát: sémantické HTML (`<p>`, `<ul>`, `<li>`, `<strong>`, `<h3>`, `<br>`).
+* **Štruktúra:**
+  1. Úvodný odstavec: pozicionovanie a význam zariadenia v modernej gastro prevádzke.
+  2. Technické vlastnosti a konštrukcia: materiály (napr. nerez AISI 304), odolnosť, technické riešenia.
+  3. Prevádzkové výhody: úspora času/energie, štandardizácia procesov, hygiena HACCP a bezpečnosť.
+  4. Inštalácia, údržba a servis: pripojenie, čistenie, bežná starostlivosť.
+  5. Často kladené otázky (FAQ) – presne 4 až 5 praktických technických/prevádzkových otázok a odpovedí pre B2B zákazníka (elektrické zapojenie a napätie, pravidelná údržba/čistenie, gastro vyťaženie, kompatibilita). Otázky aj odpovede musia vychádzať z dodaných údajov (nič si nevymýšľaj).
+     HTML formátovanie FAQ na konci popisu:
+     `<h3>Často kladené otázky (FAQ)</h3>`
+     `<p><strong>Otázka: ...?</strong><br>Odpoveď: ...</p>`
+     (spolu presne 4 až 5 otázok a odpovedí)
+  6. Záver: odporúčané nasadenie a certifikácie.
+* Prirodzene začleň B2B SEO frázy („profesionálne gastro vybavenie“, „horeca“, „komerčná kuchyňa“).
+
+#### 🔹 3. SEO titulka (seoTitle)
+* Dĺžka: 50–60 znakov.
+* Názov produktu + kľúčová vlastnosť alebo kategória. Každá titulka musí byť výstižná a jedinečná.
+* Príklad: „Pracovný stôl GN1/1 so zásuvkami – nerezový nábytok“
+
+#### 🔹 4. SEO popis (metaDescription)
+* Dĺžka: 120–160 znakov.
+* Začni presne prefixom: `GastroPro.sk | `
+* Zhrň hlavné prednosti, určenie a výzvu k akcii (CTA).
+* Príklad: „GastroPro.sk | Robustný nerezový stôl GN1/1 so zásuvkami pre gastro prevádzky. Vysoká odolnosť, hygienické spracovanie, rýchle dodanie.“
+
+#### 🔹 5. Parametre pre parametrické filtre (parameters)
+* Extrahuj hodnoty pre očakávané parametre z názvu, popisov a `existingParameters`.
+* **Hodnota musí byť čisté číslo bez jednotky** (jednotka je v názve parametra, napr. pre „Šírka (mm)“ uveď „800“, nie „800 mm“).
+* Pre parametre s „(Áno/Nie)“ použi striktne hodnotu „Áno“ alebo „Nie“.
+* Ak parameter v údajoch spoľahlivo nenájdeš, kľúč do objektu vôbec neuvádzaj (žiadne odhady).
+* Extrahované parametre už zbytočne neopakuj v popise, e-shop ich spracuje ako samostatné tabuľkové filtre.
 
 ---
 
 ### 📥 **VSTUP**
-
-Dostaneš vstup ako **JSON pole** s nasledovnou štruktúrou:
-
+JSON pole s 1 produktom:
 ```json
 [
-{{
-    "code": "Katalógové číslo produktu",
+  {{
+    "code": "Katalógové číslo",
     "name": "Názov produktu",
-    "shortDescription": "Stručný existujúci popis",
-    "description": "Detailný popis alebo prázdne pole",
-    "existingParameters": {{"...": "už známe technické parametre (nepovinné pole)"}}
-}}
+    "shortDescription": "Existujúci krátky popis alebo prázdne",
+    "description": "Existujúci dlhý popis alebo prázdne",
+    "existingParameters": {{}}
+  }}
 ]
 ```
-
-* Ak produkt obsahuje `existingParameters`, využi tieto hodnoty na **odlíšenie textov od podobných produktov** – každý `shortDescription`, `description` aj `seoTitle` musí byť jedinečný, nie kópia textu susedného produktu s podobným názvom.
-
----
-
-### ✍️ **TVOJA ÚLOHA PRE KAŽDÝ PRODUKT**
-
-#### 🔹 1. **Krátky popis** (50–200 slov)
-
-* Zhrň v jednej vete základnú funkciu, použitie a zdôrazni hlavnú konkurenčnú výhodu
-* V zozname uveď dôležité parametre a technické údaje (výkon, rozmery, materiály)
-* Použi **HTML značky** (`<strong>`, `<br>`, `<ul>`, `<li>`, atď.)
-
-#### 🔹 2. **Dlhý popis** (200–600 slov)
-
-* Štruktúra:
-
-* Úvodný odstavec – pozicionovanie a účel produktu
-* Technické vlastnosti – výkony, rozmery, kapacita, materiály
-* Výhody pre prevádzku – úspora času, energie, štandardizácia, produktivita
-* Inštalácia a údržba – pripojenie, čistenie, servis
-* Záver – certifikácie, odporúčané použitie
-
-* Uvádzaj technické údaje (výkon, kapacita, materiály, rozmery)
-* Použi HTML značky (`<p>`, `<ul>`, `<li>`, `<strong>` atď.)
-* Prirodzene začleň SEO frázy:
-    * „profesionálne gastro vybavenie"
-    * „komerčná kuchyňa \\ [typ zariadenia]"
-    * „horeca \\ [kategória]"
-    * „\\ [značka] \\ [model] technické parametre"
-
----
-
-#### 🔹 3. SEO titulka
-
-* Dĺžka: 50–60 znakov
-* Obsahuje názov produktu/služby + značka, kategória alebo unikátna výhoda
-* Každá SEO titulka musí byť jedinečná
-* Príklad: „Pracovný stôl GN1/1 so zásuvkami – nerezový nábytok"
-
-#### 🔹 4. metaDescription: SEO popis
-
-* Dĺžka: 120–160 znakov
-* Pole "metaDescription" obsahuje SEO popis produktu
-* Obsahuje výhody, kľúčové parametre alebo použitie
-* Motivuje k akcii (napr. Objednajte online, Vyskúšajte zdarma, Zistite viac)
-* Pridaj prefix "GastroPro.sk | "
-* Príklad: „GastroPro.sk | Robustný nerezový stôl GN1/1 so zásuvkami pre gastro prevádzky. Vysoká odolnosť, hygienické spracovanie, rýchle dodanie."
-
-#### 🔹 5. Parametre pre parametrické filtrovanie (parameters)
-
-* Ak boli v inštrukciách zadané očakávané parametre, tvojou úlohou je vyextrahovať tieto konkrétne technické parametre z názvu a popisov produktu (vrátane `existingParameters`).
-* Vytvor nový JSON objekt `"parameters"` a ulož do neho nájdené kľúče z očakávaných parametrov a ich zistené hodnoty.
-* Hodnoty by mali byť stručné a štandardizované (napr. iba "230" pre Napätie (V), alebo "Nerez" pre Materiál). Nevpisuj tam celé vety!
-* **Jednotka je už uvedená v názve parametra** (napr. "Šírka (mm)", "Príkon (W)") – hodnota musí byť **iba čisté číslo bez jednotky** (napr. "800", nie "800 mm"). Rozmery uvádzaj v jednotke z názvu parametra.
-* Pre parametre s "(Áno/Nie)" v názve použi presne hodnotu "Áno" alebo "Nie".
-* Používaj presne tie názvy parametrov (kľúče), ktoré boli zadané v inštrukciách – nevymýšľaj vlastné.
-* Ak niektorý parameter nevieš v názve ani popisoch spoľahlivo nájsť, jednoducho tento kľúč do objektu `"parameters"` vôbec nezaraďuj – **žiadne odhady**.
-* Extrahované parametre z tohto objektu už NESPOMÍNAJ v poliach `shortDescription` ani `description` (ak to nie je nevyhnutné pre plynulosť textu), nakoniec ich eshop spracuje ako samostatné tabuľkové vlastnosti.
 
 ---
 
 ### 📤 **VÝSTUP**
-
-**Presne to isté JSON pole** s všetkými produktmi ale s vylepšenými poľami:
-
-* `"shortDescription"` (HTML),
-* `"description"` (HTML),
-* `"seoTitle"`,
-* `"metaDescription"`,
-* `"parameters"` (objekt s extrahovanými parametrami, ak boli požadované),
-
-**DÔLEŽITÉ: Výstup musí byť validný JSON - skontroluj čiarky, úvodzovky a zátvorky!**
-
-**Výstup musí byť IBA čisté JSON pole – žiadne komentáre, vysvetlenia, úvodný ani záverečný text. Nezačínaj s ```json a nekončí s ```.**
-
+IBA čisté validné JSON pole s 1 vylepšeným produktom bez úvodného/záverečného textu a bez ```json:
 ```json
-{{
-    "code": "Katalógové číslo produktu",
+[
+  {{
+    "code": "Katalógové číslo",
     "name": "Názov produktu",
-    "shortDescription": "<strong>Profesionálne ...</strong><br>...",
-    "description": "<p>...</p><ul><li>...</li></ul>",
-    "seoTitle": "....",
-    "metaDescription": "....",
-    "parameters": {{
-        "Napätie (V)": "230",
-        "Materiál": "Nerez"
-    }}
-}}
+    "shortDescription": "<strong>...</strong><br>...",
+    "description": "<p>...</p><h3>Často kladené otázky (FAQ)</h3><p><strong>Otázka: ...?</strong><br>Odpoveď: ...</p>",
+    "seoTitle": "...",
+    "metaDescription": "GastroPro.sk | ...",
+    "parameters": {{}}
+  }}
 ]
 ```
-
----
-
-### ✅ **KONTROLA PRED VÝSTUPOM**
-
-* [ ] Popisy sú profesionálne a technicky správne
-* [ ] Obsahujú HTML značky
-* [ ] Obsahujú relevantné SEO prvky (title, metaDescription)
-* [ ] Nie sú prítomné žiadne duplicity ani nerelevantné frázy
-* [ ] Krátky popis má 50-200 slov
-* [ ] Dlhý popis má 200-600 slov
-* [ ] SEO titulka má 50-60 znakov
-* [ ] metaDescription má 120-160 znakov
-* [ ] Objekt `"parameters"` obsahuje iba vyžiadané parametre so zmysluplnými číselnými/textovými hodnotami
-* [ ] Výstup je čistý JSON bez akýchkoľvek iných prvkov
 """
 
 
@@ -264,7 +214,7 @@ def create_system_prompt_no_dimensions(category_name: str = "", expected_paramet
 * **NEUVÁDZAJ** konkrétne číselné rozmery produktu (napr. 1000x500x800 mm).
 * Ak by si chcel uviesť objem, **NEUVÁDZAJ** konkrétnu hodnotu. Namiesto toho použi vetu: "Objem sa mení v závislosti na zvolenej variante tovaru".
 * Ostatné technické parametre (napríklad výkon, napätie) **MÔŽEŠ** uvádzať.
-* Toto platí pre všetky polia: `shortDescription`, `description`, `seoTitle`, `metaDescription`.
+* Toto platí pre všetky polia: `shortDescription`, `description`, `seoTitle`, `metaDescription` (vrátane všetkých otázok a odpovedí v sekcii FAQ).
 
 ---
 """

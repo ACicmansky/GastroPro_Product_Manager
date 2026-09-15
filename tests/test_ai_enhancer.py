@@ -355,3 +355,18 @@ def test_gemini_client_defaults_to_gemini_3_8_flash():
 
     client = GeminiClient({})
     assert client.model_name == "gemini-3.8-flash"
+
+
+def test_system_prompts_include_faq_generation():
+    """Prompts instruct LLM to generate 4-5 FAQs in description and variants respect negative constraints."""
+    from src.ai.prompts import create_system_prompt, create_system_prompt_no_dimensions
+
+    standard_prompt = create_system_prompt("Gastro", ["Šírka (mm)"])
+    assert "Často kladené otázky (FAQ)" in standard_prompt
+    assert "4 až 5 praktických" in standard_prompt
+    assert "<h3>Často kladené otázky (FAQ)</h3>" in standard_prompt
+    assert "300–800 slov" in standard_prompt
+
+    variant_prompt = create_system_prompt_no_dimensions("Gastro", ["Šírka (mm)"])
+    assert "Často kladené otázky (FAQ)" in variant_prompt
+    assert "vrátane všetkých otázok a odpovedí v sekcii FAQ" in variant_prompt
