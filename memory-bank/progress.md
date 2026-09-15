@@ -54,6 +54,20 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Category Prefix Removal ("Tovary a kategórie > ")**
+  - Removed all enforcement and prepending of `"Tovary a kategórie > "` across the entire project.
+  - `OutputTransformer`: Formats categories by replacing `/` with ` > ` and strips any legacy `"Tovary a kategórie > "` prefix.
+  - `BatchOrchestrator`: `_category_of(row)` and `_get_expected_params(cat)` strip legacy prefix so lookup against `categories_with_parameters.json` succeeds directly.
+  - `SettingsDialog`: Category tree and product count masking operate directly on category names without prefix.
+  - Removed obsolete `update_categories.py`.
+  - Cleaned invalid mapping entry in `categories.json`.
+  - All 244 unit, integration, and UI tests pass cleanly.
+
+- ✅ **Authoritative Live Categories & Ponytail Cleanup**
+  - Enforced that live website categories (from input files and core database products) are permanently authoritative: preserved as-is, never questioned, and recognized as valid target categories.
+  - Deleted obsolete, unreferenced `unique_categories.txt`.
+  - Pruned redundant GUI checkboxes/buttons (*"Vnútiť kategórie zo vstupného súboru"*, etc.) in favor of always-on safe defaults.
+  - Test suite: **244 tests passing** via `uv run poe check`.
 - ✅ **Single-Product Prompt Optimization (Prompt Engineering Patterns)**
   - Redesigned `create_system_prompt()` in `src/ai/prompts.py` using expert prompt engineering patterns (Instruction Hierarchy, direct singular focus, quality principles).
   - Eliminated legacy plural batch phrasing and redundant checklists, streamlining input token payload by ~250–350 tokens per product.

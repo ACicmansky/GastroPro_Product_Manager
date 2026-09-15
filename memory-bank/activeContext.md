@@ -12,6 +12,24 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
 - **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
 
+## Recent Changes (2026-09-15 — Category Prefix Removal "Tovary a kategórie > ")
+- Removed all enforcement and addition of `"Tovary a kategórie > "` prefix project-wide.
+- `OutputTransformer.transform_category`: Formats categories by replacing `"/"` with `" > "` and strips any legacy `"Tovary a kategórie > "` prefix.
+- `BatchOrchestrator`: `_category_of(row)` and `_get_expected_params(cat)` strip legacy `"Tovary a kategórie > "` prefix so lookups match keys in `categories_with_parameters.json`.
+- `SettingsDialog`: Category tree view and product count masking operate directly on category names without prefix.
+- Deleted obsolete script `update_categories.py`.
+- Cleaned legacy invalid mapping `"" -> "Tovary a kategórie >"` in `categories.json`.
+- Updated test suites across `test_output_transformer.py`, `test_ai_enhancer.py`, `test_category_scoped_ai.py`, `test_gui_window.py`, `test_integration_pipeline.py`, `test_scraper_new_format.py`, `test_topchladenie_scraper.py`, and `test_category_filter.py`.
+- Suite: **244 tests passing** via `uv run poe check`.
+
+## Recent Changes (2026-09-15 — Authoritative Live Categories & Ponytail Cleanup)
+- Enforced live website categories (from uploaded input file and DB `source="core"` products) as permanently authoritative: never remapped and never prompted.
+- Deleted obsolete, unreferenced `unique_categories.txt` file.
+- `CategoryService`: `file_categories` are recognized as valid targets in `is_target_category` and `get_unique_target_categories`, and preserved as-is in `map_or_ask`.
+- `Pipeline`: Automatically registers unique categories from both input file (`main_df`) and core DB products (`db_df`).
+- `MainWindow` & `CategoryMappingDialog`: Removed redundant category forcing checkboxes and buttons; live categories are preserved by default.
+- Suite: **244 tests passing** via `uv run poe check`.
+
 ## Recent Changes (2026-09-15 — Single-Product Prompt Optimization via Prompt Engineering)
 - Redesigned `create_system_prompt()` in `src/ai/prompts.py` using core prompt engineering patterns (Instruction Hierarchy, singular framing, and redundancy removal).
 - Converted prompt from legacy multi-product batch phrasing to laser-focused single-product generation, eliminating confusion from cross-product references.
