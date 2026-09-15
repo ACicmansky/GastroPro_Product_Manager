@@ -233,6 +233,35 @@ class TestPipelineWithMainData:
         assert not callback_called
         assert res.product_count == 1
 
+    def test_pipeline_preserves_db_core_categories_without_file(self, config, tmp_path):
+        """Test that pipeline running without main file preserves DB core categories."""
+        from src.pipeline.pipeline import Pipeline
+        from src.domain.models import PipelineOptions
+
+        pipeline = Pipeline(config)
+        pipeline.db.upsert(
+            pd.DataFrame(
+                {
+                    "code": ["CORE_TEST_001"],
+                    "name": ["Core DB Product"],
+                    "defaultCategory": ["Kategória Z Databázy"],
+                    "source": ["core"],
+                }
+            )
+        )
+
+        callback_called = False
+
+        def callback(old_cat, product_name):
+            nonlocal callback_called
+            callback_called = True
+            return "Remapped"
+
+        options = PipelineOptions(main_file_path="", enabled_feeds=[])
+        res = pipeline.run(options, on_unknown_category=callback)
+        assert not callback_called
+        assert res.product_count >= 1
+
 
 class TestPipelineOutput:
     """Test pipeline output and saving."""

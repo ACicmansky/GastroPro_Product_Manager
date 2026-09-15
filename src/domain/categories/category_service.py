@@ -31,7 +31,7 @@ class CategoryService:
         self._mappings: dict[str, str] = {}
         self._session_mappings: dict[str, str] = {}
         self.file_categories: set[str] = set()
-        self.force_file_categories: bool = False
+        self.force_file_categories: bool = True
         self._interactive_callback: Optional[Callable[[str, Optional[str]], str]] = None
         self._load()
 
@@ -99,13 +99,12 @@ class CategoryService:
     def map_or_ask(self, old_category: str, product_name: Optional[str] = None) -> str:
         """Map a category, using interactive callback if mapping is unknown.
 
-        If force_file_categories is enabled and the category comes from the input file,
-        returns it as-is without invoking the callback.
+        Categories from the live input file are authoritative and preserved as-is.
         If the category is already a known target, returns it as-is.
         If no callback is set, returns the original category unchanged.
         """
-        # Force names from input file if requested
-        if self.force_file_categories and old_category in self.file_categories:
+        # Live website / input file categories are always preserved as-is
+        if old_category in self.file_categories:
             self._session_mappings[old_category] = old_category
             return old_category
 
@@ -164,20 +163,29 @@ class CategoryService:
 
     def get_unique_target_categories(self) -> List[str]:
         """Return sorted list of unique target (new) category names."""
-        return sorted(set(self._mappings.values()))
+        targets = set(self._mappings.values()) | self.file_categories
+        return sorted(targets)
 
     def is_target_category(self, category: str) -> bool:
-        """Check if a category is already in new/target format.
+        """Check if a category is already a valid target category.
 
         Recognized if either:
         - It appears as a value in existing mappings, or
-        - It uses the new-format prefix "Tovary a kategórie > ".
+        - It comes from the live website / input file.
         """
         if not category:
             return False
-        if category.startswith("Tovary a kategórie > "):
-            return True
-        return category in set(self._mappings.values())
+        clean = (
+            category[len("Tovary a kategórie > ") :].strip()
+            if category.startswith("Tovary a kategórie > ")
+            else category
+        )
+        return (
+            clean in self.file_categories
+            or clean in set(self._mappings.values())
+            or category in self.file_categories
+            or category in set(self._mappings.values())
+        )
 
     def set_interactive_callback(self, callback: Optional[Callable[[str, Optional[str]], str]]):
         """Set callback for interactive category mapping.

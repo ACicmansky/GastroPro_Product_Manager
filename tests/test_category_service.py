@@ -138,3 +138,25 @@ class TestCategoryServiceForceFileCategories:
         res2 = service.map_or_ask("Vlastná Kategória", "Produkt 2")
         assert res2 == "Vlastná Kategória"
         assert call_count == 1
+
+    def test_file_categories_are_recognized_as_targets(self, mappings_file):
+        service = CategoryService(mappings_file)
+        service.set_file_categories(["Kategória Z Webstránky"])
+        assert service.is_target_category("Kategória Z Webstránky")
+        assert "Kategória Z Webstránky" in service.get_unique_target_categories()
+
+    def test_file_categories_preserved_by_default_without_force_flag(self, mappings_file):
+        service = CategoryService(mappings_file)
+        service.set_file_categories(["Kategória Z Eshopu"])
+
+        callback_called = False
+
+        def callback(old_cat, product_name):
+            nonlocal callback_called
+            callback_called = True
+            return "Mapped"
+
+        service.set_interactive_callback(callback)
+        res = service.map_or_ask("Kategória Z Eshopu", "Produkt 1")
+        assert res == "Kategória Z Eshopu"
+        assert not callback_called

@@ -103,13 +103,23 @@ class Pipeline:
         if main_df.empty and not db_df.empty:
             main_df = db_df
 
+        # Register live website categories (input file and existing core DB products)
+        live_categories = set()
+        if not db_df.empty and "defaultCategory" in db_df.columns:
+            core_mask = (db_df["source"] == "core") if "source" in db_df.columns else slice(None)
+            live_categories.update(
+                str(c).strip()
+                for c in db_df.loc[core_mask, "defaultCategory"].dropna().unique()
+                if str(c).strip() and str(c).strip().lower() != "nan"
+            )
         if not main_df.empty and "defaultCategory" in main_df.columns:
-            file_categories = {
+            live_categories.update(
                 str(c).strip()
                 for c in main_df["defaultCategory"].dropna().unique()
                 if str(c).strip() and str(c).strip().lower() != "nan"
-            }
-            self.category_service.set_file_categories(file_categories)
+            )
+        if live_categories:
+            self.category_service.set_file_categories(live_categories)
         self.category_service.set_force_file_categories(options.force_file_categories)
 
         # 3. Parse XML feeds
