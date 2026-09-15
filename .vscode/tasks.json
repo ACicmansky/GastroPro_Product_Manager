@@ -1,0 +1,74 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run App (poe run)",
+            "type": "shell",
+            "command": "uv run poe run",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared",
+                "focus": true
+            }
+        },
+        {
+            "label": "Check Code & Fast Tests (poe check)",
+            "type": "shell",
+            "command": "uv run poe check",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Run All Tests (poe test:fast)",
+            "type": "shell",
+            "command": "uv run poe test:fast",
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Run Test Coverage (poe test:cov)",
+            "type": "shell",
+            "command": "uv run poe test:cov",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Auto-fix Lint & Formatting (poe lint:fix)",
+            "type": "shell",
+            "command": "uv run poe lint:fix && uv run poe format",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "silent",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "Build Standalone Executable (poe build)",
+            "type": "shell",
+            "command": "uv run poe build",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        }
+    ]
+}
