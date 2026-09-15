@@ -17,6 +17,7 @@ from typing import Dict, Optional, Tuple, Callable
 import pandas as pd
 
 from .api_client import GeminiClient
+from .pruning import prune_text
 from .result_parser import ResultParser
 from .run_control import RunControl
 from .prompts import (
@@ -62,6 +63,8 @@ class BatchOrchestrator:
         self.chunk_size = ai_config.get("chunk_size", 500)
         self.poll_failure_limit = ai_config.get("poll_failure_limit", 20)
         self.thinking_level = ai_config.get("thinking_level")
+        self.max_desc_chars = ai_config.get("max_desc_chars", 1200)
+        self.max_short_desc_chars = ai_config.get("max_short_desc_chars", 500)
         os.makedirs(self.tmp_dir, exist_ok=True)
 
         self.category_parameters = load_category_parameters()
@@ -454,7 +457,9 @@ class BatchOrchestrator:
                 {
                     "code": str(row.get("code", "")),
                     "name": str(row.get("name", "")),
-                    "shortDescription": str(row.get("shortDescription", "")),
+                    "shortDescription": prune_text(
+                        row.get("shortDescription", ""), max_chars=self.max_short_desc_chars
+                    ),
                     "chybajuce_parametre": missing,
                 }
             )
@@ -537,8 +542,10 @@ class BatchOrchestrator:
                     product = {
                         "code": str(row.get("code", "")),
                         "name": str(row.get("name", "")),
-                        "shortDescription": str(row.get("shortDescription", "")),
-                        "description": str(row.get("description", "")),
+                        "shortDescription": prune_text(
+                            row.get("shortDescription", ""), max_chars=self.max_short_desc_chars
+                        ),
+                        "description": prune_text(row.get("description", ""), max_chars=self.max_desc_chars),
                     }
                     # Known params differentiate copy for near-identical variants
                     existing = {

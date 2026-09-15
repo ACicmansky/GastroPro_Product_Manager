@@ -54,6 +54,11 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Input Pruning for Token Optimization**
+  - Created `prune_text` utility (`src/ai/pruning.py`) to strip bloated HTML tags, unescape entities, preserve semantic structure, and truncate on word boundaries.
+  - Integrated pruning into `BatchOrchestrator` payload generation, capping incoming `description` at 1,200 chars and `shortDescription` at 500 chars.
+  - Achieved a **37.8% reduction** in raw description characters across the 9,694-product catalog (saving ~1.8M – 2.2M input tokens).
+  - Added 6 unit tests in `tests/test_pruning.py`, bringing total suite to **240 tests passing**.
 - ✅ **Upgrade AI Model to Gemini 3.8 Flash & Thinking Level Configuration**
   - Upgraded model from `gemini-2.5-flash-lite` to `gemini-3.8-flash` in `config.json` and `GeminiClient`.
   - Added configurable `thinking_level` setting (`"medium"` user-selected default) across config, BatchOrchestrator, and SettingsDialog.

@@ -181,7 +181,8 @@ The application is organized into a `src` package to ensure clear separation of 
 
 ## AI Enhancement Architecture
 
-- **Model**: `gemini-3.8-flash` (with configurable `thinking_level`, defaulting to `"medium"`) via the asynchronous **Gemini Batch API** (`client.batches.create`) — JSONL requests built per category with structured output JSON schema, uploaded, polled every 30s until completion.
+- **Model**: `gemini-3.8-flash` (with configurable `thinking_level`, defaulting to `"low"` / `"medium"`) via the asynchronous **Gemini Batch API** (`client.batches.create`) — JSONL requests built per category with structured output JSON schema, uploaded, polled every 30s until completion.
+- **Input Pruning**: Raw XML feed descriptions and short descriptions are automatically stripped of HTML tags, entities unescaped, and truncated on word boundaries (`max_desc_chars: 1200`, `max_short_desc_chars: 500`) to reduce input tokens by ~38%.
 - **Content Outputs**: B2B short/long descriptions (HTML) plus SEO metadata and `filteringProperty:{parameter}` columns per category.
 - **Dual Prompts**: Products with `pairCode` (variants) get dimension-free prompts; standard products get the full prompt.
 - **Job Tracking**: `batch_jobs` SQLite table; interrupted jobs resume automatically inside `BatchOrchestrator.process()`.

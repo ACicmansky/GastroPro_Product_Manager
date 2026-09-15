@@ -1,23 +1,28 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-15 (Upgrade AI model to Gemini 3.8 Flash with configurable thinking depth)*
+*Last updated: 2026-09-15 (Input pruning optimization & Gemini 3.8 Flash upgrade)*
 
 ## Current State
 The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
 - **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
-- **Testing & QA**: 234 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Testing & QA**: 240 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
 - **Type Safety**: `PyQt5-stubs` installed and `pyrightconfig.json` calibrated with `.venv` and path exclusions.
 - **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching on `windows-latest`.
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
 - **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
 
+## Recent Changes (2026-09-15 — Input Pruning Optimization & Token Savings)
+- Implemented intelligent input pruning utility (`src/ai/pruning.py`, `prune_text`): strips bloated HTML tags, unescapes entities, preserves semantic linebreaks, and truncates text on word boundaries.
+- Integrated input pruning into `BatchOrchestrator._build_category_requests` and `_build_missing_param_requests`, capping incoming `description` to 1,200 chars and `shortDescription` to 500 chars (`max_desc_chars` / `max_short_desc_chars` in `config.json`).
+- Cuts catalog raw description characters from 14.3M down to 8.9M (a **37.8% reduction**, saving ~1.8M – 2.2M input tokens).
+- Suite: 240 tests passing (`test:fast` in ~9s).
+
 ## Recent Changes (2026-09-15 — Upgrade to Gemini 3.8 Flash & Thinking Level Configuration)
 - Upgraded default AI model from `gemini-2.5-flash-lite` to Google's reasoning model `gemini-3.8-flash` in `config.json` and `GeminiClient`.
-- Integrated `thinking_level` setting (`"medium"` user-selected default, `"low"` / `"high"` selectable) into `config.json`, `BatchOrchestrator`, and `SettingsDialog` GUI.
-- `BatchOrchestrator` now serializes `"thinkingConfig": {"thinkingLevel": "MEDIUM"}` into batch JSONL `generationConfig` payloads.
-- Measured catalog token requirements across 9,694 products (~5.8M input tokens, ~8.1M content output tokens) with estimated Batch API cost of ~$23.74 USD (~€22.00 EUR).
-- Suite: 234 tests passing (`test:fast` in ~10s).
+- Integrated `thinking_level` setting (`"low"` configured, selectable in GUI) into `config.json`, `BatchOrchestrator`, and `SettingsDialog` GUI.
+- `BatchOrchestrator` serializes `"thinkingConfig": {"thinkingLevel": "LOW"}` into batch JSONL `generationConfig` payloads.
+- Suite: 240 tests passing.
 
 ## Recent Changes (2026-09-14 — Force category names from input file & "Apply to All" checkbox)
 - Implemented option to force category names from the input file when mapping categories (see `journal/2026_09_14_force_input_file_categories.md`).

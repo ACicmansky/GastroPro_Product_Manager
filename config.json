@@ -146,14 +146,16 @@
   "ai_enhancement": {
     "enabled": true,
     "model": "gemini-3.8-flash",
-    "thinking_level": "medium",
-    "batch_size": 15,
+    "thinking_level": "low",
+    "batch_size": 35,
     "temperature": 0,
     "retry_attempts": 3,
     "retry_delay": 60,
     "max_parallel_calls": 10,
     "chunk_size": 500,
-    "poll_failure_limit": 20
+    "poll_failure_limit": 20,
+    "max_desc_chars": 1200,
+    "max_short_desc_chars": 500
   },
   "db_path": "data/products.db"
 }
