@@ -317,3 +317,41 @@ class TestAIEnhancementConfiguration:
         assert "retry_attempts" in ai_config
         assert "retry_delay" in ai_config
         assert ai_config["retry_attempts"] > 0
+
+    def test_ai_model_and_thinking_level(self, config):
+        """Test model is gemini-3.8-flash and thinking_level is set."""
+        ai_config = config["ai_enhancement"]
+        assert ai_config["model"] == "gemini-3.8-flash"
+        assert ai_config.get("thinking_level") in ("low", "medium", "high")
+
+
+def test_batch_orchestrator_builds_thinking_config():
+    """BatchOrchestrator includes thinkingConfig in generationConfig when configured."""
+    from src.ai.batch_orchestrator import BatchOrchestrator
+
+    class DummyClient:
+        is_available = True
+        model_name = "gemini-3.8-flash"
+
+    orch = BatchOrchestrator(
+        client=DummyClient(),
+        result_parser=None,
+        config={"ai_enhancement": {"thinking_level": "medium", "batch_size": 10}},
+    )
+
+    df = pd.DataFrame([{"code": "P1", "name": "Item 1", "defaultCategory": "Tovary a kategórie > Gastro"}])
+    requests = []
+    orch._build_category_requests(df, {0}, requests, is_group1=False)
+
+    assert len(requests) == 1
+    gen_cfg = requests[0]["request"]["generationConfig"]
+    assert "thinkingConfig" in gen_cfg
+    assert gen_cfg["thinkingConfig"]["thinkingLevel"] == "MEDIUM"
+
+
+def test_gemini_client_defaults_to_gemini_3_8_flash():
+    """GeminiClient defaults to gemini-3.8-flash when not specified."""
+    from src.ai.api_client import GeminiClient
+
+    client = GeminiClient({})
+    assert client.model_name == "gemini-3.8-flash"

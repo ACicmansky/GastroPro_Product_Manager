@@ -32,7 +32,7 @@ from src.data.database.product_db import ProductDB
 
 logger = logging.getLogger(__name__)
 
-KNOWN_MODELS = ["gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro"]
+KNOWN_MODELS = ["gemini-3.8-flash", "gemini-2.5-flash-lite", "gemini-2.5-flash", "gemini-2.5-pro"]
 
 TARGET_PREFIX = "Tovary a kategórie > "
 
@@ -168,6 +168,11 @@ class SettingsDialog(QDialog):
         self.model_combo.addItems(KNOWN_MODELS)
         self.model_combo.setCurrentText(ai.get("model", KNOWN_MODELS[0]))
         form.addRow("Model:", self.model_combo)
+
+        self.thinking_level_combo = QComboBox()
+        self.thinking_level_combo.addItems(["medium", "low", "high"])
+        self.thinking_level_combo.setCurrentText(ai.get("thinking_level", "medium"))
+        form.addRow("Hĺbka uvažovania:", self.thinking_level_combo)
 
         def spin(minimum, maximum, value, suffix=""):
             box = QSpinBox()
@@ -443,6 +448,7 @@ class SettingsDialog(QDialog):
 
         ai = self.config.setdefault("ai_enhancement", {})
         ai["model"] = self.model_combo.currentText().strip()
+        ai["thinking_level"] = self.thinking_level_combo.currentText().strip()
         ai["batch_size"] = self.batch_size_spin.value()
         ai["retry_attempts"] = self.retry_attempts_spin.value()
         ai["retry_delay"] = self.retry_delay_spin.value()

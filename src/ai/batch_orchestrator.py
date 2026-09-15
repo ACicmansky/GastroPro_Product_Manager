@@ -61,6 +61,7 @@ class BatchOrchestrator:
         self.tmp_dir = ai_config.get("tmp_dir", os.path.join("out", "batch_requests"))
         self.chunk_size = ai_config.get("chunk_size", 500)
         self.poll_failure_limit = ai_config.get("poll_failure_limit", 20)
+        self.thinking_level = ai_config.get("thinking_level")
         os.makedirs(self.tmp_dir, exist_ok=True)
 
         self.category_parameters = load_category_parameters()
@@ -465,6 +466,10 @@ class BatchOrchestrator:
             for i in range(0, len(products), self.batch_size):
                 chunk = products[i : i + self.batch_size]
                 product_count += len(chunk)
+                gen_cfg = {"temperature": self.temperature}
+                if self.thinking_level:
+                    gen_cfg["thinkingConfig"] = {"thinkingLevel": self.thinking_level.upper()}
+
                 jsonl_requests.append(
                     {
                         "key": f"fill_{hash(cat_name)}_{i}",
@@ -473,7 +478,7 @@ class BatchOrchestrator:
                             "contents": [{"role": "user", "parts": [{"text": json.dumps(chunk, ensure_ascii=False)}]}],
                             # ponytail: no responseMimeType — google_search + JSON mime conflict; parser strips fences
                             "tools": [{"google_search": {}}],
-                            "generationConfig": {"temperature": self.temperature},
+                            "generationConfig": gen_cfg,
                         },
                     }
                 )
@@ -547,6 +552,14 @@ class BatchOrchestrator:
 
                 if products:
                     req_key = f"req_{'g1' if is_group1 else 'g2'}_{hash(cat_name)}_{i}"
+                    gen_cfg = {
+                        "temperature": self.temperature,
+                        "responseMimeType": "application/json",
+                        "responseSchema": build_response_schema(expected_params),
+                    }
+                    if self.thinking_level:
+                        gen_cfg["thinkingConfig"] = {"thinkingLevel": self.thinking_level.upper()}
+
                     jsonl_requests.append(
                         {
                             "key": req_key,
@@ -555,11 +568,7 @@ class BatchOrchestrator:
                                 "contents": [
                                     {"role": "user", "parts": [{"text": json.dumps(products, ensure_ascii=False)}]}
                                 ],
-                                "generationConfig": {
-                                    "temperature": self.temperature,
-                                    "responseMimeType": "application/json",
-                                    "responseSchema": build_response_schema(expected_params),
-                                },
+                                "generationConfig": gen_cfg,
                             },
                         }
                     )

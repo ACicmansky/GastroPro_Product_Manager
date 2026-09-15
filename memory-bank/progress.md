@@ -54,6 +54,12 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Upgrade AI Model to Gemini 3.8 Flash & Thinking Level Configuration**
+  - Upgraded model from `gemini-2.5-flash-lite` to `gemini-3.8-flash` in `config.json` and `GeminiClient`.
+  - Added configurable `thinking_level` setting (`"medium"` user-selected default) across config, BatchOrchestrator, and SettingsDialog.
+  - Wired `thinkingConfig` serialization into batch JSONL `generationConfig` requests.
+  - Calculated precise full-catalog token metrics (9,694 products, ~5.8M input, ~8.1M output tokens, projected cost ~$23.74 USD / ~€22.00 EUR).
+  - Added 3 new unit tests, total test suite: 234 tests passing in ~10s.
 - ✅ **Force Category Names from Input File & "Apply to All" Option**
   - Added option to force original category names from the uploaded input file, bypassing interactive category mapping prompts.
   - Added "Aplikovať na všetky kategórie zo súboru" checkbox and "📁 Vnútiť názov zo súboru" button in `CategoryMappingDialog`.

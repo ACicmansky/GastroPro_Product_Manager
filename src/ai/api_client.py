@@ -22,7 +22,7 @@ class GeminiClient:
 
         ai_config = config.get("ai_enhancement", {})
         self.api_key = os.getenv("GOOGLE_API_KEY") or ai_config.get("api_key", "")
-        self.model_name = ai_config.get("model", "gemini-2.5-flash-lite")
+        self.model_name = ai_config.get("model", "gemini-3.8-flash")
         self.temperature = ai_config.get("temperature", 0.1)
         self.retry_delay = ai_config.get("retry_delay", 60)
         self.retry_attempts = ai_config.get("retry_attempts", 3)

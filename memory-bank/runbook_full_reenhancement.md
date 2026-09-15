@@ -13,7 +13,7 @@ Goal: every product gets deterministic filter values (currently 0 of 5,691 "enha
 - `pip install -r requirements.txt` (fixed 2026-07-07: `google-genai`, not `google-generativeai`).
 - `.env` has `GOOGLE_API_KEY`.
 - Optional consistency tweak: `config.json` → `ai_enhancement.batch_size: 15` (currently 30). Smaller batches = more consistent outputs, more requests.
-- Model stays `gemini-2.5-flash-lite` (A/B verdict: 3.1-flash-lite filled fewer params + factual errors).
+- Model: `gemini-3.8-flash` (with `thinking_level: "medium"`, estimated ~$23.74 USD / ~€22.00 EUR for all 9,694 products via Batch API).
 
 ## 1. Choose input
 - **Simplest**: `2026_04_08_GastroPro_repaired.xlsx` (Downloads) — categories already backfilled.
