@@ -19,11 +19,11 @@ def sample_data():
             "name": ["Product 1", "Product 2", "Product 3", "Product 4", "Product 5"],
             "price": ["100", "200", "300", "400", "500"],
             "defaultCategory": [
-                "Tovary a kategórie > Chladenie > Chladničky",
-                "Tovary a kategórie > Chladenie > Mrazničky",
-                "Tovary a kategórie > Chladenie > Chladničky",
-                "Tovary a kategórie > Gastro > Sporáky",
-                "Tovary a kategórie > Gastro > Rúry",
+                "Chladenie > Chladničky",
+                "Chladenie > Mrazničky",
+                "Chladenie > Chladničky",
+                "Gastro > Sporáky",
+                "Gastro > Rúry",
             ],
         }
     )
@@ -53,10 +53,10 @@ class TestCategoryExtraction:
 
         # Should return unique, sorted categories
         assert len(categories) == 4
-        assert "Tovary a kategórie > Chladenie > Chladničky" in categories
-        assert "Tovary a kategórie > Chladenie > Mrazničky" in categories
-        assert "Tovary a kategórie > Gastro > Sporáky" in categories
-        assert "Tovary a kategórie > Gastro > Rúry" in categories
+        assert "Chladenie > Chladničky" in categories
+        assert "Chladenie > Mrazničky" in categories
+        assert "Gastro > Sporáky" in categories
+        assert "Gastro > Rúry" in categories
 
     def test_extract_categories_sorted(self, sample_data):
         """Test categories are returned sorted."""
@@ -96,9 +96,9 @@ class TestCategoryExtraction:
             {
                 "code": ["PROD001", "PROD002", "PROD003"],
                 "defaultCategory": [
-                    "Tovary a kategórie > Category 1",
+                    "Category 1",
                     None,
-                    "Tovary a kategórie > Category 2",
+                    "Category 2",
                 ],
             }
         )
@@ -118,9 +118,9 @@ class TestCategoryExtraction:
             {
                 "code": ["PROD001", "PROD002", "PROD003"],
                 "defaultCategory": [
-                    "Tovary a kategórie > Category 1",
+                    "Category 1",
                     "",
-                    "Tovary a kategórie > Category 2",
+                    "Category 2",
                 ],
             }
         )
@@ -142,10 +142,10 @@ class TestCategorySearch:
 
         filter = CategoryFilter()
         categories = [
-            "Tovary a kategórie > Chladenie > Chladničky",
-            "Tovary a kategórie > Chladenie > Mrazničky",
-            "Tovary a kategórie > Gastro > Sporáky",
-            "Tovary a kategórie > Gastro > Rúry",
+            "Chladenie > Chladničky",
+            "Chladenie > Mrazničky",
+            "Gastro > Sporáky",
+            "Gastro > Rúry",
         ]
 
         result = filter.search_categories(categories, "Chladenie")
@@ -160,8 +160,8 @@ class TestCategorySearch:
 
         filter = CategoryFilter()
         categories = [
-            "Tovary a kategórie > Chladenie > Chladničky",
-            "Tovary a kategórie > Gastro > Sporáky",
+            "Chladenie > Chladničky",
+            "Gastro > Sporáky",
         ]
 
         result = filter.search_categories(categories, "chladenie")
@@ -176,8 +176,8 @@ class TestCategorySearch:
 
         filter = CategoryFilter()
         categories = [
-            "Tovary a kategórie > Chladenie > Chladničky",
-            "Tovary a kategórie > Gastro > Sporáky",
+            "Chladenie > Chladničky",
+            "Gastro > Sporáky",
         ]
 
         result = filter.search_categories(categories, "")
@@ -191,8 +191,8 @@ class TestCategorySearch:
 
         filter = CategoryFilter()
         categories = [
-            "Tovary a kategórie > Chladenie > Chladničky",
-            "Tovary a kategórie > Gastro > Sporáky",
+            "Chladenie > Chladničky",
+            "Gastro > Sporáky",
         ]
 
         result = filter.search_categories(categories, "Nonexistent")

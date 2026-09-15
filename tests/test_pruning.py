@@ -72,7 +72,7 @@ def test_batch_orchestrator_prunes_input_descriptions():
             {
                 "code": "TEST01",
                 "name": "Názov",
-                "defaultCategory": "Tovary a kategórie > Gastro",
+                "defaultCategory": "Gastro",
                 "shortDescription": long_html_sdesc,
                 "description": long_html_desc,
             }

@@ -2904,10 +2904,6 @@
     "newCategory": "Gastro Prevádzky a Profesionáli > Nerezový nábytok"
   },
   {
-    "oldCategory": "",
-    "newCategory": "Tovary a kategórie >"
-  },
-  {
     "oldCategory": "Chladiace vitríny - pultové ",
     "newCategory": "Gastro Prevádzky a Profesionáli > Vitríny > Chladiace vitríny"
   },
@@ -2918,5 +2914,13 @@
   {
     "oldCategory": "Planetárny mixér ",
     "newCategory": "Gastro Prevádzky a Profesionáli > Príprava surovín > Ponorné mixéry"
+  },
+  {
+    "oldCategory": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Truhlicové mrazničky",
+    "newCategory": "Gastro Prevádzky a Profesionáli > Chladenie a mrazenie > Mrazničky > Truhlicové mrazničky"
+  },
+  {
+    "oldCategory": "Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grilovacie platne s podstavbou",
+    "newCategory": "Gastro Prevádzky a Profesionáli > Varná technika > Grily > Grilovacie platne"
   }
 ]

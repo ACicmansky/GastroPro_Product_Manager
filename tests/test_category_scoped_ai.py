@@ -7,8 +7,8 @@ from src.ai.batch_orchestrator import BatchOrchestrator
 
 pytestmark = pytest.mark.unit
 
-CAT1 = "Tovary a kategórie > Chladenie > Vitríny"
-CAT2 = "Tovary a kategórie > Varenie > Sporáky"
+CAT1 = "Chladenie > Vitríny"
+CAT2 = "Varenie > Sporáky"
 
 
 def test_select_scopes_to_category(tmp_path):
@@ -19,10 +19,10 @@ def test_select_scopes_to_category(tmp_path):
     )
     df = pd.DataFrame(
         [
-            {"code": "A", "defaultCategory": CAT1, "aiProcessed": "1"},
+            # legacy DB row with prefix: must still normalize to CAT1
+            {"code": "A", "defaultCategory": "Tovary a kategórie > " + CAT1, "aiProcessed": "1"},
             {"code": "B", "defaultCategory": CAT2, "aiProcessed": "0"},
-            # stale pre-migration DB row: no prefix, must still match CAT1
-            {"code": "C", "defaultCategory": "Chladenie > Vitríny", "aiProcessed": "0"},
+            {"code": "C", "defaultCategory": CAT1, "aiProcessed": "0"},
         ]
     )
 

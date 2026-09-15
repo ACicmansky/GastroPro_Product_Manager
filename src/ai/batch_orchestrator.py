@@ -440,12 +440,21 @@ class BatchOrchestrator:
     # Request building (unchanged shape, scoped by the caller's indices)
     # ------------------------------------------------------------------
 
+    def _get_expected_params(self, cat: str) -> list:
+        """Look up expected filter params for a category."""
+        if not cat:
+            return []
+        if cat in self.category_parameters:
+            return self.category_parameters[cat]
+        clean = cat[len("Tovary a kategórie > ") :].strip() if cat.startswith("Tovary a kategórie > ") else cat
+        return self.category_parameters.get(clean, [])
+
     def _build_missing_param_requests(self, df: pd.DataFrame) -> Tuple[list, int]:
         """Group products by category and list each one's unfilled expected params."""
         by_cat: Dict[str, list] = {}
         for _, row in df.iterrows():
             cat = self._category_of(row)
-            expected = self.category_parameters.get(cat)
+            expected = self._get_expected_params(cat)
             if not expected:
                 continue
             missing = [
@@ -498,14 +507,13 @@ class BatchOrchestrator:
     @staticmethod
     def _category_of(row) -> str:
         """First non-empty of newCategory/defaultCategory (empty column != missing column),
-        normalized to the "Tovary a kategórie > " target prefix — DB rows saved before
-        the category migration lack it, but categories_with_parameters.json keys have it.
+        stripping any legacy 'Tovary a kategórie > ' prefix.
         """
         for col in ("newCategory", "defaultCategory"):
             val = str(row.get(col) or "").strip()
             if val and val.lower() != "nan":
-                if not val.startswith("Tovary a kategórie > "):
-                    val = "Tovary a kategórie > " + val
+                if val.startswith("Tovary a kategórie > "):
+                    val = val[len("Tovary a kategórie > ") :].strip()
                 return val
         return ""
 
@@ -524,7 +532,7 @@ class BatchOrchestrator:
                 logger.warning(f"Skipping {len(cat_subset)} products with no category.")
                 continue
 
-            expected_params = self.category_parameters.get(cat_name, [])
+            expected_params = self._get_expected_params(cat_name)
 
             sort_cols = [c for c in ("pairCode", "code") if c in cat_subset.columns]
             if sort_cols:

@@ -178,8 +178,8 @@ class TestImageSplitting:
 class TestCategoryTransformation:
     """Test category transformation with prefix and separator."""
 
-    def test_category_add_prefix(self, config):
-        """Test adding 'Tovary a kategórie > ' prefix."""
+    def test_category_format(self, config):
+        """Test formatting category without prefix."""
         from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
@@ -188,21 +188,21 @@ class TestCategoryTransformation:
 
         result = transformer.transform_category(df)
 
-        expected = "Tovary a kategórie > Vitríny > Chladiace vitríny"
+        expected = "Vitríny > Chladiace vitríny"
         assert result.loc[0, "defaultCategory"] == expected
         assert result.loc[0, "categoryText"] == expected
 
-    def test_category_replace_separator(self, config):
-        """Test replacing '/' with ' > '."""
+    def test_category_replace_separator_and_strip_prefix(self, config):
+        """Test replacing '/' with ' > ' and stripping legacy prefix."""
         from src.domain.transform.output_transformer import OutputTransformer
 
         transformer = OutputTransformer(config)
 
-        df = pd.DataFrame({"defaultCategory": ["Cat1/Cat2/Cat3"]})
+        df = pd.DataFrame({"defaultCategory": ["Tovary a kategórie > Cat1/Cat2/Cat3"]})
 
         result = transformer.transform_category(df)
 
-        expected = "Tovary a kategórie > Cat1 > Cat2 > Cat3"
+        expected = "Cat1 > Cat2 > Cat3"
         assert result.loc[0, "defaultCategory"] == expected
 
     def test_category_empty(self, config):
@@ -215,8 +215,7 @@ class TestCategoryTransformation:
 
         result = transformer.transform_category(df)
 
-        # Should still add prefix
-        assert result.loc[0, "defaultCategory"] == "Tovary a kategórie > "
+        assert result.loc[0, "defaultCategory"] == ""
 
 
 class TestCodeUppercase:

@@ -46,8 +46,8 @@ class TestTopchladenieScraper:
                 "price": ["100.00"],
                 "shortDescription": ["Short desc"],
                 "description": ["Long description"],
-                "defaultCategory": ["Tovary a kategórie > Category > Subcategory"],
-                "categoryText": ["Tovary a kategórie > Category > Subcategory"],
+                "defaultCategory": ["Category > Subcategory"],
+                "categoryText": ["Category > Subcategory"],
                 "image": ["img1.jpg"],
                 "image2": ["img2.jpg"],
             }
@@ -83,8 +83,8 @@ class TestScraperColumnMapping:
                 "manufacturer": ["Liebherr"],
                 "shortDescription": ["Short"],
                 "description": ["Long"],
-                "defaultCategory": ["Tovary a kategórie > Category"],
-                "categoryText": ["Tovary a kategórie > Category"],
+                "defaultCategory": ["Category"],
+                "categoryText": ["Category"],
                 "active": ["1"],
                 "image": [""],
                 "image2": [""],
@@ -217,13 +217,13 @@ class TestScraperCategoryTransformation:
             {
                 "code": ["PROD001"],
                 "name": ["Product"],
-                "defaultCategory": ["Tovary a kategórie > Vitríny > Chladiace vitríny"],
-                "categoryText": ["Tovary a kategórie > Vitríny > Chladiace vitríny"],
+                "defaultCategory": ["Vitríny > Chladiace vitríny"],
+                "categoryText": ["Vitríny > Chladiace vitríny"],
             }
         )
 
         # Verify category has correct format
-        expected = "Tovary a kategórie > Vitríny > Chladiace vitríny"
+        expected = "Vitríny > Chladiace vitríny"
         assert data.loc[0, "defaultCategory"] == expected
 
     def test_category_applied_to_both_columns(self, config):
@@ -235,14 +235,14 @@ class TestScraperCategoryTransformation:
             {
                 "code": ["PROD001"],
                 "name": ["Product"],
-                "defaultCategory": ["Tovary a kategórie > Cat > Sub"],
-                "categoryText": ["Tovary a kategórie > Cat > Sub"],
+                "defaultCategory": ["Cat > Sub"],
+                "categoryText": ["Cat > Sub"],
             }
         )
 
         # Both should have same transformed value
         assert data.loc[0, "defaultCategory"] == data.loc[0, "categoryText"]
-        assert "Tovary a kategórie > " in data.loc[0, "defaultCategory"]
+        assert " > " in data.loc[0, "defaultCategory"]
 
 
 class TestScraperOutput:

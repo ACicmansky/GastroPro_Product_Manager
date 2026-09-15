@@ -181,17 +181,16 @@ def test_fuzzy_match_populates_audit():
 
 
 def test_category_falls_back_when_newcategory_column_empty():
-    """Empty newCategory falls back to defaultCategory; pre-migration values
-    (no 'Tovary a kategórie > ' prefix) are normalized so they match
-    categories_with_parameters.json keys."""
+    """Empty newCategory falls back to defaultCategory; legacy 'Tovary a kategórie > '
+    prefix is stripped so values match categories_with_parameters.json keys."""
     from src.ai.batch_orchestrator import BatchOrchestrator
 
     row = pd.Series({"newCategory": "", "defaultCategory": "Gastro > Pulty"})
-    assert BatchOrchestrator._category_of(row) == "Tovary a kategórie > Gastro > Pulty"
+    assert BatchOrchestrator._category_of(row) == "Gastro > Pulty"
     row_nan = pd.Series({"newCategory": float("nan"), "defaultCategory": "Gastro > Pulty"})
-    assert BatchOrchestrator._category_of(row_nan) == "Tovary a kategórie > Gastro > Pulty"
+    assert BatchOrchestrator._category_of(row_nan) == "Gastro > Pulty"
     prefixed = pd.Series({"newCategory": "Tovary a kategórie > Gastro > Pulty"})
-    assert BatchOrchestrator._category_of(prefixed) == "Tovary a kategórie > Gastro > Pulty"
+    assert BatchOrchestrator._category_of(prefixed) == "Gastro > Pulty"
     assert BatchOrchestrator._category_of(pd.Series({"code": "X"})) == ""
 
 
@@ -339,7 +338,7 @@ def test_batch_orchestrator_builds_thinking_config():
         config={"ai_enhancement": {"thinking_level": "medium", "batch_size": 10}},
     )
 
-    df = pd.DataFrame([{"code": "P1", "name": "Item 1", "defaultCategory": "Tovary a kategórie > Gastro"}])
+    df = pd.DataFrame([{"code": "P1", "name": "Item 1", "defaultCategory": "Gastro"}])
     requests = []
     orch._build_category_requests(df, {0}, requests, is_group1=False)
 

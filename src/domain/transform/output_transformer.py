@@ -174,11 +174,7 @@ class OutputTransformer:
 
     def transform_category(self, df: pd.DataFrame, output_df: pd.DataFrame = None) -> pd.DataFrame:
         """
-        Transform category: add prefix and replace separator.
-
-        Transformation:
-        - Add prefix: "Tovary a kategórie > "
-        - Replace "/" with " > "
+        Transform category: replace separator ("/" with " > ") and strip legacy prefix.
 
         Args:
             df: Input DataFrame with 'defaultCategory' column
@@ -206,11 +202,11 @@ class OutputTransformer:
             if category and category != "nan":
                 # Replace "/" with " > "
                 category = category.replace("/", " > ")
-                # Add prefix only if not already present
-                if not category.startswith("Tovary a kategórie > "):
-                    category = "Tovary a kategórie > " + category
+                # Strip legacy prefix if present
+                if category.startswith("Tovary a kategórie > "):
+                    category = category[len("Tovary a kategórie > ") :].strip()
             else:
-                category = "Tovary a kategórie > "
+                category = ""
 
             transformed_categories.append(category)
 

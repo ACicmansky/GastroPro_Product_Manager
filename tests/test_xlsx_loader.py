@@ -73,7 +73,7 @@ class TestWriteXlsx:
             {
                 "code": ["TEST001"],
                 "name": ["Produkt č. 1 - špeciálne znaky"],
-                "defaultCategory": ["Tovary a kategórie > Vitríny"],
+                "defaultCategory": ["Vitríny"],
             }
         )
         output_path = tmp_path / "output_special.xlsx"
