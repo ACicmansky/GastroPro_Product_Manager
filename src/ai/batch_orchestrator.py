@@ -63,6 +63,7 @@ class BatchOrchestrator:
         self.chunk_size = ai_config.get("chunk_size", 500)
         self.poll_failure_limit = ai_config.get("poll_failure_limit", 20)
         self.thinking_level = ai_config.get("thinking_level")
+        self.thinking_budget = ai_config.get("thinking_budget")
         self.max_desc_chars = ai_config.get("max_desc_chars", 1200)
         self.max_short_desc_chars = ai_config.get("max_short_desc_chars", 500)
         os.makedirs(self.tmp_dir, exist_ok=True)
@@ -481,8 +482,9 @@ class BatchOrchestrator:
                 chunk = products[i : i + self.batch_size]
                 product_count += len(chunk)
                 gen_cfg = {"temperature": self.temperature}
-                if self.thinking_level:
-                    gen_cfg["thinkingConfig"] = {"thinkingLevel": self.thinking_level.upper()}
+                thinking_cfg = self._get_thinking_config()
+                if thinking_cfg:
+                    gen_cfg["thinkingConfig"] = thinking_cfg
 
                 jsonl_requests.append(
                     {
@@ -576,8 +578,9 @@ class BatchOrchestrator:
                         "responseMimeType": "application/json",
                         "responseSchema": build_response_schema(expected_params),
                     }
-                    if self.thinking_level:
-                        gen_cfg["thinkingConfig"] = {"thinkingLevel": self.thinking_level.upper()}
+                    thinking_cfg = self._get_thinking_config()
+                    if thinking_cfg:
+                        gen_cfg["thinkingConfig"] = thinking_cfg
 
                     jsonl_requests.append(
                         {
@@ -591,3 +594,20 @@ class BatchOrchestrator:
                             },
                         }
                     )
+
+    def _get_thinking_config(self) -> Optional[dict]:
+        """Return thinkingConfig dict for generationConfig, ensuring mutual exclusivity.
+
+        Google Gemini API accepts either thinkingBudget (int tokens) OR thinkingLevel (enum),
+        never both.
+        """
+        if self.thinking_budget is not None:
+            try:
+                budget = int(self.thinking_budget)
+                if budget > 0:
+                    return {"thinkingBudget": budget}
+            except (ValueError, TypeError):
+                pass
+        if self.thinking_level:
+            return {"thinkingLevel": self.thinking_level.upper()}
+        return None

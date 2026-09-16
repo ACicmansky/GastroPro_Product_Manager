@@ -11,6 +11,11 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 - **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching on `windows-latest`.
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
 - **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
+## Recent Changes (2026-09-16 — Thinking Budget Calibration & Chunk Size Reduction)
+- Lowered `chunk_size` from 500 to 100 in `config.json` to prevent long Google Batch scheduling delays and worker node preemption timeouts (`code: 13`). Chunks now finish every ~25-35 minutes instead of 5+ hours.
+- Calibrated `thinking_budget: 3072` tokens in `config.json` and updated `src/ai/batch_orchestrator.py` with `_get_thinking_config()` to pass `{"thinkingBudget": 3072}` to Gemini API generationConfig.
+- Bounded reasoning prevents runaway internal reasoning tokens while preserving deep technical extraction and FAQ quality.
+- Verified mutual exclusivity handling for Gemini API (`thinkingBudget` vs `thinkingLevel`) with automated test. Suite: **245 tests passing** via `uv run poe check`.
 
 ## Recent Changes (2026-09-16 — Autonomous Categorization Subagent)
 - Implemented and executed autonomous classification subagent (`scripts/auto_categorize.py`) using `gemini-3.8-flash` across 4 concurrent worker threads.

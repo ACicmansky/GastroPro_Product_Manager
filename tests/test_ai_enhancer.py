@@ -348,6 +348,31 @@ def test_batch_orchestrator_builds_thinking_config():
     assert gen_cfg["thinkingConfig"]["thinkingLevel"] == "MEDIUM"
 
 
+def test_batch_orchestrator_builds_thinking_budget_config():
+    """BatchOrchestrator serializes thinkingBudget and prioritizes it over thinking_level."""
+    from src.ai.batch_orchestrator import BatchOrchestrator
+
+    class DummyClient:
+        is_available = True
+        model_name = "gemini-3.8-flash"
+
+    orch = BatchOrchestrator(
+        client=DummyClient(),
+        result_parser=None,
+        config={"ai_enhancement": {"thinking_budget": 3072, "thinking_level": "high", "batch_size": 10}},
+    )
+
+    df = pd.DataFrame([{"code": "P1", "name": "Item 1", "defaultCategory": "Gastro"}])
+    requests = []
+    orch._build_category_requests(df, {0}, requests, is_group1=False)
+
+    assert len(requests) == 1
+    gen_cfg = requests[0]["request"]["generationConfig"]
+    assert "thinkingConfig" in gen_cfg
+    assert gen_cfg["thinkingConfig"] == {"thinkingBudget": 3072}
+    assert "thinkingLevel" not in gen_cfg["thinkingConfig"]
+
+
 def test_gemini_client_defaults_to_gemini_3_8_flash():
     """GeminiClient defaults to gemini-3.8-flash when not specified."""
     from src.ai.api_client import GeminiClient
