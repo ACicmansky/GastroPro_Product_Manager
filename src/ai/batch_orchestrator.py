@@ -61,6 +61,8 @@ class BatchOrchestrator:
         self.temperature = ai_config.get("temperature", 0.1)
         self.tmp_dir = ai_config.get("tmp_dir", os.path.join("out", "batch_requests"))
         self.chunk_size = ai_config.get("chunk_size", 500)
+        self.parallel_chunks = max(1, int(ai_config.get("parallel_chunks", 1)))
+        self.poll_interval = ai_config.get("poll_interval", 15)
         self.poll_failure_limit = ai_config.get("poll_failure_limit", 20)
         self.thinking_level = ai_config.get("thinking_level")
         self.thinking_budget = ai_config.get("thinking_budget")
@@ -211,13 +213,12 @@ class BatchOrchestrator:
         stats = {"ai_should_process": total, "ai_processed": run["processed_products"]}
         chunks = self.run_db.chunks_for(run_id)
 
+        in_flight = {}  # chunk_id -> dict with chunk info
+        pending_queue = []
+
         for chunk in chunks:
             if chunk["status"] == "applied":
                 continue
-
-            if control and control.is_cancel_requested:
-                self.run_db.update_run(run_id, status="cancelled")
-                return df, stats
 
             chunk_codes = set(chunk["codes"])
             valid_indices = df.index[df["code"].astype(str).str.strip().isin(chunk_codes)]
@@ -226,19 +227,48 @@ class BatchOrchestrator:
                 continue
 
             if chunk["status"] == "submitted" and chunk["job_name"]:
-                # ponytail: uploaded_file_name isn't persisted per chunk, so a resumed chunk skips
-                # remote-file cleanup after download (Google auto-expires uploaded files anyway).
-                job_name, uploaded_name = chunk["job_name"], ""
+                # Resumed chunk: monitor existing job in cloud without re-submitting
+                in_flight[chunk["id"]] = {
+                    "chunk": chunk,
+                    "valid_indices": valid_indices,
+                    "job_name": chunk["job_name"],
+                    "uploaded_name": "",
+                    "start_time": time.time(),
+                }
             else:
+                pending_queue.append((chunk, valid_indices))
+
+        consecutive_poll_errors = 0
+
+        while in_flight or pending_queue:
+            # 1. Check control for cancellation / pause
+            if control and control.is_cancel_requested:
+                for item in in_flight.values():
+                    try:
+                        self.client.cancel_batch_job(item["job_name"])
+                    except Exception as e:
+                        logger.warning(f"Could not cancel job {item['job_name']}: {e}")
+                self.run_db.update_run(run_id, status="cancelled")
+                return df, stats
+
+            if control and control.is_pause_requested:
+                self.run_db.update_run(run_id, status="paused")
+                return df, stats
+
+            # 2. Fill sliding window up to self.parallel_chunks
+            while len(in_flight) < self.parallel_chunks and pending_queue:
+                chunk, valid_indices = pending_queue.pop(0)
+
                 jsonl_requests = self._build_chunk_requests(df, valid_indices, group1_indices)
                 if not jsonl_requests:
                     self.run_db.mark_chunk(chunk["id"], "applied", detail="no requests generated")
                     continue
+
                 if progress_callback:
                     progress_callback(
                         stats["ai_processed"],
                         total,
-                        f"Beh {run_id}: davka {chunk['chunk_index'] + 1}/{len(chunks)}, priprava a odosielanie...",
+                        f"Beh {run_id}: dávka {chunk['chunk_index'] + 1}/{len(chunks)}, odosielanie do cloudu...",
                     )
                 try:
                     job_name, uploaded_name = self._submit_chunk(jsonl_requests)
@@ -247,51 +277,89 @@ class BatchOrchestrator:
                     self.run_db.mark_chunk(chunk["id"], "failed", detail=str(e))
                     self.run_db.update_run(run_id, status="interrupted", detail=str(e))
                     return df, stats
+
                 self.run_db.mark_chunk(chunk["id"], "submitted", job_name=job_name)
+                chunk["job_name"] = job_name
+                in_flight[chunk["id"]] = {
+                    "chunk": chunk,
+                    "valid_indices": valid_indices,
+                    "job_name": job_name,
+                    "uploaded_name": uploaded_name,
+                    "start_time": time.time(),
+                }
 
-            def chunk_progress(_current, _total, message, _chunk=chunk, _chunks=chunks, _stats=stats):
-                if progress_callback:
-                    progress_callback(
-                        _stats["ai_processed"],
-                        total,
-                        f"Beh {run_id}: davka {_chunk['chunk_index'] + 1}/{len(_chunks)}, "
-                        f"{_stats['ai_processed']}/{total} produktov, {message}",
+            if not in_flight:
+                break
+
+            # 3. Poll all in-flight jobs
+            completed_chunk_ids = []
+            for chunk_id, item in list(in_flight.items()):
+                job_name = item["job_name"]
+                chunk = item["chunk"]
+                valid_indices = item["valid_indices"]
+                uploaded_name = item["uploaded_name"]
+
+                try:
+                    batch_job = self.client.get_batch_job(job_name)
+                    state = batch_job.state.name
+                    consecutive_poll_errors = 0
+                except Exception as e:
+                    consecutive_poll_errors += 1
+                    logger.error(
+                        f"Error polling job {job_name}: {e} ({consecutive_poll_errors}/{self.poll_failure_limit})"
                     )
+                    if consecutive_poll_errors >= self.poll_failure_limit:
+                        self.run_db.update_run(run_id, status="interrupted", detail="network/API unreachable")
+                        return df, stats
+                    continue
 
-            outcome, batch_job = self._wait_for_job(job_name, chunk_progress, total, control)
+                if self.batch_job_db:
+                    self.batch_job_db.update_status(job_name, state)
 
-            if outcome == "paused":
-                self.run_db.update_run(run_id, status="paused")
-                return df, stats
-            if outcome == "cancelled":
-                self.run_db.update_run(run_id, status="cancelled")
-                return df, stats
-            if outcome == "interrupted":
-                self.run_db.update_run(run_id, status="interrupted", detail="network/API unreachable")
-                return df, stats
-            if outcome == "failed":
-                state = batch_job.state.name if batch_job else "unknown"
-                self.run_db.mark_chunk(chunk["id"], "failed", detail=f"job state {state}")
-                continue
+                if state == "JOB_STATE_SUCCEEDED":
+                    logger.info(f"Batch Job {job_name} Status: JOB_STATE_SUCCEEDED")
+                    df, applied = self._download_and_apply(
+                        df,
+                        batch_job,
+                        uploaded_name,
+                        progress_callback,
+                        total,
+                        valid_indices=valid_indices,
+                    )
+                    if applied.get("error"):
+                        self.run_db.update_run(run_id, status="interrupted", detail=applied["error"])
+                        return df, stats
 
-            df, applied = self._download_and_apply(
-                df,
-                batch_job,
-                uploaded_name,
-                chunk_progress,
-                total,
-                valid_indices=valid_indices,
-            )
-            if applied.get("error"):
-                # Job succeeded in the cloud; keep chunk "submitted" so resume re-downloads it.
-                self.run_db.update_run(run_id, status="interrupted", detail=applied["error"])
-                return df, stats
-            applied_count = applied.get("ai_processed", 0)
-            stats["ai_processed"] += applied_count
-            self.run_db.mark_chunk(chunk["id"], "applied")
-            self.run_db.update_run(run_id, processed_delta=applied_count)
-            if on_chunk_applied:
-                on_chunk_applied(df.loc[valid_indices])
+                    applied_count = applied.get("ai_processed", 0)
+                    stats["ai_processed"] += applied_count
+                    self.run_db.mark_chunk(chunk["id"], "applied")
+                    self.run_db.update_run(run_id, processed_delta=applied_count)
+                    if on_chunk_applied:
+                        on_chunk_applied(df.loc[valid_indices])
+                    completed_chunk_ids.append(chunk_id)
+
+                elif state in self.COMPLETED_STATES:
+                    logger.error(f"Batch Job {job_name} ended in non-success state: {state}")
+                    self.run_db.mark_chunk(chunk["id"], "failed", detail=f"job state {state}")
+                    completed_chunk_ids.append(chunk_id)
+
+            for cid in completed_chunk_ids:
+                del in_flight[cid]
+
+            if progress_callback and in_flight:
+                active_count = len(in_flight)
+                progress_callback(
+                    stats["ai_processed"],
+                    total,
+                    f"Beh {run_id}: {stats['ai_processed']}/{total} produktov ({active_count} aktívnych dávok v cloude)...",
+                )
+
+            # 4. Responsive sleep if no chunks finished in this pass
+            if not completed_chunk_ids and in_flight:
+                for _ in range(int(self.poll_interval)):
+                    if control and (control.is_cancel_requested or control.is_pause_requested):
+                        break
+                    time.sleep(1)
 
         final_chunks = self.run_db.chunks_for(run_id)
         failed = [c for c in final_chunks if c["status"] == "failed"]

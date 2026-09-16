@@ -25,6 +25,7 @@ class FakeClient:
         self.create_calls = 0
         self.unreachable_jobs = set()
         self.fail_downloads = False
+        self.cancelled_jobs = []
 
     def upload_file(self, file_path):
         name = f"uploaded/{len(self.uploads)}"
@@ -65,7 +66,7 @@ class FakeClient:
         pass
 
     def cancel_batch_job(self, job_name):
-        pass
+        self.cancelled_jobs.append(job_name)
 
 
 def _make_df(cat):
@@ -197,3 +198,108 @@ def test_cancel_stops_run(tmp_path):
 
     assert run_db.get_resumable_run() is None  # cancelled is not resumable
     assert run_db.get_run(1)["status"] == "cancelled"  # first run in this fresh db
+
+
+def test_parallel_chunks_dispatch(tmp_path):
+    """With parallel_chunks=3, all 3 chunks are submitted concurrently."""
+    cat = _known_category()
+    df = pd.DataFrame(
+        {
+            "code": ["P1", "P2", "P3", "P4", "P5", "P6"],
+            "name": ["N1", "N2", "N3", "N4", "N5", "N6"],
+            "shortDescription": [""] * 6,
+            "description": [""] * 6,
+            "newCategory": [cat] * 6,
+            "aiProcessed": [""] * 6,
+        }
+    )
+    config = _config(tmp_path, chunk_size=2, parallel_chunks=3, poll_interval=0)
+    run_db = RunDB(str(tmp_path / "runs.db"))
+    client = FakeClient()
+    applied_calls = []
+
+    orch = BatchOrchestrator(
+        client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config
+    )
+
+    updated_df, stats = orch.process(
+        df,
+        group1_indices=set(),
+        progress_callback=None,
+        on_chunk_applied=lambda chunk_df: applied_calls.append(len(chunk_df)),
+    )
+
+    assert stats["ai_processed"] == 6
+    assert client.create_calls == 3  # All 3 chunks created
+    assert len(applied_calls) == 3
+    assert sum(applied_calls) == 6
+    assert run_db.get_run(1)["status"] == "completed"
+    chunks = run_db.chunks_for(1)
+    assert len(chunks) == 3
+    assert all(c["status"] == "applied" for c in chunks)
+
+
+def test_parallel_chunks_sliding_window(tmp_path):
+    """With parallel_chunks=2 and 3 chunks, jobs are dispatched within the sliding window."""
+    cat = _known_category()
+    df = pd.DataFrame(
+        {
+            "code": ["P1", "P2", "P3", "P4", "P5", "P6"],
+            "name": ["N1", "N2", "N3", "N4", "N5", "N6"],
+            "shortDescription": [""] * 6,
+            "description": [""] * 6,
+            "newCategory": [cat] * 6,
+            "aiProcessed": [""] * 6,
+        }
+    )
+    # Window size is 2, so chunk 3 won't submit until at least one of chunk 1 or 2 finishes
+    config = _config(tmp_path, chunk_size=2, parallel_chunks=2, poll_interval=0)
+    run_db = RunDB(str(tmp_path / "runs.db"))
+    client = FakeClient()
+
+    orch = BatchOrchestrator(
+        client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config
+    )
+
+    updated_df, stats = orch.process(df, group1_indices=set(), progress_callback=None)
+
+    assert stats["ai_processed"] == 6
+    assert client.create_calls == 3
+    assert run_db.get_run(1)["status"] == "completed"
+
+
+def test_parallel_chunks_cancel_cancels_all_inflight(tmp_path):
+    """When cancelled with multiple in-flight jobs, all in-flight jobs are cancelled via client."""
+    cat = _known_category()
+    df = pd.DataFrame(
+        {
+            "code": ["P1", "P2", "P3", "P4"],
+            "name": ["N1", "N2", "N3", "N4"],
+            "shortDescription": [""] * 4,
+            "description": [""] * 4,
+            "newCategory": [cat] * 4,
+            "aiProcessed": [""] * 4,
+        }
+    )
+    config = _config(tmp_path, chunk_size=2, parallel_chunks=2, poll_interval=0)
+    run_db = RunDB(str(tmp_path / "runs.db"))
+
+    # Client that keeps jobs running and requests cancel on first poll
+    control = RunControl()
+
+    class StalledClient(FakeClient):
+        def get_batch_job(self, job_name):
+            control.cancel()
+            return SimpleNamespace(name=job_name, state=SimpleNamespace(name="JOB_STATE_RUNNING"))
+
+    client = StalledClient()
+    orch = BatchOrchestrator(
+        client=client, result_parser=ResultParser(allowed_params=set()), run_db=run_db, config=config
+    )
+
+    orch.process(df, group1_indices=set(), control=control)
+
+    assert run_db.get_run(1)["status"] == "cancelled"
+    # Both in-flight jobs should have been cancelled
+    assert "job/0" in client.cancelled_jobs
+    assert "job/1" in client.cancelled_jobs

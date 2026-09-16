@@ -154,6 +154,7 @@
     "retry_delay": 60,
     "max_parallel_calls": 10,
     "chunk_size": 50,
+    "parallel_chunks": 5,
     "poll_failure_limit": 20,
     "max_desc_chars": 1200,
     "max_short_desc_chars": 500
