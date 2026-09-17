@@ -42,8 +42,7 @@ from .toast import ToastHost
 from .settings_dialog import SettingsDialog
 from src.config.config_loader import load_config, read_api_key
 from src.domain.categories.category_service import CategoryService
-from src.data.loaders.xlsx_loader import load_xlsx
-from src.domain.categories.category_filter import CategoryFilter
+from src.data.excel import load_xlsx
 from src.domain.models import PipelineOptions
 from src.data.database.run_db import RunDB
 from src.ai.run_control import RunControl
@@ -75,7 +74,6 @@ class MainWindow(QMainWindow):
         self.config = load_config()
         self.last_statistics = None
         self.result_df = None
-        self.category_filter = CategoryFilter()
         self.category_service = CategoryService()
         self.all_categories = []
         self.main_data_df = None
@@ -1124,20 +1122,14 @@ class MainWindow(QMainWindow):
             original_category: The unmapped category
             product_name: Product name for context
         """
-        # Check if original_category is from the loaded input file
-        is_from_file = original_category in getattr(self, "all_categories", [])
-        has_input_file = bool(self.main_data_file)
-
         # Get suggestions from CategoryService (uses categories.json mappings)
         suggestions = self.category_service.suggest(original_category, top_n=5)
 
-        # Show dialog with suggestions and file context
+        # Show dialog with suggestions
         dialog = CategoryMappingDialog(
             original_category,
             suggestions,
             product_name,
-            is_from_file=is_from_file,
-            has_input_file=has_input_file,
             parent=self,
         )
         if dialog.exec_():

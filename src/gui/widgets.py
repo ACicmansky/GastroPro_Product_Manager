@@ -33,18 +33,14 @@ class CategoryMappingDialog(QDialog):
         original_category,
         suggestions=None,
         product_name=None,
-        is_from_file=False,
-        has_input_file=False,
         parent=None,
+        **kwargs,
     ):
         super().__init__(parent)
         self.original_category = original_category
         self.suggestions = suggestions or []
         self.product_name = product_name
-        self.is_from_file = is_from_file
-        self.has_input_file = has_input_file
         self.new_category = None
-        self.apply_to_all_from_file = False
         self.cancel_pipeline = False
         self.init_ui()
 
@@ -164,9 +160,6 @@ class CategoryMappingDialog(QDialog):
 
     def get_new_category(self):
         return self.new_category
-
-    def should_apply_to_all_from_file(self) -> bool:
-        return False
 
 
 class PriceMappingDialog(QDialog):

@@ -109,7 +109,7 @@ class PipelineWorker(QObject):
             raise PipelineCancelled()
         return self._category_result or original_category
 
-    def set_category_mapping_result(self, new_category: str, apply_to_all_from_file: bool = False):
+    def set_category_mapping_result(self, new_category: str):
         """Called by GUI when user provides category mapping."""
         self._category_result = new_category
         if self._category_loop:
