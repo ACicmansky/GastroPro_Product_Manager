@@ -2,8 +2,7 @@
 
 import pandas as pd
 
-from src.data.loaders.xlsx_loader import load_xlsx
-from src.data.writers.xlsx_writer import write_xlsx
+from src.data.excel import load_xlsx, write_xlsx
 
 
 class TestLoadXlsx:
