@@ -81,20 +81,37 @@ class CategoryService:
             return mapped
         return old_category
 
-    def map_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Map category columns in a DataFrame in-place (on a copy).
+    @staticmethod
+    def extract_categories(df: pd.DataFrame) -> List[str]:
+        """Extract unique categories from DataFrame.
 
-        Updates both 'defaultCategory' and 'categoryText' columns.
+        Args:
+            df: DataFrame with product data
+
+        Returns:
+            Sorted list of unique category names
         """
-        df = df.copy()
-        for idx, row in df.iterrows():
-            if "defaultCategory" in df.columns:
-                old_cat = str(row.get("defaultCategory", ""))
-                new_cat = self.map_category(old_cat)
-                df.at[idx, "defaultCategory"] = new_cat
-                if "categoryText" in df.columns:
-                    df.at[idx, "categoryText"] = new_cat
-        return df
+        if "defaultCategory" not in df.columns:
+            return []
+        categories = df["defaultCategory"].dropna().unique().tolist()
+        categories = [cat for cat in categories if cat and str(cat).strip()]
+        return sorted(categories)
+
+    @staticmethod
+    def search_categories(categories: List[str], search_text: str) -> List[str]:
+        """Search/filter categories by text.
+
+        Args:
+            categories: List of category names
+            search_text: Text to search for (case-insensitive)
+
+        Returns:
+            Filtered list of categories containing search text
+        """
+        if not search_text or not search_text.strip():
+            return categories
+        search_text_lower = search_text.lower()
+        return [cat for cat in categories if search_text_lower in cat.lower()]
 
     def map_or_ask(self, old_category: str, product_name: Optional[str] = None) -> str:
         """Map a category, using interactive callback if mapping is unknown.

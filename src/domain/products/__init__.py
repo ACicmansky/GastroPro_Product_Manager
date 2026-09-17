@@ -1,1 +1,1 @@
-# src/domain/products/__init__.py
+from .merger import ProductMerger, get_pair_code

@@ -1,7 +1,7 @@
 """Tests for variant service pair code logic."""
 
 import pytest
-from src.domain.products.variant_service import get_pair_code
+from src.domain.products import get_pair_code
 
 
 class TestGetPairCode:
