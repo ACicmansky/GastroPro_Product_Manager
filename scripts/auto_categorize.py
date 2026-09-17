@@ -30,10 +30,9 @@ logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(me
 logger = logging.getLogger(__name__)
 
 DB_PATH = "data/products.db"
-EXCEL_PATH = "C:/Users/Andrej/Downloads/2026_09_16_GastroPro.xlsx"
 CATEGORIES_PATH = "categories_with_parameters.json"
-BATCH_SIZE = 60
-MAX_WORKERS = 4
+DEFAULT_BATCH_SIZE = 60
+DEFAULT_MAX_WORKERS = 4
 
 
 def load_allowed_categories() -> Tuple[List[str], set]:
@@ -219,6 +218,20 @@ def update_excel_file(excel_path: str, code_to_cat: Dict[str, str]):
 
 
 def main():
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Automatická AI kategorizácia nezaradených produktov (napr. z feedov)."
+    )
+    parser.add_argument("--db", default=DB_PATH, help=f"Cesta k SQLite databáze (predvolené: {DB_PATH})")
+    parser.add_argument("--excel", default=None, help="Voliteľná cesta k Excel súboru na aktualizáciu")
+    parser.add_argument(
+        "--categories", default=CATEGORIES_PATH, help=f"Cesta k JSON kategóriám (predvolené: {CATEGORIES_PATH})"
+    )
+    parser.add_argument("--batch-size", type=int, default=DEFAULT_BATCH_SIZE, help="Veľkosť dávky produktov")
+    parser.add_argument("--max-workers", type=int, default=DEFAULT_MAX_WORKERS, help="Počet paralelných vlákien")
+    args = parser.parse_args()
+
     start_time = time.time()
     api_key = read_api_key()
     if not api_key:
@@ -230,7 +243,7 @@ def main():
     allowed_categories, allowed_set = load_allowed_categories()
     logger.info(f"Načítaných {len(allowed_categories)} autoritatívnych kategórií.")
 
-    uncategorized = fetch_uncategorized_products(DB_PATH)
+    uncategorized = fetch_uncategorized_products(args.db)
     logger.info(f"Nájdených {len(uncategorized)} nezaradených produktov na klasifikáciu.")
 
     if not uncategorized:
@@ -239,14 +252,14 @@ def main():
 
     system_instruction = build_system_prompt(allowed_categories)
 
-    batches = [uncategorized[i : i + BATCH_SIZE] for i in range(0, len(uncategorized), BATCH_SIZE)]
+    batches = [uncategorized[i : i + args.batch_size] for i in range(0, len(uncategorized), args.batch_size)]
     total_batches = len(batches)
     logger.info(
-        f"Rozdelených do {total_batches} dávok po {BATCH_SIZE} produktov. Spúšťam {MAX_WORKERS} paralelných vlákien..."
+        f"Rozdelených do {total_batches} dávok po {args.batch_size} produktov. Spúšťam {args.max_workers} paralelných vlákien..."
     )
 
     all_results = []
-    with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
+    with ThreadPoolExecutor(max_workers=args.max_workers) as executor:
         future_to_batch = {
             executor.submit(
                 classify_batch,
@@ -271,10 +284,11 @@ def main():
     code_to_cat = {code: cat for code, cat, _ in all_results if code and cat}
 
     # 1. Update SQLite DB
-    update_database(DB_PATH, code_to_cat)
+    update_database(args.db, code_to_cat)
 
-    # 2. Update Excel File
-    update_excel_file(EXCEL_PATH, code_to_cat)
+    # 2. Update Excel File if provided
+    if args.excel and os.path.exists(args.excel):
+        update_excel_file(args.excel, code_to_cat)
 
     # 3. Save report
     os.makedirs("out", exist_ok=True)
