@@ -141,21 +141,15 @@ class OutputTransformer:
             "image8",
         ]
 
-        if "Obrázky" not in df.columns:
-            # Preserve existing image columns from df / output_df if present
-            for col in image_columns:
-                if col in df.columns:
-                    output_df[col] = df[col].astype(str).replace("nan", "").replace("None", "")
-                elif col not in output_df.columns:
-                    output_df[col] = ""
-            return output_df
-
-        # When 'Obrázky' is in df, start with existing image columns or empty
+        # Initialize image columns from df or empty string
         for col in image_columns:
             if col in df.columns:
                 output_df[col] = df[col].astype(str).replace("nan", "").replace("None", "")
             elif col not in output_df.columns:
                 output_df[col] = ""
+
+        if "Obrázky" not in df.columns:
+            return output_df
 
         # Split and assign images from 'Obrázky' (overriding only when non-empty)
         for idx, row in df.iterrows():
