@@ -4,6 +4,8 @@ import json
 import os
 from typing import Dict
 
+import dotenv
+
 
 def load_config(config_path: str = "config.json") -> Dict:
     """Load configuration from JSON file."""
@@ -13,15 +15,11 @@ def load_config(config_path: str = "config.json") -> Dict:
 
 def read_api_key(env_path: str = ".env") -> str:
     """Read GOOGLE_API_KEY from environment or .env file."""
-    key = os.environ.get("GOOGLE_API_KEY", "")
-    if key:
-        return key
-    if os.path.exists(env_path):
-        with open(env_path, "r", encoding="utf-8") as f:
-            for line in f:
-                if line.strip().startswith("GOOGLE_API_KEY="):
-                    return line.strip().split("=", 1)[1].strip().strip('"').strip("'")
-    return ""
+    return (
+        os.environ.get("GOOGLE_API_KEY")
+        or (dotenv.get_key(env_path, "GOOGLE_API_KEY") if os.path.exists(env_path) else None)
+        or ""
+    )
 
 
 def save_api_key(key: str, env_path: str = ".env"):
