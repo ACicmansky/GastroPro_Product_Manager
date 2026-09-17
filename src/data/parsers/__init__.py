@@ -1,2 +1,3 @@
-from .xml_parser import XMLParser
-from .xml_parser_factory import XMLParserFactory
+from .xml_parser import XMLParser, XMLParserFactory, fetch_and_parse, parse
+
+__all__ = ["XMLParser", "XMLParserFactory", "fetch_and_parse", "parse"]

@@ -3,62 +3,96 @@ XML Parser for new 138-column format.
 Parses XML feeds directly to new e-shop format.
 """
 
-import pandas as pd
+import html
+import logging
+import re
+import time
+import urllib.request
 import xml.etree.ElementTree as ET
 from typing import Dict
-import html
-import re
+
 from bs4 import BeautifulSoup
+import pandas as pd
+
+logger = logging.getLogger(__name__)
+
+
+def fetch_and_parse(
+    feed_name: str, url: str, config: Dict, retries: int = 3
+) -> pd.DataFrame:
+    """Fetch XML feed from URL (with retries) and parse it."""
+    req = urllib.request.Request(
+        url,
+        headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+                          "AppleWebKit/537.36 (KHTML, like Gecko) "
+                          "Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "application/xml,text/xml,*/*;q=0.9",
+        },
+    )
+    for attempt in range(1, retries + 1):
+        try:
+            with urllib.request.urlopen(req, timeout=120) as response:
+                xml_content = response.read().decode("utf-8")
+            return parse(feed_name, xml_content, config)
+        except Exception as e:
+            if attempt == retries:
+                logger.error(
+                    f"Failed to fetch feed {feed_name} from {url} "
+                    f"after {retries} attempts: {e}"
+                )
+                return pd.DataFrame()
+            logger.warning(
+                f"Fetch attempt {attempt}/{retries} for {feed_name} failed: "
+                f"{e} — retrying in {5 * attempt}s"
+            )
+            time.sleep(5 * attempt)
+    return pd.DataFrame()
+
+
+def parse(feed_name: str, xml_content: str, config: Dict) -> pd.DataFrame:
+    """Parse XML feed automatically detecting type."""
+    return XMLParser(config).parse_feed(feed_name, xml_content)
 
 
 class XMLParser:
     """Parser for XML feeds outputting to new 138-column format."""
 
     def __init__(self, config: Dict):
-        """
-        Initialize XML parser with configuration.
-
-        Args:
-            config: Configuration dictionary from config.json
-        """
+        """Initialize XML parser with configuration."""
         self.config = config
         self.xml_feeds = config.get("xml_feeds", {})
 
-    def parse_gastromarket(self, xml_content: str) -> pd.DataFrame:
-        """
-        Parse Gastromarket XML feed to new format.
+    def parse_feed(self, feed_name: str, xml_content: str) -> pd.DataFrame:
+        """Parse any configured XML feed to new format."""
+        feed_key = feed_name.lower()
+        print(f"\nParsing {feed_name} XML feed...")
 
-        Args:
-            xml_content: XML content as string
+        feed_config = self.xml_feeds.get(feed_key, {})
+        if feed_key not in ("gastromarket", "gastromarket_stalgast", "forgastro") and not feed_config:
+            raise ValueError(f"Unknown feed name: {feed_name}")
 
-        Returns:
-            DataFrame with new format columns
-        """
-        print("\nParsing Gastromarket XML feed...")
-
-        feed_config = self.xml_feeds.get("gastromarket", {})
-        root_element = feed_config.get("root_element", "channel")
-        item_element = feed_config.get("item_element", "item")
+        is_gm = "gastromarket" in feed_key
+        root_element = feed_config.get("root_element", "channel" if is_gm else None)
+        item_element = feed_config.get("item_element", "item" if is_gm else "product")
         mapping = feed_config.get("mapping", {})
         namespace_url = feed_config.get("namespace")
 
         xml_root = ET.fromstring(xml_content)
 
-        # Register namespace if provided
         namespaces = {}
         if namespace_url:
             namespaces = {"g": namespace_url}
-            # Register namespace for ElementTree
             ET.register_namespace("g", namespace_url)
 
-        root = xml_root.find(root_element)
+        root = xml_root.find(root_element) if root_element else xml_root
+        if root is None:
+            root = xml_root
 
-        # Extract data
         data = []
         for item in root.findall(f".//{item_element}"):
             row = {}
             for xml_field, new_field in mapping.items():
-                # Use namespace prefix if configured
                 if namespace_url:
                     element = item.find(f"g:{xml_field}", namespaces)
                 else:
@@ -67,143 +101,36 @@ class XMLParser:
                 value = element.text if element is not None and element.text else ""
                 row[new_field] = value
 
-            # Add feed name
-            row["source"] = "gastromarket"
+            row["source"] = feed_key
             data.append(row)
 
         df = pd.DataFrame(data)
 
-        # Process images - check if IMAGE column exists in result
-        if "IMAGE" in df.columns:
-            df = self._split_images(df, "IMAGE")
-
-        # Clean prices
-        if "price" in df.columns:
-            df = self._clean_prices(df)
-
-        # Ensure all values are strings and replace NaN
-        for col in df.columns:
-            df[col] = df[col].astype(str).replace("nan", "").replace("None", "")
-
-        print(f"  Parsed {len(df)} products from Gastromarket")
-        return df
-
-    def parse_gastromarket_stalgast(self, xml_content: str) -> pd.DataFrame:
-        """
-        Parse Gastromarket Stalgast XML feed to new format.
-
-        Args:
-            xml_content: XML content as string
-
-        Returns:
-            DataFrame with new format columns
-        """
-        print("\nParsing Gastromarket Stalgast XML feed...")
-
-        feed_config = self.xml_feeds.get("gastromarket_stalgast", {})
-        root_element = feed_config.get("root_element", "channel")
-        item_element = feed_config.get("item_element", "item")
-        mapping = feed_config.get("mapping", {})
-        namespace_url = feed_config.get("namespace")
-
-        xml_root = ET.fromstring(xml_content)
-
-        # Register namespace if provided
-        namespaces = {}
-        if namespace_url:
-            namespaces = {"g": namespace_url}
-            # Register namespace for ElementTree
-            ET.register_namespace("g", namespace_url)
-
-        root = xml_root.find(root_element)
-
-        # Extract data
-        data = []
-        for item in root.findall(f".//{item_element}"):
-            row = {}
-            for xml_field, new_field in mapping.items():
-                # Use namespace prefix if configured
-                if namespace_url:
-                    element = item.find(f"g:{xml_field}", namespaces)
-                else:
-                    element = item.find(xml_field)
-
-                value = element.text if element is not None and element.text else ""
-                row[new_field] = value
-
-            # Add feed name
-            row["source"] = "gastromarket_stalgast"
-            data.append(row)
-
-        df = pd.DataFrame(data)
-
-        # Process images - check if IMAGE column exists in result
-        if "IMAGE" in df.columns:
-            df = self._split_images(df, "IMAGE")
-
-        # Clean prices
-        if "price" in df.columns:
-            df = self._clean_prices(df)
-
-        # Ensure all values are strings and replace NaN
-        for col in df.columns:
-            df[col] = df[col].astype(str).replace("nan", "").replace("None", "")
-
-        print(f"  Parsed {len(df)} products from Gastromarket Stalgast")
-        return df
-
-    def parse_forgastro(self, xml_content: str) -> pd.DataFrame:
-        """
-        Parse ForGastro XML feed to new format.
-
-        Args:
-            xml_content: XML content as string
-
-        Returns:
-            DataFrame with new format columns
-        """
-        print("\nParsing ForGastro XML feed...")
-
-        feed_config = self.xml_feeds.get("forgastro", {})
-        item_element = feed_config.get("item_element", "product")
-        mapping = feed_config.get("mapping", {})
-
-        # Parse XML
-        root = ET.fromstring(xml_content)
-
-        # Extract data
-        data = []
-        for item in root.findall(f".//{item_element}"):
-            row = {}
-            for xml_field, new_field in mapping.items():
-                element = item.find(xml_field)
-                value = element.text if element is not None and element.text else ""
-                row[new_field] = value
-
-            # Add feed name
-            row["source"] = "forgastro"
-            data.append(row)
-
-        df = pd.DataFrame(data)
-
-        # Process HTML content in description field
-        if "description" in df.columns:
+        if feed_key == "forgastro" and "description" in df.columns:
             df = self._process_forgastro_html(df)
 
-        # Process images - check if IMAGES column exists in result
-        if "IMAGES" in df.columns:
-            df = self._split_images(df, "IMAGES")
+        for img_col in ("IMAGE", "IMAGES"):
+            if img_col in df.columns:
+                df = self._split_images(df, img_col)
 
-        # Clean prices
         if "price" in df.columns:
             df = self._clean_prices(df)
 
-        # Ensure all values are strings and replace NaN
         for col in df.columns:
             df[col] = df[col].astype(str).replace("nan", "").replace("None", "")
 
-        print(f"  Parsed {len(df)} products from ForGastro")
+        print(f"  Parsed {len(df)} products from {feed_name}")
         return df
+
+    def parse_gastromarket(self, xml_content: str) -> pd.DataFrame:
+        return self.parse_feed("gastromarket", xml_content)
+
+    def parse_gastromarket_stalgast(self, xml_content: str) -> pd.DataFrame:
+        return self.parse_feed("gastromarket_stalgast", xml_content)
+
+    def parse_forgastro(self, xml_content: str) -> pd.DataFrame:
+        return self.parse_feed("forgastro", xml_content)
+
 
     def _split_images(self, df: pd.DataFrame, image_column: str) -> pd.DataFrame:
         """
@@ -375,3 +302,10 @@ class XMLParser:
                 continue
 
         return df
+
+
+class XMLParserFactory:
+    """Backwards-compatible factory shim routing to standalone functions."""
+
+    fetch_and_parse = staticmethod(fetch_and_parse)
+    parse = staticmethod(parse)

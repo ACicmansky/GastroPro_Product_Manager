@@ -96,9 +96,9 @@ class TestXMLParserFactory:
 
     def test_factory_parse_method(self, sample_xml_gastromarket, config):
         """Test factory parse method."""
-        from src.data.parsers.xml_parser_factory import XMLParserFactory
+        from src.data.parsers import parse
 
-        result = XMLParserFactory.parse("gastromarket", sample_xml_gastromarket, config)
+        result = parse("gastromarket", sample_xml_gastromarket, config)
 
         assert isinstance(result, pd.DataFrame)
         assert "code" in result.columns
@@ -401,7 +401,7 @@ def test_fetch_and_parse_retries_transient_failure(monkeypatch):
     """502 on first attempts, success on the last -> feed still parsed."""
     from unittest.mock import MagicMock
 
-    from src.data.parsers.xml_parser_factory import XMLParserFactory
+    from src.data.parsers import fetch_and_parse
 
     xml = (
         '<?xml version="1.0"?><products><product>'
@@ -421,6 +421,6 @@ def test_fetch_and_parse_retries_transient_failure(monkeypatch):
     monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
     monkeypatch.setattr("time.sleep", lambda s: None)
 
-    df = XMLParserFactory.fetch_and_parse("forgastro", "https://example.com/feed.xml", {})
+    df = fetch_and_parse("forgastro", "https://example.com/feed.xml", {})
     assert calls["n"] == 3
     assert len(df) == 1
