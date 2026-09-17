@@ -159,5 +159,10 @@
     "max_desc_chars": 1200,
     "max_short_desc_chars": 500
   },
+  "image_generation": {
+    "model": "gemini-2.5-flash-image",
+    "output_dir": "out/generated_images",
+    "aspect_ratio": "1:1"
+  },
   "db_path": "data/products.db"
 }

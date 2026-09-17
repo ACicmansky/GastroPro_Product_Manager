@@ -55,6 +55,15 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Catalog-Wide Batch AI Product Image Generation (100% Image Coverage)**
+  - Developed and executed autonomous batch pipeline ([scripts/batch_generate_images.py](file:///c:/Source/Python/GastroPro_Product_Manager/scripts/batch_generate_images.py)) utilizing Google GenAI Batch API (`gemini-2.5-flash-image` "Nano Banana").
+  - Generated commercial studio product photographs for all 509 catalog products lacking images in 14.9 minutes.
+  - Named all output files by product code: `out/generated_images/{code}.png` (509 PNGs, 466.91 MB).
+  - Total tokens: 817,416; total incurred cost: **$0.278 USD (~28 cents)**.
+  - Synchronized image references into `data/products.db`.
+  - **Result: 9,712 / 9,712 products (100.00%) in catalog database now have images.**
+  - Full test suite: **263 tests passing** in parallel via `uv run poe check`.
+
 - ✅ **Database to Excel Export Functionality & UI Button**
   - Added `Pipeline.export_from_db()` to export current products directly from SQLite `data/products.db` into the final 138-column e-shop Excel format.
   - Added `export_db_button` ("💾 Exportovať z databázy") and `Ctrl+E` shortcut in GUI action layout.
