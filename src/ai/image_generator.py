@@ -1,6 +1,5 @@
 """AI-powered commercial product image generator for gastronomy equipment."""
 
-import html
 import logging
 import os
 import re
@@ -11,21 +10,14 @@ from dotenv import load_dotenv
 from google import genai
 from google.genai import types
 
+from src.ai.pruning import prune_text
+
 logger = logging.getLogger(__name__)
 
 
 def clean_text_from_html(text: str) -> str:
-    """Strip HTML tags and unescape HTML entities, returning cleaned text."""
-    if not text:
-        return ""
-    # Unescape HTML entities
-    unescaped = html.unescape(str(text))
-    # Replace common HTML breaks/lists with punctuation or spaces
-    unescaped = re.sub(r"</?(li|p|div|br\s*/?)>", " ", unescaped, flags=re.IGNORECASE)
-    # Strip remaining HTML tags
-    clean = re.sub(r"<[^>]+>", " ", unescaped)
-    # Normalize whitespaces
-    return re.sub(r"\s+", " ", clean).strip()
+    """Strip HTML tags and unescape HTML entities, delegating to prune_text."""
+    return prune_text(text, max_chars=10000).replace("\n", " ").strip()
 
 
 def sanitize_filename(filename: str) -> str:
