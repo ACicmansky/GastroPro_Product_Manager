@@ -171,13 +171,13 @@ The application is organized into a `src` package to ensure clear separation of 
 ### Current Structure (post July 2026 layered refactor)
 - **main.py**: Application entry point (GUI, 138-column format)
 - **src/pipeline/**: `pipeline.py` (Pipeline coordinator), `scraping.py` (ScrapingOrchestrator)
-- **src/data/**: `loaders/` (CSV/XLSX + factory), `parsers/` (XMLParserFactory; Gastromarket namespaced `g:` prefix, ForGastro plain), `writers/`, `database/` (ProductDB document store, BatchJobDB)
-- **src/domain/**: `products/` (ProductMerger, variant_service), `categories/` (CategoryService, filter), `pricing/` (PricingService), `transform/` (OutputTransformer, 138 columns), `models.py`
-- **src/ai/**: `api_client.py` (GeminiClient), `batch_orchestrator.py`, `product_enricher.py`, `prompts.py`, `result_parser.py`
+- **src/data/**: `excel.py` (load_xlsx, write_xlsx), `parsers/` (config-driven XMLParser; Gastromarket namespaced `g:` prefix, ForGastro plain), `database/` (ProductDB document store, RunDB)
+- **src/domain/**: `products/` (ProductMerger, get_pair_code), `categories/` (CategoryService), `pricing/` (PricingService), `transform/` (OutputTransformer, 138 columns), `models.py`
+- **src/ai/**: `api_client.py` (GeminiClient), `batch_orchestrator.py`, `product_enricher.py`, `prompts.py`, `result_parser.py`, `image_generator.py`
 - **src/scrapers/**: `base_scraper.py`, `topchladenie_scraper.py`, `mebella_scraper.py`
 - **src/gui/**: `main_window.py`, `worker.py` (thin PipelineWorker), `widgets.py`, dialogs
 - **src/config/**: config loading and schema
-- **tests/**: 196 tests (unit + integration, pytest markers)
+- **tests/**: 249 tests (unit + integration, pytest markers)
 
 ## AI Enhancement Architecture
 

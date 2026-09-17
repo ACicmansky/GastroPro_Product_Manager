@@ -9,13 +9,12 @@ src/
 │   ├── pipeline.py        # Pipeline — linear coordinator of the whole flow
 │   └── scraping.py        # ScrapingOrchestrator — runs enabled scrapers
 ├── data/         # I/O layer
-│   ├── loaders/           # XLSX/CSV loading (factory picks by extension)
-│   ├── parsers/           # XML feed parsers via XMLParserFactory
-│   ├── writers/           # CSV export
-│   └── database/          # ProductDB (JSON document store), BatchJobDB
+│   ├── excel.py           # Consolidated XLSX loading and writing
+│   ├── parsers/           # Config-driven XML feed parser (XMLParser)
+│   └── database/          # ProductDB (JSON document store), RunDB (run/chunk tracking)
 ├── domain/       # Business logic (pure, no I/O)
-│   ├── products/          # ProductMerger, variant_service (get_pair_code)
-│   ├── categories/        # CategoryService, category filter
+│   ├── products/          # ProductMerger, get_pair_code
+│   ├── categories/        # CategoryService (mapping, suggestions, filter extraction)
 │   ├── pricing/           # PricingService (table_bases_prices.json records)
 │   ├── transform/         # OutputTransformer (138-column output)
 │   └── models.py          # MergeResult, MergeStats, PipelineOptions...
@@ -137,8 +136,8 @@ src/
 - **src/gui/main_window.py**: `MainWindow` manages the UI and delegates processing to `PipelineWorker`.
 - **src/gui/worker.py**: Thin `QThread` worker running `Pipeline` in the background. Blocking interactive callbacks (category mapping, price mapping) use signal → dialog → `QEventLoop` → `set_*_result`.
 - **src/pipeline/pipeline.py**: `Pipeline` orchestrates the flow: load → parse feeds → scrape → price-map (pre-merge, Mebella) → merge → map categories → AI enhance → transform → export.
-- **src/domain/**: Pure business logic — `ProductMerger`, `CategoryService`, `PricingService`, `OutputTransformer`, `variant_service`.
-- **src/data/**: Loaders/parsers/writers/database; `XMLParserFactory` picks Gastromarket (namespaced) vs ForGastro parser.
+- **src/domain/**: Pure business logic — `ProductMerger` (with `get_pair_code`), `CategoryService`, `PricingService`, `OutputTransformer`.
+- **src/data/**: Excel I/O (`excel.py`), config-driven `XMLParser`, document store (`ProductDB`), and run tracker (`RunDB`).
 - **src/ai/**: `BatchOrchestrator` drives the Gemini Batch API through `GeminiClient`; `ResultParser` applies results back via 3-strategy fuzzy matching.
 
 ## Technical Decisions

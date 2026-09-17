@@ -1,12 +1,12 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-17 (AI Product Image Generator implemented and verified)*
+*Last updated: 2026-09-18 (Ponytail Audit Codebase Simplification Completed)*
 
 ## Current State
 The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
 - **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
-- **Testing & QA**: 263 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Testing & QA**: 249 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
 - **Type Safety**: `PyQt5-stubs` installed and `pyrightconfig.json` calibrated with `.venv` and path exclusions.
 - **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching on `windows-latest`.
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
@@ -15,8 +15,18 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 - **AI Enhancement**: Full catalog run (9,650 products, 193 batch chunks) completed with 100% success rate. 9,701 / 9,712 products (99.89%) enhanced in SQLite database with B2B copy, FAQs, SEO metadata, and category parameters.
 - **Image Integrity & 100% Catalog Image Coverage**: Fixed image wiping bugs in `OutputTransformer` and `ProductMerger`. Restored 9,192 existing images from source files and backups. Generated commercial studio product photographs for all remaining 509 missing items using `gemini-2.5-flash-image` Batch API. **9,712 / 9,712 products (100.00%) in database now have images.**
 - **AI Product Image Generator**: Core module `ProductImageGenerator` (`src/ai/image_generator.py`) and autonomous batch runner (`scripts/batch_generate_images.py`). Generated 509 high-resolution PNGs (466.9 MB) in `out/generated_images/{code}.png` for **$0.28 USD total**.
+- **Streamlined Code Architecture (Ponytail Audit)**: 1,277 lines of boilerplate, dead scripts, duplicate parsing methods, and legacy tables purged. Consolidated XML parsing to single config-driven method, unified Excel I/O into `src/data/excel.py`, inlined category helpers into `CategoryService`, and retired obsolete `BatchJobDB` in favor of `RunDB`.
 
-## Recent Changes (2026-09-17 — Batch AI Image Generation for All Missing Products)
+## Recent Changes (2026-09-18 — Ponytail Audit Code Simplification)
+- Executed comprehensive repo simplification based on `/ponytail-audit`:
+  - Pruned one-shot scripts (`generate_product_image.py`, `cleaning.py`, `restore_product_images.py`, `categories.py`); sanitized `auto_categorize.py` with CLI arguments for future feed categorization.
+  - Unified `XMLParser` feed parsing into single config-driven `parse_feed` and inlined `fetch_and_parse` / `parse`, deleting `xml_parser_factory.py`.
+  - Replaced legacy `BatchJobDB` with `RunDB` across AI and pipeline subsystems, deleting `batch_job_db.py`.
+  - Consolidated `src/data/loaders/` and `src/data/writers/` into `src/data/excel.py`.
+  - Inlined category filtering methods into `CategoryService`, removing `category_filter.py` and obsolete `map_dataframe` tests.
+  - Inlined `get_pair_code` into `src/domain/products/merger.py`, removing `variant_service.py`.
+  - Cleaned up dead GUI stubs and duplicated image column loops.
+- **Impact:** Net **1,277 lines of bloat eliminated**, 13 files deleted, all 249 tests passing with 0 regressions.
 - Executed Google GenAI Batch Job (`batches/fc1kxpn6pl17kg19sfr5h3lxiqfreudd3zwl`) for 507 items + 2 initial tests in 14.9 minutes.
 - Extracted 509 commercial studio photos into `out/generated_images/{code}.png`.
 - Updated `data/products.db` image references via `update_database_with_generated_images()`.
