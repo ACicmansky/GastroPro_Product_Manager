@@ -174,6 +174,26 @@ class TestImageSplitting:
         assert result.loc[0, "image"] == ""
         assert result.loc[0, "image2"] == ""
 
+    def test_split_images_preserves_existing_images_when_obrazky_missing(self, config):
+        """Test that existing image columns are preserved when Obrázky column is absent."""
+        from src.domain.transform.output_transformer import OutputTransformer
+
+        transformer = OutputTransformer(config)
+
+        df = pd.DataFrame(
+            {
+                "code": ["ABC1"],
+                "image": ["https://example.com/img1.jpg"],
+                "image2": ["https://example.com/img2.jpg"],
+            }
+        )
+
+        result = transformer.split_images(df)
+
+        assert result.loc[0, "image"] == "https://example.com/img1.jpg"
+        assert result.loc[0, "image2"] == "https://example.com/img2.jpg"
+        assert result.loc[0, "image3"] == ""
+
 
 class TestCategoryTransformation:
     """Test category transformation with prefix and separator."""

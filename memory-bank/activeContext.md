@@ -1,16 +1,33 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-15 (Input pruning optimization & Gemini 3.8 Flash upgrade)*
+*Last updated: 2026-09-17 (Full catalog AI enhancement completed across 9,701 products)*
 
 ## Current State
 The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
 - **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
-- **Testing & QA**: 240 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Testing & QA**: 250 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
 - **Type Safety**: `PyQt5-stubs` installed and `pyrightconfig.json` calibrated with `.venv` and path exclusions.
 - **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching on `windows-latest`.
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
 - **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
+- **AI Enhancement**: Full catalog run (9,650 products, 193 batch chunks) completed with 100% success rate. 9,701 / 9,712 products (99.89%) enhanced in SQLite database with B2B copy, FAQs, SEO metadata, and category parameters.
+- **Image Integrity**: Fixed image wiping bug in `OutputTransformer.split_images()` and `ProductMerger._update_from_feed()`. Restored images for 9,192 products; 9,203 / 9,712 products (94.76%) now have images.
+
+## Recent Changes (2026-09-17 — Image Data Loss Bug Fix & Restoration)
+- Fixed bug in `OutputTransformer.split_images` ([src/domain/transform/output_transformer.py](file:///c:/Source/Python/GastroPro_Product_Manager/src/domain/transform/output_transformer.py)) where missing `"Obrázky"` column caused all image columns to be blanked out to `""` on export.
+- Updated `ProductMerger._update_from_feed` ([src/domain/products/merger.py](file:///c:/Source/Python/GastroPro_Product_Manager/src/domain/products/merger.py)) to prevent empty feed image columns from overwriting valid existing images in target.
+- Added 2 new unit tests in [tests/test_output_transformer.py](file:///c:/Source/Python/GastroPro_Product_Manager/tests/test_output_transformer.py) and [tests/test_data_merging_new_format.py](file:///c:/Source/Python/GastroPro_Product_Manager/tests/test_data_merging_new_format.py). Suite: **250 tests passing** via `uv run poe check`.
+- Executed image restoration script (`scripts/restore_product_images.py`), combining images from `products (2).xlsx` (5,391 products) and `products_backup_20260916_104351.db` (9,136 products).
+- Restored **9,192 products**; total products with images in DB is now **9,203 (94.76%)**, while preserving 100% of the AI enhancements.
+
+## Recent Changes (2026-09-17 — Full Catalog AI Enhancement Completion)
+- Completed Run #3 across all 193 batch chunks using `gemini-3.8-flash` Batch API with sliding-window parallelism (`parallel_chunks: 5`).
+- Exact measured token usage across the run: **18,569,272 prompt tokens**, **12,367,228 candidate tokens**, totaling **30,936,500 tokens**.
+- Realized cost: **$30.15 USD** for the batch run + **$1.61 USD** for the live categorization subagent, reconciling to the **€31.02 Monthly Spend** shown in Google Cloud Billing.
+- Database state: **9,701 / 9,712 products (99.89%)** enhanced and durably stored.
+- Detailed metrics saved in `out/token_usage_summary_run3.json`.
+
 ## Recent Changes (2026-09-16 — Concurrent Parallel Batch Chunks via Sliding Window)
 - Implemented sliding-window concurrent batch chunk dispatcher in `BatchOrchestrator._run_chunks` ([src/ai/batch_orchestrator.py](file:///c:/Source/Python/GastroPro_Product_Manager/src/ai/batch_orchestrator.py)).
 - Added `"parallel_chunks": 5` to [config.json](file:///c:/Source/Python/GastroPro_Product_Manager/config.json). Up to 5 batch jobs run simultaneously in Google Cloud (250 products running in parallel).

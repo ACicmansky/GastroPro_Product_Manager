@@ -523,3 +523,31 @@ class TestDiscontinuationLogic:
         assert len(result) == 1
         assert "PROD_KEEP" in result["code"].values
         assert "PROD_DROP" not in result["code"].values
+
+    def test_feed_does_not_overwrite_main_image_with_empty(self):
+        """Test that a feed with empty image column does not blank out existing main image."""
+        from src.domain.products.merger import ProductMerger
+
+        merger = ProductMerger()
+
+        main_df = pd.DataFrame(
+            {
+                "code": ["PROD1"],
+                "name": ["Product 1"],
+                "image": ["https://example.com/original.jpg"],
+            }
+        )
+
+        feed_df = pd.DataFrame(
+            {
+                "code": ["PROD1"],
+                "name": ["Product 1 from feed"],
+                "image": [""],
+            }
+        )
+
+        merge_result = merger.merge(main_df, {"feed1": feed_df})
+        result = merge_result.products
+
+        assert len(result) == 1
+        assert result.iloc[0]["image"] == "https://example.com/original.jpg"

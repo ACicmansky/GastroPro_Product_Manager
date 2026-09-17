@@ -14,7 +14,7 @@ class ProductMerger:
     """Merges product data from main file and XML feed sources."""
 
     # Image columns in priority order (first is the primary image)
-    IMAGE_COLUMNS = ["image"] + [f"image{i}" for i in range(2, 11)]
+    IMAGE_COLUMNS = ["image", "defaultImage"] + [f"image{i}" for i in range(2, 21)]
 
     # Fields that are never overridden by feed data when they exist in main.
     # These are AI-enhanced, manually edited, or tracking fields.
@@ -146,12 +146,20 @@ class ProductMerger:
             return
 
         # Image merge prioritizes the source with more images
-        keep_existing_images = self._count_images(feed_row) < self._count_images(pd.Series(target))
+        target_img_count = self._count_images(pd.Series(target))
+        feed_img_count = self._count_images(feed_row)
+        keep_existing_images = feed_img_count < target_img_count
+
         for col in feed_row.index:
             if col in skip_fields or pd.isna(feed_row[col]):
                 continue
-            if keep_existing_images and col in self.IMAGE_COLUMNS:
-                continue
+            if col in self.IMAGE_COLUMNS:
+                feed_val = str(feed_row[col]).strip()
+                # Never overwrite an existing image with an empty feed value
+                if not feed_val or feed_val.lower() in ("none", "nan", ""):
+                    continue
+                if keep_existing_images:
+                    continue
             target[col] = feed_row[col]
 
     def _keep_main_products(

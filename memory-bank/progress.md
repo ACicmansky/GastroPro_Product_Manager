@@ -55,6 +55,21 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Image Data Loss Bug Fix & Full Restoration (9,192 Products Restored)**
+  - Fixed regression in `OutputTransformer.split_images()` where missing legacy `"Obrázky"` column wiped existing `image` columns to `""` on export.
+  - Enhanced `ProductMerger._update_from_feed()` to protect existing images from empty feed values and expanded `IMAGE_COLUMNS` up to `image20` + `defaultImage`.
+  - Added unit tests for both fixes (test suite: **250 tests passing** in ~9s via `uv run poe check`).
+  - Restored images for **9,192 products** in `data/products.db` by merging client file `products (2).xlsx` and pre-incident backup `products_backup_20260916_104351.db`.
+  - **Result: 9,203 / 9,712 products (94.76%) now have images, with 100% of AI copy, FAQs, SEO metadata, and parameters fully preserved.**
+
+- ✅ **Full Catalog AI Enhancement Completion (Run #3 & #4)**
+  - Successfully enhanced 9,701 / 9,712 products in the database (99.89% catalog coverage).
+  - Processed 193 batch chunks concurrently via sliding-window dispatcher (`parallel_chunks: 5`) with `gemini-3.8-flash` and bounded reasoning (`thinking_budget: 3072`).
+  - Total tokens consumed: **30,936,500 tokens** (18,569,272 input / prompt tokens + 12,367,228 output / reasoning candidate tokens).
+  - Total realized cost on Gemini Batch API: **$30.15 USD**, reconciling with the live categorization subagent ($1.61 USD) to the **€31.02 Monthly Spend** in Google Cloud Billing.
+  - Zero chunk failures; data durably committed to SQLite `ProductDB`.
+  - Detailed metrics stored in `out/token_usage_summary_run3.json`.
+
 - ✅ **Category Prefix Removal ("Tovary a kategórie > ")**
   - Removed all enforcement and prepending of `"Tovary a kategórie > "` across the entire project.
   - `OutputTransformer`: Formats categories by replacing `/` with ` > ` and strips any legacy `"Tovary a kategórie > "` prefix.

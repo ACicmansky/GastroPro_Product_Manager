@@ -125,24 +125,6 @@ class OutputTransformer:
         if output_df is None:
             output_df = pd.DataFrame(index=df.index)
 
-        if "Obrázky" not in df.columns:
-            logger.warning("'Obrázky' column not found")
-            # Initialize empty image columns
-            image_columns = [
-                "image",
-                "image2",
-                "image3",
-                "image4",
-                "image5",
-                "image6",
-                "image7",
-                "image8",
-            ]
-            for col in image_columns:
-                output_df[col] = ""
-            return output_df
-
-        # Define image column names in order
         image_columns = [
             "image",
             "image2",
@@ -154,14 +136,26 @@ class OutputTransformer:
             "image8",
         ]
 
-        # Initialize all image columns as empty
-        for col in image_columns:
-            output_df[col] = ""
+        if "Obrázky" not in df.columns:
+            # Preserve existing image columns from df / output_df if present
+            for col in image_columns:
+                if col in df.columns:
+                    output_df[col] = df[col].astype(str).replace("nan", "").replace("None", "")
+                elif col not in output_df.columns:
+                    output_df[col] = ""
+            return output_df
 
-        # Split and assign images
+        # When 'Obrázky' is in df, start with existing image columns or empty
+        for col in image_columns:
+            if col in df.columns:
+                output_df[col] = df[col].astype(str).replace("nan", "").replace("None", "")
+            elif col not in output_df.columns:
+                output_df[col] = ""
+
+        # Split and assign images from 'Obrázky' (overriding only when non-empty)
         for idx, row in df.iterrows():
             images_str = str(row["Obrázky"]) if pd.notna(row["Obrázky"]) else ""
-            if images_str and images_str != "nan":
+            if images_str and images_str not in ("nan", "None", ""):
                 # Split by comma and strip whitespace
                 images = [img.strip() for img in images_str.split(",") if img.strip()]
 
