@@ -27,7 +27,6 @@ from .prompts import (
     create_system_prompt_no_dimensions,
     load_category_parameters,
 )
-from src.data.database.batch_job_db import BatchJobDB
 from src.data.database.run_db import RunDB
 
 logger = logging.getLogger(__name__)
@@ -47,13 +46,11 @@ class BatchOrchestrator:
         self,
         client: GeminiClient,
         result_parser: ResultParser,
-        batch_job_db: Optional[BatchJobDB] = None,
         run_db: Optional[RunDB] = None,
         config: Optional[Dict] = None,
     ):
         self.client = client
         self.parser = result_parser
-        self.batch_job_db = batch_job_db
         self.run_db = run_db
 
         ai_config = (config or {}).get("ai_enhancement", {})
@@ -313,9 +310,6 @@ class BatchOrchestrator:
                         return df, stats
                     continue
 
-                if self.batch_job_db:
-                    self.batch_job_db.update_status(job_name, state)
-
                 if state == "JOB_STATE_SUCCEEDED":
                     logger.info(f"Batch Job {job_name} Status: JOB_STATE_SUCCEEDED")
                     df, applied = self._download_and_apply(
@@ -389,10 +383,6 @@ class BatchOrchestrator:
         uploaded_name = self.client.upload_file(jsonl_path)
         batch_job = self.client.create_batch_job(uploaded_name, model=model)
         logger.info(f"Batch Job Created: {batch_job.name}")
-
-        if self.batch_job_db:
-            self.batch_job_db.add_job(batch_job.name, batch_job.state.name, jsonl_path, uploaded_name)
-
         return batch_job.name, uploaded_name
 
     def _wait_for_job(
@@ -432,9 +422,6 @@ class BatchOrchestrator:
                     return "interrupted", None
                 time.sleep(30)
                 continue
-
-            if self.batch_job_db:
-                self.batch_job_db.update_status(job_name, state)
 
             logger.info(f"Batch Job {job_name} Status: {state}")
             if progress_callback:

@@ -11,7 +11,6 @@ from .prompts import load_category_parameters
 from .result_parser import ResultParser
 from .run_control import RunControl
 from src.domain.models import EnrichmentResult
-from src.data.database.batch_job_db import BatchJobDB
 from src.data.database.run_db import RunDB
 
 logger = logging.getLogger(__name__)
@@ -20,18 +19,22 @@ logger = logging.getLogger(__name__)
 class ProductEnricher:
     """Coordinates AI enhancement of product data."""
 
-    def __init__(self, config: Dict, batch_job_db: Optional[BatchJobDB] = None):
+    def __init__(self, config: Dict, run_db: Optional[RunDB] = None):
         self.client = GeminiClient(config)
         category_params = load_category_parameters()
         self.parser = ResultParser(
             similarity_threshold=config.get("ai_enhancement", {}).get("similarity_threshold", 85),
             allowed_params={f for filters in category_params.values() for f in filters},
         )
-        self.run_db = RunDB(batch_job_db.db_path) if batch_job_db else None
+        if run_db is not None:
+            self.run_db = run_db
+        else:
+            db_path = config.get("db_path", "data/products.db")
+            self.run_db = RunDB(db_path) if db_path else None
+
         self.orchestrator = BatchOrchestrator(
             client=self.client,
             result_parser=self.parser,
-            batch_job_db=batch_job_db,
             run_db=self.run_db,
             config=config,
         )

@@ -1,4 +1,4 @@
-"""Tests for ProductDB and BatchJobDB — SQLite persistence round trips."""
+"""Tests for ProductDB — SQLite persistence round trips."""
 
 import json
 import sqlite3
@@ -7,17 +7,11 @@ import pandas as pd
 import pytest
 
 from src.data.database.product_db import ProductDB
-from src.data.database.batch_job_db import BatchJobDB
 
 
 @pytest.fixture
 def product_db(tmp_path):
     return ProductDB(str(tmp_path / "products.db"))
-
-
-@pytest.fixture
-def job_db(tmp_path):
-    return BatchJobDB(str(tmp_path / "jobs.db"))
 
 
 @pytest.mark.unit
@@ -82,30 +76,3 @@ class TestProductDB:
             product_db.backup(max_backups=2)
         backups = glob.glob(os.path.join(product_db.backups_dir, "products_backup_*.db"))
         assert 1 <= len(backups) <= 2
-
-
-@pytest.mark.unit
-class TestBatchJobDB:
-    def test_add_job_becomes_active(self, job_db):
-        job_db.add_job("jobs/123", "JOB_STATE_PENDING", "in.jsonl", "files/abc")
-        job = job_db.get_active_job()
-        assert job is not None
-        assert job["status"] == "JOB_STATE_PENDING"
-        assert job["uploaded_file_name"] == "files/abc"
-
-    def test_get_active_job_empty_returns_none(self, job_db):
-        assert job_db.get_active_job() is None
-
-    def test_get_active_job_ignores_completed(self, job_db):
-        job_db.add_job("jobs/done", "JOB_STATE_SUCCEEDED", "a.jsonl", "f1")
-        job_db.add_job("jobs/failed", "JOB_STATE_FAILED", "b.jsonl", "f2")
-        assert job_db.get_active_job() is None
-        job_db.add_job("jobs/running", "JOB_STATE_RUNNING", "c.jsonl", "f3")
-        active = job_db.get_active_job()
-        assert active is not None
-        assert active["job_name"] == "jobs/running"
-
-    def test_update_status_closes_active_job(self, job_db):
-        job_db.add_job("jobs/run", "JOB_STATE_RUNNING", "a.jsonl", "f1")
-        job_db.update_status("jobs/run", "JOB_STATE_SUCCEEDED", details="ok")
-        assert job_db.get_active_job() is None
