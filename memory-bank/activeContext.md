@@ -1,18 +1,27 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-17 (Full catalog AI enhancement completed across 9,701 products)*
+*Last updated: 2026-09-17 (Direct database export to Excel functionality added)*
 
 ## Current State
 The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
 - **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
-- **Testing & QA**: 250 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Testing & QA**: 255 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
 - **Type Safety**: `PyQt5-stubs` installed and `pyrightconfig.json` calibrated with `.venv` and path exclusions.
 - **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching on `windows-latest`.
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
 - **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
+- **Database Export**: One-click direct export button ("💾 Exportovať z databázy" / `Ctrl+E`) exporting all products from SQLite database directly into final 138-column e-shop Excel file.
 - **AI Enhancement**: Full catalog run (9,650 products, 193 batch chunks) completed with 100% success rate. 9,701 / 9,712 products (99.89%) enhanced in SQLite database with B2B copy, FAQs, SEO metadata, and category parameters.
 - **Image Integrity**: Fixed image wiping bug in `OutputTransformer.split_images()` and `ProductMerger._update_from_feed()`. Restored images for 9,192 products; 9,203 / 9,712 products (94.76%) now have images.
+
+## Recent Changes (2026-09-17 — Export Products from Database to Excel Button & Pipeline)
+- Added `export_from_db(output_path, selected_categories=None, on_progress=None)` to `Pipeline` ([src/pipeline/pipeline.py](file:///c:/Source/Python/GastroPro_Product_Manager/src/pipeline/pipeline.py)), enabling instant export of the database catalog into the final 138-column e-shop Excel format.
+- Fixed `OutputTransformer.apply_direct_mappings()` to explicitly preserve and forward all dynamic `filteringProperty:*` columns from incoming DataFrame into `output_df`.
+- Created `DBExportWorker` in `src/gui/worker.py` to run export operations on a background `QThread` with progress reporting, duration, and row count tracking.
+- Added `export_db_button` (`💾 Exportovať z databázy`) with keyboard shortcut `Ctrl+E` in `MainWindow` ([src/gui/main_window.py](file:///c:/Source/Python/GastroPro_Product_Manager/src/gui/main_window.py)), styled in `styles/main.qss`.
+- Added `export` subcommand to CLI tool (`scripts/pipeline_cli.py export -o out/export.xlsx`).
+- Added 5 new automated tests in [tests/test_pipeline_new_format.py](file:///c:/Source/Python/GastroPro_Product_Manager/tests/test_pipeline_new_format.py) and [tests/test_gui_window.py](file:///c:/Source/Python/GastroPro_Product_Manager/tests/test_gui_window.py). Test suite: **255 tests passing** via `uv run poe check`.
 
 ## Recent Changes (2026-09-17 — Image Data Loss Bug Fix & Restoration)
 - Fixed bug in `OutputTransformer.split_images` ([src/domain/transform/output_transformer.py](file:///c:/Source/Python/GastroPro_Product_Manager/src/domain/transform/output_transformer.py)) where missing `"Obrázky"` column caused all image columns to be blanked out to `""` on export.

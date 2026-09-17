@@ -9,6 +9,7 @@ Examples:
     python scripts/pipeline_cli.py merge main.xlsx --feeds out/feeds/*.xlsx -o merged.xlsx
     python scripts/pipeline_cli.py categories merged.xlsx -o mapped.xlsx
     python scripts/pipeline_cli.py transform mapped.xlsx -o output.xlsx
+    python scripts/pipeline_cli.py export -o final.xlsx
     python scripts/pipeline_cli.py run main.xlsx -o output.xlsx --preserve-edits
 """
 
@@ -265,6 +266,23 @@ def cmd_run(args, config):
     )
 
 
+def cmd_export(args, config):
+    from src.pipeline.pipeline import Pipeline
+
+    logger.info("Exporting products from database to %s...", args.out)
+    result = Pipeline(config).export_from_db(
+        output_path=args.out,
+        selected_categories=args.categories,
+        on_progress=lambda m: logger.info("%s", m),
+    )
+    logger.info(
+        "Export complete: %d products in %.1fs -> %s",
+        result.product_count,
+        result.duration_seconds,
+        result.output_path,
+    )
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--config", default="config.json")
@@ -322,6 +340,11 @@ def main():
     p.add_argument("--preserve-edits", action="store_true")
     p.add_argument("--only", nargs="*", help="feed names (default: all configured)")
     p.set_defaults(func=cmd_run)
+
+    p = sub.add_parser("export", help="export products from database directly to final xlsx format")
+    p.add_argument("-o", "--out", default="out/export.xlsx", help="output file path")
+    p.add_argument("--categories", nargs="*", help="optional category names to filter")
+    p.set_defaults(func=cmd_export)
 
     args = parser.parse_args()
     setup_logging()

@@ -371,3 +371,55 @@ class Pipeline:
     def save_output(self, df: pd.DataFrame, file_path: str) -> None:
         """Save DataFrame to xlsx. Convenience method."""
         write_xlsx(df, file_path)
+
+    def export_from_db(
+        self,
+        output_path: str,
+        selected_categories: Optional[list] = None,
+        on_progress: Optional[Callable] = None,
+    ) -> PipelineResult:
+        """Export current products from SQLite database directly to the final Excel format.
+
+        Args:
+            output_path: Target XLSX file path.
+            selected_categories: Optional list of category names to filter by.
+            on_progress: Progress callback (message: str).
+
+        Returns:
+            PipelineResult with output path, product count, and duration.
+        """
+        start_time = time.time()
+        result = PipelineResult()
+
+        def progress(msg: str):
+            if on_progress:
+                on_progress(msg)
+            logger.info(msg)
+
+        progress("Načítavam produkty z databázy...")
+        df = self.db.get_all()
+        if df.empty:
+            progress("Databáza je prázdna.")
+            raise RuntimeError("V databáze sa nenachádzajú žiadne produkty na export.")
+
+        if selected_categories and "defaultCategory" in df.columns:
+            orig_count = len(df)
+            df = df[df["defaultCategory"].isin(selected_categories)].copy()
+            progress(f"Filtrovaných {len(df)} z {orig_count} produktov podľa vybraných kategórií...")
+            if df.empty:
+                raise RuntimeError("Žiadne produkty v databáze nezodpovedajú vybraným kategóriám.")
+
+        # Ensure structured feed dimensions/weight overrides are applied
+        df = apply_feed_specs(df)
+
+        progress(f"Transformujem {len(df)} produktov do výstupného formátu...")
+        output_df = self.transformer.transform(df)
+
+        progress(f"Zapisujem do Excel súboru: {output_path}...")
+        write_xlsx(output_df, output_path)
+
+        result.output_path = output_path
+        result.product_count = len(output_df)
+        result.duration_seconds = time.time() - start_time
+        progress(f"Export dokončený: {result.product_count} produktov za {result.duration_seconds:.1f}s")
+        return result

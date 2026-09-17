@@ -180,3 +180,45 @@ class AIResumeWorker(QObject):
             self.error.emit(str(e))
         finally:
             self.finished.emit()
+
+
+class DBExportWorker(QObject):
+    """Exports products from SQLite database directly to Excel file in a background thread."""
+
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+    progress = pyqtSignal(str)
+    result = pyqtSignal(object)  # PipelineResult
+    statistics = pyqtSignal(dict)
+
+    def __init__(
+        self,
+        config: Dict,
+        output_path: str,
+        selected_categories: Optional[list] = None,
+    ):
+        super().__init__()
+        self.pipeline = Pipeline(config)
+        self.output_path = output_path
+        self.selected_categories = selected_categories
+
+    def run(self):
+        """Called from QThread."""
+        try:
+            pipeline_result = self.pipeline.export_from_db(
+                output_path=self.output_path,
+                selected_categories=self.selected_categories,
+                on_progress=lambda msg: self.progress.emit(msg),
+            )
+            self.statistics.emit(
+                {
+                    "total_products": pipeline_result.product_count,
+                    "duration": pipeline_result.duration_seconds,
+                }
+            )
+            self.result.emit(pipeline_result)
+        except Exception as e:
+            logger.error(f"DB export error: {e}", exc_info=True)
+            self.error.emit(str(e))
+        finally:
+            self.finished.emit()

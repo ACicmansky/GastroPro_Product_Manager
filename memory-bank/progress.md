@@ -55,6 +55,14 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Database to Excel Export Functionality & UI Button**
+  - Added `Pipeline.export_from_db()` to export current products directly from SQLite `data/products.db` into the final 138-column e-shop Excel format.
+  - Added `export_db_button` ("💾 Exportovať z databázy") and `Ctrl+E` shortcut in GUI action layout.
+  - Implemented `DBExportWorker` running export operations on a background `QThread` with progress reporting and toast completion actions.
+  - Enhanced `OutputTransformer.apply_direct_mappings()` to preserve and forward all dynamic `filteringProperty:*` columns.
+  - Added CLI `export` command in `scripts/pipeline_cli.py`.
+  - Added 5 automated tests (unit + GUI). Total suite: **255 tests passing**.
+
 - ✅ **Image Data Loss Bug Fix & Full Restoration (9,192 Products Restored)**
   - Fixed regression in `OutputTransformer.split_images()` where missing legacy `"Obrázky"` column wiped existing `image` columns to `""` on export.
   - Enhanced `ProductMerger._update_from_feed()` to protect existing images from empty feed values and expanded `IMAGE_COLUMNS` up to `image20` + `defaultImage`.

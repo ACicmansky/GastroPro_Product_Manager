@@ -36,7 +36,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QThread, QStandardPaths, QSettings, QUrl
 from PyQt5.QtGui import QKeySequence, QDesktopServices
 
-from .worker import PipelineWorker, AIResumeWorker
+from .worker import PipelineWorker, AIResumeWorker, DBExportWorker
 from .widgets import CategoryMappingDialog, PriceMappingDialog
 from .toast import ToastHost
 from .settings_dialog import SettingsDialog
@@ -201,6 +201,7 @@ class MainWindow(QMainWindow):
         # Shortcuts
         QShortcut(QKeySequence("Ctrl+O"), self, activated=self.select_main_data_file)
         QShortcut(QKeySequence("Ctrl+R"), self, activated=self.process_and_export)
+        QShortcut(QKeySequence("Ctrl+E"), self, activated=self.export_from_db)
 
     def _open_settings(self):
         dialog = SettingsDialog(self.config, parent=self)
@@ -558,14 +559,27 @@ class MainWindow(QMainWindow):
         self.update_progress(message)
 
     def _create_process_button(self, parent):
-        """Create process button."""
+        """Create action buttons (Process & Export + DB Export)."""
+        actions_layout = QHBoxLayout()
+        actions_layout.setSpacing(10)
+
         self.process_button = QPushButton("Spracovať a exportovať")
         self.process_button.setProperty("primary", True)
         self.process_button.setMinimumHeight(46)
         self.process_button.setCursor(Qt.PointingHandCursor)
-        self.process_button.setToolTip("Spustiť spracovanie (Ctrl+R)")
+        self.process_button.setToolTip("Spustiť spracovanie feedov a dát (Ctrl+R)")
         self.process_button.clicked.connect(self.process_and_export)
-        parent.addWidget(self.process_button)
+
+        self.export_db_button = QPushButton("💾 Exportovať z databázy")
+        self.export_db_button.setObjectName("exportDbButton")
+        self.export_db_button.setMinimumHeight(46)
+        self.export_db_button.setCursor(Qt.PointingHandCursor)
+        self.export_db_button.setToolTip("Exportovať produkty z lokálnej SQLite databázy do finálneho XLSX (Ctrl+E)")
+        self.export_db_button.clicked.connect(self.export_from_db)
+
+        actions_layout.addWidget(self.process_button, 3)
+        actions_layout.addWidget(self.export_db_button, 2)
+        parent.addLayout(actions_layout)
 
     def _create_statistics_display(self, parent):
         """Create results panel (KPI tiles + note)."""
@@ -806,9 +820,77 @@ class MainWindow(QMainWindow):
         # Start processing
         self.thread.start()
 
+    def export_from_db(self):
+        """Export products from SQLite database directly to Excel file."""
+        default_dir = self._settings().value(
+            "last_output_dir",
+            QStandardPaths.writableLocation(QStandardPaths.DownloadLocation),
+        )
+        default_filename = f"{default_dir}/{datetime.now().strftime('%Y_%m_%d')}_GastroPro_export.xlsx"
+        output_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Uložiť export z databázy",
+            default_filename,
+            "XLSX files (*.xlsx)",
+        )
+        if not output_path:
+            return
+        self._settings().setValue("last_output_dir", str(Path(output_path).parent))
+
+        # Check if category filter is active and filtering
+        selected_categories = None
+        if self.category_filter_group.isVisible() and self.main_data_file:
+            selected = self.get_selected_categories()
+            if len(selected) < len(self.all_categories):
+                selected_categories = selected
+
+        # Update UI state
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setRange(0, 0)
+        self.status_label.setText("Exportujem produkty z databázy...")
+        self.status_label.setVisible(True)
+        self._reset_stages()
+        self.stage_row.setVisible(True)
+        self._set_stage("export")
+        self._set_ui_enabled(False)
+        self.export_db_button.setText("⏳ Exportujem...")
+        self.stats_group.setVisible(False)
+        self.open_export_button.setVisible(False)
+        self.open_folder_button.setVisible(False)
+        self._update_right_pane()
+
+        # Create worker thread
+        self.export_thread = QThread()
+        self.export_worker = DBExportWorker(
+            self.config,
+            output_path=output_path,
+            selected_categories=selected_categories,
+        )
+        self.export_worker.moveToThread(self.export_thread)
+
+        # Connect signals
+        self.export_thread.started.connect(self.export_worker.run)
+        self.export_worker.finished.connect(self.export_thread.quit)
+        self.export_worker.finished.connect(self.export_worker.deleteLater)
+        self.export_thread.finished.connect(self.export_thread.deleteLater)
+        self.export_worker.result.connect(self.handle_result)
+        self.export_worker.statistics.connect(self.handle_statistics)
+        self.export_worker.error.connect(self.show_error_message)
+        self.export_worker.progress.connect(self.update_progress)
+
+        # Cleanup
+        self.export_thread.finished.connect(lambda: self._set_ui_enabled(True))
+        self.export_thread.finished.connect(lambda: self.progress_bar.setVisible(False))
+        self.export_thread.finished.connect(lambda: self.status_label.setVisible(False))
+        self.export_thread.finished.connect(lambda: self.export_db_button.setText("💾 Exportovať z databázy"))
+
+        # Start export
+        self.export_thread.start()
+
     def _set_ui_enabled(self, enabled: bool):
         """Enable or disable all UI inputs during processing."""
         self.process_button.setEnabled(enabled)
+        self.export_db_button.setEnabled(enabled)
         # no settings edits (or a second AI run from the params tab) mid-run
         self.settings_button.setEnabled(enabled)
         self.ai_resume_button.setEnabled(enabled and self.ai_resume_button.isVisible())

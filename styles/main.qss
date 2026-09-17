@@ -97,6 +97,16 @@ QPushButton[danger="true"]:hover {
     border-color: $danger;
 }
 
+QPushButton#exportDbButton {
+    font-weight: 600;
+    padding: 9px 16px;
+}
+
+QPushButton#exportDbButton:hover {
+    border-color: $accent;
+    background-color: $surfaceAlt;
+}
+
 /* --- Inputs --- */
 QLineEdit, QTextEdit, QPlainTextEdit {
     background-color: $surface;

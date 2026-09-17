@@ -181,3 +181,51 @@ def test_activity_log_collects_messages(window):
     text = window.activity_log.toPlainText()
     assert "Merging product data..." in text
     assert len(text) > len(before)
+
+
+def test_export_db_button_properties(window):
+    """export_db_button must exist, have tooltip, and follow _set_ui_enabled."""
+    assert hasattr(window, "export_db_button")
+    assert "Exportovať z databázy" in window.export_db_button.text()
+    assert window.export_db_button.objectName() == "exportDbButton"
+    assert "Ctrl+E" in window.export_db_button.toolTip()
+
+    window._set_ui_enabled(False)
+    assert not window.export_db_button.isEnabled()
+    window._set_ui_enabled(True)
+    assert window.export_db_button.isEnabled()
+
+
+def test_db_export_worker_execution(tmp_path):
+    """DBExportWorker must execute pipeline.export_from_db and emit result and statistics."""
+    import pandas as pd
+    from src.data.database.product_db import ProductDB
+    from src.gui.worker import DBExportWorker
+
+    db_path = str(tmp_path / "test_products.db")
+    db = ProductDB(db_path)
+    db.upsert(pd.DataFrame([{"code": "EXP1", "name": "Item 1", "price": "10"}]))
+
+    config = {
+        "db_path": db_path,
+        "output_mapping": {"mappings": {}, "default_values": {}},
+    }
+    out_file = str(tmp_path / "out_worker.xlsx")
+    worker = DBExportWorker(config, out_file)
+
+    emitted_result = []
+    emitted_stats = []
+    emitted_finished = []
+
+    worker.result.connect(emitted_result.append)
+    worker.statistics.connect(emitted_stats.append)
+    worker.finished.connect(lambda: emitted_finished.append(True))
+
+    worker.run()
+
+    assert len(emitted_result) == 1
+    assert emitted_result[0].product_count == 1
+    assert len(emitted_stats) == 1
+    assert emitted_stats[0]["total_products"] == 1
+    assert len(emitted_finished) == 1
+    assert os.path.exists(out_file)

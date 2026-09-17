@@ -106,6 +106,11 @@ class OutputTransformer:
             if col in df.columns and col not in output_df.columns:
                 output_df[col] = df[col]
 
+        # Forward dynamic filtering properties extracted by AI or feeds
+        for col in df.columns:
+            if col.startswith("filteringProperty:") and col not in output_df.columns:
+                output_df[col] = df[col]
+
         logger.debug(f"  Mapped {len(output_df.columns)} columns")
         return output_df
 

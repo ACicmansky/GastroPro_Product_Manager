@@ -296,3 +296,74 @@ class TestPipelineOutput:
 
         for col in get_output_columns():
             assert col in result.columns
+
+    def test_export_from_db_creates_valid_file(self, config, test_data_dir):
+        """Test exporting all products from database directly to Excel."""
+        from src.pipeline.pipeline import Pipeline
+
+        pipeline = Pipeline(config)
+        sample_df = pd.DataFrame(
+            [
+                {
+                    "code": "PROD001",
+                    "name": "Product 1",
+                    "price": "150",
+                    "defaultCategory": "Gastro > Chladenie",
+                    "image": "http://example.com/1.jpg",
+                },
+                {
+                    "code": "PROD002",
+                    "name": "Product 2",
+                    "price": "250",
+                    "defaultCategory": "Gastro > Pečenie",
+                    "image": "http://example.com/2.jpg",
+                },
+            ]
+        )
+        pipeline.db.upsert(sample_df)
+
+        output_file = test_data_dir / "db_export.xlsx"
+        result = pipeline.export_from_db(str(output_file))
+
+        assert output_file.exists()
+        assert result.product_count == 2
+        assert result.output_path == str(output_file)
+
+        loaded = pd.read_excel(output_file, engine="openpyxl")
+        assert len(loaded) == 2
+        assert "code" in loaded.columns
+        assert "defaultCategory" in loaded.columns
+        assert "image" in loaded.columns
+        assert set(loaded["code"].tolist()) == {"PROD001", "PROD002"}
+
+    def test_export_from_db_with_category_filter(self, config, test_data_dir):
+        """Test exporting filtered categories from database."""
+        from src.pipeline.pipeline import Pipeline
+
+        pipeline = Pipeline(config)
+        sample_df = pd.DataFrame(
+            [
+                {"code": "P1", "name": "Prod 1", "defaultCategory": "Cat A"},
+                {"code": "P2", "name": "Prod 2", "defaultCategory": "Cat B"},
+                {"code": "P3", "name": "Prod 3", "defaultCategory": "Cat A"},
+            ]
+        )
+        pipeline.db.upsert(sample_df)
+
+        output_file = test_data_dir / "cat_filtered_export.xlsx"
+        result = pipeline.export_from_db(str(output_file), selected_categories=["Cat A"])
+
+        assert result.product_count == 2
+        loaded = pd.read_excel(output_file, engine="openpyxl")
+        assert len(loaded) == 2
+        assert set(loaded["code"].tolist()) == {"P1", "P3"}
+
+    def test_export_from_db_empty_raises_error(self, config, test_data_dir):
+        """Test that exporting an empty database raises RuntimeError."""
+        from src.pipeline.pipeline import Pipeline
+
+        pipeline = Pipeline(config)
+        output_file = test_data_dir / "empty_export.xlsx"
+
+        with pytest.raises(RuntimeError, match="V databáze sa nenachádzajú žiadne produkty"):
+            pipeline.export_from_db(str(output_file))
