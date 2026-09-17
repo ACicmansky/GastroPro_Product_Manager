@@ -7,11 +7,10 @@ from typing import Callable, Dict, Optional
 import pandas as pd
 
 from src.ai.product_enricher import ProductEnricher
-from src.data.database.batch_job_db import BatchJobDB
 from src.data.database.product_db import ProductDB
-from src.data.loaders.xlsx_loader import load_xlsx
-from src.data.parsers.xml_parser_factory import XMLParserFactory
-from src.data.writers.xlsx_writer import write_xlsx
+from src.data.database.run_db import RunDB
+from src.data.excel import load_xlsx, write_xlsx
+from src.data.parsers import fetch_and_parse, parse as parse_xml_feed
 from src.domain.categories.category_service import CategoryService
 from src.domain.models import PipelineOptions, PipelineResult
 from src.domain.pricing.pricing_service import PricingService
@@ -45,11 +44,11 @@ class Pipeline:
         db_path = config.get("db_path", "data/products.db")
 
         self.db = ProductDB(db_path)
-        self.batch_job_db = BatchJobDB(db_path)
+        self.run_db = RunDB(db_path)
         self.merger = ProductMerger()
         self.category_service = CategoryService()
         self.transformer = OutputTransformer(config)
-        self.enricher = ProductEnricher(config, batch_job_db=self.batch_job_db)
+        self.enricher = ProductEnricher(config, run_db=self.run_db)
         self.pricing_service = PricingService()
         self.scraping = ScrapingOrchestrator(config)
 
@@ -133,7 +132,7 @@ class Pipeline:
             if options.enabled_feeds is not None and feed_name not in options.enabled_feeds:
                 continue
             progress(f"Parsing XML feed: {feed_name}")
-            feed_df = XMLParserFactory.fetch_and_parse(feed_name, url, self.config)
+            feed_df = fetch_and_parse(feed_name, url, self.config)
             if feed_df is not None and not feed_df.empty:
                 feed_dfs[feed_name] = feed_df
                 progress(f"Feed '{feed_name}': {len(feed_df)} products")
@@ -350,7 +349,7 @@ class Pipeline:
 
     def parse_xml(self, feed_name: str, xml_content: str) -> pd.DataFrame:
         """Parse an XML feed. Convenience method for testing."""
-        result = XMLParserFactory.parse(feed_name, xml_content, self.config)
+        result = parse_xml_feed(feed_name, xml_content, self.config)
         return result if result is not None else pd.DataFrame()
 
     def map_categories(self, df: pd.DataFrame, ask_interactive: bool = False) -> pd.DataFrame:

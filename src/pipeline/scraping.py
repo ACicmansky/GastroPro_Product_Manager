@@ -5,7 +5,7 @@ from typing import Dict, Optional, Callable
 
 import pandas as pd
 
-from src.domain.products.variant_service import get_pair_code
+from src.domain.products import get_pair_code
 from src.scrapers.mebella_scraper import MebellaScraper
 from src.scrapers.topchladenie_scraper import TopchladenieScraper
 

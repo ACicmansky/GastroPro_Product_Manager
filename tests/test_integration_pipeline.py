@@ -9,8 +9,8 @@ from pathlib import Path
 import pytest
 
 from src.config.config_loader import load_config
-from src.data.loaders.xlsx_loader import load_xlsx
-from src.data.parsers.xml_parser_factory import XMLParserFactory
+from src.data.excel import load_xlsx
+from src.data.parsers import parse as parse_xml
 from src.domain.products.merger import ProductMerger
 from src.domain.transform.output_transformer import OutputTransformer
 
@@ -25,7 +25,7 @@ def config():
 @pytest.fixture(scope="module")
 def feed_dfs(config):
     return {
-        name: XMLParserFactory.parse(name, (FIXTURES / f"{name}.xml").read_text(encoding="utf-8"), config)
+        name: parse_xml(name, (FIXTURES / f"{name}.xml").read_text(encoding="utf-8"), config)
         for name in ("gastromarket", "forgastro")
     }
 

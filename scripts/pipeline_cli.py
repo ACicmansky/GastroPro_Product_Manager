@@ -22,9 +22,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from src.config.config_loader import load_config
-from src.data.loaders.xlsx_loader import load_xlsx
-from src.data.parsers.xml_parser_factory import XMLParserFactory
-from src.data.writers.xlsx_writer import write_xlsx
+from src.data.excel import load_xlsx, write_xlsx
+from src.data.parsers import fetch_and_parse
 from src.domain.categories.category_service import CategoryService
 from src.domain.models import PipelineOptions
 from src.domain.products.feed_specs import apply_feed_specs
@@ -43,7 +42,7 @@ def cmd_feeds(args, config):
         if not url:
             continue
         logger.info("Fetching feed '%s'...", name)
-        df = XMLParserFactory.fetch_and_parse(name, url, config)
+        df = fetch_and_parse(name, url, config)
         if df is None or df.empty:
             logger.warning("Feed '%s' returned no products", name)
             continue
@@ -98,7 +97,6 @@ def cmd_transform(args, config):
 
 def cmd_ai(args, config):
     from src.ai.product_enricher import ProductEnricher  # imports AI stack — keep lazy
-    from src.data.database.batch_job_db import BatchJobDB
     from src.data.database.run_db import RunDB
     import pandas as pd
 
@@ -120,7 +118,7 @@ def cmd_ai(args, config):
         return
 
     if getattr(args, "resume", False):
-        enricher = ProductEnricher(config, batch_job_db=BatchJobDB(db_path))
+        enricher = ProductEnricher(config, run_db=RunDB(db_path))
         if not enricher.get_resumable_run():
             logger.info("No resumable AI run.")
             return
@@ -158,7 +156,7 @@ def cmd_ai(args, config):
 
     # --limit micro-tests stay untracked (one-off, no chunking); unlimited runs get
     # run/chunk tracking so an interruption can be continued with `ai --resume`.
-    enricher = ProductEnricher(config, batch_job_db=BatchJobDB(db_path) if not args.limit else None)
+    enricher = ProductEnricher(config, run_db=RunDB(db_path) if not args.limit else None)
     progress = lambda *a: logger.info("%s", a[-1] if a else "")
     if fill_missing:
         result = enricher.fill_missing_params(

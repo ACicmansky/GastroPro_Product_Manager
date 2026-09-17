@@ -202,7 +202,7 @@ class TestPipelineWithMainData:
         """Test that force_file_categories skips interactive callback for file categories."""
         from src.pipeline.pipeline import Pipeline
         from src.domain.models import PipelineOptions
-        from src.data.writers.xlsx_writer import write_xlsx
+        from src.data.excel import write_xlsx
 
         pipeline = Pipeline(config)
 
