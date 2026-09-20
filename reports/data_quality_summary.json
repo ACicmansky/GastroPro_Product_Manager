@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-09-21T00:54:37.326992",
+  "total_products_audited": 9712,
+  "total_issues_found": 362,
+  "unique_flagged_products": 358,
+  "by_severity": {
+    "WARNING": 355,
+    "INFO": 5,
+    "ERROR": 2
+  },
+  "by_issue_type": {
+    "TEXT_PARAM_MISMATCH": 360,
+    "GEOMETRIC_IMPOSSIBILITY": 2
+  },
+  "by_field": {
+    "Rozmery (ŠxHxV)": 295,
+    "Príkon (W)": 60,
+    "Napätie (V)": 5,
+    "Objem (l)": 2
+  }
+}

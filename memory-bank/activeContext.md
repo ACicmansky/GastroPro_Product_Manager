@@ -1,24 +1,30 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-18 (Hexagonal Architecture Refactor Completed)*
+*Last updated: 2026-09-21 (Multi-Tiered Data Verification & Accuracy Engine)*
 
 ## Current State
 The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
 - **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
-- **Testing & QA**: 255 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
-- **Type Safety**: `PyQt5-stubs` installed and `pyrightconfig.json` calibrated with `.venv` and path exclusions.
-- **Hexagonal Architecture (Ports and Adapters)**: Full separation of domain rules, driving use cases (`SyncCatalogUseCase`, `ExportCatalogUseCase`, `ResumeAiUseCase`, `EnrichCategoriesUseCase`), and driven ports (`ProductRepositoryPort`, `RunRepositoryPort`, `FeedGatewayPort`, `ScraperGatewayPort`, `AiEnricherPort`, `ExcelIOPort`, `EventSinkPort`, `UserResolutionPort`).
-- **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching on `windows-latest`.
-- **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
-- **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
-- **Database Export**: One-click direct export button ("💾 Exportovať z databázy" / `Ctrl+E`) exporting all products from SQLite database directly into final 138-column e-shop Excel file.
-- **AI Enhancement**: Full catalog run (9,650 products, 193 batch chunks) completed with 100% success rate. 9,701 / 9,712 products (99.89%) enhanced in SQLite database with B2B copy, FAQs, SEO metadata, and category parameters.
-- **Image Integrity & 100% Catalog Image Coverage**: Fixed image wiping bugs in `OutputTransformer` and `ProductMerger`. Restored 9,192 existing images from source files and backups. Generated commercial studio product photographs for all remaining 509 missing items using `gemini-2.5-flash-image` Batch API. **9,712 / 9,712 products (100.00%) in database now have images.**
-- **AI Product Image Generator**: Core module `ProductImageGenerator` (`src/ai/image_generator.py`) and autonomous batch runner (`scripts/batch_generate_images.py`). Generated 509 high-resolution PNGs (466.9 MB) in `out/generated_images/{code}.png` for **$0.28 USD total**.
-- **Streamlined Code Architecture (Ponytail Audit)**: 1,277 lines of boilerplate, dead scripts, duplicate parsing methods, and legacy tables purged. Consolidated XML parsing to single config-driven method, unified Excel I/O into `src/data/excel.py`, inlined category helpers into `CategoryService`, and retired obsolete `BatchJobDB` in favor of `RunDB`.
+- **Testing & QA**: **267 tests passing** in parallel with `pytest-xdist` (`test:fast` in ~10s), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Multi-Tiered Data Verification Engine**:
+  - `CatalogAuditor` (`src/domain/specs/auditor.py`): Zero-cost offline scanner detecting text vs. parameter contradictions and physical impossibilities across all 9,712 products.
+  - `OEM Spec Adapters` (`src/scrapers/oem/`): Canonical manufacturer ground-truth extraction for top brands (Forcold, Stalgast) covering >70% of the catalog for $0.00.
+  - `SpecPatcher` (`src/domain/specs/patcher.py`): Safe, synchronized patching of parameters and customer-facing HTML text (shortDescription, description, FAQ, metaDescription) with automatic SQLite backups.
+  - `Targeted Grounded AI Fact-Checker` (`scripts/fact_check_products.py`): Precision search-grounded micro-verifier using `gemini-2.5-flash-lite` for unresolved anomalies (<$0.50).
+- **Catalog Filter Parameter Restoration**: Recovered 34,108 AI filter parameters for 9,119 products from pre-incident backup with 100% image coverage preserved.
+- **Hexagonal Architecture (Ports and Adapters)**: Full separation of domain rules, driving use cases, and driven ports.
 
-## Recent Changes (2026-09-18 — Hexagonal Architecture (Ports & Adapters) Refactor)
+## Recent Changes (2026-09-21 — Multi-Tiered Product Data Verification & Accuracy Engine)
+- Investigated product `F840130` generation trace: proven that Google Search grounding was never invoked during batch processing (due to strict JSON schema mode in Batch API), and the "70 mm" insulation error originated from an upstream distributor typo in `ALLexport-products.csv` (August 2025).
+- Identified official manufacturer ground truth on `forcold.it` for model `G-GN1410TN-FC` / `M-GN1410TN-FC`: `INSULATION (mm): 60`.
+- Built `CatalogAuditor` (`src/domain/specs/auditor.py`) and CLI `scripts/audit_catalog.py`: audited all 9,712 products, generating `reports/data_quality_audit.csv` and `reports/data_quality_summary.json`.
+- Restored 34,108 filter parameters across 9,119 products from `data/backups/products_backup_20260917_205246.db` (`scripts/restore_ai_parameters.py`).
+- Built `ForcoldAdapter` and `StalgastAdapter` in `src/scrapers/oem/`.
+- Built `SpecPatcher` in `src/domain/specs/patcher.py` and CLI `scripts/patch_product_specs.py`.
+- Successfully patched `F840130` and sister models (`F840131`, `F840650`, `F840651`) to 60 mm insulation across parameters and text descriptions.
+- Added 10 automated unit tests; full test suite: **267 passed tests** in ~10s via `uv run poe check`.
+
 - Transitioned architecture to **Pragmatic Hexagonal Architecture** with zero breaking changes:
   - Created Domain Ports (`src/domain/ports/`): `ProductRepositoryPort`, `RunRepositoryPort`, `FeedGatewayPort`, `ScraperGatewayPort`, `AiEnricherPort`, `ExcelIOPort`, `EventSinkPort`, `UserResolutionPort`.
   - Created Use Cases (`src/pipeline/use_cases/`): `SyncCatalogUseCase`, `ExportCatalogUseCase`, `ResumeAiUseCase`, `EnrichCategoriesUseCase`.
