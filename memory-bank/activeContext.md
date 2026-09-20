@@ -1,13 +1,14 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-18 (Ponytail Audit Codebase Simplification Completed)*
+*Last updated: 2026-09-18 (Hexagonal Architecture Refactor Completed)*
 
 ## Current State
 The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
 - **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
-- **Testing & QA**: 249 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Testing & QA**: 255 tests passing in parallel with `pytest-xdist` (`test:fast`), full branch coverage reporting with `pytest-cov` (`test:cov`).
 - **Type Safety**: `PyQt5-stubs` installed and `pyrightconfig.json` calibrated with `.venv` and path exclusions.
+- **Hexagonal Architecture (Ports and Adapters)**: Full separation of domain rules, driving use cases (`SyncCatalogUseCase`, `ExportCatalogUseCase`, `ResumeAiUseCase`, `EnrichCategoriesUseCase`), and driven ports (`ProductRepositoryPort`, `RunRepositoryPort`, `FeedGatewayPort`, `ScraperGatewayPort`, `AiEnricherPort`, `ExcelIOPort`, `EventSinkPort`, `UserResolutionPort`).
 - **CI/CD**: GitHub Actions workflow (`.github/workflows/ci.yml`) leveraging `astral-sh/setup-uv@v5` caching on `windows-latest`.
 - **Packaging**: PyInstaller spec (`gastropro.spec`) and automated build script (`scripts/build_exe.py` / `uv run poe build`) with frozen asset path resolution in `src/gui/theme.py`.
 - **Crash Resilience**: Global `sys.excepthook` handler (`src/gui/crash_handler.py`) providing logging to `logs/gastropro.log` and user-facing recovery dialogs.
@@ -17,7 +18,14 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 - **AI Product Image Generator**: Core module `ProductImageGenerator` (`src/ai/image_generator.py`) and autonomous batch runner (`scripts/batch_generate_images.py`). Generated 509 high-resolution PNGs (466.9 MB) in `out/generated_images/{code}.png` for **$0.28 USD total**.
 - **Streamlined Code Architecture (Ponytail Audit)**: 1,277 lines of boilerplate, dead scripts, duplicate parsing methods, and legacy tables purged. Consolidated XML parsing to single config-driven method, unified Excel I/O into `src/data/excel.py`, inlined category helpers into `CategoryService`, and retired obsolete `BatchJobDB` in favor of `RunDB`.
 
-## Recent Changes (2026-09-18 — Ponytail Audit Code Simplification)
+## Recent Changes (2026-09-18 — Hexagonal Architecture (Ports & Adapters) Refactor)
+- Transitioned architecture to **Pragmatic Hexagonal Architecture** with zero breaking changes:
+  - Created Domain Ports (`src/domain/ports/`): `ProductRepositoryPort`, `RunRepositoryPort`, `FeedGatewayPort`, `ScraperGatewayPort`, `AiEnricherPort`, `ExcelIOPort`, `EventSinkPort`, `UserResolutionPort`.
+  - Created Use Cases (`src/pipeline/use_cases/`): `SyncCatalogUseCase`, `ExportCatalogUseCase`, `ResumeAiUseCase`, `EnrichCategoriesUseCase`.
+  - Refactored `Pipeline` (`src/pipeline/pipeline.py`) into a composition root and backward-compatible facade supporting constructor dependency injection.
+  - Adapted Qt worker threads (`src/gui/worker.py`) using `QtSignalEventSink` and `QtDialogResolver`.
+  - Created `tests/test_use_cases.py` verifying in-memory repository execution without filesystem/network I/O (<0.05s).
+- **Result: 255 tests passing cleanly with 0 regressions** via `uv run poe check`.
 - Executed comprehensive repo simplification based on `/ponytail-audit`:
   - Pruned one-shot scripts (`generate_product_image.py`, `cleaning.py`, `restore_product_images.py`, `categories.py`); sanitized `auto_categorize.py` with CLI arguments for future feed categorization.
   - Unified `XMLParser` feed parsing into single config-driven `parse_feed` and inlined `fetch_and_parse` / `parse`, deleting `xml_parser_factory.py`.

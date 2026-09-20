@@ -55,6 +55,15 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Pragmatic Hexagonal Architecture (Ports and Adapters) Refactor**
+  - Architected and implemented clean inward dependency flow: domain rules and use cases isolated from external drivers (PyQt5, CLI) and driven adapters (SQLite, XML feeds, Gemini API, Excel).
+  - Defined driven and driving ports (`src/domain/ports/`): `ProductRepositoryPort`, `RunRepositoryPort`, `FeedGatewayPort`, `ScraperGatewayPort`, `AiEnricherPort`, `ExcelIOPort`, `EventSinkPort`, `UserResolutionPort` using standard `typing.Protocol`.
+  - Extracted single-responsibility Use Cases (`src/pipeline/use_cases/`): `SyncCatalogUseCase`, `ExportCatalogUseCase`, `ResumeAiUseCase`, `EnrichCategoriesUseCase`.
+  - Converted `Pipeline` into a backward-compatible facade and composition root supporting constructor dependency injection.
+  - Decoupled Qt GUI workers from nested event loops via `QtSignalEventSink` and `QtDialogResolver`.
+  - Added in-memory unit tests in `tests/test_use_cases.py` running in <0.05s without disk or network I/O.
+  - **Result: 255 tests passing cleanly with 0 regressions.**
+
 - ✅ **Catalog-Wide Batch AI Product Image Generation (100% Image Coverage)**
   - Developed and executed autonomous batch pipeline ([scripts/batch_generate_images.py](file:///c:/Source/Python/GastroPro_Product_Manager/scripts/batch_generate_images.py)) utilizing Google GenAI Batch API (`gemini-2.5-flash-image` "Nano Banana").
   - Generated commercial studio product photographs for all 509 catalog products lacking images in 14.9 minutes.

@@ -1,19 +1,61 @@
-"""Thin pipeline worker — bridges pipeline callbacks to Qt signals."""
+"""Thin pipeline worker — bridges pipeline use cases and driven ports to Qt signals."""
 
 import logging
 from typing import Dict, Optional
 
-from PyQt5.QtCore import QObject, pyqtSignal, QEventLoop
+from PyQt5.QtCore import QEventLoop, QObject, pyqtSignal
 
-from src.pipeline.pipeline import Pipeline
-from src.domain.models import PipelineOptions
 from src.ai.run_control import RunControl
+from src.domain.models import PipelineOptions
+from src.pipeline.pipeline import Pipeline
 
 logger = logging.getLogger(__name__)
 
 
 class PipelineCancelled(Exception):
     """User aborted the run from an interactive dialog."""
+
+
+class QtSignalEventSink:
+    """Adapts Qt signals to EventSinkPort (driving adapter)."""
+
+    def __init__(
+        self,
+        progress_sig=None,
+        stage_sig=None,
+        ai_progress_sig=None,
+    ):
+        self._progress = progress_sig
+        self._stage = stage_sig
+        self._ai_progress = ai_progress_sig
+
+    def emit_progress(self, message: str) -> None:
+        if self._progress:
+            self._progress.emit(message)
+        logger.info(message)
+
+    def emit_stage(self, stage_key: str) -> None:
+        if self._stage:
+            self._stage.emit(stage_key)
+
+    def emit_ai_progress(self, current: int, total: int, message: str) -> None:
+        if self._ai_progress:
+            self._ai_progress.emit(int(current), int(total), str(message))
+        elif self._progress:
+            self._progress.emit(message)
+
+
+class QtDialogResolver:
+    """Adapts worker Qt event loops to UserResolutionPort (driving adapter)."""
+
+    def __init__(self, worker: "PipelineWorker"):
+        self._worker = worker
+
+    def resolve_category(self, original_category: str, product_name: str = "") -> str:
+        return self._worker._on_unknown_category(original_category, product_name)
+
+    def resolve_price(self, product_data: dict, prices_df) -> Optional[str]:
+        return self._worker._on_unmapped_price(product_data, prices_df)
 
 
 class PipelineWorker(QObject):
@@ -44,18 +86,20 @@ class PipelineWorker(QObject):
         self._price_loop: Optional[QEventLoop] = None
 
     def run(self):
-        """Execute the pipeline. Called from QThread."""
+        """Execute the pipeline via driving ports. Called from QThread."""
         try:
+            event_sink = QtSignalEventSink(
+                progress_sig=self.progress,
+                stage_sig=self.stage,
+                ai_progress_sig=self.ai_progress,
+            )
+            resolver = QtDialogResolver(self)
+
             pipeline_result = self.pipeline.run(
                 self.options,
-                on_progress=self._on_progress,
-                on_unknown_category=self._on_unknown_category,
-                on_unmapped_price=self._on_unmapped_price,
+                event_sink=event_sink,
+                user_resolution=resolver,
                 ai_control=self.ai_control,
-                on_stage=self.stage.emit,
-                on_ai_progress=lambda current, total, message: self.ai_progress.emit(
-                    int(current), int(total), str(message)
-                ),
             )
 
             # Emit statistics
@@ -96,9 +140,6 @@ class PipelineWorker(QObject):
         finally:
             self.finished.emit()
 
-    def _on_progress(self, message: str):
-        self.progress.emit(message)
-
     def _on_unknown_category(self, original_category: str, product_name: Optional[str] = None) -> str:
         """Block and ask GUI for category mapping."""
         self._category_result = None
@@ -137,11 +178,7 @@ class PipelineWorker(QObject):
 
 
 class AIResumeWorker(QObject):
-    """AI-only run — no feeds/merge/file load, just DB in -> DB out.
-
-    Without `categories` it resumes an interrupted run; with `categories`
-    it re-processes only products of those categories (params changed).
-    """
+    """AI-only run — no feeds/merge/file load, just DB in -> DB out."""
 
     finished = pyqtSignal()
     error = pyqtSignal(str)
@@ -162,18 +199,22 @@ class AIResumeWorker(QObject):
 
     def run(self):
         """Called from QThread."""
-        callbacks = dict(
-            on_progress=lambda msg: self.progress.emit(msg),
-            ai_control=self.ai_control,
-            on_ai_progress=lambda current, total, message: self.ai_progress.emit(
-                int(current), int(total), str(message)
-            ),
+        event_sink = QtSignalEventSink(
+            progress_sig=self.progress,
+            ai_progress_sig=self.ai_progress,
         )
         try:
             if self.categories:
-                pipeline_result = self.pipeline.run_ai_for_categories(self.categories, **callbacks)
+                pipeline_result = self.pipeline.run_ai_for_categories(
+                    self.categories,
+                    event_sink=event_sink,
+                    ai_control=self.ai_control,
+                )
             else:
-                pipeline_result = self.pipeline.run_ai_resume(**callbacks)
+                pipeline_result = self.pipeline.run_ai_resume(
+                    event_sink=event_sink,
+                    ai_control=self.ai_control,
+                )
             self.result.emit(pipeline_result)
         except Exception as e:
             logger.error(f"AI resume error: {e}", exc_info=True)
@@ -204,11 +245,12 @@ class DBExportWorker(QObject):
 
     def run(self):
         """Called from QThread."""
+        event_sink = QtSignalEventSink(progress_sig=self.progress)
         try:
             pipeline_result = self.pipeline.export_from_db(
                 output_path=self.output_path,
                 selected_categories=self.selected_categories,
-                on_progress=lambda msg: self.progress.emit(msg),
+                event_sink=event_sink,
             )
             self.statistics.emit(
                 {

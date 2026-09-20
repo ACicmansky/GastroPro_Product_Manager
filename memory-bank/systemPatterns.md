@@ -1,32 +1,46 @@
 # GastroPro Product Manager - System Patterns
 
 ## Architecture Overview
-Layered architecture (July 2026 refactor). Dependencies flow downward only — GUI → pipeline → domain/data/ai/scrapers. Zero circular dependencies.
+Pragmatic Hexagonal Architecture (Ports and Adapters) refactor (September 2026). Decouples core business rules and use cases from external drivers (PyQt5 GUI, CLI scripts) and driven dependencies (SQLite, Gemini API, XML parsers, Excel I/O). Dependencies flow inward towards domain and use cases. Zero circular dependencies.
 
 ```
 src/
-├── pipeline/     # Orchestration
-│   ├── pipeline.py        # Pipeline — linear coordinator of the whole flow
-│   └── scraping.py        # ScrapingOrchestrator — runs enabled scrapers
-├── data/         # I/O layer
-│   ├── excel.py           # Consolidated XLSX loading and writing
-│   ├── parsers/           # Config-driven XML feed parser (XMLParser)
-│   └── database/          # ProductDB (JSON document store), RunDB (run/chunk tracking)
-├── domain/       # Business logic (pure, no I/O)
-│   ├── products/          # ProductMerger, get_pair_code
-│   ├── categories/        # CategoryService (mapping, suggestions, filter extraction)
-│   ├── pricing/           # PricingService (table_bases_prices.json records)
-│   ├── transform/         # OutputTransformer (138-column output)
-│   └── models.py          # MergeResult, MergeStats, PipelineOptions...
-├── ai/           # Gemini integration
-│   ├── api_client.py      # GeminiClient (quota, upload, batch jobs)
+├── pipeline/          # Application Use Cases & Facade
+│   ├── use_cases/     # Focused business workflows
+│   │   ├── sync_catalog.py      # SyncCatalogUseCase (full multi-source flow)
+│   │   ├── export_catalog.py    # ExportCatalogUseCase (direct DB -> 138-col XLSX)
+│   │   ├── resume_ai.py         # ResumeAiUseCase (resuming interrupted batch jobs)
+│   │   └── enrich_categories.py # EnrichCategoriesUseCase (category-scoped AI re-runs)
+│   ├── pipeline.py    # Pipeline — backward-compatible facade & composition root
+│   └── scraping.py    # ScrapingOrchestrator — satisfies ScraperGatewayPort
+├── domain/            # Pure business logic & ports
+│   ├── ports/         # Python Protocols (driven & driving interfaces)
+│   │   ├── repositories.py      # ProductRepositoryPort, RunRepositoryPort
+│   │   ├── gateways.py          # FeedGatewayPort, ScraperGatewayPort, AiEnricherPort, ExcelIOPort
+│   │   ├── events.py            # EventSinkPort, NullEventSink, CallbackEventSink, ConsoleEventSink
+│   │   └── resolution.py        # UserResolutionPort, AutoSkipResolution, CallbackResolution
+│   ├── products/      # ProductMerger, get_pair_code, feed_specs
+│   ├── categories/    # CategoryService (mapping, suggestions, filter extraction)
+│   ├── pricing/       # PricingService (table_bases_prices.json records)
+│   ├── transform/     # OutputTransformer (138-column output)
+│   └── models.py      # MergeResult, MergeStats, PipelineOptions, PipelineResult...
+├── data/              # Driven adapters (I/O)
+│   ├── excel.py       # Consolidated XLSX loading and writing (ExcelIOPort)
+│   ├── parsers/       # Config-driven XML feed parser (FeedGatewayPort)
+│   └── database/      # ProductDB (JSON document store), RunDB (run/chunk tracking)
+├── ai/                # Driven adapter: Gemini integration (AiEnricherPort)
+│   ├── api_client.py          # GeminiClient (quota, upload, batch jobs)
 │   ├── batch_orchestrator.py  # BatchOrchestrator (JSONL build, poll, resume)
-│   ├── product_enricher.py    # Grouping variants vs standard
+│   ├── product_enricher.py    # ProductEnricher (satisfies AiEnricherPort)
 │   ├── prompts.py             # Dual prompt system
-│   └── result_parser.py       # ResultParser (3-strategy fuzzy matching)
-├── scrapers/     # BaseScraper + Topchladenie (threaded), Mebella (Playwright)
-├── gui/          # PyQt5: MainWindow, thin PipelineWorker, widgets, dialogs
-└── config/       # Config loading and schema
+│   ├── result_parser.py       # ResultParser (3-strategy fuzzy matching)
+│   └── image_generator.py     # ProductImageGenerator (Nano Banana studio photos)
+├── scrapers/          # Driven adapter: Web scrapers (ScraperGatewayPort)
+├── gui/               # Driving adapter: PyQt5 GUI
+│   ├── main_window.py # MainWindow (UI cards, actions, settings)
+│   ├── worker.py      # Thin PipelineWorker + QtSignalEventSink + QtDialogResolver
+│   └── widgets.py     # UI components, dialogs, toasts
+└── config/            # Config loading and schema
 ```
 
 ### AI Enhancement Layer
