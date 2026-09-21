@@ -97,3 +97,65 @@ def test_auditor_passes_clean_data():
     )
     issues = auditor.audit_dataframe(df)
     assert len(issues) == 0
+
+
+def test_auditor_ignores_sink_basin_subcomponent_dimension():
+    auditor = CatalogAuditor()
+    df = pd.DataFrame(
+        [
+            {
+                "code": "S980727110",
+                "name": "Umývací stôl krytovaný s drezom 1100x700x850mm",
+                "shortDescription": "Zabudovaný drez s rozmermi 500x500x250 mm.",
+                "description": "Vanička drezu: 500x500x250 mm.",
+                "filteringProperty:Šírka (mm)": "1100",
+                "filteringProperty:Hĺbka (mm)": "700",
+                "filteringProperty:Výška (mm)": "850",
+            }
+        ]
+    )
+    issues = auditor.audit_dataframe(df)
+    assert len(issues) == 0
+
+
+def test_auditor_handles_multi_power_and_split_power():
+    auditor = CatalogAuditor()
+    df = pd.DataFrame(
+        [
+            {
+                "code": "LAMP1",
+                "name": "Lapač hmyzu 2x 6W",
+                "shortDescription": "Žiarivky: 2x 6W.",
+                "description": "",
+                "filteringProperty:Príkon (W)": "12",
+            },
+            {
+                "code": "PIZZA1",
+                "name": "Pizza stôl",
+                "shortDescription": "Chladiaci výkon 0,24 + 0,12 kW.",
+                "description": "",
+                "filteringProperty:Príkon (W)": "360",
+            },
+        ]
+    )
+    issues = auditor.audit_dataframe(df)
+    assert len(issues) == 0
+
+
+def test_auditor_allows_sous_vide_circulator_volume():
+    auditor = CatalogAuditor()
+    df = pd.DataFrame(
+        [
+            {
+                "code": "S691100",
+                "name": "Cirkulátor SOUS-VIDE EKO",
+                "defaultCategory": "Varenie > Sous-vide",
+                "filteringProperty:Šírka (mm)": "145",
+                "filteringProperty:Hĺbka (mm)": "115",
+                "filteringProperty:Výška (mm)": "325",
+                "filteringProperty:Objem (l)": "26",  # 26 L water bath capacity
+            }
+        ]
+    )
+    issues = auditor.audit_dataframe(df)
+    assert len(issues) == 0

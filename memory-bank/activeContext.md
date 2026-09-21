@@ -1,17 +1,17 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-21 (Multi-Tiered Data Verification & Accuracy Engine)*
+*Last updated: 2026-09-21 (Multi-Tiered Data Verification & Accuracy Engine - Milestone Completed)*
 
 ## Current State
 The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
 - **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
-- **Testing & QA**: **267 tests passing** in parallel with `pytest-xdist` (`test:fast` in ~10s), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Testing & QA**: **274 tests passing** in parallel with `pytest-xdist` (`test:fast` in ~13s), full branch coverage reporting with `pytest-cov` (`test:cov`).
 - **Multi-Tiered Data Verification Engine**:
-  - `CatalogAuditor` (`src/domain/specs/auditor.py`): Zero-cost offline scanner detecting text vs. parameter contradictions and physical impossibilities across all 9,712 products.
-  - `OEM Spec Adapters` (`src/scrapers/oem/`): Canonical manufacturer ground-truth extraction for top brands (Forcold, Stalgast) covering >70% of the catalog for $0.00.
-  - `SpecPatcher` (`src/domain/specs/patcher.py`): Safe, synchronized patching of parameters and customer-facing HTML text (shortDescription, description, FAQ, metaDescription) with automatic SQLite backups.
-  - `Targeted Grounded AI Fact-Checker` (`scripts/fact_check_products.py`): Precision search-grounded micro-verifier using `gemini-2.5-flash-lite` for unresolved anomalies (<$0.50).
+  - `CatalogAuditor` (`src/domain/specs/auditor.py`): Zero-cost offline scanner detecting text vs. parameter contradictions and physical impossibilities across all 9,712 products. Enhanced with sub-component recognition, multi-dimension extraction, split-power sums, and space-separator handling. Slashed audit issues from 362 down to 13 real discrepancies.
+  - `OEM Spec Adapters` (`src/scrapers/oem/`): Canonical manufacturer ground-truth extraction for top brands (`ForcoldAdapter`, `StalgastAdapter`, `LiebherrAdapter`) covering >75% of the catalog for $0.00.
+  - `SpecPatcher` (`src/domain/specs/patcher.py`): Safe, synchronized patching of parameters and customer-facing HTML text (shortDescription, description, FAQ, metaDescription) with automatic SQLite backups. Patched confirmed typos in `F840130` series, `F852412`, `F787025`, and `F725001`.
+  - `Targeted Grounded AI Fact-Checker` (`scripts/fact_check_products.py`): Precision search-grounded micro-verifier using `gemini-2.5-flash-lite` with Google Search grounding for unresolved anomalies (<$0.01 per product). Verified top equipment models with 90–100% confidence.
 - **Catalog Filter Parameter Restoration**: Recovered 34,108 AI filter parameters for 9,119 products from pre-incident backup with 100% image coverage preserved.
 - **Hexagonal Architecture (Ports and Adapters)**: Full separation of domain rules, driving use cases, and driven ports.
 
@@ -20,10 +20,11 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 - Identified official manufacturer ground truth on `forcold.it` for model `G-GN1410TN-FC` / `M-GN1410TN-FC`: `INSULATION (mm): 60`.
 - Built `CatalogAuditor` (`src/domain/specs/auditor.py`) and CLI `scripts/audit_catalog.py`: audited all 9,712 products, generating `reports/data_quality_audit.csv` and `reports/data_quality_summary.json`.
 - Restored 34,108 filter parameters across 9,119 products from `data/backups/products_backup_20260917_205246.db` (`scripts/restore_ai_parameters.py`).
-- Built `ForcoldAdapter` and `StalgastAdapter` in `src/scrapers/oem/`.
+- Built `ForcoldAdapter`, `StalgastAdapter`, and `LiebherrAdapter` in `src/scrapers/oem/`.
 - Built `SpecPatcher` in `src/domain/specs/patcher.py` and CLI `scripts/patch_product_specs.py`.
-- Successfully patched `F840130` and sister models (`F840131`, `F840650`, `F840651`) to 60 mm insulation across parameters and text descriptions.
-- Added 10 automated unit tests; full test suite: **267 passed tests** in ~10s via `uv run poe check`.
+- Patched confirmed dimension typos in `F852412`, `F787025`, and `F725001`.
+- Built and enhanced targeted fact-checking subagent (`scripts/fact_check_products.py`) with Gemini Google Search grounding.
+- Full test suite: **274 passed tests** in ~13s via `uv run poe check`.
 
 - Transitioned architecture to **Pragmatic Hexagonal Architecture** with zero breaking changes:
   - Created Domain Ports (`src/domain/ports/`): `ProductRepositoryPort`, `RunRepositoryPort`, `FeedGatewayPort`, `ScraperGatewayPort`, `AiEnricherPort`, `ExcelIOPort`, `EventSinkPort`, `UserResolutionPort`.

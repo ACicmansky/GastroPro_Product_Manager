@@ -4,6 +4,7 @@ import argparse
 import json
 import logging
 import os
+import re
 import sys
 from typing import Any, Dict, List, Optional
 
@@ -65,8 +66,24 @@ Respond with ONLY a raw JSON object (no markdown, no backticks) with these field
             config=config,
             contents=prompt,
         )
-        raw_text = response.text.strip().replace("```json", "").replace("```", "").strip()
-        data = json.loads(raw_text)
+        raw_text = (response.text or "").strip()
+        json_match = re.search(r"\{[\s\S]*\}", raw_text)
+        if json_match:
+            data = json.loads(json_match.group(0), strict=False)
+        else:
+            data = json.loads(raw_text, strict=False)
+
+        # Fallback to grounding metadata if source_url is missing
+        if not data.get("source_url") and response.candidates:
+            cand = response.candidates[0]
+            gm = getattr(cand, "grounding_metadata", None)
+            if gm and hasattr(gm, "grounding_chunks") and gm.grounding_chunks:
+                for chunk in gm.grounding_chunks:
+                    web = getattr(chunk, "web", None)
+                    if web and getattr(web, "uri", None):
+                        data["source_url"] = web.uri
+                        break
+
         return data
     except Exception as e:
         logger.warning(f"Fact check failed for {code}: {e}")

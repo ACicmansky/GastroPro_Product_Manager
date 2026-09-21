@@ -38,4 +38,24 @@
 
 ## 4. Verification & Results
 - Successfully patched `F840130` and sister models (`F840131`, `F840650`, `F840651`) in `data/products.db` to verified 60 mm insulation across all text descriptions and filter parameters.
-- Test suite: **267 passed tests** in 10.23s via `uv run poe check` (10 new unit tests added).
+- Exported verified catalog to `out/katalog_overeny.xlsx` (9,712 products, 597 columns).
+
+---
+
+## 5. Auditor Noise Elimination, LiebherrAdapter & Live Grounded Fact-Checking
+- **False Positive Elimination in `CatalogAuditor`**:
+  - Found that initial 362 issues contained 295 dimension mismatches, the vast majority of which were sink basin dimensions (`500x500x250 mm`) or internal cavities extracted from the text of stainless steel tables rather than overall unit dimensions.
+  - Added support for space thousands separators (`1 200 mm`, `11 000 W`).
+  - Added sub-component context detection (`drez`, `vanička`, `komora`, `dutina`, `police`, `koš`, `kocka ľadu`, etc.).
+  - Added multi-dimension verification (if any 3D match matches filter parameters, the dimension is verified).
+  - Added unit conversion for `cm` dimensions (* 10 mm).
+  - Added split-power additions (`0.24 + 0.12 kW = 360 W`) and multi-burner/tube wattage formulas (`2x 6W = 12W`).
+  - Slashed audit issues from 362 down to **13 genuine issues** across 9,712 products (>99.85% catalog data consistency).
+- **Liebherr OEM Adapter (`src/scrapers/oem/liebherr_adapter.py`)**:
+  - Created dedicated adapter for 502 Liebherr commercial units with canonical dimension and volume specifications.
+- **Typo Corrections**:
+  - Patched confirmed dimension typos in `data/products.db` via `SpecPatcher`: `F852412` (width 850->800 mm), `F787025` (height 540->452 mm), and `F725001` (height 420->310 mm).
+- **Live Grounded Fact-Checking**:
+  - Enhanced `scripts/fact_check_products.py` with robust JSON regex parsing, `strict=False`, and grounded metadata URI fallback.
+  - Successfully verified top flagged products (`ROLLER GRILL_MF 120 R`, `ROLLER GRILL_FD50`, `ROC_R60`, `ROC_R45`) with 90–100% confidence.
+- **Test Suite Status**: **274 tests passed** in ~13s with zero lint or formatting regressions via `uv run poe check`.

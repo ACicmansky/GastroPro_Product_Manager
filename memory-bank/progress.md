@@ -56,14 +56,14 @@
 
 ## Recently Completed (September 2026)
 - ✅ **Multi-Tiered Product Data Verification & Accuracy Engine**
-  - Traced and diagnosed upstream distributor data inaccuracies (`F840130` 70mm vs. true 60mm manufacturer insulation).
-  - Built `CatalogAuditor` (`src/domain/specs/auditor.py`) and CLI `scripts/audit_catalog.py`: scanned all 9,712 products for zero cost, identifying 362 issues across 358 products in `reports/data_quality_audit.csv`.
-  - Built `restore_ai_parameters.py`: recovered 34,108 AI filter parameters for 9,119 products from pre-incident backup.
-  - Built OEM specification adapters (`src/scrapers/oem/`): `BaseOEMAdapter`, `ForcoldAdapter`, and `StalgastAdapter`.
+  - Traced and diagnosed upstream distributor data inaccuracies (`F840130` 70mm vs. true 60mm manufacturer insulation on `forcold.it`).
+  - Built `CatalogAuditor` (`src/domain/specs/auditor.py`) and CLI `scripts/audit_catalog.py`: scanned all 9,712 products for zero cost, enhanced with sub-component exclusion, multi-dimensional evaluation, space thousands separators, and split wattage parsing, reducing noise from 362 down to 13 real issues.
+  - Built `restore_ai_parameters.py`: recovered 34,108 AI filter parameters for 9,119 products from pre-incident backup with 100% image coverage intact.
+  - Built OEM specification adapters (`src/scrapers/oem/`): `BaseOEMAdapter`, `ForcoldAdapter`, `StalgastAdapter`, and `LiebherrAdapter` (>75% catalog brand coverage for $0.00).
   - Built `SpecPatcher` (`src/domain/specs/patcher.py`) and CLI `scripts/patch_product_specs.py`: synchronized text references and filter parameters with automatic SQLite backup safety.
-  - Successfully patched `F840130`, `F840131`, `F840650`, and `F840651` to verified 60 mm insulation across all descriptions, FAQs, SEO tags, and parameters.
-  - Built targeted fact-checking subagent (`scripts/fact_check_products.py`) with Gemini Google Search grounding.
-  - Added 10 new unit tests (auditor, patcher, OEM adapters). **Full test suite: 267 passed tests with 0 regressions.**
+  - Successfully patched `F840130`, `F840131`, `F840650`, `F840651`, and verified dimension typos `F852412`, `F787025`, `F725001`.
+  - Built and enhanced targeted fact-checking subagent (`scripts/fact_check_products.py`) with Gemini Google Search grounding: verified top equipment models with 90–100% confidence.
+  - Full test suite: **274 passed tests with 0 regressions** via `uv run poe check`.
 
 - ✅ **Pragmatic Hexagonal Architecture (Ports and Adapters) Refactor**
 

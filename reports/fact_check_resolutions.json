@@ -1,0 +1,66 @@
+[
+  {
+    "code": "ROLLER GRILL_MF 120 R",
+    "verified_specs": {
+      "insulation_mm": null,
+      "volume_l": 12,
+      "power_w": 6400,
+      "voltage_v": "380 V",
+      "width_mm": 470,
+      "depth_mm": 350,
+      "height_mm": 350,
+      "temp_range": "0 – 180°C"
+    },
+    "source_url": "https://vertexaisearch.cloud.google.com/grounding-api-redirect/AUZIYQElEILcx1jiWu3OJHFzRRqyDTFI9bNMt-19JQXQJkGF3mzI4g8DRzzNVjtY-tzdYIO_d7zUxj8eO24T5CpXRGfhy2soHrL2ee3RlqdTeS5QGQwSh3JnQK0UHSEp3-ohureSdMOYkqKCIJKjSUJrxeyTNbp1g0hCCBvHDu7Wqx0=",
+    "confidence": 1.0,
+    "notes": "The reported dimensions of 280x250x110 appear to refer to the basket dimensions, not the overall unit dimensions. The verified external dimensions are 350x470x350mm. Some sources list voltage as 220V, while others list 380V. The 380V specification appears more frequently in technical datasheets."
+  },
+  {
+    "code": "ROLLER GRILL_FD50",
+    "verified_specs": {
+      "insulation_mm": null,
+      "volume_l": 5.0,
+      "power_w": 3200,
+      "voltage_v": "230 V / 50 Hz",
+      "width_mm": 215,
+      "depth_mm": 425,
+      "height_mm": 320,
+      "temp_range": "0 – 180°C"
+    },
+    "source_url": "https://www.sunshine-equipment.com/products/roller-grill-fd-50-single-deep-fryer-5l",
+    "confidence": 0.9,
+    "notes": "The reported dimensions 140x260x100 appear to refer to the basket dimensions, not the overall unit dimensions. The verified overall dimensions are 215x425x320mm. The volume is 5L, power is 3.2kW (3200W), voltage is 230V/50Hz, and the temperature range is 0-180°C. Some sources list slightly different width dimensions (e.g., 175mm), but 215mm is more consistently reported for the main unit dimensions."
+  },
+  {
+    "code": "ROC_R60",
+    "verified_specs": {
+      "insulation_mm": null,
+      "volume_l": 60,
+      "power_w": 11000,
+      "voltage_v": "400 V",
+      "width_mm": 600,
+      "depth_mm": 810,
+      "height_mm": 1400,
+      "temp_range": null
+    },
+    "source_url": "https://www.robot-coupe.com/en/products/cutters/r60-t",
+    "confidence": 1.0,
+    "notes": "The reported power discrepancy of 0 W versus 11000 W is resolved. The official specifications consistently list the power as 11000 W. The voltage is specified as three-phase 400 V. Dimensions are also confirmed."
+  },
+  {
+    "code": "ROC_R45",
+    "verified_specs": {
+      "insulation_mm": null,
+      "volume_l": 45,
+      "power_w": 10000,
+      "voltage_v": "380-400 V",
+      "width_mm": 760,
+      "depth_mm": 600,
+      "height_mm": 1400,
+      "temp_range": null
+    },
+    "source_url": "https://www.techonchufa.com/wp-content/uploads/2023/07/ROBOT-COUPE-R45-T-CUTTER-MIXER.pdf",
+    "confidence": 0.9,
+    "notes": "The reported power of 0 W is incorrect. The manufacturer's specifications clearly state a power of 10000 W. The voltage is listed as 380/400 V, three-phase. Dimensions are 760mm width, 600mm depth, and 1400mm height. The bowl capacity is 45 liters."
+  }
+]

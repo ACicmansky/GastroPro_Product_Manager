@@ -13,11 +13,20 @@ _INSULATION_RE = re.compile(
     r"(?:izol[aá]ci[a-z]*|hr[uú]bk[a-z]*\s+sten[a-z]*|sten[a-z]*\s+s\s+hr[uú]bk[a-z]*)\s*[:\s-]*(\d+)\s*mm\b",
     re.IGNORECASE,
 )
-_POWER_KW_RE = re.compile(r"\b(\d+(?:[.,]\d+)?)\s*kW\b", re.IGNORECASE)
-_POWER_W_RE = re.compile(r"\b(\d+)\s*W\b", re.IGNORECASE)
+_POWER_KW_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*kW\b", re.IGNORECASE)
+_POWER_W_RE = re.compile(r"(?<!\d)(\d{1,2}(?:\s+\d{3})|\d+)\s*W\b", re.IGNORECASE)
+_MULTI_POWER_RE = re.compile(r"(\d+)\s*[xX*]\s*(\d+(?:[.,]\d+)?)\s*(k?W)\b", re.IGNORECASE)
+_SPLIT_SUM_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*\+\s*(\d+(?:[.,]\d+)?)\s*(k?W)\b", re.IGNORECASE)
 _VOLT_RE = re.compile(r"\b(230|400|12|24|220-240|380-415)\s*V\b", re.IGNORECASE)
 _VOLUME_RE = re.compile(r"\b(\d+)\s*(?:l|litr(?:ov|a|y)?)\b", re.IGNORECASE)
-_DIMS_3D_RE = re.compile(r"\b(\d{2,4})\s*[xX*×]\s*(\d{2,4})\s*[xX*×]\s*(\d{2,4})\b")
+_DIMS_3D_RE = re.compile(
+    r"(?<!\d)(\d{1,2}(?:\s+\d{3})|\d{2,4})\s*[xX*×]\s*(\d{1,2}(?:\s+\d{3})|\d{2,4})\s*[xX*×]\s*(\d{1,2}(?:\s+\d{3})|\d{2,4})\s*(mm|cm)?(?!\d)",
+    re.IGNORECASE,
+)
+_SUB_COMPONENTS_RE = re.compile(
+    r"(drez|vani[cč]k|komor|vn[uú]torn|dutin|polic|z[aá]suvk|ro[sš]t|pieck|balen|ko[sš]|[lľ]ad|kock|kali[sš]k|vaf[lľ]|zlo[zž]en|panv|n[aá]dob)",
+    re.IGNORECASE,
+)
 
 
 def _to_float(val: Any) -> Optional[float]:
@@ -55,7 +64,7 @@ class CatalogAuditor:
 
             short_desc = str(row.get("shortDescription") or "")
             desc = str(row.get("description") or "")
-            full_text = f"{short_desc} {desc}"
+            full_text = f"{name} {short_desc} {desc}"
 
             # 1. Contradiction: Insulation thickness in text vs filteringProperty
             ins_param = _to_int(row.get("filteringProperty:Hrúbka izolácie (mm)"))
@@ -95,26 +104,44 @@ class CatalogAuditor:
 
             # 2. Contradiction: Power (W / kW)
             power_param = _to_float(row.get("filteringProperty:Príkon (W)"))
-            kw_match = _POWER_KW_RE.search(full_text)
-            if kw_match and power_param is not None:
-                kw_val = float(kw_match.group(1).replace(",", "."))
-                w_from_kw = kw_val * 1000
-                # Allow 5% tolerance for rounding (e.g. 0.52 kW vs 508 W)
-                if abs(w_from_kw - power_param) / max(power_param, 1) > 0.15:
-                    issues.append(
-                        {
-                            "code": code,
-                            "name": name,
-                            "category": cat,
-                            "source": source,
-                            "field": "Príkon (W)",
-                            "detected_in_text": f"{kw_val} kW ({w_from_kw:.0f} W)",
-                            "param_value": f"{power_param:.0f}",
-                            "issue_type": "TEXT_PARAM_MISMATCH",
-                            "severity": "WARNING",
-                            "description": f"Text states {kw_val} kW ({w_from_kw:.0f} W) but filter has {power_param:.0f} W",
-                        }
-                    )
+            if power_param is not None and power_param > 0:
+                kw_vals = [float(x.replace(",", ".")) * 1000 for x in _POWER_KW_RE.findall(full_text)]
+                w_vals = [float(x.replace(" ", "")) for x in _POWER_W_RE.findall(full_text)]
+                multi_vals = []
+                for count, p_str, unit in _MULTI_POWER_RE.findall(full_text):
+                    mult = 1000.0 if unit.lower() == "kw" else 1.0
+                    multi_vals.append(float(count) * float(p_str.replace(",", ".")) * mult)
+
+                split_vals = []
+                for a_str, b_str, unit in _SPLIT_SUM_RE.findall(full_text):
+                    mult = 1000.0 if unit.lower() == "kw" else 1.0
+                    split_vals.append((float(a_str.replace(",", ".")) + float(b_str.replace(",", "."))) * mult)
+
+                all_powers = kw_vals + w_vals + multi_vals + split_vals
+                if all_powers:
+                    # Check if ANY detected wattage matches within 15% tolerance
+                    matched = any(abs(v - power_param) / max(power_param, 1) <= 0.15 for v in all_powers)
+                    # Check split kW power sum (e.g. 0.24 + 0.12 kW = 0.36 kW = 360 W)
+                    if not matched and len(kw_vals) > 1:
+                        if abs(sum(kw_vals) - power_param) / max(power_param, 1) <= 0.15:
+                            matched = True
+
+                    if not matched:
+                        detected_str = f"{all_powers[0]:.0f} W" if all_powers else ""
+                        issues.append(
+                            {
+                                "code": code,
+                                "name": name,
+                                "category": cat,
+                                "source": source,
+                                "field": "Príkon (W)",
+                                "detected_in_text": detected_str,
+                                "param_value": f"{power_param:.0f}",
+                                "issue_type": "TEXT_PARAM_MISMATCH",
+                                "severity": "WARNING",
+                                "description": f"Text mentions power {detected_str} but filter has {power_param:.0f} W",
+                            }
+                        )
 
             # 3. Contradiction: Voltage (V)
             volt_param = str(row.get("filteringProperty:Napätie (V)") or "").strip()
@@ -145,38 +172,58 @@ class CatalogAuditor:
             depth_p = _to_float(row.get("filteringProperty:Hĺbka (mm)"))
             height_p = _to_float(row.get("filteringProperty:Výška (mm)"))
 
-            dims_match = _DIMS_3D_RE.search(full_text)
-            if dims_match and width_p and depth_p and height_p:
-                tw, td, th = (
-                    float(dims_match.group(1)),
-                    float(dims_match.group(2)),
-                    float(dims_match.group(3)),
-                )
-                text_dims_sorted = sorted([tw, td, th])
+            if width_p and depth_p and height_p:
                 param_dims_sorted = sorted([width_p, depth_p, height_p])
-                # Check if dimensions diverge significantly (>20mm)
-                diffs = [abs(a - b) for a, b in zip(text_dims_sorted, param_dims_sorted)]
-                if any(d > 25 for d in diffs):
-                    issues.append(
-                        {
-                            "code": code,
-                            "name": name,
-                            "category": cat,
-                            "source": source,
-                            "field": "Rozmery (ŠxHxV)",
-                            "detected_in_text": f"{tw:.0f}x{td:.0f}x{th:.0f}",
-                            "param_value": f"{width_p:.0f}x{depth_p:.0f}x{height_p:.0f}",
-                            "issue_type": "TEXT_PARAM_MISMATCH",
-                            "severity": "WARNING",
-                            "description": f"Text dimensions {tw:.0f}x{td:.0f}x{th:.0f} diverge from filter {width_p:.0f}x{depth_p:.0f}x{height_p:.0f}",
-                        }
-                    )
+                raw_matches = []
+                for match in _DIMS_3D_RE.finditer(full_text):
+                    g = match.groups()
+                    unit = (g[3] or "mm").lower()
+                    mult = 10.0 if unit == "cm" else 1.0
+                    dims = [float(g[i].replace(" ", "")) * mult for i in range(3)]
+                    start, end = match.start(), match.end()
+                    surrounding = full_text[max(0, start - 50) : min(len(full_text), end + 50)]
+                    is_sub = bool(_SUB_COMPONENTS_RE.search(surrounding))
+                    raw_matches.append((dims, is_sub))
+
+                if raw_matches:
+                    # 4a. Check if ANY detected 3D dimension matches filter parameters within 20mm
+                    any_matched = False
+                    for dims, _ in raw_matches:
+                        diffs = [abs(a - b) for a, b in zip(sorted(dims), param_dims_sorted)]
+                        if all(d <= 20 for d in diffs):
+                            any_matched = True
+                            break
+
+                    if not any_matched:
+                        # 4b. Check if non-sub-component matches exist
+                        non_sub = [dims for dims, is_sub in raw_matches if not is_sub]
+                        if non_sub:
+                            tw, td, th = non_sub[0]
+                            issues.append(
+                                {
+                                    "code": code,
+                                    "name": name,
+                                    "category": cat,
+                                    "source": source,
+                                    "field": "Rozmery (ŠxHxV)",
+                                    "detected_in_text": f"{tw:.0f}x{td:.0f}x{th:.0f}",
+                                    "param_value": f"{width_p:.0f}x{depth_p:.0f}x{height_p:.0f}",
+                                    "issue_type": "TEXT_PARAM_MISMATCH",
+                                    "severity": "WARNING",
+                                    "description": f"Text dimensions {tw:.0f}x{td:.0f}x{th:.0f} diverge from filter {width_p:.0f}x{depth_p:.0f}x{height_p:.0f}",
+                                }
+                            )
 
             # 5. Geometric Sanity: Volume vs External Dimensions
             vol_p = _to_float(row.get("filteringProperty:Objem (l)"))
             if vol_p and width_p and depth_p and height_p:
                 gross_volume_l = (width_p * depth_p * height_p) / 1_000_000.0
-                if gross_volume_l > 0:
+                is_immersion = bool(
+                    re.search(
+                        r"(sous-vide|cirkul[aá]tor|ponorn[yý]|termocirkul[aá]tor)", f"{name} {cat}", re.IGNORECASE
+                    )
+                )
+                if gross_volume_l > 0 and not is_immersion:
                     # Inner net volume cannot exceed external gross volume!
                     if vol_p > gross_volume_l * 1.05:  # Allow 5% tolerance for slight dim rounding
                         issues.append(
