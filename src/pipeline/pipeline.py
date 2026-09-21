@@ -23,6 +23,7 @@ from src.domain.ports.repositories import ProductRepositoryPort, RunRepositoryPo
 from src.domain.ports.resolution import CallbackResolution, UserResolutionPort
 from src.domain.pricing.pricing_service import PricingService
 from src.domain.products.merger import ProductMerger
+from src.domain.products.variant_service import CatalogVariantService
 from src.domain.transform.output_transformer import OutputTransformer
 from src.pipeline.scraping import ScrapingOrchestrator
 from src.pipeline.use_cases import (
@@ -58,6 +59,7 @@ class Pipeline:
         scraping: Optional[ScraperGatewayPort] = None,
         feed_gateway: Optional[FeedGatewayPort] = None,
         excel_io: Optional[ExcelIOPort] = None,
+        variant_service: Optional[CatalogVariantService] = None,
     ):
         self.config = config
         db_path = config.get("db_path", "data/products.db")
@@ -73,6 +75,7 @@ class Pipeline:
         self.scraping = scraping or ScrapingOrchestrator(config)
         self.feed_gateway = feed_gateway
         self.excel_io = excel_io
+        self.variant_service = variant_service or CatalogVariantService()
 
         # Initialize Use Cases
         self.sync_use_case = SyncCatalogUseCase(
@@ -85,6 +88,7 @@ class Pipeline:
             scraper_gateway=self.scraping,
             ai_enricher=self.enricher,
             excel_io=self.excel_io,
+            variant_service=self.variant_service,
             config=self.config,
         )
 

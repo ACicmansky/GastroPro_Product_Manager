@@ -238,3 +238,56 @@ def test_event_sink_ports():
     console_sink.emit_progress("console progress")
     console_sink.emit_stage("merge")
     console_sink.emit_ai_progress(2, 5, "console ai")
+
+
+def test_sync_catalog_use_case_applies_variant_pairing(config):
+    """SyncCatalogUseCase applies CatalogVariantService before export and save."""
+    sample_df = pd.DataFrame(
+        [
+            {
+                "code": "CONTI BAR",
+                "name": "CONTI BAR",
+                "price": "100.00",
+                "defaultCategory": "Podnože",
+                "source": "core",
+            },
+            {
+                "code": "CONTI DINING",
+                "name": "CONTI DINING",
+                "price": "80.00",
+                "defaultCategory": "Podnože",
+                "source": "core",
+            },
+        ]
+    )
+    repo = InMemoryProductRepository(sample_df)
+    feed_gw = MockFeedGateway({})
+    mock_excel = MockExcelIO()
+    test_config = dict(config)
+    test_config["xml_feeds"] = {}
+
+    use_case = SyncCatalogUseCase(
+        product_repo=repo,
+        merger=ProductMerger(),
+        category_service=CategoryService(),
+        transformer=OutputTransformer(test_config),
+        pricing_service=PricingService(),
+        feed_gateway=feed_gw,
+        excel_io=mock_excel,
+        config=test_config,
+    )
+
+    options = PipelineOptions(output_path="out/output_variants.xlsx")
+    use_case.execute(options)
+
+    # Check written Excel
+    written_df = mock_excel.written["out/output_variants.xlsx"]
+    assert "pairCode" in written_df.columns
+    assert "variant:Prevedenie" in written_df.columns
+    assert written_df.loc[0, "pairCode"] == "CONTI"
+    assert written_df.loc[1, "pairCode"] == "CONTI"
+    assert written_df.loc[0, "variantVisibility"] == "1"
+
+    # Check database upserted data
+    upserted_df = repo.get_all()
+    assert upserted_df.loc[0, "pairCode"] == "CONTI"

@@ -278,3 +278,41 @@ class CatalogVariantService:
 
         breakdown = (part1_updates, part2_updates, part3_updates)
         return all_updates, stats, breakdown
+
+    def apply_to_dataframe(self, df: Any) -> Any:
+        """Apply variant pairing and parameter extraction directly to a pandas DataFrame."""
+        import pandas as pd
+
+        if df.empty or "code" not in df.columns:
+            return df
+
+        df = df.copy()
+        products_dict = {
+            str(row["code"]).strip(): row.dropna().to_dict()
+            for _, row in df.iterrows()
+            if pd.notna(row.get("code")) and str(row.get("code")).strip()
+        }
+
+        all_updates, stats, _ = self.generate_all_updates(products_dict)
+        if not all_updates:
+            return df
+
+        # Vectorized application via code mapping per updated column
+        col_mappings: Dict[str, Dict[str, Any]] = defaultdict(dict)
+        for code, upd_dict in all_updates.items():
+            for col_name, val in upd_dict.items():
+                col_mappings[col_name][code] = val
+
+        for col_name, code_val_map in col_mappings.items():
+            if col_name not in df.columns:
+                df[col_name] = ""
+            mapped_series = df["code"].map(code_val_map)
+            update_mask = mapped_series.notna()
+            df.loc[update_mask, col_name] = mapped_series[update_mask]
+
+        logger.info(
+            "Applied variant pairing: %d paired across %d families.",
+            stats.get("total_products_paired", 0),
+            stats.get("mebella_families_created", 0) + stats.get("dim_groups_created", 0),
+        )
+        return df

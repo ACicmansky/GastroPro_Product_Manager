@@ -20,6 +20,7 @@ from src.domain.ports.resolution import AutoSkipResolution, UserResolutionPort
 from src.domain.pricing.pricing_service import PricingService
 from src.domain.products.feed_specs import apply_feed_specs
 from src.domain.products.merger import ProductMerger
+from src.domain.products.variant_service import CatalogVariantService
 from src.domain.transform.output_transformer import OutputTransformer
 
 logger = logging.getLogger(__name__)
@@ -62,6 +63,7 @@ class SyncCatalogUseCase:
         scraper_gateway: Optional[ScraperGatewayPort] = None,
         ai_enricher: Optional[AiEnricherPort] = None,
         excel_io: Optional[ExcelIOPort] = None,
+        variant_service: Optional[CatalogVariantService] = None,
         config: Optional[Dict] = None,
     ):
         self.repo = product_repo
@@ -73,6 +75,7 @@ class SyncCatalogUseCase:
         self.scraper_gateway = scraper_gateway
         self.ai_enricher = ai_enricher
         self.excel_io = excel_io or DefaultExcelIO()
+        self.variant_service = variant_service or CatalogVariantService()
         self.config = config or {}
 
     def execute(
@@ -214,6 +217,10 @@ class SyncCatalogUseCase:
 
         # 8b. Structured feed specs override AI-extracted dims/weight
         merged_df = apply_feed_specs(merged_df)
+
+        # 8c. Pair product variants and extract variant parameters
+        events.emit_progress("Pairing catalog product variants...")
+        merged_df = self.variant_service.apply_to_dataframe(merged_df)
 
         # 9. Transform to output format
         events.emit_stage("export")
