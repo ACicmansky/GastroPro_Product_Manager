@@ -234,22 +234,27 @@ class ProductMerger:
         return count
 
 
-VALID_SUFFIXES = {"BAR", "DINING", "COFFEE"}
+VALID_SUFFIXES = {"BAR", "DINING", "COFFEE", "LOUNGE"}
 
 
 def get_pair_code(code) -> str:
-    """Extract pair code by removing variant suffix.
+    """Extract pair code by removing variant suffix (e.g. BAR, DINING, COFFEE, LOUNGE).
 
-    Products with suffixes like 'BAR', 'DINING', 'COFFEE' are variants
-    of a base product. This returns the base code without the suffix.
+    Products with suffixes or keywords like 'BAR', 'DINING', 'COFFEE' are variants
+    of a base product. This returns the base code without the variant keyword.
 
-    Returns empty string if code has no valid variant suffix.
+    Returns empty string if code has no valid variant keyword.
     """
+    import re
+
     code_str = str(code).strip() if code is not None else ""
     if not code_str:
         return ""
 
-    parts = code_str.split()
-    if len(parts) > 1 and parts[-1] in VALID_SUFFIXES:
-        return " ".join(parts[:-1])
-    return ""
+    pattern = r"\b(" + "|".join(sorted(VALID_SUFFIXES)) + r")\b"
+    if not re.search(pattern, code_str, flags=re.IGNORECASE):
+        return ""
+
+    base = re.sub(pattern, "", code_str, count=1, flags=re.IGNORECASE)
+    base = re.sub(r"\s+", " ", base).strip()
+    return base

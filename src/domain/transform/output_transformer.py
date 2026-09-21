@@ -67,6 +67,9 @@ class OutputTransformer:
         # 6. Apply default values
         output_df = self.apply_default_values(output_df)
 
+        # 7. Update variant visibility based on pairCode
+        output_df = self._update_variantVisibility(output_df)
+
         logger.info(f"Transformation complete: {len(output_df.columns)} columns, {len(output_df)} rows")
 
         return output_df
@@ -109,6 +112,11 @@ class OutputTransformer:
         # Forward dynamic filtering properties extracted by AI or feeds
         for col in df.columns:
             if col.startswith("filteringProperty:") and col not in cols_dict:
+                cols_dict[col] = df[col]
+
+        # Forward dynamic variant parameter properties (e.g. variant:Rozmer, variant:Prevedenie)
+        for col in df.columns:
+            if col.startswith("variant:") and col not in cols_dict:
                 cols_dict[col] = df[col]
 
         output_df = pd.DataFrame(cols_dict, index=df.index)
@@ -262,7 +270,10 @@ class OutputTransformer:
         return df
 
     def _update_variantVisibility(self, df: pd.DataFrame) -> pd.DataFrame:
-        df.loc[df["pairCode"] != "", "variantVisibility"] = "1"
+        if "pairCode" in df.columns and "variantVisibility" in df.columns:
+            pair_series = df["pairCode"].fillna("").astype(str).str.strip()
+            mask = (pair_series != "") & (~pair_series.isin(["nan", "None"]))
+            df.loc[mask, "variantVisibility"] = "1"
         return df
 
     def _ensure_all_columns(self, df: pd.DataFrame) -> pd.DataFrame:
@@ -291,8 +302,12 @@ class OutputTransformer:
         # Keep important tracking columns that might not be in the config output list
         internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
 
-        # Keep dynamic filtering properties extracted by AI
-        dynamic_cols = [col for col in df.columns if col.startswith("filteringProperty:") and col not in required_cols]
+        # Keep dynamic filtering properties extracted by AI and variant parameters
+        dynamic_cols = [
+            col
+            for col in df.columns
+            if (col.startswith("filteringProperty:") or col.startswith("variant:")) and col not in required_cols
+        ]
 
         extra_cols = dynamic_cols + [col for col in internal_tracking if col in df.columns and col not in required_cols]
 

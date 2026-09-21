@@ -55,6 +55,14 @@
 - ✅ AI tracking columns in output (`aiProcessed`, `aiProcessedDate`)
 
 ## Recently Completed (September 2026)
+- ✅ **Catalog Product Variant Pairing & pairCode Normalization**
+  - Resolved corrupt legacy float `pairCode` artifacts (`1.0` - `21.0`), mapping cold room and furniture series to canonical codes (`BT100`, `TN70`, `GAUS10`, etc.) and clearing 3 singletons.
+  - Implemented `CatalogVariantService` (`src/domain/products/variant_service.py`): paired 156 multi-height Mebella table base families (426 items) with `variant:Prevedenie` (`Barová výška...`), and 155 strict dimension families (1,103 equipment items) with `variant:Rozmer`.
+  - Updated `OutputTransformer` (`src/domain/transform/output_transformer.py`) to forward all dynamic `variant:*` columns and activate `variantVisibility = "1"`.
+  - Created `scripts/populate_catalog_variants.py` with safety backup and committed updates across 2,133 products to `data/products.db`.
+  - Total catalog status: **2,130 products (21.93%) properly paired as variants**, **7,582 standalone products** keep `pairCode = ""` matching Shoptet specifications.
+  - Full test suite passing: **283 tests passing** in ~28s via `uv run poe check`.
+
 - ✅ **Multi-Tiered Product Data Verification & Accuracy Engine**
   - Traced and diagnosed upstream distributor data inaccuracies (`F840130` 70mm vs. true 60mm manufacturer insulation on `forcold.it`).
   - Built `CatalogAuditor` (`src/domain/specs/auditor.py`) and CLI `scripts/audit_catalog.py`: scanned all 9,712 products for zero cost, enhanced with sub-component exclusion, multi-dimensional evaluation, space thousands separators, decimal dimensions, dual-voltage lists, and split wattage parsing, achieving **0 issues across all 9,712 products (100.00% catalog consistency)**.

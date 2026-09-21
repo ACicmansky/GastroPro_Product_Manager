@@ -1,12 +1,16 @@
 # GastroPro Product Manager - Active Context
 
-*Last updated: 2026-09-21 (Multi-Tiered Data Verification & Accuracy Engine - Milestone Completed)*
+*Last updated: 2026-09-21 (Catalog Product Variant Pairing & pairCode Normalization - Milestone Completed)*
 
 ## Current State
 The project has achieved **State-Of-The-Art (SOTA)** status with a complete developer experience, testing, CI/CD, and packaging toolchain:
 - **Fast Tooling**: `uv` package manager, PEP 621 `pyproject.toml`, deterministic `uv.lock`, isolated `.venv`, and `poethepoet` task runner (`uv run poe ...`).
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
-- **Testing & QA**: **276 tests passing** in parallel with `pytest-xdist` (`test:fast` in ~18s), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Testing & QA**: **283 tests passing** in parallel with `pytest-xdist` (`test:fast` in ~28s), full branch coverage reporting with `pytest-cov` (`test:cov`).
+- **Catalog Product Variant Pairing & Shoptet Compliance Engine**:
+  - `CatalogVariantService` (`src/domain/products/variant_service.py`): Automated normalizer, Mebella base grouper, and dimension variant clusterer. Paired 2,130 products across 482 variant families with zero `.0` float artifacts, while leaving 7,582 standalone products empty in strict accordance with Shoptet specifications.
+  - `OutputTransformer` (`src/domain/transform/output_transformer.py`): Forwarding and preserving all dynamic `variant:*` columns (`variant:Rozmer`, `variant:Prevedenie`) in direct mappings and schema column alignment; automatically setting `variantVisibility = "1"` for all paired items.
+  - `Migration & Maintenance CLI` (`scripts/populate_catalog_variants.py`): CLI with `--dry-run`, `--apply`, and automatic SQLite database backup.
 - **Multi-Tiered Data Verification Engine**:
   - `CatalogAuditor` (`src/domain/specs/auditor.py`): Zero-cost offline scanner detecting text vs. parameter contradictions and physical impossibilities across all 9,712 products. Enhanced with sub-component recognition, multi-dimension extraction, split-power sums, space-separator handling, decimal dimensions, and multi-zone commercial range formulas. Achieved **0 discrepancies across all 9,712 products (100.00% consistency)**.
   - `GUI & CLI Audit Pipeline`: Added `🔍 Audit dát` button (`Ctrl+Shift+A`) and `CatalogAuditWorker` in GUI, plus `scripts/pipeline_cli.py audit` and `export --audit`.
