@@ -9,14 +9,14 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")
 
 from src.data.database.product_db import ProductDB
 from src.domain.specs.patcher import SpecPatcher
-from src.scrapers.oem.forcold_adapter import ForcoldAdapter
+from src.scrapers.oem import get_all_oem_adapters
 
 sys.stdout.reconfigure(encoding="utf-8")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
-def patch_single_product(code: str, db_path: str = "data/products.db"):
+def patch_single_product(code: str, db_path: str = "data/products.db", dry_run: bool = False):
     """Patch a single product using registered OEM adapters."""
     db = ProductDB(db_path)
     df = db.get_all()
@@ -29,7 +29,7 @@ def patch_single_product(code: str, db_path: str = "data/products.db"):
     name = str(row.get("name") or "")
 
     # Try adapters
-    adapters = [ForcoldAdapter()]
+    adapters = get_all_oem_adapters()
     specs = None
     adapter_name = None
     for a in adapters:
@@ -43,6 +43,16 @@ def patch_single_product(code: str, db_path: str = "data/products.db"):
         logger.warning(f"No OEM specifications found for product {code} ({name})")
         return
 
+    if dry_run:
+        _, changes = SpecPatcher.patch_product_dict(row.to_dict(), specs, verified_source=adapter_name)
+        if changes:
+            logger.info(f"[DRY RUN] Would patch {code} ({adapter_name}):")
+            for ch in changes:
+                logger.info(f"  - {ch}")
+        else:
+            logger.info(f"[DRY RUN] Product {code} is already up to date with OEM specs.")
+        return
+
     patcher = SpecPatcher(db_path=db_path)
     changes = patcher.patch_product_in_db(code, specs, verified_source=adapter_name, create_backup=True)
     if changes:
@@ -53,17 +63,18 @@ def patch_single_product(code: str, db_path: str = "data/products.db"):
         logger.info(f"Product {code} was already up to date with OEM specs.")
 
 
-def patch_all_oem_products(db_path: str = "data/products.db"):
+def patch_all_oem_products(db_path: str = "data/products.db", dry_run: bool = False):
     """Scan all products in DB and apply OEM specs where available."""
     db = ProductDB(db_path)
     df = db.get_all()
-    adapters = [ForcoldAdapter()]
+    adapters = get_all_oem_adapters()
     patcher = SpecPatcher(db_path=db_path)
 
-    total_patched = 0
+    total_matched = 0
+    total_would_patch = 0
     total_changes = 0
 
-    # Create single backup before batch
+    # Create single backup before batch if not dry run
     first = True
 
     for _, row in df.iterrows():
@@ -73,27 +84,42 @@ def patch_all_oem_products(db_path: str = "data/products.db"):
             if a.can_handle(code, name):
                 specs = a.get_specs(code, name)
                 if specs:
+                    total_matched += 1
                     source_tag = f"oem:{a.manufacturer_name.lower()}"
-                    changes = patcher.patch_product_in_db(code, specs, verified_source=source_tag, create_backup=first)
-                    first = False
-                    if changes:
-                        total_patched += 1
-                        total_changes += len(changes)
+                    if dry_run:
+                        _, changes = SpecPatcher.patch_product_dict(row.to_dict(), specs, verified_source=source_tag)
+                        if changes:
+                            total_would_patch += 1
+                            total_changes += len(changes)
+                    else:
+                        changes = patcher.patch_product_in_db(
+                            code, specs, verified_source=source_tag, create_backup=first
+                        )
+                        first = False
+                        if changes:
+                            total_would_patch += 1
+                            total_changes += len(changes)
+                    break
 
-    logger.info(f"Batch OEM patch complete: {total_patched} products updated with {total_changes} changes.")
+    action_label = "would be updated" if dry_run else "updated"
+    logger.info(
+        f"OEM scan complete: {total_matched} products matched OEM adapters, "
+        f"{total_would_patch} {action_label} with {total_changes} changes."
+    )
 
 
 def main():
     parser = argparse.ArgumentParser(description="Patch product technical specifications from verified OEM sources")
     parser.add_argument("--code", help="Single product code to patch (e.g. F840130)")
     parser.add_argument("--all-oem", action="store_true", help="Patch all products matching registered OEM adapters")
+    parser.add_argument("--dry-run", action="store_true", help="Simulate patches without modifying the database")
     parser.add_argument("--db", default="data/products.db", help="Path to SQLite database")
     args = parser.parse_args()
 
     if args.code:
-        patch_single_product(args.code, db_path=args.db)
+        patch_single_product(args.code, db_path=args.db, dry_run=args.dry_run)
     elif args.all_oem:
-        patch_all_oem_products(db_path=args.db)
+        patch_all_oem_products(db_path=args.db, dry_run=args.dry_run)
     else:
         parser.print_help()
 
