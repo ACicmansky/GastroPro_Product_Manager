@@ -1,18 +1,9 @@
 {
-  "timestamp": "2026-09-21T21:56:08.941032",
+  "timestamp": "2026-09-21T22:26:13.066364",
   "total_products_audited": 9712,
-  "total_issues_found": 13,
-  "unique_flagged_products": 13,
-  "by_severity": {
-    "INFO": 7,
-    "WARNING": 6
-  },
-  "by_issue_type": {
-    "TEXT_PARAM_MISMATCH": 13
-  },
-  "by_field": {
-    "Napätie (V)": 7,
-    "Rozmery (ŠxHxV)": 4,
-    "Príkon (W)": 2
-  }
+  "total_issues_found": 0,
+  "unique_flagged_products": 0,
+  "by_severity": {},
+  "by_issue_type": {},
+  "by_field": {}
 }

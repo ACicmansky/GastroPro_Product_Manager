@@ -19,3 +19,4 @@ logs/
 htmlcov/
 dist/
 build/
+reports/data_quality_audit_*_*.csv

@@ -20,11 +20,11 @@ _SPLIT_SUM_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s*\+\s*(\d+(?:[.,]\d+)?)\s*(k?W)\
 _VOLT_RE = re.compile(r"\b(230|400|12|24|220-240|380-415)\s*V\b", re.IGNORECASE)
 _VOLUME_RE = re.compile(r"\b(\d+)\s*(?:l|litr(?:ov|a|y)?)\b", re.IGNORECASE)
 _DIMS_3D_RE = re.compile(
-    r"(?<!\d)(\d{1,2}(?:\s+\d{3})|\d{2,4})\s*[xX*×]\s*(\d{1,2}(?:\s+\d{3})|\d{2,4})\s*[xX*×]\s*(\d{1,2}(?:\s+\d{3})|\d{2,4})\s*(mm|cm)?(?!\d)",
+    r"(?<!\d)(\d{1,2}(?:\s+\d{3})|\d+(?:[.,]\d+)?)\s*[xX*×]\s*(\d{1,2}(?:\s+\d{3})|\d+(?:[.,]\d+)?)\s*[xX*×]\s*(\d{1,2}(?:\s+\d{3})|\d+(?:[.,]\d+)?)\s*(mm|cm)?(?!\d)",
     re.IGNORECASE,
 )
 _SUB_COMPONENTS_RE = re.compile(
-    r"(drez|vani[cč]k|komor|vn[uú]torn|dutin|polic|z[aá]suvk|ro[sš]t|pieck|balen|ko[sš]|[lľ]ad|kock|kali[sš]k|vaf[lľ]|zlo[zž]en|panv|n[aá]dob)",
+    r"(drez|vani[cč]k|kom[oô]r|vn[uú]torn|dutin|polic|z[aá]suvk|ro[sš]t|pieck|balen|k[oô][sš]|[lľ]ad|kock|kali[sš]k|vaf[lľ]|zlo[zž]en|panv|n[aá]dob)",
     re.IGNORECASE,
 )
 
@@ -119,12 +119,26 @@ class CatalogAuditor:
 
                 all_powers = kw_vals + w_vals + multi_vals + split_vals
                 if all_powers:
-                    # Check if ANY detected wattage matches within 15% tolerance
+                    # 2a. Check if ANY detected wattage matches within 15% tolerance
                     matched = any(abs(v - power_param) / max(power_param, 1) <= 0.15 for v in all_powers)
-                    # Check split kW power sum (e.g. 0.24 + 0.12 kW = 0.36 kW = 360 W)
+                    # 2b. Check split kW power sum (e.g. 0.24 + 0.12 kW = 0.36 kW = 360 W)
                     if not matched and len(kw_vals) > 1:
                         if abs(sum(kw_vals) - power_param) / max(power_param, 1) <= 0.15:
                             matched = True
+
+                    # 2c. Check multi-zone / multi-burner commercial ranges (e.g. 4 zones * 3.5 kW = 14 kW)
+                    burners = _to_float(row.get("filteringProperty:Počet horákov/platní"))
+                    if not matched and burners and burners > 1:
+                        if any(abs((v * burners) - power_param) / max(power_param, 1) <= 0.15 for v in all_powers):
+                            matched = True
+                        # Combined hob + oven (e.g. 4x 2.6 kW + 7.5 kW oven = 17.9 kW)
+                        elif len(kw_vals) >= 2:
+                            for kw_a in kw_vals:
+                                for kw_b in kw_vals:
+                                    if kw_a != kw_b:
+                                        if abs((kw_a * burners + kw_b) - power_param) / max(power_param, 1) <= 0.15:
+                                            matched = True
+                                            break
 
                     if not matched:
                         detected_str = f"{all_powers[0]:.0f} W" if all_powers else ""
@@ -145,13 +159,22 @@ class CatalogAuditor:
 
             # 3. Contradiction: Voltage (V)
             volt_param = str(row.get("filteringProperty:Napätie (V)") or "").strip()
-            volt_match = _VOLT_RE.search(full_text)
-            if volt_match and volt_param and volt_param.lower() not in ("nan", ""):
-                v_text = volt_match.group(1).replace("-", "/")
-                # Normalize 220V / 230V, 380V / 400V
-                v_text_norm = "230" if "230" in v_text or "220" in v_text else v_text
-                v_param_norm = "230" if "230" in volt_param or "220" in volt_param else volt_param
-                if v_text_norm != v_param_norm and volt_param not in ("230/400", "220-240", "380-415"):
+            v_matches = _VOLT_RE.findall(full_text)
+            if v_matches and volt_param and volt_param.lower() not in ("nan", ""):
+                # Normalize voltages (220/230, 380/400)
+                norm = lambda v: "230" if "230" in v or "220" in v else ("400" if "400" in v or "380" in v else v)
+                param_norm = norm(volt_param)
+                is_dual_text = any(("230" in v and "400" in v) or ("220" in v and "380" in v) for v in v_matches)
+                is_dual_param = "230" in volt_param and "400" in volt_param
+
+                # Consistent if dual voltage on either side or if any detected voltage matches param
+                v_matched = (
+                    is_dual_text
+                    or is_dual_param
+                    or any(norm(v) == param_norm for v in v_matches)
+                    or volt_param in ("230/400", "220-240", "380-415")
+                )
+                if not v_matched:
                     issues.append(
                         {
                             "code": code,
@@ -159,11 +182,11 @@ class CatalogAuditor:
                             "category": cat,
                             "source": source,
                             "field": "Napätie (V)",
-                            "detected_in_text": v_text,
+                            "detected_in_text": v_matches[0],
                             "param_value": volt_param,
                             "issue_type": "TEXT_PARAM_MISMATCH",
                             "severity": "INFO",
-                            "description": f"Text mentions {v_text} V but filter has {volt_param} V",
+                            "description": f"Text mentions {v_matches[0]} V but filter has {volt_param} V",
                         }
                     )
 
@@ -179,7 +202,9 @@ class CatalogAuditor:
                     g = match.groups()
                     unit = (g[3] or "mm").lower()
                     mult = 10.0 if unit == "cm" else 1.0
-                    dims = [float(g[i].replace(" ", "")) * mult for i in range(3)]
+                    dims = [float(g[i].replace(" ", "").replace(",", ".")) * mult for i in range(3)]
+                    if any(d < 30 for d in dims):
+                        continue
                     start, end = match.start(), match.end()
                     surrounding = full_text[max(0, start - 50) : min(len(full_text), end + 50)]
                     is_sub = bool(_SUB_COMPONENTS_RE.search(surrounding))

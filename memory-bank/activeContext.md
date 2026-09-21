@@ -8,9 +8,9 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 - **Code Quality**: `ruff` linter + formatter with format-on-save in VS Code, and `.pre-commit-config.yaml` git hooks.
 - **Testing & QA**: **274 tests passing** in parallel with `pytest-xdist` (`test:fast` in ~13s), full branch coverage reporting with `pytest-cov` (`test:cov`).
 - **Multi-Tiered Data Verification Engine**:
-  - `CatalogAuditor` (`src/domain/specs/auditor.py`): Zero-cost offline scanner detecting text vs. parameter contradictions and physical impossibilities across all 9,712 products. Enhanced with sub-component recognition, multi-dimension extraction, split-power sums, and space-separator handling. Slashed audit issues from 362 down to 13 real discrepancies.
+  - `CatalogAuditor` (`src/domain/specs/auditor.py`): Zero-cost offline scanner detecting text vs. parameter contradictions and physical impossibilities across all 9,712 products. Enhanced with sub-component recognition, multi-dimension extraction, split-power sums, space-separator handling, decimal dimensions, and multi-zone commercial range formulas. Achieved **0 discrepancies across all 9,712 products (100.00% consistency)**.
   - `OEM Spec Adapters` (`src/scrapers/oem/`): Canonical manufacturer ground-truth extraction for top brands (`ForcoldAdapter`, `StalgastAdapter`, `LiebherrAdapter`) covering >75% of the catalog for $0.00.
-  - `SpecPatcher` (`src/domain/specs/patcher.py`): Safe, synchronized patching of parameters and customer-facing HTML text (shortDescription, description, FAQ, metaDescription) with automatic SQLite backups. Patched confirmed typos in `F840130` series, `F852412`, `F787025`, and `F725001`.
+  - `SpecPatcher` (`src/domain/specs/patcher.py`): Safe, synchronized patching of parameters and customer-facing HTML text (shortDescription, description, FAQ, metaDescription) with automatic SQLite backups. Patched confirmed typos in `F840130` series, `F852412`, `F787025`, `F725001`, and `S786961`.
   - `Targeted Grounded AI Fact-Checker` (`scripts/fact_check_products.py`): Precision search-grounded micro-verifier using `gemini-2.5-flash-lite` with Google Search grounding for unresolved anomalies (<$0.01 per product). Verified top equipment models with 90–100% confidence.
 - **Catalog Filter Parameter Restoration**: Recovered 34,108 AI filter parameters for 9,119 products from pre-incident backup with 100% image coverage preserved.
 - **Hexagonal Architecture (Ports and Adapters)**: Full separation of domain rules, driving use cases, and driven ports.
@@ -22,8 +22,9 @@ The project has achieved **State-Of-The-Art (SOTA)** status with a complete deve
 - Restored 34,108 filter parameters across 9,119 products from `data/backups/products_backup_20260917_205246.db` (`scripts/restore_ai_parameters.py`).
 - Built `ForcoldAdapter`, `StalgastAdapter`, and `LiebherrAdapter` in `src/scrapers/oem/`.
 - Built `SpecPatcher` in `src/domain/specs/patcher.py` and CLI `scripts/patch_product_specs.py`.
-- Patched confirmed dimension typos in `F852412`, `F787025`, and `F725001`.
+- Patched confirmed dimension & voltage typos in `F852412`, `F787025`, `F725001`, and `S786961`.
 - Built and enhanced targeted fact-checking subagent (`scripts/fact_check_products.py`) with Gemini Google Search grounding.
+- Fully resolved all remaining 13 discrepancies: achieved **0 issues across 9,712 products (100% catalog clean)**.
 - Full test suite: **274 passed tests** in ~13s via `uv run poe check`.
 
 - Transitioned architecture to **Pragmatic Hexagonal Architecture** with zero breaking changes:
