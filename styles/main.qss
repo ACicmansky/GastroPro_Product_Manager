@@ -97,12 +97,14 @@ QPushButton[danger="true"]:hover {
     border-color: $danger;
 }
 
-QPushButton#exportDbButton {
+QPushButton#exportDbButton,
+QPushButton#auditCatalogButton {
     font-weight: 600;
     padding: 9px 16px;
 }
 
-QPushButton#exportDbButton:hover {
+QPushButton#exportDbButton:hover,
+QPushButton#auditCatalogButton:hover {
     border-color: $accent;
     background-color: $surfaceAlt;
 }

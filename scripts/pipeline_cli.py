@@ -279,6 +279,19 @@ def cmd_export(args, config):
         result.duration_seconds,
         result.output_path,
     )
+    if getattr(args, "audit", False):
+        logger.info("Running catalog quality audit...")
+        from scripts.audit_catalog import run_catalog_audit
+
+        db_path = config.get("db_path", "data/products.db")
+        run_catalog_audit(db_path=db_path)
+
+
+def cmd_audit(args, config):
+    from scripts.audit_catalog import run_catalog_audit
+
+    db_path = config.get("db_path", "data/products.db")
+    run_catalog_audit(db_path=db_path, out_dir=args.out_dir)
 
 
 def main():
@@ -339,9 +352,14 @@ def main():
     p.add_argument("--only", nargs="*", help="feed names (default: all configured)")
     p.set_defaults(func=cmd_run)
 
+    p = sub.add_parser("audit", help="audit catalog products for data quality and spec discrepancies")
+    p.add_argument("--out-dir", default="reports", help="output directory for reports")
+    p.set_defaults(func=cmd_audit)
+
     p = sub.add_parser("export", help="export products from database directly to final xlsx format")
     p.add_argument("-o", "--out", default="out/export.xlsx", help="output file path")
     p.add_argument("--categories", nargs="*", help="optional category names to filter")
+    p.add_argument("--audit", action="store_true", help="run quality audit after export")
     p.set_defaults(func=cmd_export)
 
     args = parser.parse_args()

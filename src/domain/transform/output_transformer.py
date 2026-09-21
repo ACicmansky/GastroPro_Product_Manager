@@ -83,7 +83,7 @@ class OutputTransformer:
         """
         logger.debug("Applying direct mappings")
 
-        output_df = pd.DataFrame(index=df.index)
+        cols_dict = {}
 
         # Collect new-format column names from mappings
         new_format_cols = set(self.new_output_columns)
@@ -91,26 +91,27 @@ class OutputTransformer:
 
         for old_col, new_col in self.mappings.items():
             if old_col in df.columns and new_col != "Obrázky":
-                output_df[new_col] = df[old_col].astype(str).fillna("")
+                cols_dict[new_col] = df[old_col].astype(str).fillna("")
                 mapped_new_cols.add(new_col)
                 logger.debug(f"  Mapped: {old_col} -> {new_col}")
 
         # Preserve columns already in new format that weren't covered by mappings
         for col in df.columns:
-            if col in new_format_cols and col not in mapped_new_cols and col not in output_df.columns:
-                output_df[col] = df[col]
+            if col in new_format_cols and col not in mapped_new_cols and col not in cols_dict:
+                cols_dict[col] = df[col]
 
         # Forward internal tracking columns that shouldn't be lost
         internal_tracking = ["aiProcessed", "source", "last_updated", "images_count", "categoryMap_match"]
         for col in internal_tracking:
-            if col in df.columns and col not in output_df.columns:
-                output_df[col] = df[col]
+            if col in df.columns and col not in cols_dict:
+                cols_dict[col] = df[col]
 
         # Forward dynamic filtering properties extracted by AI or feeds
         for col in df.columns:
-            if col.startswith("filteringProperty:") and col not in output_df.columns:
-                output_df[col] = df[col]
+            if col.startswith("filteringProperty:") and col not in cols_dict:
+                cols_dict[col] = df[col]
 
+        output_df = pd.DataFrame(cols_dict, index=df.index)
         logger.debug(f"  Mapped {len(output_df.columns)} columns")
         return output_df
 
@@ -279,13 +280,10 @@ class OutputTransformer:
         # Merge schema-generated columns with any config-supplied ones
         required_cols = list(dict.fromkeys(_schema_cols() + self.new_output_columns))
 
-        missing_columns = []
-        for col in required_cols:
-            if col not in df.columns:
-                df[col] = ""
-                missing_columns.append(col)
-
+        missing_columns = [col for col in required_cols if col not in df.columns]
         if missing_columns:
+            missing_df = pd.DataFrame({col: "" for col in missing_columns}, index=df.index)
+            df = pd.concat([df, missing_df], axis=1)
             logger.debug(f"  Added {len(missing_columns)} missing columns")
         else:
             logger.debug("  All columns already present")

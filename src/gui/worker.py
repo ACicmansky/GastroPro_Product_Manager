@@ -264,3 +264,42 @@ class DBExportWorker(QObject):
             self.error.emit(str(e))
         finally:
             self.finished.emit()
+
+
+class CatalogAuditWorker(QObject):
+    """Audits products in SQLite database for contradictions and physical plausibility."""
+
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+    progress = pyqtSignal(str)
+    result = pyqtSignal(object)  # pd.DataFrame of issues
+    statistics = pyqtSignal(dict)
+
+    def __init__(self, config: Optional[Dict] = None, out_dir: str = "reports"):
+        super().__init__()
+        self.config = config or {}
+        self.out_dir = out_dir
+
+    def run(self):
+        """Called from QThread."""
+        try:
+            from scripts.audit_catalog import run_catalog_audit
+
+            db_path = self.config.get("db_path", "data/products.db") if self.config else "data/products.db"
+            issues_df = run_catalog_audit(
+                db_path=db_path,
+                out_dir=self.out_dir,
+                on_progress=lambda msg: self.progress.emit(msg),
+            )
+            self.statistics.emit(
+                {
+                    "total_issues": len(issues_df),
+                    "flagged_products": int(issues_df["code"].nunique()) if not issues_df.empty else 0,
+                }
+            )
+            self.result.emit(issues_df)
+        except Exception as e:
+            logger.error(f"Catalog audit error: {e}", exc_info=True)
+            self.error.emit(str(e))
+        finally:
+            self.finished.emit()

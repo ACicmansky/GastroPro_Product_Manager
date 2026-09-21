@@ -229,3 +229,64 @@ def test_db_export_worker_execution(tmp_path):
     assert emitted_stats[0]["total_products"] == 1
     assert len(emitted_finished) == 1
     assert os.path.exists(out_file)
+
+
+def test_audit_catalog_button_properties(window):
+    """audit_button must exist, have tooltip, and follow _set_ui_enabled."""
+    assert hasattr(window, "audit_button")
+    assert "Audit dát" in window.audit_button.text()
+    assert window.audit_button.objectName() == "auditCatalogButton"
+    assert "Ctrl+Shift+A" in window.audit_button.toolTip()
+
+    window._set_ui_enabled(False)
+    assert not window.audit_button.isEnabled()
+    window._set_ui_enabled(True)
+    assert window.audit_button.isEnabled()
+
+
+def test_catalog_audit_worker_execution(tmp_path):
+    """CatalogAuditWorker must execute run_catalog_audit and emit result, statistics, and finished."""
+    import pandas as pd
+    from src.data.database.product_db import ProductDB
+    from src.gui.worker import CatalogAuditWorker
+
+    db_path = str(tmp_path / "test_products.db")
+    db = ProductDB(db_path)
+    db.upsert(
+        pd.DataFrame(
+            [
+                {
+                    "code": "AUD1",
+                    "name": "Chladnička 600 mm",
+                    "filteringProperty:Šírka (mm)": "600",
+                }
+            ]
+        )
+    )
+
+    out_dir = str(tmp_path / "reports")
+    config = {"db_path": db_path}
+    worker = CatalogAuditWorker(config, out_dir=out_dir)
+
+    emitted_result = []
+    emitted_stats = []
+    emitted_progress = []
+    emitted_finished = []
+
+    worker.result.connect(emitted_result.append)
+    worker.statistics.connect(emitted_stats.append)
+    worker.progress.connect(emitted_progress.append)
+    worker.finished.connect(lambda: emitted_finished.append(True))
+
+    worker.run()
+
+    assert len(emitted_result) == 1
+    assert isinstance(emitted_result[0], pd.DataFrame)
+    assert len(emitted_result[0]) == 0  # no issues in clean product
+    assert len(emitted_stats) == 1
+    assert emitted_stats[0]["total_issues"] == 0
+    assert emitted_stats[0]["flagged_products"] == 0
+    assert len(emitted_progress) >= 1
+    assert len(emitted_finished) == 1
+    assert os.path.exists(os.path.join(out_dir, "data_quality_audit.csv"))
+    assert os.path.exists(os.path.join(out_dir, "data_quality_summary.json"))

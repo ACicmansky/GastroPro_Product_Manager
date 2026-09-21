@@ -36,7 +36,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QThread, QStandardPaths, QSettings, QUrl
 from PyQt5.QtGui import QKeySequence, QDesktopServices
 
-from .worker import PipelineWorker, AIResumeWorker, DBExportWorker
+from .worker import PipelineWorker, AIResumeWorker, DBExportWorker, CatalogAuditWorker
 from .widgets import CategoryMappingDialog, PriceMappingDialog
 from .toast import ToastHost
 from .settings_dialog import SettingsDialog
@@ -200,6 +200,7 @@ class MainWindow(QMainWindow):
         QShortcut(QKeySequence("Ctrl+O"), self, activated=self.select_main_data_file)
         QShortcut(QKeySequence("Ctrl+R"), self, activated=self.process_and_export)
         QShortcut(QKeySequence("Ctrl+E"), self, activated=self.export_from_db)
+        QShortcut(QKeySequence("Ctrl+Shift+A"), self, activated=self.audit_catalog)
 
     def _open_settings(self):
         dialog = SettingsDialog(self.config, parent=self)
@@ -575,8 +576,18 @@ class MainWindow(QMainWindow):
         self.export_db_button.setToolTip("Exportovať produkty z lokálnej SQLite databázy do finálneho XLSX (Ctrl+E)")
         self.export_db_button.clicked.connect(self.export_from_db)
 
+        self.audit_button = QPushButton("🔍 Audit dát")
+        self.audit_button.setObjectName("auditCatalogButton")
+        self.audit_button.setMinimumHeight(46)
+        self.audit_button.setCursor(Qt.PointingHandCursor)
+        self.audit_button.setToolTip(
+            "Skontrolovať katalóg na rozpory v rozmeroch, príkone, napätí a fyzikálnu hodnovernosť (Ctrl+Shift+A)"
+        )
+        self.audit_button.clicked.connect(self.audit_catalog)
+
         actions_layout.addWidget(self.process_button, 3)
         actions_layout.addWidget(self.export_db_button, 2)
+        actions_layout.addWidget(self.audit_button, 2)
         parent.addLayout(actions_layout)
 
     def _create_statistics_display(self, parent):
@@ -885,10 +896,60 @@ class MainWindow(QMainWindow):
         # Start export
         self.export_thread.start()
 
+    def audit_catalog(self):
+        """Run data quality and factual consistency audit on the SQLite catalog."""
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setRange(0, 0)
+        self.status_label.setText("Spúšťam audit katalógu...")
+        self.status_label.setVisible(True)
+        self._set_ui_enabled(False)
+        self.audit_button.setText("⏳ Kontrolujem...")
+
+        self.audit_thread = QThread()
+        self.audit_worker = CatalogAuditWorker(self.config)
+        self.audit_worker.moveToThread(self.audit_thread)
+
+        self.audit_thread.started.connect(self.audit_worker.run)
+        self.audit_worker.finished.connect(self.audit_thread.quit)
+        self.audit_worker.finished.connect(self.audit_worker.deleteLater)
+        self.audit_thread.finished.connect(self.audit_thread.deleteLater)
+        self.audit_worker.result.connect(self._on_audit_result)
+        self.audit_worker.error.connect(self.show_error_message)
+        self.audit_worker.progress.connect(self.update_progress)
+
+        self.audit_thread.finished.connect(lambda: self._set_ui_enabled(True))
+        self.audit_thread.finished.connect(lambda: self.progress_bar.setVisible(False))
+        self.audit_thread.finished.connect(lambda: self.status_label.setVisible(False))
+        self.audit_thread.finished.connect(lambda: self.audit_button.setText("🔍 Audit dát"))
+
+        self.audit_thread.start()
+
+    def _on_audit_result(self, issues_df):
+        count = len(issues_df)
+        if count == 0:
+            self.toasts.show(
+                "Audit úspešný: Všetky produkty sú konzistentné (0 chýb).",
+                "success",
+                duration=5000,
+            )
+            self._log("Audit katalógu dokončený: 0 nájdených nezrovnalostí.")
+        else:
+            flagged = issues_df["code"].nunique() if not issues_df.empty else 0
+            self.toasts.show(
+                f"Audit našiel {count} nezrovnalostí v {flagged} produktoch (reports/data_quality_audit.csv).",
+                "warning",
+                duration=7000,
+            )
+            self._log(
+                f"Audit katalógu: {count} nezrovnalostí v {flagged} produktoch. Správa: reports/data_quality_audit.csv",
+                error=True,
+            )
+
     def _set_ui_enabled(self, enabled: bool):
         """Enable or disable all UI inputs during processing."""
         self.process_button.setEnabled(enabled)
         self.export_db_button.setEnabled(enabled)
+        self.audit_button.setEnabled(enabled)
         # no settings edits (or a second AI run from the params tab) mid-run
         self.settings_button.setEnabled(enabled)
         self.ai_resume_button.setEnabled(enabled and self.ai_resume_button.isVisible())

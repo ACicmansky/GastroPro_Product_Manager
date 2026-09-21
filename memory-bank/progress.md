@@ -58,6 +58,14 @@
 - ✅ **Multi-Tiered Product Data Verification & Accuracy Engine**
   - Traced and diagnosed upstream distributor data inaccuracies (`F840130` 70mm vs. true 60mm manufacturer insulation on `forcold.it`).
   - Built `CatalogAuditor` (`src/domain/specs/auditor.py`) and CLI `scripts/audit_catalog.py`: scanned all 9,712 products for zero cost, enhanced with sub-component exclusion, multi-dimensional evaluation, space thousands separators, decimal dimensions, dual-voltage lists, and split wattage parsing, achieving **0 issues across all 9,712 products (100.00% catalog consistency)**.
+  - Built `ForcoldAdapter`, `StalgastAdapter`, and `LiebherrAdapter` in `src/scrapers/oem/`.
+  - Built `SpecPatcher` (`src/domain/specs/patcher.py`) and CLI `scripts/patch_product_specs.py`.
+  - Built targeted fact-checking subagent (`scripts/fact_check_products.py`) with Gemini Google Search grounding.
+  - **GUI Audit Button**: Added `🔍 Audit dát` (`#auditCatalogButton`, shortcut `Ctrl+Shift+A`) and `CatalogAuditWorker` in background `QThread`.
+  - **CLI Pipeline Audit**: Added `python scripts/pipeline_cli.py audit` and `python scripts/pipeline_cli.py export --audit`.
+  - **DataFrame Fragmentation Optimization**: Refactored `OutputTransformer.apply_direct_mappings()` and `_ensure_all_columns()` to build DataFrames in a single batch, eliminating pandas `PerformanceWarning` and speeding up 9,712×597 column transforms to 0.735s.
+  - **Debris Cleanup**: Cleaned up obsolete temporary JSONL batches and CSV files in `src/ai/tmp/`.
+  - **Full Test Suite Passing**: 276 tests passing cleanly in ~18s via `uv run poe check`.
   - Built `restore_ai_parameters.py`: recovered 34,108 AI filter parameters for 9,119 products from pre-incident backup with 100% image coverage intact.
   - Built OEM specification adapters (`src/scrapers/oem/`): `BaseOEMAdapter`, `ForcoldAdapter`, `StalgastAdapter`, and `LiebherrAdapter` (>75% catalog brand coverage for $0.00).
   - Built `SpecPatcher` (`src/domain/specs/patcher.py`) and CLI `scripts/patch_product_specs.py`: synchronized text references and filter parameters with automatic SQLite backup safety.

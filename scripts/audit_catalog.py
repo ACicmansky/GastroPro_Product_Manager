@@ -8,6 +8,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from datetime import datetime
+from typing import Callable, Optional
 
 import pandas as pd
 
@@ -20,13 +21,21 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 
 
-def run_catalog_audit(db_path: str = "data/products.db", out_dir: str = "reports") -> pd.DataFrame:
+def run_catalog_audit(
+    db_path: str = "data/products.db",
+    out_dir: str = "reports",
+    on_progress: Optional[Callable[[str], None]] = None,
+) -> pd.DataFrame:
     """Audit all products in SQLite DB and save CSV + summary JSON."""
     os.makedirs(out_dir, exist_ok=True)
+    if on_progress:
+        on_progress(f"Načítavam produkty z databázy {db_path}...")
     db = ProductDB(db_path)
     logger.info(f"Loading products from {db_path}...")
     df = db.get_all()
     logger.info(f"Loaded {len(df)} products. Running CatalogAuditor...")
+    if on_progress:
+        on_progress(f"Spúšťam audit {len(df)} produktov...")
 
     auditor = CatalogAuditor()
     issues_df = auditor.audit_dataframe(df)
@@ -53,6 +62,8 @@ def run_catalog_audit(db_path: str = "data/products.db", out_dir: str = "reports
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, indent=2, ensure_ascii=False)
 
+    if on_progress:
+        on_progress(f"Audit dokončený: {len(issues_df)} zistení.")
     logger.info(f"Audit completed: {len(issues_df)} issues found across {summary['unique_flagged_products']} products.")
     logger.info(f"Reports saved to {latest_csv} and {summary_path}")
     return issues_df
